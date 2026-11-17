@@ -1,0 +1,615 @@
+# Admin moyo — Sveltia CMS (compatible Decap CMS).
+# Chaque enregistrement crée un commit sur GitHub → Cloudflare Pages redéploie automatiquement.
+backend:
+  name: github
+  repo: VOTRE-COMPTE/moyo-site   # ← à remplacer
+  branch: main
+  commit_messages:
+    create: "contenu : ajoute {{collection}} « {{slug}} »"
+    update: "contenu : modifie {{collection}} « {{slug}} »"
+    delete: "contenu : supprime {{collection}} « {{slug}} »"
+
+locale: fr
+site_url: https://moyo.example
+media_folder: src/assets/uploads
+public_folder: ../../assets/uploads
+slug: { encoding: ascii, clean_accents: true }
+
+collections:
+  - name: projects
+    label: Projets
+    label_singular: Projet
+    folder: src/content/projects
+    extension: yaml
+    format: yaml
+    create: true
+    identifier_field: title
+    summary: "{{title}} · {{year}}"
+    sortable_fields: [order, year, title]
+    fields:
+      - { name: title, label: Titre, widget: string }
+      - { name: client, label: Client, widget: string }
+      - { name: year, label: Année, widget: number, value_type: int }
+      - name: location
+        label: Lieu
+        widget: object
+        fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }]
+      - { name: sectors, label: Secteurs, widget: relation, collection: sectors, search_fields: [title.fr], value_field: "{{slug}}", display_fields: [title.fr], multiple: true }
+      - { name: disciplines, label: Disciplines, widget: relation, collection: services, search_fields: [title.fr], value_field: "{{slug}}", display_fields: [title.fr], multiple: true }
+      - { name: cover, label: Image de couverture, widget: image }
+      - name: coverAlt
+        label: Texte alternatif de la couverture
+        widget: object
+        fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }]
+      - name: summary
+        label: Résumé
+        widget: object
+        fields: [{ name: fr, label: FR, widget: text }, { name: en, label: EN, widget: text }]
+      - name: blocks
+        label: Étude de cas (blocs)
+        widget: list
+        types:
+          - name: text
+            label: Texte
+            fields:
+              - { name: title, label: Intertitre, widget: object, required: false, fields: [{ name: fr, label: FR, widget: string, required: false }, { name: en, label: EN, widget: string, required: false }] }
+              - { name: body, label: Texte, widget: object, fields: [{ name: fr, label: FR, widget: text }, { name: en, label: EN, widget: text }] }
+          - name: image
+            label: Image
+            fields:
+              - { name: src, label: Image, widget: image }
+              - { name: layout, label: Format, widget: select, options: [{ label: Pleine largeur, value: full }, { label: En retrait, value: inset }], default: full }
+              - { name: alt, label: Texte alternatif, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+          - name: diptych
+            label: Deux images
+            fields:
+              - { name: left, label: Image gauche, widget: image }
+              - { name: right, label: Image droite, widget: image }
+              - { name: alt, label: Texte alternatif, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+          - name: video
+            label: Vidéo
+            fields:
+              - { name: url, label: "URL du fichier MP4 (Cloudflare R2 / Stream)", widget: string }
+              - { name: caption, label: Légende, widget: object, required: false, fields: [{ name: fr, label: FR, widget: string, required: false }, { name: en, label: EN, widget: string, required: false }] }
+          - name: quote
+            label: Citation
+            fields:
+              - { name: body, label: Citation, widget: object, fields: [{ name: fr, label: FR, widget: text }, { name: en, label: EN, widget: text }] }
+              - { name: author, label: Auteur, widget: string, required: false }
+      - name: credits
+        label: Crédits
+        widget: list
+        required: false
+        fields:
+          - { name: role, label: Rôle, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+          - { name: name, label: Nom, widget: string }
+      - { name: featured, label: "Mis en avant sur l'accueil", widget: boolean, default: false }
+      - { name: order, label: "Ordre d'affichage", widget: number, value_type: int, default: 0 }
+      - { name: placeholder, label: "Projet d'exemple (affiche la mention « exemple »)", widget: boolean, default: false }
+      - { name: draft, label: Brouillon (non publié), widget: boolean, default: false }
+
+  - name: services
+    label: Services
+    label_singular: Service
+    folder: src/content/services
+    extension: yaml
+    format: yaml
+    create: true
+    identifier_field: title.fr
+    summary: "{{title.fr}}"
+    sortable_fields: [order]
+    fields:
+      - { name: title, label: Nom, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+      - { name: short, label: Accroche, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+      - { name: description, label: Description, widget: object, fields: [{ name: fr, label: FR, widget: text }, { name: en, label: EN, widget: text }] }
+      - name: deliverables
+        label: Livrables
+        widget: list
+        fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }]
+      - { name: order, label: Ordre, widget: number, value_type: int, default: 0 }
+      - { name: draft, label: Masqué, widget: boolean, default: false }
+
+  - name: sectors
+    label: Secteurs
+    label_singular: Secteur
+    folder: src/content/sectors
+    extension: yaml
+    format: yaml
+    create: true
+    identifier_field: title.fr
+    summary: "{{title.fr}}"
+    fields:
+      - { name: title, label: Nom, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+      - { name: line, label: Phrase, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+      - name: theme
+        label: Ambiance visuelle des pages projet
+        widget: select
+        options:
+          - { label: "Luxe — laiton sur nuit", value: luxe }
+          - { label: "Hôtellerie — pierre de l'Estérel", value: hotellerie }
+          - { label: "Yachting — bleu de nuit", value: yachting }
+          - { label: "Événementiel — lumière de scène", value: evenementiel }
+          - { label: "Startup — métal liquide", value: startup }
+      - { name: order, label: Ordre, widget: number, value_type: int, default: 0 }
+
+  - name: team
+    label: Équipe
+    label_singular: Membre
+    folder: src/content/team
+    extension: yaml
+    format: yaml
+    create: true
+    identifier_field: name
+    fields:
+      - { name: name, label: Nom, widget: string }
+      - { name: role, label: Rôle, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+      - { name: order, label: Ordre, widget: number, value_type: int, default: 0 }
+      - { name: placeholder, label: Exemple, widget: boolean, default: false }
+
+  - name: partners
+    label: Clients & réseau
+    label_singular: Entrée
+    folder: src/content/partners
+    extension: yaml
+    format: yaml
+    create: true
+    identifier_field: name
+    fields:
+      - { name: name, label: Nom, widget: string }
+      - { name: kind, label: Type, widget: select, options: [{ label: Client, value: client }, { label: Partenaire du réseau, value: partner }] }
+      - { name: field, label: Domaine, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+      - { name: url, label: Site web, widget: string, required: false }
+      - { name: order, label: Ordre, widget: number, value_type: int, default: 0 }
+      - { name: placeholder, label: Exemple, widget: boolean, default: false }
+
+  - name: settings
+    label: Réglages
+    files:
+      - name: site
+        label: Coordonnées, showreel & SEO
+        file: src/content/settings/site.yaml
+        fields:
+          - { name: email, label: E-mail, widget: string }
+          - { name: phone, label: Téléphone, widget: string, required: false }
+          - { name: region, label: Région, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+          - { name: coordinates, label: Coordonnées affichées, widget: string }
+          - { name: socials, label: Réseaux sociaux, widget: list, fields: [{ name: label, label: Nom, widget: string }, { name: url, label: URL, widget: string }] }
+          - name: showreel
+            label: Showreel
+            widget: object
+            fields:
+              - { name: mode, label: Affichage, widget: select, options: [{ label: Masqué, value: hidden }, { label: Emplacement réservé, value: teaser }, { label: Vidéo, value: video }] }
+              - { name: url, label: "URL de la vidéo (MP4)", widget: string, required: false }
+              - { name: title, label: Titre, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+          - name: seo
+            label: SEO
+            widget: object
+            fields:
+              - { name: title, label: Titre, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
+              - { name: description, label: Description, widget: object, fields: [{ name: fr, label: FR, widget: text }, { name: en, label: EN, widget: text }] }
+
+  - name: pages
+    label: Textes des pages
+    files:
+    - name: contact
+      label: Contact
+      file: src/content/pages/contact.yaml
+      fields:
+      - name: title
+        label: Title
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+      - name: text
+        label: Text
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: text
+        - name: en
+          label: EN
+          widget: text
+    - name: home
+      label: Accueil
+      file: src/content/pages/home.yaml
+      fields:
+      - name: hero
+        label: Hero
+        widget: object
+        fields:
+        - name: line
+          label: Line
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: scroll
+          label: Scroll
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+      - name: manifesto
+        label: Manifesto
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: text
+        - name: en
+          label: EN
+          widget: text
+      - name: work
+        label: Work
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: all
+          label: All
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+      - name: services
+        label: Services
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: text
+          label: Text
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: text
+          - name: en
+            label: EN
+            widget: text
+      - name: sectors
+        label: Sectors
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+      - name: clients
+        label: Clients
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+      - name: cta
+        label: Cta
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: text
+          label: Text
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+    - name: legal
+      label: Mentions légales
+      file: src/content/pages/legal.yaml
+      fields:
+      - name: title
+        label: Title
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+      - name: updated
+        label: Updated
+        widget: string
+      - name: body
+        label: Body
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: markdown
+        - name: en
+          label: EN
+          widget: markdown
+    - name: notfound
+      label: Page 404
+      file: src/content/pages/notfound.yaml
+      fields:
+      - name: title
+        label: Title
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+      - name: text
+        label: Text
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+    - name: privacy
+      label: Confidentialité
+      file: src/content/pages/privacy.yaml
+      fields:
+      - name: title
+        label: Title
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+      - name: updated
+        label: Updated
+        widget: string
+      - name: body
+        label: Body
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: markdown
+        - name: en
+          label: EN
+          widget: markdown
+    - name: services
+      label: Services
+      file: src/content/pages/services.yaml
+      fields:
+      - name: title
+        label: Title
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+      - name: intro
+        label: Intro
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: text
+        - name: en
+          label: EN
+          widget: text
+      - name: process
+        label: Process
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: steps
+          label: Steps
+          widget: list
+          fields:
+          - name: title
+            label: Title
+            widget: object
+            fields:
+            - name: fr
+              label: FR
+              widget: string
+            - name: en
+              label: EN
+              widget: string
+          - name: text
+            label: Text
+            widget: object
+            fields:
+            - name: fr
+              label: FR
+              widget: string
+            - name: en
+              label: EN
+              widget: string
+      - name: pricing
+        label: Pricing
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+    - name: studio
+      label: Studio
+      file: src/content/pages/studio.yaml
+      fields:
+      - name: title
+        label: Title
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: string
+        - name: en
+          label: EN
+          widget: string
+      - name: lead
+        label: Lead
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: text
+        - name: en
+          label: EN
+          widget: text
+      - name: story
+        label: Story
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: text
+        - name: en
+          label: EN
+          widget: text
+      - name: values
+        label: Values
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: items
+          label: Items
+          widget: list
+          fields:
+          - name: title
+            label: Title
+            widget: object
+            fields:
+            - name: fr
+              label: FR
+              widget: string
+            - name: en
+              label: EN
+              widget: string
+          - name: text
+            label: Text
+            widget: object
+            fields:
+            - name: fr
+              label: FR
+              widget: string
+            - name: en
+              label: EN
+              widget: string
+      - name: team
+        label: Team
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+      - name: network
+        label: Network
+        widget: object
+        fields:
+        - name: title
+          label: Title
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: text
+          label: Text
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: text
+          - name: en
+            label: EN
+            widget: text

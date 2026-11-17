@@ -1,0 +1,98 @@
+---
+import '../styles/tokens.css';
+import '../styles/site.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { type Lang, type RouteKey, type T, ui } from '../i18n/ui';
+import { getSettings } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  current?: RouteKey;
+  /** Chemins équivalents dans chaque langue (sélecteur + hreflang) */
+  alternates: T;
+  sector?: string;
+  image?: string;
+  jsonld?: Record<string, unknown>;
+}
+const { lang, title, description, current, alternates, sector, image, jsonld } = Astro.props;
+const settings = await getSettings();
+const fullTitle = title ? `${title} · moyo` : settings.seo.title[lang];
+const desc = description || settings.seo.description[lang];
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const canonical = site + Astro.url.pathname;
+const ogImage = site + (image || '/og.jpg');
+const preview = import.meta.env.PUBLIC_PREVIEW === 'true';
+const defaultDa = import.meta.env.PUBLIC_DA || 'nocturne';
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'moyo',
+  url: site + '/',
+  email: settings.email,
+  description: settings.seo.description[lang],
+  areaServed: ['Côte d\'Azur', 'Monaco', 'Nice', 'Cannes', 'Antibes', 'Saint-Tropez', 'France'].map((n) => ({ '@type': 'Place', name: n })),
+  address: { '@type': 'PostalAddress', addressRegion: 'Provence-Alpes-Côte d\'Azur', addressCountry: 'FR' },
+  knowsLanguage: ['fr', 'en'],
+};
+---
+<!doctype html>
+<html lang={lang} data-da={defaultDa} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="fr" href={site + alternates.fr} />
+    <link rel="alternate" hreflang="en" href={site + alternates.en} />
+    <link rel="alternate" hreflang="x-default" href={site + alternates.fr} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="moyo" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_GB'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0b1424" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {preview && <meta name="robots" content="noindex" />}
+    <script is:inline define:vars={{ defaultDa, preview }}>
+      (function () {
+        var d = document.documentElement, da = defaultDa, t = null;
+        d.classList.add('js');
+        try {
+          if (preview) da = new URLSearchParams(location.search).get('da') || localStorage.getItem('moyo-da') || da;
+          t = localStorage.getItem('moyo-theme');
+        } catch (e) {}
+        var native = { nocturne: 'dark', atelier: 'light', argent: 'dark' };
+        d.dataset.da = native[da] ? da : 'nocturne';
+        d.dataset.theme = t === 'light' || t === 'dark' ? t : native[d.dataset.da];
+      })();
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld ?? org)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">{ui('skip', lang)}</a>
+    <Header lang={lang} current={current} alternates={alternates} />
+    <main id="main" data-sector={sector}>
+      <slot />
+    </main>
+    <Footer lang={lang} alternates={alternates} />
+    <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+    {preview && (
+      <div class="da-switch" role="group" aria-label="Piste de direction artistique">
+        <span>Piste</span>
+        <button type="button" data-da-set="nocturne" aria-pressed="false">Nocturne</button>
+        <button type="button" data-da-set="atelier" aria-pressed="false">Atelier</button>
+        <button type="button" data-da-set="argent" aria-pressed="false">Argent</button>
+      </div>
+    )}
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

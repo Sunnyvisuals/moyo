@@ -1,0 +1,21 @@
+---
+import { type Lang, ui } from '../i18n/ui';
+interface Props { lang: Lang; line: string; region: string; coordinates: string; mark?: string; focus?: number; tag?: 'h1' | 'p' }
+const { lang, line, region, coordinates, mark = 'moyo', focus = 1, tag = 'h1' } = Astro.props;
+const Tag = tag;
+---
+<section class="hero" data-focus="pending" data-hero data-hero-focus={focus}>
+  <div class="hero__scene" aria-hidden="true">
+    <div class="hero__poster"></div>
+    <canvas data-gl></canvas>
+  </div>
+  <div class="hero__top">
+    <p class="hero__line">{line}</p>
+    <p class="hero__meta">
+      <span>{region}</span>
+      <span>{coordinates}</span>
+      <span>{ui('localTime', lang)} <time data-clock>--:--</time></span>
+    </p>
+  </div>
+  <Tag class="hero__mark wordmark">{mark}<span class="sr-only">, {line}</span></Tag>
+</section>

@@ -1,0 +1,36 @@
+title: "Hôtel Calcaire"
+client: "Hôtel Calcaire"
+year: 2025
+location: { fr: "Èze", en: "Èze" }
+sectors: [hotellerie]
+disciplines: [identite, web-design, production-video]
+cover: ../../assets/uploads/calcaire-0.jpg
+coverAlt: { fr: "Lumière de persiennes sur un mur de pierre", en: "Shutter light on a stone wall" }
+summary:
+  fr: "Vingt-deux chambres taillées dans la roche. Une identité aussi calme que le lieu."
+  en: "Twenty-two rooms carved into the rock. An identity as calm as the place."
+featured: true
+order: 4
+placeholder: true
+blocks:
+  - type: text
+    title: { fr: "Le contexte", en: "Context" }
+    body:
+      fr: "Pour sa réouverture, l'hôtel voulait parler à une clientèle qui fuit le bruit. Nous avons travaillé la lumière du lieu comme matière première : des persiennes, de la pierre, des heures précises. Le site se lit comme une journée sur place."
+      en: "For its reopening, the hotel wanted to speak to guests who run from noise. We used the light of the place as raw material: shutters, stone, precise hours of the day. The website reads like a day on site."
+  - type: image
+    layout: full
+    src: ../../assets/uploads/calcaire-1.jpg
+    alt: { fr: "Lumière de persiennes sur un mur de pierre", en: "Shutter light on a stone wall" }
+  - type: quote
+    body:
+      fr: "Le site donne envie de ne rien faire, ce qui est exactement le but."
+      en: "The website makes you want to do nothing, which is exactly the point."
+    author: "Hôtel Calcaire"
+  - type: diptych
+    left: ../../assets/uploads/calcaire-2.jpg
+    right: ../../assets/uploads/calcaire-3.jpg
+    alt: { fr: "Détails du projet", en: "Project details" }
+credits:
+  - { role: { fr: "Direction artistique", en: "Art direction" }, name: "moyo" }
+  - { role: { fr: "Client", en: "Client" }, name: "Hôtel Calcaire" }

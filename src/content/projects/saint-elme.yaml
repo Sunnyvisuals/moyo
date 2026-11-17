@@ -1,0 +1,36 @@
+title: "Marina Saint-Elme"
+client: "Marina Saint-Elme"
+year: 2025
+location: { fr: "Villefranche-sur-Mer", en: "Villefranche-sur-Mer" }
+sectors: [yachting]
+disciplines: [identite, design-graphique, social-media]
+cover: ../../assets/uploads/saint-elme-0.jpg
+coverAlt: { fr: "Lumières du port la nuit, reflétées dans l'eau", en: "Harbour lights at night reflected in the water" }
+summary:
+  fr: "Une marina historique, une signalétique entière, une présence en ligne à reconstruire."
+  en: "A historic marina, a complete signage system, an online presence to rebuild."
+featured: false
+order: 6
+placeholder: true
+blocks:
+  - type: text
+    title: { fr: "Le contexte", en: "Context" }
+    body:
+      fr: "Quatre cents anneaux, des visiteurs de vingt nationalités et aucune signalétique cohérente. Nous avons dessiné un système de pictogrammes et de typographie lisible de jour comme de nuit, puis la ligne éditoriale de la marina sur les réseaux."
+      en: "Four hundred berths, visitors of twenty nationalities and no coherent signage. We designed a system of pictograms and typography readable by day and by night, then the marina's editorial line on social media."
+  - type: image
+    layout: full
+    src: ../../assets/uploads/saint-elme-1.jpg
+    alt: { fr: "Lumières du port la nuit, reflétées dans l'eau", en: "Harbour lights at night reflected in the water" }
+  - type: quote
+    body:
+      fr: "Les plaisanciers trouvent enfin la capitainerie."
+      en: "Boaters can finally find the harbour office."
+    author: "Marina Saint-Elme"
+  - type: diptych
+    left: ../../assets/uploads/saint-elme-2.jpg
+    right: ../../assets/uploads/saint-elme-3.jpg
+    alt: { fr: "Détails du projet", en: "Project details" }
+credits:
+  - { role: { fr: "Direction artistique", en: "Art direction" }, name: "moyo" }
+  - { role: { fr: "Client", en: "Client" }, name: "Marina Saint-Elme" }

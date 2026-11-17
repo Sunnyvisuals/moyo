@@ -1,0 +1,5 @@
+order: 11
+name: "Atelier Fil d'Or"
+kind: partner
+field: { fr: "Impression d'art", en: "Fine-art printing" }
+placeholder: true

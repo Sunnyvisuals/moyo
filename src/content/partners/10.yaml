@@ -1,0 +1,5 @@
+order: 10
+name: "Studio Basse Corniche"
+kind: partner
+field: { fr: "Son & mixage", en: "Sound & mixing" }
+placeholder: true

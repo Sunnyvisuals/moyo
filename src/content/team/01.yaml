@@ -1,0 +1,4 @@
+order: 1
+name: "Prénom Nom"
+role: { fr: "Fondation & direction artistique", en: "Founder & art direction" }
+placeholder: true

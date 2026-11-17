@@ -1,0 +1,5 @@
+order: 9
+name: "Collectif Lumen"
+kind: partner
+field: { fr: "Chefs opérateurs", en: "Cinematographers" }
+placeholder: true

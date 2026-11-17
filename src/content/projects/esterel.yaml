@@ -1,0 +1,36 @@
+title: "Nuit d'Estérel"
+client: "Fondation Estérel"
+year: 2025
+location: { fr: "Saint-Raphaël", en: "Saint-Raphaël" }
+sectors: [evenementiel]
+disciplines: [evenementiel, audiovisuel, motion]
+cover: ../../assets/uploads/esterel-0.jpg
+coverAlt: { fr: "Faisceaux de lumière magenta sur une scène", en: "Magenta light beams on a stage" }
+summary:
+  fr: "Un gala de 600 invités, une identité, une scène, quatre heures de contenus projetés."
+  en: "A 600-guest gala, one identity, one stage, four hours of projected content."
+featured: true
+order: 3
+placeholder: true
+blocks:
+  - type: text
+    title: { fr: "Le contexte", en: "Context" }
+    body:
+      fr: "La fondation voulait une soirée qui ne ressemble à aucun gala de la saison. Nous avons conçu l'identité, les invitations et la scénographie lumineuse, puis produit les contenus de scène diffusés pendant toute la nuit."
+      en: "The foundation wanted an evening unlike any other gala of the season. We designed the identity, the invitations and the light scenography, then produced the stage content that ran through the night."
+  - type: image
+    layout: full
+    src: ../../assets/uploads/esterel-1.jpg
+    alt: { fr: "Faisceaux de lumière magenta sur une scène", en: "Magenta light beams on a stage" }
+  - type: quote
+    body:
+      fr: "Pour une fois, personne ne regardait son téléphone."
+      en: "For once, nobody was looking at their phone."
+    author: "Fondation Estérel"
+  - type: diptych
+    left: ../../assets/uploads/esterel-2.jpg
+    right: ../../assets/uploads/esterel-3.jpg
+    alt: { fr: "Détails du projet", en: "Project details" }
+credits:
+  - { role: { fr: "Direction artistique", en: "Art direction" }, name: "moyo" }
+  - { role: { fr: "Client", en: "Client" }, name: "Fondation Estérel" }

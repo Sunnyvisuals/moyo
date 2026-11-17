@@ -1,0 +1,10 @@
+order: 10
+title: { fr: "Social media", en: "Social media" }
+short: { fr: "Une présence qui ressemble à la marque.", en: "A presence that looks like the brand." }
+description:
+  fr: "Lignes éditoriales, formats, production de contenus. Pas de calendrier rempli pour le remplir : moins de publications, mieux pensées."
+  en: "Editorial lines, formats, content production. No calendar filled for its own sake: fewer posts, better considered."
+deliverables:
+  - { fr: "Ligne éditoriale", en: "Editorial line" }
+  - { fr: "Formats et templates", en: "Formats and templates" }
+  - { fr: "Production de contenus", en: "Content production" }

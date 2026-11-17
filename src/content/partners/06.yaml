@@ -1,0 +1,5 @@
+order: 6
+name: "Marina Saint-Elme"
+kind: client
+field: { fr: "Port de plaisance", en: "Marina" }
+placeholder: true

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-preview/
+.astro/
+.env
+.env.*
+.DS_Store
+public/admin/sveltia-cms.js

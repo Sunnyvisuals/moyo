@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { type Lang, routes, ui } from '../i18n/ui';
+import { getProjects, getSectors, getServices } from '../lib/content';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const [projects, services, sectors] = await Promise.all([getProjects(), getServices(), getSectors()]);
+const sectorTitles = Object.fromEntries(sectors.map((s) => [s.id, s.data.title[lang]]));
+const serviceTitles = Object.fromEntries(services.map((s) => [s.id, s.data.title[lang]]));
+const usedDisc = services.filter((s) => projects.some((p) => p.data.disciplines.some((d) => d.id === s.id)));
+const usedSec = sectors.filter((s) => projects.some((p) => p.data.sectors.some((d) => d.id === s.id)));
+const title = ui('nav.projects', lang);
+---
+<Base lang={lang} current="projects" alternates={routes.projects} title={title}
+  description={lang === 'fr' ? 'Les projets de moyo : identités, films, 3D, VFX, sites et événements pour le luxe, l\'hôtellerie, le yachting et les startups sur la Côte d\'Azur.' : 'moyo\'s work: identities, films, 3D, VFX, websites and events for luxury, hospitality, yachting and startups on the French Riviera.'}>
+  <header class="page-head">
+    <h1>{title}<sup data-count>{projects.length}</sup></h1>
+  </header>
+  <div class="wrap" data-filters data-status-template={ui('filters.status', lang)}>
+    <div class="filters">
+      <div class="filters__row" role="group" aria-label={ui('filters.discipline', lang)}>
+        <span class="filters__label" aria-hidden="true">{ui('filters.discipline', lang)}</span>
+        <button class="chip" type="button" data-filter="d" data-value="" aria-pressed="true">{ui('filters.all', lang)}</button>
+        {usedDisc.map((s) => <button class="chip" type="button" data-filter="d" data-value={s.id} aria-pressed="false">{s.data.title[lang]}</button>)}
+      </div>
+      <div class="filters__row" role="group" aria-label={ui('filters.sector', lang)}>
+        <span class="filters__label" aria-hidden="true">{ui('filters.sector', lang)}</span>
+        <button class="chip" type="button" data-filter="s" data-value="" aria-pressed="true">{ui('filters.all', lang)}</button>
+        {usedSec.map((s) => <button class="chip" type="button" data-filter="s" data-value={s.id} aria-pressed="false">{s.data.title[lang]}</button>)}
+      </div>
+      <p class="filters__status" aria-live="polite" data-status></p>
+    </div>
+    <div class="work-grid">
+      {projects.map((p, i) => <ProjectCard p={p} lang={lang} sectorTitles={sectorTitles} serviceTitles={serviceTitles} eager={i < 2} />)}
+      <p class="work-empty" data-empty hidden>{ui('filters.empty', lang)}</p>
+    </div>
+  </div>
+</Base>

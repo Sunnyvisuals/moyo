@@ -1,0 +1,4 @@
+order: 4
+name: "Prénom Nom"
+role: { fr: "Design & développement web", en: "Web design & development" }
+placeholder: true

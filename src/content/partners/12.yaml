@@ -1,0 +1,5 @@
+order: 12
+name: "Scène Mobile"
+kind: partner
+field: { fr: "Régie & lumière", en: "Stage & lighting" }
+placeholder: true

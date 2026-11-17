@@ -1,0 +1,5 @@
+order: 2
+name: "Chantier Velarium"
+kind: client
+field: { fr: "Construction navale", en: "Shipbuilding" }
+placeholder: true

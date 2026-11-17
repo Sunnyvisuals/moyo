@@ -1,0 +1,10 @@
+order: 6
+title: { fr: "3D", en: "3D" }
+short: { fr: "Objets, espaces, lumière.", en: "Objects, spaces, light." }
+description:
+  fr: "Rendus produits, architecture, scènes complètes. La 3D nous permet de montrer un yacht avant sa mise à l'eau ou un flacon avant son premier moule."
+  en: "Product renders, architecture, full scenes. 3D lets us show a yacht before launch or a bottle before its first mould."
+deliverables:
+  - { fr: "Rendus produit", en: "Product renders" }
+  - { fr: "Scènes et environnements", en: "Scenes and environments" }
+  - { fr: "Animation 3D", en: "3D animation" }

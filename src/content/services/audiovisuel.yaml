@@ -1,0 +1,10 @@
+order: 8
+title: { fr: "Audiovisuel", en: "Audiovisual" }
+short: { fr: "Son et image pour les lieux.", en: "Sound and image for places." }
+description:
+  fr: "Dispositifs vidéo pour boutiques, halls d'hôtel, stands et scènes. Mapping, murs d'écrans, boucles d'ambiance, création sonore."
+  en: "Video installations for boutiques, hotel lobbies, booths and stages. Mapping, video walls, ambient loops, sound design."
+deliverables:
+  - { fr: "Mapping vidéo", en: "Video mapping" }
+  - { fr: "Contenus pour écrans", en: "Content for screens" }
+  - { fr: "Création sonore", en: "Sound design" }

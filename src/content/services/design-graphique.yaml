@@ -1,0 +1,10 @@
+order: 3
+title: { fr: "Design graphique", en: "Graphic design" }
+short: { fr: "Édition, packaging, signalétique.", en: "Print, packaging, signage." }
+description:
+  fr: "Ce qui se tient dans la main compte autant que ce qui s'affiche. Livres, coffrets, menus, signalétique : le soin du papier, de la matière et de l'impression."
+  en: "What you hold matters as much as what you see on screen. Books, boxes, menus, signage: care for paper, material and print."
+deliverables:
+  - { fr: "Édition et print", en: "Editorial and print" }
+  - { fr: "Packaging", en: "Packaging" }
+  - { fr: "Signalétique", en: "Signage" }

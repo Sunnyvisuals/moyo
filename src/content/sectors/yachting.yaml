@@ -1,0 +1,4 @@
+order: 3
+theme: yachting
+title: { fr: "Yachting & ports", en: "Yachting & marinas" }
+line: { fr: "Chantiers, marinas, flottes. La précision à l'échelle de la mer.", en: "Shipyards, marinas, fleets. Precision at the scale of the sea." }

@@ -1,0 +1,10 @@
+order: 2
+title: { fr: "Stratégie de marque", en: "Brand strategy" }
+short: { fr: "Savoir ce qu'on dit avant de le dire.", en: "Know what to say before saying it." }
+description:
+  fr: "Positionnement, plateforme de marque, territoire d'expression. Un travail court et précis qui donne une direction claire à tout ce qui suit."
+  en: "Positioning, brand platform, expressive territory. Short, precise work that sets a clear direction for everything that follows."
+deliverables:
+  - { fr: "Plateforme de marque", en: "Brand platform" }
+  - { fr: "Territoire verbal et visuel", en: "Verbal and visual territory" }
+  - { fr: "Architecture de marque", en: "Brand architecture" }

@@ -1,0 +1,21 @@
+hero:
+  line: { fr: "Studio de création sur la Côte d'Azur.", en: "Creative studio on the French Riviera." }
+  scroll: { fr: "Défiler", en: "Scroll" }
+manifesto:
+  fr: "Nous sommes un studio de création, pas une agence. Nous faisons des images, des films, des identités et des sites, avec la même exigence pour un flacon de parfum que pour un yacht de soixante mètres. Peu de projets, beaucoup d'attention. Le reste se voit à l'écran."
+  en: "We are a creative studio, not an agency. We make images, films, identities and websites, with the same care for a perfume bottle as for a sixty-metre yacht. Few projects, a lot of attention. The rest shows on screen."
+work:
+  title: { fr: "Projets récents", en: "Recent work" }
+  all: { fr: "Tous les projets", en: "All projects" }
+services:
+  title: { fr: "Ce que nous faisons", en: "What we do" }
+  text:
+    fr: "Douze disciplines sous un même toit. Un projet peut en mobiliser deux ou dix : vous avez un seul interlocuteur."
+    en: "Twelve disciplines under one roof. A project may call on two or ten of them: you deal with one team."
+sectors:
+  title: { fr: "Pour qui", en: "Who we work with" }
+clients:
+  title: { fr: "Ils nous ont confié leur image", en: "They trusted us with their image" }
+cta:
+  title: { fr: "Un projet en tête ?", en: "Something in mind?" }
+  text: { fr: "Écrivez-nous. Réponse sous 48 heures, devis sur mesure.", en: "Write to us. Reply within 48 hours, tailored quote." }

@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import { type Lang, routes, ui } from '../i18n/ui';
+import { getPage, getServices } from '../lib/content';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const [page, services] = await Promise.all([getPage('services'), getServices()]);
+---
+<Base lang={lang} current="services" alternates={routes.services} title={page.title[lang]} description={page.intro[lang]}>
+  <header class="page-head">
+    <h1>{page.title[lang]}<sup>{services.length}</sup></h1>
+    <p class="lede">{page.intro[lang]}</p>
+  </header>
+  <section class="wrap svc-list" aria-label={page.title[lang]}>
+    {services.map((s) => (
+      <details class="svc" id={s.id} data-svc>
+        <summary>
+          <h2>{s.data.title[lang]}</h2>
+          <span class="svc__short">{s.data.short[lang]}<span class="svc__plus" aria-hidden="true"></span></span>
+        </summary>
+        <div class="svc__body">
+          <p>{s.data.description[lang]}</p>
+          <ul>
+            {s.data.deliverables.map((d) => <li>{d[lang]}</li>)}
+            <li class="muted">{ui('onQuote', lang)}</li>
+          </ul>
+        </div>
+      </details>
+    ))}
+  </section>
+  <section class="section wrap" aria-labelledby="process-title">
+    <h2 id="process-title" class="t-xl">{page.process.title[lang]}</h2>
+    <ol class="steps">
+      {page.process.steps.map((st: any, i: number) => (
+        <li class="step"><span class="step__n">{String(i + 1).padStart(2, '0')}</span><h3>{st.title[lang]}</h3><p>{st.text[lang]}</p></li>
+      ))}
+    </ol>
+  </section>
+  <section class="wrap" style="padding-bottom:var(--section)">
+    <div class="quote-note">
+      <p class="t-lg display">{page.pricing[lang]}</p>
+      <a class="btn" href={routes.contact[lang]}><span class="dot"></span>{ui('writeUs', lang)}</a>
+    </div>
+  </section>
+</Base>

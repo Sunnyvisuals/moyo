@@ -1,0 +1,10 @@
+order: 7
+title: { fr: "Production vidéo", en: "Video production" }
+short: { fr: "De l'écriture à la livraison.", en: "From script to delivery." }
+description:
+  fr: "Films de marque, reportages, contenus courts. Nous écrivons, tournons et montons avec une équipe resserrée et un réseau de chefs opérateurs sur toute la Côte d'Azur."
+  en: "Brand films, documentaries, short-form content. We write, shoot and edit with a tight crew and a network of cinematographers across the Riviera."
+deliverables:
+  - { fr: "Écriture et préparation", en: "Writing and pre-production" }
+  - { fr: "Tournage", en: "Shooting" }
+  - { fr: "Montage et post-production", en: "Editing and post-production" }
