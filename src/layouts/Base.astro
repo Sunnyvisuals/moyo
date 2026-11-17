@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { type Lang, type RouteKey, type T, ui } from '../i18n/ui';
 import { getSettings } from '../lib/content';
+import fontUrl from '../assets/fonts/NeueMontreal-Medium.woff2?url';
 
 interface Props {
   lang: Lang;
@@ -16,8 +17,10 @@ interface Props {
   sector?: string;
   image?: string;
   jsonld?: Record<string, unknown>;
+  /** Accueil plein écran : pas de pied de page */
+  bare?: boolean;
 }
-const { lang, title, description, current, alternates, sector, image, jsonld } = Astro.props;
+const { lang, title, description, current, alternates, sector, image, jsonld, bare } = Astro.props;
 const settings = await getSettings();
 const fullTitle = title ? `${title} · moyo` : settings.seo.title[lang];
 const desc = description || settings.seo.description[lang];
@@ -38,7 +41,7 @@ const org = {
 };
 ---
 <!doctype html>
-<html lang={lang} data-theme="light">
+<html lang={lang} data-theme="light" class:list={[bare && 'is-bare']}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -58,6 +61,7 @@ const org = {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
     {preview && <meta name="robots" content="noindex" />}
     <script is:inline>
       (function () {
@@ -75,7 +79,7 @@ const org = {
     <main id="main" data-sector={sector}>
       <slot />
     </main>
-    <Footer lang={lang} alternates={alternates} />
+    {!bare && <Footer lang={lang} alternates={alternates} />}
     <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
     <script>
       import '../scripts/site';

@@ -96,6 +96,7 @@ const settings = defineCollection({
     phone: z.string().optional(),
     region: t,
     coordinates: z.string(),
+    availability: t.optional(),
     socials: z.array(z.object({ label: z.string(), url: z.string() })).default([]),
     showreel: z.object({
       mode: z.enum(['hidden', 'teaser', 'video']).default('teaser'),

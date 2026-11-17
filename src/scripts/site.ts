@@ -89,7 +89,7 @@ if (clocks.length) {
 }
 
 /* ---------- Défilement doux (bureau uniquement) ---------- */
-if (fine && !reduced) {
+if (fine && !reduced && !root.classList.contains('is-bare')) {
   const lenis = new Lenis({ duration: 1.5, easing: (t) => 1 - Math.pow(1 - t, 4), smoothWheel: true });
   const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
@@ -113,6 +113,17 @@ if (heroEl) {
   });
   (document.fonts?.ready ?? Promise.resolve()).then(focusIn);
   setTimeout(focusIn, 1500);
+}
+
+/* ---------- Accueil : bande de projets WebGL ---------- */
+const ribbonCanvas = document.querySelector<HTMLCanvasElement>('[data-ribbon-canvas]');
+const ribbonList = document.querySelector<HTMLElement>('[data-ribbon]');
+if (ribbonCanvas && ribbonList) {
+  const startRibbon = () => import('./ribbon').then(({ initRibbon }) => {
+    if (!initRibbon(ribbonCanvas, ribbonList, { reduced })) root.classList.add('no-ribbon');
+  });
+  const whenIdle = () => ('requestIdleCallback' in window ? (window as any).requestIdleCallback(startRibbon, { timeout: 1200 }) : setTimeout(startRibbon, 300));
+  if (document.readyState === 'complete') whenIdle(); else window.addEventListener('load', whenIdle, { once: true });
 }
 
 /* ---------- Boucle de défilement : manifeste, parallaxe, hero, en-tête ---------- */

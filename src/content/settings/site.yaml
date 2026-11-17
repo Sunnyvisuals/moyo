@@ -3,6 +3,7 @@ email: "hello@moyo.example"
 phone: ""
 region: { fr: "Côte d'Azur, France", en: "French Riviera, France" }
 coordinates: "43° N, 7° E"
+availability: { fr: "Nouveaux projets dès janvier 2027", en: "Booking from January 2027" }
 socials:
   - { label: "Instagram", url: "https://instagram.com/" }
   - { label: "Vimeo", url: "https://vimeo.com/" }

@@ -173,6 +173,7 @@ collections:
           - { name: phone, label: Téléphone, widget: string, required: false }
           - { name: region, label: Région, widget: object, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
           - { name: coordinates, label: Coordonnées affichées, widget: string }
+          - { name: availability, label: Disponibilité (accueil), widget: object, required: false, fields: [{ name: fr, label: FR, widget: string }, { name: en, label: EN, widget: string }] }
           - { name: socials, label: Réseaux sociaux, widget: list, fields: [{ name: label, label: Nom, widget: string }, { name: url, label: URL, widget: string }] }
           - name: showreel
             label: Showreel
@@ -219,6 +220,50 @@ collections:
       label: Accueil
       file: src/content/pages/home.yaml
       fields:
+      - name: intro
+        label: Intro
+        widget: object
+        fields:
+        - name: fr
+          label: FR
+          widget: text
+        - name: en
+          label: EN
+          widget: text
+      - name: ribbon
+        label: Ribbon
+        widget: object
+        fields:
+        - name: hint
+          label: Hint
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: view
+          label: View
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
+        - name: talk
+          label: Talk
+          widget: object
+          fields:
+          - name: fr
+            label: FR
+            widget: string
+          - name: en
+            label: EN
+            widget: string
       - name: hero
         label: Hero
         widget: object

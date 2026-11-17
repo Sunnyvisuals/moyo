@@ -1,3 +1,10 @@
+intro:
+  fr: "moyo est un studio de création pluridisciplinaire sur la Côte d'Azur. Image, mouvement, espace et web pour les marques qui veulent être regardées."
+  en: "moyo is a multidisciplinary creative studio on the French Riviera. Image, motion, space and web for brands that want to be looked at."
+ribbon:
+  hint: { fr: "Faire défiler", en: "Scroll" }
+  view: { fr: "Voir le projet", en: "View project" }
+  talk: { fr: "Parlons-en", en: "Let's talk" }
 hero:
   line: { fr: "Studio de création sur la Côte d'Azur.", en: "Creative studio on the French Riviera." }
   scroll: { fr: "Défiler", en: "Scroll" }

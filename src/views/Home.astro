@@ -1,109 +1,43 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
-import { type Lang, projectUrl, routes, ui } from '../i18n/ui';
-import { getPage, getPartners, getProjects, getSectors, getServices, getSettings } from '../lib/content';
+import { type Lang, projectUrl, routes } from '../i18n/ui';
+import { getPage, getProjects, getSectors, getServices, getSettings } from '../lib/content';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const [page, settings, projects, services, sectors, partners] = await Promise.all([
-  getPage('home'), getSettings(), getProjects(), getServices(), getSectors(), getPartners(),
-]);
-const featured = projects.filter((p) => p.data.featured).slice(0, 5);
+const [page, settings, projects, sectors, services] = await Promise.all([getPage('home'), getSettings(), getProjects(), getSectors(), getServices()]);
 const sectorTitle = Object.fromEntries(sectors.map((s) => [s.id, s.data.title[lang]]));
 const serviceTitle = Object.fromEntries(services.map((s) => [s.id, s.data.title[lang]]));
-const clients = partners.filter((p) => p.data.kind === 'client');
-const words = (page.manifesto[lang] as string).split(/\s+/);
-const countBy = (id: string) => projects.filter((p) => p.data.sectors.some((s) => s.id === id)).length;
-const sr = settings.showreel;
+// « moyo » reste toujours en minuscules, même dans un texte en capitales
+const intro = (page.intro[lang] as string).split(/(moyo)/);
 ---
-<Base lang={lang} current="home" alternates={routes.home}>
-  <Hero lang={lang} line={page.hero.line[lang]} region={settings.region[lang]} coordinates={settings.coordinates} />
-
-  <section class="manifesto wrap" data-manifesto aria-label={lang === 'fr' ? 'Manifeste' : 'Manifesto'}>
-    <div class="manifesto__sticky">
-      <p class="manifesto__text">{words.map((w) => <><span class="w">{w}</span>{' '}</>)}</p>
-    </div>
-  </section>
-
-  <section class="section wrap" aria-labelledby="work-title">
-    <div class="feature-head" style="display:flex;justify-content:space-between;align-items:end;gap:2rem;margin-bottom:clamp(3rem,6vw,5rem)">
-      <h2 id="work-title" class="t-xxl">{page.work.title[lang]}</h2>
-      <a class="btn btn--ghost" href={routes.projects[lang]}>{page.work.all[lang]}</a>
-    </div>
-    <div class="features">
-      {featured.map((p, i) => (
-        <a class="feature" href={projectUrl(p.id, lang)} data-cursor={ui('view', lang)}>
-          <div class="feature__media" data-reveal>
-            <Image src={p.data.cover} alt={p.data.coverAlt[lang]} widths={[640, 1000, 1600]} quality={70} sizes="(max-width: 760px) 100vw, 80vw" loading={i === 0 ? 'eager' : 'lazy'} data-parallax style={`view-transition-name: vt-${p.id}`} />
-          </div>
-          <div class="feature__caption">
-            <h3 class="feature__title">{p.data.title}</h3>
-            <p class="feature__meta">
-              {p.data.sectors.map((s) => sectorTitle[s.id]).join(', ')}, {p.data.year}
-              {p.data.placeholder && <><br /><span class="tag tag--sample" style="margin-top:.5rem">{ui('sample', lang)}</span></>}
-            </p>
-          </div>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  {sr.mode !== 'hidden' && (
-    <section class="showreel" aria-label={sr.title[lang]}>
-      {sr.mode === 'video' && sr.url ? (
-        <video src={sr.url} muted loop playsinline autoplay preload="none" />
-      ) : (
-        <div class="showreel__ring">{ui('showreelSoon', lang)}</div>
-      )}
-      <span class="showreel__label">{sr.title[lang]}</span>
-    </section>
-  )}
-
-  <section class="section wrap grid svc-home" aria-labelledby="svc-title">
-    <div class="svc-home__intro">
-      <h2 id="svc-title" class="t-xl">{page.services.title[lang]}</h2>
-      <p class="muted">{page.services.text[lang]}</p>
-      <p><a class="link" href={routes.services[lang]}>{ui('allServices', lang)}</a></p>
-    </div>
-    <ul class="svc-home__list">
-      {services.map((s) => (
-        <li><a href={`${routes.services[lang]}#${s.id}`}><span class="name">{s.data.title[lang]}</span><span class="short">{s.data.short[lang]}</span></a></li>
+<Base lang={lang} current="home" alternates={routes.home} bare>
+  <section class="stage" data-stage aria-label={lang === 'fr' ? 'Projets' : 'Work'}>
+    <h1 class="sr-only">moyo, {page.hero.line[lang]}</h1>
+    <canvas class="stage__gl" data-ribbon-canvas aria-hidden="true"></canvas>
+    <ul class="ribbon" data-ribbon data-view={page.ribbon.view[lang]}>
+      {projects.map((p, i) => (
+        <li class="ribbon__item">
+          <a href={projectUrl(p.id, lang)} data-title={p.data.title} data-meta={`${serviceTitle[p.data.disciplines[0].id]}, ${sectorTitle[p.data.sectors[0].id]}, ${p.data.year}`}>
+            <Image src={p.data.cover} alt={p.data.coverAlt[lang]} width={1024} quality={72} loading={i < 3 ? 'eager' : 'lazy'} />
+            <span class="ribbon__title label">{p.data.title}</span>
+            <span class="ribbon__meta label">{serviceTitle[p.data.disciplines[0].id]}</span>
+          </a>
+        </li>
       ))}
     </ul>
-  </section>
-
-  <section class="section wrap" aria-labelledby="sectors-title" style="padding-top:0">
-    <h2 id="sectors-title" class="t-xl">{page.sectors.title[lang]}</h2>
-    <div class="sectors">
-      {sectors.map((s) => (
-        <a class="sector" data-sector={s.data.theme} href={`${routes.projects[lang]}?s=${s.id}`}>
-          <span class="sector__count">{countBy(s.id)} {ui('projectsCount', lang)}</span>
-          <span>
-            <span class="sector__title" style="display:block;margin-bottom:1rem">{s.data.title[lang]}</span>
-            <span class="sector__line" style="display:block">{s.data.line[lang]}</span>
-          </span>
-        </a>
-      ))}
+    <p class="stage__caption label" aria-hidden="true"><span data-caption-title>{projects[0].data.title}</span><span data-caption-meta class="muted"></span></p>
+    <p class="stage__hint label muted" aria-hidden="true">{page.ribbon.hint[lang]}</p>
+    <div class="stage__bottom">
+      <p class="stage__intro">{intro.map((part) => (part === 'moyo' ? <span class="nocase">moyo</span> : part))}</p>
+      <ul class="stage__social label">
+        {settings.socials.map((so) => <li><a class="roll" href={so.url} rel="noopener" target="_blank"><span data-t={so.label}>{so.label}</span></a></li>)}
+      </ul>
+      <p class="stage__contact label">
+        <a class="roll" href={`mailto:${settings.email}`}><span data-t={settings.email}>{settings.email}</span></a>
+        {settings.phone && <a href={`tel:${settings.phone.replace(/\s/g, '')}`}>{settings.phone}</a>}
+        <a class="roll" href={routes.legal[lang]}><span data-t={lang === 'fr' ? 'Mentions légales' : 'Legal notice'}>{lang === 'fr' ? 'Mentions légales' : 'Legal notice'}</span></a>
+      </p>
     </div>
-  </section>
-
-  <section class="section" aria-labelledby="clients-title" style="padding-top:0">
-    <h2 id="clients-title" class="wrap t-sm muted" style="font-family:var(--f-text);letter-spacing:0;font-weight:400;margin-bottom:2rem">{page.clients.title[lang]}</h2>
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee__track">
-        {[...clients, ...clients].map((c) => <span>{c.data.name}</span>)}
-      </div>
-    </div>
-    <ul class="sr-only">{clients.map((c) => <li>{c.data.name}</li>)}</ul>
-  </section>
-
-  <section class="section wrap cta" aria-labelledby="cta-title">
-    <h2 id="cta-title" class="cta__title">{page.cta.title[lang]}</h2>
-    <div class="cta__row">
-      <a class="btn" href={routes.contact[lang]}><span class="dot"></span>{ui('writeUs', lang)}</a>
-      <a class="cta__mail link" href={`mailto:${settings.email}`}>{settings.email}</a>
-    </div>
-    <p class="muted" style="margin-top:1.5rem">{page.cta.text[lang]}</p>
   </section>
 </Base>

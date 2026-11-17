@@ -2,19 +2,20 @@
    moyo — design tokens
    Direction unique : monochrome noir & blanc, clair (défaut) et sombre
    ========================================================================== */
-@import '@fontsource-variable/geist/wght.css';
 
-/* Logotype provisoire : Neue Montreal Medium (Pangram Pangram) — sous-ensemble ASCII */
+/* Neue Montreal Medium (Pangram Pangram) — logotype et interface. Licence commerciale requise. */
 @font-face {
   font-family: 'moyo Logo';
-  src: url('../assets/fonts/NeueMontreal-Medium-subset.woff2') format('woff2');
+  src: url('../assets/fonts/NeueMontreal-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: block;
 }
 
 :root {
-  --f-logo: 'moyo Logo', 'Geist Variable', system-ui, sans-serif;
+  --f-logo: 'moyo Logo', 'Helvetica Neue', Arial, sans-serif;
+  --t-label: 0.75rem;
+  --label-tracking: 0.03em;
   /* Échelle typographique (ratio ~1.333, display en clamp) */
   --t-xs: 0.75rem;
   --t-sm: 0.875rem;
@@ -43,12 +44,12 @@
 
 /* ---------- Typo ---------- */
 :root {
-  --f-display: 'Geist Variable', system-ui, sans-serif;
-  --f-text: 'Geist Variable', system-ui, sans-serif;
-  --display-weight: 600;
-  --display-tracking: -0.045em;
-  --display-leading: 1;
-  --text-leading: 1.5;
+  --f-display: var(--f-logo);
+  --f-text: var(--f-logo);
+  --display-weight: 500;
+  --display-tracking: -0.035em;
+  --display-leading: 0.92;
+  --text-leading: 1.45;
 }
 
 /* ---------- Clair (défaut) ---------- */

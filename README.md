@@ -49,9 +49,9 @@ Les mentions légales et la politique de confidentialité sont des **brouillons 
 ## Direction artistique
 
 - Monochrome noir & blanc, mode clair par défaut et mode sombre : `src/styles/tokens.css`.
-- Typographie : Geist (titres et texte). Logotype provisoire en Neue Montreal Medium (Pangram Pangram), SVG dans `public/brand/`.
+- Typographie : Neue Montreal Medium partout (interface en petites capitales). Logotype « moyo » toujours en minuscules, SVG dans `public/brand/`.
   ⚠️ L'usage commercial de Neue Montreal demande une licence Pangram Pangram.
-- Scène WebGL du hero (métal liquide en niveaux de gris) : `src/scripts/hero-gl.ts`. Désactivée sur mobile, sans GPU et en mouvement réduit.
+- Accueil plein écran : bande de projets incurvée en WebGL (`src/scripts/ribbon.ts`), molette / glisser / flèches, décalage RVB selon la vitesse. Sans GPU : carrousel HTML. Mouvement réduit : bande fixe, sans effet.
 
 ## Qualité
 
