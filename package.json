@@ -10,6 +10,10 @@
     "build:preview": "npm run cms && PUBLIC_PREVIEW=true astro build --outDir dist-preview && node scripts/relativize.mjs dist-preview",
     "preview": "astro preview"
   },
+  "devDependencies": {
+    "wrangler": "^3",
+    "@cloudflare/workers-types": "^4"
+  },
   "dependencies": {
     "astro": "^5",
     "@astrojs/sitemap": "^3.7.5",
