@@ -90,15 +90,20 @@ def arc(img, rng, color, cx, cy, r, width=0.004, glow=0.05, strength=1.0):
     return img + (line + halo)[..., None] * color * strength
 
 
-def finish(img, rng, grain=0.045, vignette=0.55, name="x"):
+def finish(img, rng, grain=0.0, vignette=0.35, name="x"):
     x, y = grid()
     v = 1 - vignette * (((x - 0.5) * 1.2) ** 2 + ((y - 0.5) * 1.4) ** 2)
     img = img * np.clip(v, 0, 1)[..., None]
     img = img / (1 + img * 0.35)  # tonemap doux
-    noise = rng.normal(0, grain, img.shape[:2]).astype(np.float32)
-    img = img + noise[..., None]
+    if grain:
+        img = img + rng.normal(0, grain, img.shape[:2]).astype(np.float32)[..., None]
     img = np.clip(img, 0, 1) ** (1 / 1.08)
-    im = Image.fromarray((img * 255).astype(np.uint8))
+    # noir et blanc franc : luminance, noirs écrasés, blancs nets
+    lum = img @ np.array([0.299, 0.587, 0.114], dtype=np.float32)
+    lo, hi = np.percentile(lum, 2), np.percentile(lum, 99.6)
+    lum = np.clip((lum - lo) / max(hi - lo, 1e-3), 0, 1)
+    lum = lum * lum * (3 - 2 * lum)  # courbe en S
+    im = Image.fromarray((lum * 255).astype(np.uint8)).convert('RGB')
     im.save(os.path.join(OUT, f"{name}.jpg"), quality=84, optimize=True, progressive=True)
     print("ok", name)
 
@@ -131,7 +136,7 @@ def hotel(name, seed, variant):
     img = shutters(img, rng, P["ivoire"] * 1.05, angle=-30 + 10 * variant, freq=18 + 4 * variant, duty=0.5, strength=0.55)
     img = blobs(img, rng, [P["porphyre"], P["rose"], P["olive"] * 1.4, P["porphyre"] * 0.7], 4 + variant % 2, 0.2, 0.8)
     img = gaussian_filter(img, sigma=(3, 3, 0))
-    finish(img, rng, grain=0.035, vignette=0.4, name=name)
+    finish(img, rng, name=name)
 
 
 def yacht(name, seed, variant):
@@ -165,7 +170,7 @@ def event(name, seed, variant):
         img = img + beam[..., None] * c * 0.55
     img = bokeh(img, rng, 25, [P["magenta"], P["scene"]], 0.01, 0.04, 8, 0.0, 0.5, 0.35)
     img = gaussian_filter(img, sigma=(2, 2, 0))
-    finish(img, rng, grain=0.06, name=name)
+    finish(img, rng, name=name)
 
 
 def startup(name, seed, variant):
@@ -179,7 +184,7 @@ def startup(name, seed, variant):
     chrome = (band ** 3)[..., None] * P["blanc"] * 0.85 + (band ** 0.6)[..., None] * P["acier"] * 0.4
     mask = radial(0.5 + 0.15 * (variant - 1), 0.5, 0.75)[..., None]
     img = img * (1 - mask) + chrome * mask + mask * P["menthe"] * 0.05
-    finish(img, rng, grain=0.03, vignette=0.6, name=name)
+    finish(img, rng, name=name)
 
 
 def studio(name, seed):

@@ -28,17 +28,23 @@ varying float vShade;
 uniform sampler2D uTex;
 uniform vec4 uCrop;
 uniform float uVel, uAlpha, uHover, uReady;
-uniform vec3 uBg;
+uniform vec3 uBg, uAccent;
 void main(){
   vec2 uv = vUv * uCrop.xy + uCrop.zw;
-  float s = clamp(uVel, -1.0, 1.0) * 0.035;
-  vec2 o = vec2(s, s * 0.15);
-  vec3 c = vec3(texture2D(uTex, uv + o).r, texture2D(uTex, uv).g, texture2D(uTex, uv - o).b);
-  // fines lignes de balayage pendant le mouvement
-  float scan = 1.0 - abs(uVel) * 0.12 * step(0.5, fract(vUv.y * 140.0));
-  c *= scan;
-  c = mix(c, c * 0.82, uHover * 0.0);
-  c = mix(uBg * 0.92, c, uReady);
+  // flou de mouvement horizontal, en niveaux de gris
+  float s = clamp(uVel, -1.0, 1.0) * 0.03;
+  vec3 c = vec3(0.0);
+  for (int i = 0; i < 7; i++) {
+    float k = float(i) / 6.0 - 0.5;
+    c += texture2D(uTex, uv + vec2(s * k, 0.0)).rgb;
+  }
+  c /= 7.0;
+  float lum = dot(c, vec3(0.299, 0.587, 0.114));
+  // au survol : l'image quitte le noir et blanc pour un bichromie bleu Klein
+  vec3 mono = vec3(lum);
+  vec3 duo = mix(uAccent * 0.6, vec3(1.0), lum);
+  c = mix(mono, duo, uHover);
+  c = mix(uBg, c, uReady);
   gl_FragColor = vec4(c, uAlpha);
 }`;
 
@@ -84,7 +90,7 @@ export function initRibbon(canvas: HTMLCanvasElement, list: HTMLElement, opts: {
   gl.enableVertexAttribArray(loc);
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const U: Record<string, WebGLUniformLocation | null> = {};
-  for (const n of ['uU0', 'uW', 'uH', 'uR', 'uD', 'uF', 'uAspect', 'uBend', 'uTex', 'uCrop', 'uVel', 'uAlpha', 'uHover', 'uReady', 'uBg']) U[n] = gl.getUniformLocation(prog, n);
+  for (const n of ['uU0', 'uW', 'uH', 'uR', 'uD', 'uF', 'uAspect', 'uBend', 'uTex', 'uCrop', 'uVel', 'uAlpha', 'uHover', 'uReady', 'uBg', 'uAccent']) U[n] = gl.getUniformLocation(prog, n);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -167,13 +173,14 @@ export function initRibbon(canvas: HTMLCanvasElement, list: HTMLElement, opts: {
   const viewLabel = list.dataset.view || '';
   let shownIdx = -1;
 
-  const bgColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim().replace('#', '');
+  const hexColor = (name: string) => {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim().replace('#', '');
     const n = parseInt(v.length === 3 ? v.split('').map((c) => c + c).join('') : v, 16);
     return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
   };
-  let bg = bgColor();
-  new MutationObserver(() => (bg = bgColor())).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  let bg = hexColor('--bg');
+  let accent = hexColor('--accent');
+  new MutationObserver(() => { bg = hexColor('--bg'); accent = hexColor('--accent'); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   // entrées
   const nudge = () => (idle = 0);
@@ -202,6 +209,7 @@ export function initRibbon(canvas: HTMLCanvasElement, list: HTMLElement, opts: {
       cursor.classList.toggle('is-label', hover >= 0);
       cursorLabel.textContent = hover >= 0 ? viewLabel : '';
     }
+    caption?.closest('.stage')?.classList.toggle('is-hovering', hover >= 0);
   });
   const up = () => { dragging = false; };
   canvas.addEventListener('pointerup', (e) => {
@@ -213,6 +221,7 @@ export function initRibbon(canvas: HTMLCanvasElement, list: HTMLElement, opts: {
   canvas.addEventListener('pointerleave', () => {
     hover = -1;
     cursor?.classList.remove('is-label');
+    caption?.closest('.stage')?.classList.remove('is-hovering');
   });
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') { target = (Math.round(target / STEP) + 1) * STEP; nudge(); }
@@ -247,7 +256,7 @@ export function initRibbon(canvas: HTMLCanvasElement, list: HTMLElement, opts: {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(U.uW, W); gl.uniform1f(U.uH, H); gl.uniform1f(U.uR, R); gl.uniform1f(U.uD, D);
     gl.uniform1f(U.uF, F); gl.uniform1f(U.uAspect, aspect); gl.uniform1f(U.uBend, bend);
-    gl.uniform1f(U.uVel, vel); gl.uniform3fv(U.uBg, bg);
+    gl.uniform1f(U.uVel, vel); gl.uniform3fv(U.uBg, bg); gl.uniform3fv(U.uAccent, accent);
     const R_ = R / Math.max(bend, 1e-4);
     const maxU = Math.min(R_ * 1.5, L / 2);
     for (let i = 0; i < N; i++) {
