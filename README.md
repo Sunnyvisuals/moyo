@@ -48,11 +48,10 @@ Les mentions légales et la politique de confidentialité sont des **brouillons 
 
 ## Direction artistique
 
-- 3 pistes dans `src/styles/tokens.css` : `nocturne` (défaut), `atelier`, `argent`. Choix en production : variable `PUBLIC_DA`.
-- 5 ambiances secteur (`luxe`, `hotellerie`, `yachting`, `evenementiel`, `startup`) appliquées aux pages projet.
-- Logotype provisoire en Neue Montreal Medium (Pangram Pangram) : fichiers SVG dans `public/brand/`.
+- Monochrome noir & blanc, mode clair par défaut et mode sombre : `src/styles/tokens.css`.
+- Typographie : Geist (titres et texte). Logotype provisoire en Neue Montreal Medium (Pangram Pangram), SVG dans `public/brand/`.
   ⚠️ L'usage commercial de Neue Montreal demande une licence Pangram Pangram.
-- Scène WebGL du hero : `src/scripts/hero-gl.ts` (désactivée sur mobile, sans GPU et en mouvement réduit).
+- Scène WebGL du hero (métal liquide en niveaux de gris) : `src/scripts/hero-gl.ts`. Désactivée sur mobile, sans GPU et en mouvement réduit.
 
 ## Qualité
 

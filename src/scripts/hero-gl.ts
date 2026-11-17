@@ -109,7 +109,7 @@ vec3 scene2(vec2 q, float t){
   float bands = 0.5 + 0.5 * sin(n.x * 2.6 + n.y * 1.8 + h * 4.5);
   vec3 env = mix(uB * 0.6, uA * 0.95, smoothstep(0.0, 1.0, bands));
   env += pow(max(n.y, 0.0), 8.0) * uA * 0.5;
-  env = mix(env, uC, 0.06 * smoothstep(0.6, 1.0, bands));
+  env = mix(env, uC, 0.04 * smoothstep(0.6, 1.0, bands));
   float r = length(q * vec2(0.85, 1.25)) + (h - 0.5) * 0.25;
   float mask = smoothstep(0.62, 0.48, r);
   float halo = smoothstep(0.9, 0.45, r) * 0.08;
@@ -184,7 +184,7 @@ export function initHero(canvas: HTMLCanvasElement, opts: { reduced: boolean; ba
     gl.uniform3fv(u.a, hexToRgb(cs.getPropertyValue('--gl-a')));
     gl.uniform3fv(u.b, hexToRgb(cs.getPropertyValue('--gl-b')));
     gl.uniform3fv(u.c, hexToRgb(cs.getPropertyValue('--gl-c')));
-    gl.uniform1f(u.mode, MODES[root.dataset.da || 'nocturne'] ?? 0);
+    gl.uniform1f(u.mode, 2); // monochrome : métal liquide
     gl.uniform1f(u.light, root.dataset.theme === 'light' ? 1 : 0);
     if (opts.reduced) draw(performance.now());
   };

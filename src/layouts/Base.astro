@@ -25,7 +25,6 @@ const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const canonical = site + Astro.url.pathname;
 const ogImage = site + (image || '/og.jpg');
 const preview = import.meta.env.PUBLIC_PREVIEW === 'true';
-const defaultDa = import.meta.env.PUBLIC_DA || 'nocturne';
 const org = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
@@ -39,7 +38,7 @@ const org = {
 };
 ---
 <!doctype html>
-<html lang={lang} data-da={defaultDa} data-theme="dark">
+<html lang={lang} data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,20 +56,15 @@ const org = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_GB'} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#0b1424" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {preview && <meta name="robots" content="noindex" />}
-    <script is:inline define:vars={{ defaultDa, preview }}>
+    <script is:inline>
       (function () {
-        var d = document.documentElement, da = defaultDa, t = null;
+        var d = document.documentElement, t = null;
         d.classList.add('js');
-        try {
-          if (preview) da = new URLSearchParams(location.search).get('da') || localStorage.getItem('moyo-da') || da;
-          t = localStorage.getItem('moyo-theme');
-        } catch (e) {}
-        var native = { nocturne: 'dark', atelier: 'light', argent: 'dark' };
-        d.dataset.da = native[da] ? da : 'nocturne';
-        d.dataset.theme = t === 'light' || t === 'dark' ? t : native[d.dataset.da];
+        try { t = localStorage.getItem('moyo-theme'); } catch (e) {}
+        d.dataset.theme = t === 'dark' ? 'dark' : 'light';
       })();
     </script>
     <script type="application/ld+json" set:html={JSON.stringify(jsonld ?? org)} />
@@ -83,14 +77,6 @@ const org = {
     </main>
     <Footer lang={lang} alternates={alternates} />
     <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
-    {preview && (
-      <div class="da-switch" role="group" aria-label="Piste de direction artistique">
-        <span>Piste</span>
-        <button type="button" data-da-set="nocturne" aria-pressed="false">Nocturne</button>
-        <button type="button" data-da-set="atelier" aria-pressed="false">Atelier</button>
-        <button type="button" data-da-set="argent" aria-pressed="false">Argent</button>
-      </div>
-    )}
     <script>
       import '../scripts/site';
     </script>

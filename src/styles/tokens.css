@@ -1,13 +1,7 @@
 /* ==========================================================================
    moyo — design tokens
-   3 pistes de DA (data-da) × 2 modes (data-theme) + 5 ambiances secteur (data-sector)
+   Direction unique : monochrome noir & blanc, clair (défaut) et sombre
    ========================================================================== */
-@import '@fontsource/instrument-serif/400.css';
-@import '@fontsource/instrument-serif/400-italic.css';
-@import '@fontsource-variable/instrument-sans/wght.css';
-@import '@fontsource-variable/hanken-grotesk/wght.css';
-@import '@fontsource-variable/newsreader/wght.css';
-@import '@fontsource-variable/syne/wght.css';
 @import '@fontsource-variable/geist/wght.css';
 
 /* Logotype provisoire : Neue Montreal Medium (Pangram Pangram) — sous-ensemble ASCII */
@@ -20,16 +14,17 @@
 }
 
 :root {
-  --f-logo: 'moyo Logo', 'Instrument Sans Variable', system-ui, sans-serif;
+  --f-logo: 'moyo Logo', 'Geist Variable', system-ui, sans-serif;
   /* Échelle typographique (ratio ~1.333, display en clamp) */
   --t-xs: 0.75rem;
   --t-sm: 0.875rem;
   --t-base: 1.0625rem;
+  --t-xxl-fix: 0;
   --t-md: 1.3125rem;
   --t-lg: clamp(1.625rem, 2.4vw, 2.25rem);
   --t-xl: clamp(2.25rem, 4.6vw, 4.25rem);
   --t-xxl: clamp(3.25rem, 9vw, 8.5rem);
-  --t-hero: clamp(8rem, 37vw, 42rem);
+  --t-hero: clamp(8rem, 34vw, 38rem);
 
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
   --section: clamp(6rem, 14vw, 13rem);
@@ -46,120 +41,43 @@
   --wordmark-tracking: -0.055em;
 }
 
-/* ---------- Piste 1 · NOCTURNE (par défaut) — bleu de nuit, laiton, serif fin ---------- */
-:root,
-[data-da='nocturne'] {
-  --f-display: 'Instrument Serif', 'Times New Roman', serif;
-  --f-text: 'Instrument Sans Variable', system-ui, sans-serif;
-  --display-weight: 400;
-  --display-tracking: -0.025em;
-  --display-leading: 0.92;
-  --text-leading: 1.55;
-}
-[data-da='nocturne'][data-theme='dark'] {
-  --bg: #0b1424;
-  --bg-2: #111d33;
-  --fg: #eee6d7;
-  --muted: #a3a9b5;
-  --line: rgb(238 230 215 / 0.16);
-  --accent: #cda669;
-  --on-accent: #0b1424;
-  --gl-bg: #070e1b;
-  --gl-a: #f0b46a;
-  --gl-b: #8fb4e3;
-  --gl-c: #f3e7d2;
-}
-[data-da='nocturne'][data-theme='light'] {
-  --bg: #e3e1db;
-  --bg-2: #d8d5cd;
-  --fg: #0b1424;
-  --muted: #4a5160;
-  --line: rgb(11 20 36 / 0.16);
-  --accent: #7a5a22;
-  --on-accent: #f3f1ec;
-  --gl-bg: #e3e1db;
-  --gl-a: #c98a3c;
-  --gl-b: #6f8fb8;
-  --gl-c: #ffffff;
-}
-
-/* ---------- Piste 2 · ATELIER — chaux, outremer, grotesque serrée + serif de lecture ---------- */
-[data-da='atelier'] {
-  --f-display: 'Hanken Grotesk Variable', system-ui, sans-serif;
-  --f-text: 'Newsreader Variable', Georgia, serif;
-  --display-weight: 560;
-  --display-tracking: -0.055em;
-  --display-leading: 0.9;
-  --text-leading: 1.6;
-}
-[data-da='atelier'][data-theme='light'] {
-  --bg: #f0f0ec;
-  --bg-2: #e4e4de;
-  --fg: #16181d;
-  --muted: #595c64;
-  --line: rgb(22 24 29 / 0.14);
-  --accent: #2437d6;
-  --on-accent: #f0f0ec;
-  --gl-bg: #e9e8e2;
-  --gl-a: #fff6e0;
-  --gl-b: #2437d6;
-  --gl-c: #c9c6bc;
-}
-[data-da='atelier'][data-theme='dark'] {
-  --bg: #12141a;
-  --bg-2: #1a1d25;
-  --fg: #ececE7;
-  --muted: #a0a3ab;
-  --line: rgb(236 236 231 / 0.14);
-  --accent: #9aa6ff;
-  --on-accent: #12141a;
-  --gl-bg: #101219;
-  --gl-a: #b8c4ff;
-  --gl-b: #3346e6;
-  --gl-c: #2a2e3a;
-}
-
-/* ---------- Piste 3 · ARGENT — graphite, métal liquide, grotesque large ---------- */
-[data-da='argent'] {
-  --f-display: 'Syne Variable', system-ui, sans-serif;
+/* ---------- Typo ---------- */
+:root {
+  --f-display: 'Geist Variable', system-ui, sans-serif;
   --f-text: 'Geist Variable', system-ui, sans-serif;
-  --display-weight: 700;
+  --display-weight: 600;
   --display-tracking: -0.045em;
-  --display-leading: 0.92;
-  --text-leading: 1.55;
-}
-[data-da='argent'][data-theme='dark'] {
-  --bg: #17191c;
-  --bg-2: #1f2226;
-  --fg: #eef0f2;
-  --muted: #9aa1a9;
-  --line: rgb(238 240 242 / 0.14);
-  --accent: #cfd6dd;
-  --on-accent: #17191c;
-  --gl-bg: #121417;
-  --gl-a: #f4f6f8;
-  --gl-b: #7d8790;
-  --gl-c: #9fd3ce;
-}
-[data-da='argent'][data-theme='light'] {
-  --bg: #d9dce0;
-  --bg-2: #cdd1d6;
-  --fg: #17191c;
-  --muted: #474d55;
-  --line: rgb(23 25 28 / 0.16);
-  --accent: #2e3338;
-  --on-accent: #eef0f2;
-  --gl-bg: #d9dce0;
-  --gl-a: #ffffff;
-  --gl-b: #5e6770;
-  --gl-c: #2d6e69;
+  --display-leading: 1;
+  --text-leading: 1.5;
 }
 
-/* ---------- Ambiances secteur (pages projet, tuiles secteurs) ---------- */
-[data-sector='luxe'] { --s-dark: #cda669; --s-light: #7a5a22; --s-glow: #f0b46a; }
-[data-sector='hotellerie'] { --s-dark: #d99a84; --s-light: #9a4632; --s-glow: #e3a58f; }
-[data-sector='yachting'] { --s-dark: #8fb4e3; --s-light: #2c5487; --s-glow: #8fb4e3; }
-[data-sector='evenementiel'] { --s-dark: #e57aa3; --s-light: #a3285a; --s-glow: #d6457a; }
-[data-sector='startup'] { --s-dark: #9fd3ce; --s-light: #2d6e69; --s-glow: #9fd3ce; }
-[data-theme='dark'] [data-sector] { --accent: var(--s-dark); }
-[data-theme='light'] [data-sector] { --accent: var(--s-light); }
+/* ---------- Clair (défaut) ---------- */
+:root,
+[data-theme='light'] {
+  --bg: #ffffff;
+  --bg-2: #f5f5f5;
+  --fg: #000000;
+  --muted: #6b6b6b;
+  --line: rgb(0 0 0 / 0.1);
+  --accent: #000000;
+  --on-accent: #ffffff;
+  --gl-bg: #ffffff;
+  --gl-a: #ffffff;
+  --gl-b: #1a1a1a;
+  --gl-c: #8a8a8a;
+}
+
+/* ---------- Sombre ---------- */
+[data-theme='dark'] {
+  --bg: #000000;
+  --bg-2: #141414;
+  --fg: #ffffff;
+  --muted: #a1a1a1;
+  --line: rgb(255 255 255 / 0.14);
+  --accent: #ffffff;
+  --on-accent: #000000;
+  --gl-bg: #000000;
+  --gl-a: #f2f2f2;
+  --gl-b: #2e2e2e;
+  --gl-c: #7a7a7a;
+}
