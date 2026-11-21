@@ -1,0 +1,13 @@
+{
+  "name": "moyo",
+  "private": true,
+  "version": "7.0.0",
+  "description": "Site du studio moyo : une page, sans dépendance au runtime.",
+  "scripts": {
+    "build": "python3 build.py",
+    "test:a11y": "python3 tests/qa.py"
+  },
+  "devDependencies": {
+    "axe-core": "^4.14.1"
+  }
+}
