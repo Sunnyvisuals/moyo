@@ -1,5 +1,0 @@
-order: 8
-name: "Festival Hors Champ"
-kind: client
-field: { fr: "Cinéma", en: "Film" }
-placeholder: true

@@ -1,5 +1,0 @@
-order: 3
-name: "Hôtel Calcaire"
-kind: client
-field: { fr: "Hôtellerie", en: "Hospitality" }
-placeholder: true

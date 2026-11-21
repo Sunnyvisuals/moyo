@@ -1,5 +1,0 @@
-order: 4
-name: "Fondation Estérel"
-kind: client
-field: { fr: "Mécénat", en: "Philanthropy" }
-placeholder: true

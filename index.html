@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>moyo — Studio créatif | Côte d'Azur</title>
+<meta name="description" content="moyo est un studio créatif multidisciplinaire basé sur la Côte d'Azur. Branding, Motion Design, VFX, Web, 3D et Production Vidéo.">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"CreativeAgency",
+  "name":"moyo",
+  "description":"Studio créatif multidisciplinaire basé sur la Côte d'Azur",
+  "url":"https://moyo.studio",
+  "email":"hello@moyo.studio",
+  "address":{"@type":"PostalAddress","addressLocality":"Nice","addressRegion":"Côte d'Azur","addressCountry":"FR"},
+  "knowsAbout":["Branding","Motion Design","VFX","Web Design","3D","Production Vidéo"]
+}
+</script>
+<style>
+/* ═══ RESET ═══ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --black:#000;
+  --white:#fff;
+  --blue:#002fa7;
+  --grey:#767676;
+  --light:#f5f5f5;
+  --border:rgba(0,0,0,.1);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --pad:clamp(20px,5vw,64px);
+  --ease:cubic-bezier(.25,0,.15,1);
+}
+
+::selection{background:var(--blue);color:var(--white)}
+
+html{scroll-behavior:smooth;font-size:100%}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .r{opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important}
+  .marquee-track{animation:none!important}
+  .hero-wordmark span{clip-path:none!important;opacity:1!important}
+}
+
+body{
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.6;
+  color:var(--black);
+  background:var(--white);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font:inherit;border:none;background:none;cursor:pointer}
+
+/* ═══ SKIP LINK ═══ */
+.skip{
+  position:absolute;top:-100%;left:16px;
+  background:var(--blue);color:var(--white);
+  padding:8px 16px;font-size:14px;z-index:1000;
+}
+.skip:focus{top:0}
+
+/* ═══ FOCUS ═══ */
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+/* ═══ NAV ═══ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 var(--pad);height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s;
+}
+.nav.scrolled{border-bottom-color:var(--border)}
+.nav-logo{font-family:var(--serif);font-size:26px;letter-spacing:-.02em}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{
+  font-size:14px;font-weight:500;position:relative;padding-bottom:2px;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:0;
+  width:0;height:1.5px;background:var(--blue);
+  transition:width .3s var(--ease);
+}
+.nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%}
+
+.nav-toggle{display:none;width:32px;height:32px;position:relative}
+.nav-toggle span{
+  display:block;width:22px;height:1.5px;background:var(--black);
+  position:absolute;left:5px;transition:transform .3s,opacity .3s;
+}
+.nav-toggle span:nth-child(1){top:10px}
+.nav-toggle span:nth-child(2){top:16px}
+.nav-toggle span:nth-child(3){top:22px}
+.nav-toggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+.mobile-menu{
+  position:fixed;inset:0;background:var(--white);z-index:99;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 var(--pad);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.mobile-menu.open{opacity:1;pointer-events:auto}
+.mobile-menu a{
+  font-family:var(--serif);font-size:clamp(2.5rem,10vw,4.5rem);
+  display:block;margin-bottom:12px;
+  transition:color .2s;
+}
+.mobile-menu a:hover{color:var(--blue)}
+
+/* ═══ HERO ═══ */
+.hero{
+  min-height:100vh;min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:120px var(--pad) 80px;
+  position:relative;
+}
+.hero-wordmark{
+  font-family:var(--serif);
+  font-size:clamp(5rem,20vw,16rem);
+  line-height:.85;letter-spacing:-.04em;
+  margin-bottom:40px;
+  overflow:hidden;
+}
+.hero-wordmark span{
+  display:inline-block;
+  clip-path:inset(0 100% 0 0);
+  animation:clipReveal .9s var(--ease) forwards;
+}
+.hero-wordmark span:nth-child(2){animation-delay:.06s}
+.hero-wordmark span:nth-child(3){animation-delay:.12s}
+.hero-wordmark span:nth-child(4){animation-delay:.18s}
+
+@keyframes clipReveal{
+  to{clip-path:inset(0 0 0 0)}
+}
+
+.hero-line{
+  width:0;height:3px;background:var(--blue);
+  margin-bottom:36px;
+  animation:lineGrow .6s var(--ease) .5s forwards;
+}
+@keyframes lineGrow{to{width:72px}}
+
+.hero-sub{
+  font-size:clamp(1rem,1.8vw,1.25rem);
+  line-height:1.55;max-width:500px;
+  opacity:0;transform:translateY(16px);
+  animation:fadeUp .7s ease .7s forwards;
+}
+
+.hero-loc{
+  position:absolute;bottom:48px;right:var(--pad);
+  text-align:right;font-size:13px;color:var(--grey);
+  letter-spacing:.02em;
+  opacity:0;animation:fadeUp .6s ease 1s forwards;
+}
+.hero-loc span{display:block}
+
+@keyframes fadeUp{
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ═══ MARQUEE ═══ */
+.marquee{
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+  padding:20px 0;
+}
+.marquee-track{
+  display:flex;gap:0;
+  animation:scroll 30s linear infinite;
+  width:max-content;
+}
+@keyframes scroll{
+  to{transform:translateX(-50%)}
+}
+.marquee-track span{
+  font-family:var(--serif);
+  font-size:clamp(1.1rem,2vw,1.5rem);
+  white-space:nowrap;
+  padding:0 24px;
+  color:var(--black);
+}
+.marquee-track span.dot{
+  color:var(--blue);
+  font-size:.6em;
+  padding:0 16px;
+  display:flex;align-items:center;
+}
+
+/* ═══ SECTIONS ═══ */
+.sec{padding:clamp(80px,12vw,160px) var(--pad)}
+.sec-label{
+  font-size:13px;font-weight:500;color:var(--grey);
+  margin-bottom:48px;
+}
+.sec-title{
+  font-family:var(--serif);
+  font-size:clamp(2rem,4.5vw,3.2rem);
+  line-height:1.15;margin-bottom:64px;
+  max-width:780px;
+}
+
+/* Reveal */
+.r{
+  opacity:0;transform:translateY(28px);
+  transition:opacity .7s ease,transform .7s ease;
+}
+.r.v{opacity:1;transform:translateY(0)}
+
+/* ═══ PROJECTS ═══ */
+.projects-list{
+  display:flex;flex-direction:column;
+}
+.proj{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:clamp(28px,4vw,48px) 0;
+  border-top:1px solid var(--border);
+  position:relative;
+  transition:padding-left .4s var(--ease);
+  cursor:pointer;
+}
+.proj:last-child{border-bottom:1px solid var(--border)}
+.proj::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:0;background:var(--blue);
+  transition:width .4s var(--ease);
+}
+.proj:hover::before,.proj:focus-within::before{width:4px}
+.proj:hover,.proj:focus-within{padding-left:24px}
+
+.proj-left{display:flex;align-items:baseline;gap:clamp(16px,3vw,40px);flex:1}
+.proj-name{
+  font-family:var(--serif);
+  font-size:clamp(1.6rem,3.5vw,2.8rem);
+  line-height:1.1;
+  transition:color .3s;
+}
+.proj:hover .proj-name{color:var(--blue)}
+.proj-cat{
+  font-size:14px;color:var(--grey);
+  white-space:nowrap;
+}
+.proj-arrow{
+  font-size:24px;color:var(--grey);
+  opacity:0;transform:translateX(-12px);
+  transition:opacity .3s,transform .3s var(--ease);
+}
+.proj:hover .proj-arrow,.proj:focus-within .proj-arrow{
+  opacity:1;transform:translateX(0);
+}
+.proj-link{
+  position:absolute;inset:0;z-index:2;
+}
+
+/* ═══ ABOUT ═══ */
+.about{background:var(--light)}
+.about-text{
+  font-family:var(--serif);
+  font-size:clamp(1.5rem,3.5vw,2.6rem);
+  line-height:1.35;
+  max-width:880px;
+}
+.about-text em{
+  font-style:italic;
+  color:var(--blue);
+}
+
+/* ═══ SERVICES ═══ */
+.services-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;max-width:960px;
+}
+.svc{
+  padding:28px 0;
+  border-top:1px solid var(--border);
+  transition:background .3s;
+}
+.svc:nth-child(-n+2){border-top:none}
+.svc:nth-child(odd){padding-right:40px}
+.svc:nth-child(even){padding-left:40px;border-left:1px solid var(--border)}
+.svc-name{
+  font-family:var(--serif);font-size:1.3rem;
+  margin-bottom:6px;
+  transition:color .2s;
+}
+.svc:hover .svc-name{color:var(--blue)}
+.svc-desc{font-size:15px;color:var(--grey);line-height:1.5}
+
+/* ═══ TESTIMONIAL ═══ */
+.testi{background:var(--black);color:var(--white)}
+.testi .sec-label{color:rgba(255,255,255,.35)}
+.testi-quote{
+  font-family:var(--serif);
+  font-size:clamp(1.5rem,3.5vw,2.6rem);
+  line-height:1.3;max-width:860px;
+  font-style:italic;
+}
+.testi-credit{
+  margin-top:48px;font-size:14px;
+  color:rgba(255,255,255,.45);
+}
+.testi-credit strong{color:var(--white);font-weight:500}
+
+/* ═══ CONTACT ═══ */
+.contact-heading{
+  font-family:var(--serif);
+  font-size:clamp(2.5rem,7vw,5rem);
+  line-height:1.08;margin-bottom:48px;
+  max-width:680px;
+}
+.contact-email{
+  font-family:var(--serif);
+  font-size:clamp(1.4rem,3.5vw,2.2rem);
+  display:inline-block;position:relative;
+  padding-bottom:4px;
+}
+.contact-email::after{
+  content:'';position:absolute;bottom:0;left:0;
+  width:100%;height:2px;background:var(--blue);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s var(--ease);
+}
+.contact-email:hover::after,.contact-email:focus-visible::after{
+  transform:scaleX(1);
+}
+.contact-note{margin-top:20px;font-size:15px;color:var(--grey)}
+
+/* ═══ FOOTER ═══ */
+.footer{
+  padding:40px var(--pad);
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--border);
+  font-size:13px;color:var(--grey);
+  flex-wrap:wrap;gap:20px;
+}
+.footer-left{display:flex;align-items:center;gap:28px}
+.footer-logo{font-family:var(--serif);font-size:18px;color:var(--black)}
+.footer-social{display:flex;gap:20px;list-style:none}
+.footer-social a{transition:color .2s}
+.footer-social a:hover{color:var(--black)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .services-grid{grid-template-columns:1fr}
+  .svc:nth-child(even){padding-left:0;border-left:none}
+  .svc:nth-child(2){border-top:1px solid var(--border)}
+  .svc:nth-child(odd){padding-right:0}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-toggle{display:block}
+  .hero-loc{
+    position:relative;bottom:auto;right:auto;
+    text-align:left;margin-top:48px;
+  }
+  .proj-cat{display:none}
+  .footer{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:480px){
+  .hero{padding-top:100px;min-height:auto;padding-bottom:48px}
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip">Aller au contenu</a>
+
+<nav class="nav" aria-label="Navigation principale">
+  <a href="#" class="nav-logo" aria-label="moyo — Accueil">moyo</a>
+  <ul class="nav-links">
+    <li><a href="#projets">Projets</a></li>
+    <li><a href="#expertises">Expertises</a></li>
+    <li><a href="#studio">Studio</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" role="dialog" aria-label="Menu" aria-hidden="true">
+  <a href="#projets">Projets</a>
+  <a href="#expertises">Expertises</a>
+  <a href="#studio">Studio</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1 class="hero-wordmark"><span>m</span><span>o</span><span>y</span><span>o</span></h1>
+    <div class="hero-line" aria-hidden="true"></div>
+    <p class="hero-sub">
+      Studio créatif multidisciplinaire sur la Côte d'Azur.
+      Nous façonnons des identités et des expériences numériques sur mesure.
+    </p>
+    <div class="hero-loc" aria-label="Localisation">
+      <span>Nice, Côte d'Azur</span>
+      <span>43.7102° N, 7.2620° E</span>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Branding</span><span class="dot">●</span>
+      <span>Motion Design</span><span class="dot">●</span>
+      <span>VFX</span><span class="dot">●</span>
+      <span>Web Design</span><span class="dot">●</span>
+      <span>3D</span><span class="dot">●</span>
+      <span>Production Vidéo</span><span class="dot">●</span>
+      <span>Social Media</span><span class="dot">●</span>
+      <span>Communication</span><span class="dot">●</span>
+      <span>Branding</span><span class="dot">●</span>
+      <span>Motion Design</span><span class="dot">●</span>
+      <span>VFX</span><span class="dot">●</span>
+      <span>Web Design</span><span class="dot">●</span>
+      <span>3D</span><span class="dot">●</span>
+      <span>Production Vidéo</span><span class="dot">●</span>
+      <span>Social Media</span><span class="dot">●</span>
+      <span>Communication</span><span class="dot">●</span>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <section id="projets" class="sec">
+    <p class="sec-label r">Projets sélectionnés</p>
+    <div class="projects-list">
+      <article class="proj r">
+        <div class="proj-left">
+          <h2 class="proj-name">Villa Riviera</h2>
+          <span class="proj-cat">Branding, Web Design</span>
+        </div>
+        <span class="proj-arrow" aria-hidden="true">→</span>
+        <a href="#" class="proj-link" aria-label="Voir le projet Villa Riviera"></a>
+      </article>
+      <article class="proj r">
+        <div class="proj-left">
+          <h2 class="proj-name">Azur Yachting</h2>
+          <span class="proj-cat">Branding, Motion Design</span>
+        </div>
+        <span class="proj-arrow" aria-hidden="true">→</span>
+        <a href="#" class="proj-link" aria-label="Voir le projet Azur Yachting"></a>
+      </article>
+      <article class="proj r">
+        <div class="proj-left">
+          <h2 class="proj-name">Maison Lune</h2>
+          <span class="proj-cat">VFX, 3D</span>
+        </div>
+        <span class="proj-arrow" aria-hidden="true">→</span>
+        <a href="#" class="proj-link" aria-label="Voir le projet Maison Lune"></a>
+      </article>
+      <article class="proj r">
+        <div class="proj-left">
+          <h2 class="proj-name">Nîmes Festival</h2>
+          <span class="proj-cat">Production Vidéo, Social Media</span>
+        </div>
+        <span class="proj-arrow" aria-hidden="true">→</span>
+        <a href="#" class="proj-link" aria-label="Voir le projet Nîmes Festival"></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="studio" class="sec about">
+    <p class="sec-label r">À propos</p>
+    <p class="about-text r">
+      Basé entre Nice et la Côte d'Azur, moyo est un studio créatif
+      qui refuse les approches génériques. Chaque projet est une
+      collaboration <em>sur mesure</em>, où la rigueur technique
+      rencontre une sensibilité visuelle forgée par la lumière
+      méditerranéenne.
+    </p>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="expertises" class="sec">
+    <p class="sec-label r">Ce que nous faisons</p>
+    <h2 class="sec-title r">Une approche multidisciplinaire, pensée pour durer.</h2>
+    <div class="services-grid">
+      <div class="svc r">
+        <h3 class="svc-name">Branding</h3>
+        <p class="svc-desc">Identité visuelle, direction artistique, systèmes de marque et guidelines.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">Motion Design</h3>
+        <p class="svc-desc">Animation graphique, habillage vidéo, contenus animés pour le digital.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">VFX</h3>
+        <p class="svc-desc">Effets visuels, compositing et intégration pour le cinéma et la publicité.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">Web Design</h3>
+        <p class="svc-desc">Sites vitrines, e-commerce et plateformes sur mesure, mobile-first.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">3D</h3>
+        <p class="svc-desc">Modélisation, rendu photoréaliste, animation et expériences immersives.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">Production Vidéo</h3>
+        <p class="svc-desc">Captation, montage, post-production et diffusion multi-plateformes.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">Social Media</h3>
+        <p class="svc-desc">Stratégie de contenu, création visuelle et gestion de communautés.</p>
+      </div>
+      <div class="svc r">
+        <h3 class="svc-name">Communication</h3>
+        <p class="svc-desc">Stratégie globale, campagnes et relations presse.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="sec testi">
+    <p class="sec-label r">Ce qu'on dit de nous</p>
+    <blockquote class="testi-quote r">
+      Travailler avec moyo a transformé notre vision. Leur approche mêle
+      rigueur créative et sensibilité méditerranéenne — le résultat dépasse
+      toujours ce qu'on imagine.
+    </blockquote>
+    <p class="testi-credit r">
+      <strong>Sophie Laurent</strong><br>
+      Directrice — Villa Riviera
+    </p>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="sec">
+    <p class="sec-label r">Contact</p>
+    <h2 class="contact-heading r">Envie de collaborer ?<br>Parlons de votre projet.</h2>
+    <a href="mailto:hello@moyo.studio" class="contact-email r">hello@moyo.studio</a>
+    <p class="contact-note r">Chaque projet est unique — sur devis.</p>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-left">
+    <span class="footer-logo">moyo</span>
+    <span>© 2024</span>
+  </div>
+  <ul class="footer-social">
+    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+    <li><a href="https://behance.net" target="_blank" rel="noopener noreferrer">Behance</a></li>
+    <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+  </ul>
+  <div><a href="#">Mentions légales</a></div>
+</footer>
+
+<script>
+// Nav scroll
+const nav=document.querySelector('.nav');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',scrollY>40);
+},{passive:true});
+
+// Mobile menu
+const tog=document.querySelector('.nav-toggle');
+const mm=document.querySelector('.mobile-menu');
+tog.addEventListener('click',()=>{
+  const o=tog.classList.toggle('open');
+  mm.classList.toggle('open',o);
+  mm.setAttribute('aria-hidden',!o);
+  tog.setAttribute('aria-expanded',o);
+  document.body.style.overflow=o?'hidden':'';
+});
+mm.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+  tog.classList.remove('open');
+  mm.classList.remove('open');
+  mm.setAttribute('aria-hidden','true');
+  tog.setAttribute('aria-expanded','false');
+  document.body.style.overflow='';
+}));
+
+// Scroll reveal with stagger
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches){
+  const obs=new IntersectionObserver((entries)=>{
+    const visible=entries.filter(e=>e.isIntersecting);
+    visible.forEach((e,i)=>{
+      setTimeout(()=>e.target.classList.add('v'),i*80);
+      obs.unobserve(e.target);
+    });
+  },{threshold:.12,rootMargin:'0px 0px -32px 0px'});
+  document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+}else{
+  document.querySelectorAll('.r').forEach(el=>el.classList.add('v'));
+}
+</script>
+
+</body>
+</html>

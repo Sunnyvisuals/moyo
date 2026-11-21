@@ -1,5 +1,0 @@
-order: 5
-name: "Nébule"
-kind: client
-field: { fr: "Tech", en: "Tech" }
-placeholder: true

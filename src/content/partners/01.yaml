@@ -1,5 +1,0 @@
-order: 1
-name: "Maison Orsane"
-kind: client
-field: { fr: "Joaillerie", en: "Jewellery" }
-placeholder: true

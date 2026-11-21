@@ -1,5 +1,0 @@
-order: 7
-name: "Atelier Sauvan"
-kind: client
-field: { fr: "Parfum", en: "Fragrance" }
-placeholder: true
