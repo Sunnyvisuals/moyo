@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>moyo — Studio créatif | Côte d'Azur</title>
 <meta name="description" content="moyo est un studio créatif multidisciplinaire basé sur la Côte d'Azur. Branding, Motion Design, VFX, Web, 3D et Production Vidéo.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -22,7 +22,6 @@
 }
 </script>
 <style>
-/* ═══ RESET ═══ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
 :root{
@@ -30,77 +29,124 @@
   --white:#fff;
   --blue:#002fa7;
   --grey:#767676;
-  --light:#f5f5f5;
+  --bg:#fff;
+  --fg:#000;
+  --fg-muted:#767676;
   --border:rgba(0,0,0,.1);
+  --surface:#f5f5f5;
   --serif:'Instrument Serif',Georgia,serif;
   --sans:'Inter',system-ui,sans-serif;
-  --pad:clamp(20px,5vw,64px);
-  --ease:cubic-bezier(.25,0,.15,1);
+  --pad:clamp(24px,5vw,72px);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0a0a0a;--fg:#f0f0f0;--fg-muted:#888;
+    --border:rgba(255,255,255,.1);--surface:#141414;
+  }
+  body{background:var(--bg);color:var(--fg)}
+  .nav{background:rgba(10,10,10,.88)}
+  .nav-toggle span{background:var(--fg)}
+  .mobile-menu{background:var(--bg)}
+  .footer-logo{color:var(--fg)}
+  .testi{background:#111}
+  .about{background:var(--surface)}
 }
 
 ::selection{background:var(--blue);color:var(--white)}
-
 html{scroll-behavior:smooth;font-size:100%}
+
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .r{opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important}
+  *{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important}
+  .r{opacity:1!important;transform:none!important;clip-path:none!important}
   .marquee-track{animation:none!important}
-  .hero-wordmark span{clip-path:none!important;opacity:1!important}
+  .loader{display:none!important}
 }
 
 body{
-  font-family:var(--sans);
-  font-size:17px;
-  line-height:1.6;
-  color:var(--black);
-  background:var(--white);
-  -webkit-font-smoothing:antialiased;
+  font-family:var(--sans);font-size:17px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   overflow-x:hidden;
 }
 
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-button{font:inherit;border:none;background:none;cursor:pointer}
+button{font:inherit;border:none;background:none;cursor:pointer;color:inherit}
 
-/* ═══ SKIP LINK ═══ */
-.skip{
-  position:absolute;top:-100%;left:16px;
-  background:var(--blue);color:var(--white);
-  padding:8px 16px;font-size:14px;z-index:1000;
+/* LOADER */
+.loader{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
 }
-.skip:focus{top:0}
+.loader-inner{text-align:center}
+.loader-word{
+  font-family:var(--serif);font-size:clamp(3rem,10vw,6rem);
+  letter-spacing:-.03em;color:var(--fg);
+  clip-path:inset(0 100% 0 0);animation:loaderReveal .8s var(--ease) .2s forwards;
+}
+.loader-bar{
+  width:0;height:2px;background:var(--blue);
+  margin:20px auto 0;animation:loaderBar 1.2s var(--ease) .4s forwards;
+}
+.loader.done{opacity:0;pointer-events:none;transition:opacity .6s var(--ease)}
+@keyframes loaderReveal{to{clip-path:inset(0 0 0 0)}}
+@keyframes loaderBar{to{width:120px}}
 
-/* ═══ FOCUS ═══ */
+/* GRAIN */
+.grain{
+  position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:200px 200px;
+}
+
+/* SKIP */
+.skip{position:absolute;top:-100%;left:16px;background:var(--blue);color:var(--white);padding:8px 16px;font-size:14px;z-index:10000;border-radius:0 0 4px 4px}
+.skip:focus{top:0}
 :focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 
-/* ═══ NAV ═══ */
+/* CURSOR */
+@media(pointer:fine){
+  .cursor{
+    position:fixed;top:0;left:0;z-index:9997;
+    width:12px;height:12px;border:1.5px solid var(--fg);border-radius:50%;
+    pointer-events:none;mix-blend-mode:difference;will-change:transform;
+    transition:width .25s var(--ease),height .25s var(--ease),
+               border-color .25s,background .25s,
+               margin-top .25s var(--ease),margin-left .25s var(--ease);
+    margin-top:-6px;margin-left:-6px;
+  }
+  .cursor.hover{
+    width:48px;height:48px;margin-top:-24px;margin-left:-24px;
+    background:var(--blue);border-color:var(--blue);
+    mix-blend-mode:normal;opacity:.6;
+  }
+}
+
+/* NAV */
 .nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   padding:0 var(--pad);height:72px;
   display:flex;align-items:center;justify-content:space-between;
-  background:rgba(255,255,255,.92);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid transparent;
-  transition:border-color .3s;
+  transition:border-color .4s,transform .4s var(--ease);
 }
 .nav.scrolled{border-bottom-color:var(--border)}
-.nav-logo{font-family:var(--serif);font-size:26px;letter-spacing:-.02em}
-.nav-links{display:flex;gap:36px;list-style:none}
-.nav-links a{
-  font-size:14px;font-weight:500;position:relative;padding-bottom:2px;
-}
-.nav-links a::after{
-  content:'';position:absolute;bottom:0;left:0;
-  width:0;height:1.5px;background:var(--blue);
-  transition:width .3s var(--ease);
-}
+.nav.hidden{transform:translateY(-100%)}
+.nav-logo{font-family:var(--serif);font-size:24px;letter-spacing:-.02em}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{font-size:13px;font-weight:400;letter-spacing:.03em;position:relative;padding-bottom:2px;transition:color .3s}
+.nav-num{font-size:10px;color:var(--blue);font-variant-numeric:tabular-nums;margin-right:6px;vertical-align:1px}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--blue);transition:width .4s var(--ease)}
 .nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%}
+.nav-links a:hover{color:var(--blue)}
 
 .nav-toggle{display:none;width:32px;height:32px;position:relative}
-.nav-toggle span{
-  display:block;width:22px;height:1.5px;background:var(--black);
-  position:absolute;left:5px;transition:transform .3s,opacity .3s;
-}
+.nav-toggle span{display:block;width:22px;height:1.5px;background:var(--fg);position:absolute;left:5px;transition:transform .4s var(--ease),opacity .3s}
 .nav-toggle span:nth-child(1){top:10px}
 .nav-toggle span:nth-child(2){top:16px}
 .nav-toggle span:nth-child(3){top:22px}
@@ -109,287 +155,206 @@ button{font:inherit;border:none;background:none;cursor:pointer}
 .nav-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
 .mobile-menu{
-  position:fixed;inset:0;background:var(--white);z-index:99;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:0 var(--pad);
-  opacity:0;pointer-events:none;transition:opacity .3s;
+  position:fixed;inset:0;background:var(--bg);z-index:99;
+  display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad);
+  clip-path:inset(0 0 100% 0);transition:clip-path .6s var(--ease);
 }
-.mobile-menu.open{opacity:1;pointer-events:auto}
+.mobile-menu.open{clip-path:inset(0 0 0 0)}
 .mobile-menu a{
-  font-family:var(--serif);font-size:clamp(2.5rem,10vw,4.5rem);
-  display:block;margin-bottom:12px;
-  transition:color .2s;
+  font-family:var(--serif);font-size:clamp(2.5rem,10vw,4.5rem);display:block;margin-bottom:12px;
+  opacity:0;transform:translateY(24px);transition:opacity .4s,transform .4s var(--ease),color .2s;
 }
+.mobile-menu.open a{opacity:1;transform:translateY(0)}
+.mobile-menu.open a:nth-child(1){transition-delay:.15s,.15s}
+.mobile-menu.open a:nth-child(2){transition-delay:.2s,.2s}
+.mobile-menu.open a:nth-child(3){transition-delay:.25s,.25s}
+.mobile-menu.open a:nth-child(4){transition-delay:.3s,.3s}
 .mobile-menu a:hover{color:var(--blue)}
+.mob-num{font-family:var(--sans);font-size:14px;color:var(--blue);margin-right:12px;vertical-align:4px}
 
-/* ═══ HERO ═══ */
+/* HERO */
 .hero{
   min-height:100vh;min-height:100svh;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:120px var(--pad) 80px;
-  position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 var(--pad) clamp(60px,10vh,120px);position:relative;
 }
+.hero-top{
+  position:absolute;top:clamp(100px,15vh,180px);left:var(--pad);right:var(--pad);
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.hero-tag{font-size:13px;color:var(--fg-muted);letter-spacing:.04em;max-width:200px;line-height:1.5}
+.hero-loc{text-align:right;font-size:12px;color:var(--fg-muted);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.hero-loc span{display:block;line-height:1.6}
+
 .hero-wordmark{
-  font-family:var(--serif);
-  font-size:clamp(5rem,20vw,16rem);
-  line-height:.85;letter-spacing:-.04em;
-  margin-bottom:40px;
-  overflow:hidden;
+  font-family:var(--serif);font-size:clamp(6rem,22vw,20rem);
+  line-height:.82;letter-spacing:-.05em;margin-bottom:32px;overflow:hidden;
 }
-.hero-wordmark span{
-  display:inline-block;
-  clip-path:inset(0 100% 0 0);
-  animation:clipReveal .9s var(--ease) forwards;
-}
-.hero-wordmark span:nth-child(2){animation-delay:.06s}
-.hero-wordmark span:nth-child(3){animation-delay:.12s}
-.hero-wordmark span:nth-child(4){animation-delay:.18s}
+.hero-wordmark span{display:inline-block;clip-path:inset(0 100% 0 0);opacity:0}
+.hero-wordmark span.on{animation:clipReveal .9s var(--ease) forwards}
+.hero-wordmark span:nth-child(2).on{animation-delay:.08s}
+.hero-wordmark span:nth-child(3).on{animation-delay:.16s}
+.hero-wordmark span:nth-child(4).on{animation-delay:.24s}
+@keyframes clipReveal{to{clip-path:inset(0 0 0 0);opacity:1}}
 
-@keyframes clipReveal{
-  to{clip-path:inset(0 0 0 0)}
-}
+.hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.hero-sub{font-size:clamp(1rem,1.6vw,1.15rem);line-height:1.6;max-width:420px;color:var(--fg-muted);font-weight:300;opacity:0;transform:translateY(16px)}
+.hero-sub.on{animation:fadeUp .7s ease forwards}
 
-.hero-line{
-  width:0;height:3px;background:var(--blue);
-  margin-bottom:36px;
-  animation:lineGrow .6s var(--ease) .5s forwards;
-}
-@keyframes lineGrow{to{width:72px}}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;font-size:14px;letter-spacing:.02em;color:var(--blue);font-weight:500;opacity:0;flex-shrink:0}
+.hero-cta.on{animation:fadeUp .6s ease forwards}
+.hero-cta-line{width:32px;height:1px;background:var(--blue);transition:width .3s var(--ease)}
+.hero-cta:hover .hero-cta-line{width:48px}
 
-.hero-sub{
-  font-size:clamp(1rem,1.8vw,1.25rem);
-  line-height:1.55;max-width:500px;
-  opacity:0;transform:translateY(16px);
-  animation:fadeUp .7s ease .7s forwards;
+.hero-scroll{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--fg-muted);
+  opacity:0;animation:fadeUp .5s ease 1.8s forwards;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
 }
+.hero-scroll-line{width:1px;height:28px;background:var(--border);position:relative;overflow:hidden}
+.hero-scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:1px;height:100%;background:var(--blue);animation:scrollLine 2s ease infinite}
+@keyframes scrollLine{0%{top:-100%}50%{top:0}100%{top:100%}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
 
-.hero-loc{
-  position:absolute;bottom:48px;right:var(--pad);
-  text-align:right;font-size:13px;color:var(--grey);
-  letter-spacing:.02em;
-  opacity:0;animation:fadeUp .6s ease 1s forwards;
-}
-.hero-loc span{display:block}
+/* MARQUEE */
+.marquee{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:18px 0}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-track{display:flex;animation:scroll 40s linear infinite;width:max-content;will-change:transform}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.marquee-track span{font-family:var(--serif);font-size:clamp(1rem,1.8vw,1.35rem);white-space:nowrap;padding:0 20px;color:var(--fg)}
+.marquee-track .dot{color:var(--blue);font-size:.5em;padding:0 14px;display:flex;align-items:center}
 
-@keyframes fadeUp{
-  to{opacity:1;transform:translateY(0)}
-}
-
-/* ═══ MARQUEE ═══ */
-.marquee{
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-  overflow:hidden;
-  padding:20px 0;
-}
-.marquee-track{
-  display:flex;gap:0;
-  animation:scroll 30s linear infinite;
-  width:max-content;
-}
-@keyframes scroll{
-  to{transform:translateX(-50%)}
-}
-.marquee-track span{
-  font-family:var(--serif);
-  font-size:clamp(1.1rem,2vw,1.5rem);
-  white-space:nowrap;
-  padding:0 24px;
-  color:var(--black);
-}
-.marquee-track span.dot{
-  color:var(--blue);
-  font-size:.6em;
-  padding:0 16px;
-  display:flex;align-items:center;
-}
-
-/* ═══ SECTIONS ═══ */
+/* SECTIONS */
 .sec{padding:clamp(80px,12vw,160px) var(--pad)}
-.sec-label{
-  font-size:13px;font-weight:500;color:var(--grey);
-  margin-bottom:48px;
-}
-.sec-title{
-  font-family:var(--serif);
-  font-size:clamp(2rem,4.5vw,3.2rem);
-  line-height:1.15;margin-bottom:64px;
-  max-width:780px;
-}
+.sec-label{font-size:12px;font-weight:400;color:var(--fg-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:48px;display:flex;align-items:center;gap:12px}
+.sec-label::before{content:'';width:24px;height:1px;background:var(--blue)}
+.sec-title{font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.4rem);line-height:1.12;margin-bottom:72px;max-width:780px}
 
-/* Reveal */
-.r{
-  opacity:0;transform:translateY(28px);
-  transition:opacity .7s ease,transform .7s ease;
-}
+.r{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s var(--ease)}
 .r.v{opacity:1;transform:translateY(0)}
 
-/* ═══ PROJECTS ═══ */
-.projects-list{
-  display:flex;flex-direction:column;
-}
+/* PROJECTS */
+.projects-list{display:flex;flex-direction:column}
 .proj{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:clamp(28px,4vw,48px) 0;
-  border-top:1px solid var(--border);
-  position:relative;
-  transition:padding-left .4s var(--ease);
-  cursor:pointer;
+  display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;
+  gap:clamp(16px,3vw,40px);padding:clamp(24px,3.5vw,44px) 0;
+  border-top:1px solid var(--border);position:relative;cursor:pointer;
+  transition:padding-left .5s var(--ease);
 }
 .proj:last-child{border-bottom:1px solid var(--border)}
-.proj::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;
-  width:0;background:var(--blue);
-  transition:width .4s var(--ease);
-}
-.proj:hover::before,.proj:focus-within::before{width:4px}
-.proj:hover,.proj:focus-within{padding-left:24px}
+.proj::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:var(--blue);transition:width .5s var(--ease)}
+.proj:hover::before,.proj:focus-within::before{width:3px}
+.proj:hover,.proj:focus-within{padding-left:28px}
 
-.proj-left{display:flex;align-items:baseline;gap:clamp(16px,3vw,40px);flex:1}
-.proj-name{
-  font-family:var(--serif);
-  font-size:clamp(1.6rem,3.5vw,2.8rem);
-  line-height:1.1;
-  transition:color .3s;
-}
+.proj-num{font-size:12px;color:var(--blue);font-variant-numeric:tabular-nums;letter-spacing:.02em;min-width:28px}
+.proj-center{display:flex;align-items:baseline;gap:clamp(12px,2vw,32px);flex:1;min-width:0}
+.proj-name{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.6rem);line-height:1.1;transition:color .4s;white-space:nowrap}
 .proj:hover .proj-name{color:var(--blue)}
-.proj-cat{
-  font-size:14px;color:var(--grey);
-  white-space:nowrap;
-}
-.proj-arrow{
-  font-size:24px;color:var(--grey);
-  opacity:0;transform:translateX(-12px);
-  transition:opacity .3s,transform .3s var(--ease);
-}
-.proj:hover .proj-arrow,.proj:focus-within .proj-arrow{
-  opacity:1;transform:translateX(0);
-}
-.proj-link{
-  position:absolute;inset:0;z-index:2;
-}
+.proj-cat{font-size:13px;color:var(--fg-muted);white-space:nowrap}
+.proj-year{font-size:12px;color:var(--fg-muted);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.proj-arrow{font-size:20px;color:var(--fg-muted);opacity:0;transform:translateX(-8px) rotate(-45deg);transition:opacity .4s,transform .4s var(--ease),color .3s}
+.proj:hover .proj-arrow,.proj:focus-within .proj-arrow{opacity:1;transform:translateX(0) rotate(-45deg);color:var(--blue)}
+.proj-link{position:absolute;inset:0;z-index:2}
 
-/* ═══ ABOUT ═══ */
-.about{background:var(--light)}
-.about-text{
-  font-family:var(--serif);
-  font-size:clamp(1.5rem,3.5vw,2.6rem);
-  line-height:1.35;
-  max-width:880px;
-}
-.about-text em{
-  font-style:italic;
-  color:var(--blue);
-}
+/* ABOUT */
+.about{background:var(--surface)}
+.about-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,100px);align-items:start}
+.about-text{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2.2rem);line-height:1.35}
+.about-text em{font-style:italic;color:var(--blue)}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:0;align-self:center}
+.stat{padding:clamp(20px,3vw,36px);border-left:1px solid var(--border)}
+.stat:nth-child(-n+2){border-bottom:1px solid var(--border)}
+.stat-num{font-family:var(--serif);font-size:clamp(2rem,4vw,3.2rem);line-height:1;color:var(--blue);margin-bottom:6px}
+.stat-label{font-size:13px;color:var(--fg-muted);line-height:1.4}
 
-/* ═══ SERVICES ═══ */
-.services-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0;max-width:960px;
-}
-.svc{
-  padding:28px 0;
-  border-top:1px solid var(--border);
-  transition:background .3s;
-}
-.svc:nth-child(-n+2){border-top:none}
-.svc:nth-child(odd){padding-right:40px}
-.svc:nth-child(even){padding-left:40px;border-left:1px solid var(--border)}
-.svc-name{
-  font-family:var(--serif);font-size:1.3rem;
-  margin-bottom:6px;
-  transition:color .2s;
-}
+/* SERVICES */
+.services-list{max-width:800px}
+.svc{display:flex;align-items:baseline;justify-content:space-between;padding:clamp(20px,3vw,32px) 0;border-top:1px solid var(--border);gap:20px;transition:padding-left .3s var(--ease)}
+.svc:last-child{border-bottom:1px solid var(--border)}
+.svc:hover{padding-left:12px}
+.svc-name{font-family:var(--serif);font-size:clamp(1.2rem,2.2vw,1.6rem);transition:color .3s;flex-shrink:0}
 .svc:hover .svc-name{color:var(--blue)}
-.svc-desc{font-size:15px;color:var(--grey);line-height:1.5}
+.svc-desc{font-size:14px;color:var(--fg-muted);line-height:1.5;max-width:320px;text-align:right}
 
-/* ═══ TESTIMONIAL ═══ */
+/* TESTIMONIAL */
 .testi{background:var(--black);color:var(--white)}
-.testi .sec-label{color:rgba(255,255,255,.35)}
-.testi-quote{
-  font-family:var(--serif);
-  font-size:clamp(1.5rem,3.5vw,2.6rem);
-  line-height:1.3;max-width:860px;
-  font-style:italic;
-}
-.testi-credit{
-  margin-top:48px;font-size:14px;
-  color:rgba(255,255,255,.45);
-}
+.testi .sec-label{color:rgba(255,255,255,.3)}
+.testi .sec-label::before{background:var(--blue)}
+.testi-quote{font-family:var(--serif);font-size:clamp(1.5rem,3.5vw,2.8rem);line-height:1.3;max-width:860px;font-style:italic;position:relative}
+.testi-quote::before{content:'\201C';position:absolute;top:-.3em;left:-.6em;font-size:3em;color:var(--blue);opacity:.4;font-style:normal;line-height:1}
+.testi-credit{margin-top:48px;font-size:14px;color:rgba(255,255,255,.4)}
 .testi-credit strong{color:var(--white);font-weight:500}
 
-/* ═══ CONTACT ═══ */
-.contact-heading{
-  font-family:var(--serif);
-  font-size:clamp(2.5rem,7vw,5rem);
-  line-height:1.08;margin-bottom:48px;
-  max-width:680px;
-}
-.contact-email{
-  font-family:var(--serif);
-  font-size:clamp(1.4rem,3.5vw,2.2rem);
-  display:inline-block;position:relative;
-  padding-bottom:4px;
-}
-.contact-email::after{
-  content:'';position:absolute;bottom:0;left:0;
-  width:100%;height:2px;background:var(--blue);
-  transform:scaleX(0);transform-origin:left;
-  transition:transform .4s var(--ease);
-}
-.contact-email:hover::after,.contact-email:focus-visible::after{
-  transform:scaleX(1);
-}
-.contact-note{margin-top:20px;font-size:15px;color:var(--grey)}
+/* CONTACT */
+.contact{position:relative;overflow:hidden}
+.contact-heading{font-family:var(--serif);font-size:clamp(2.5rem,7vw,5.5rem);line-height:1.05;margin-bottom:48px;max-width:700px}
+.contact-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:32px}
+.contact-email{font-family:var(--serif);font-size:clamp(1.3rem,3vw,2rem);display:inline-block;position:relative;padding-bottom:4px}
+.contact-email::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--blue);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.contact-email:hover::after,.contact-email:focus-visible::after{transform:scaleX(1)}
+.contact-note{margin-top:16px;font-size:14px;color:var(--fg-muted)}
+.contact-loc{font-size:13px;color:var(--fg-muted);text-align:right;line-height:1.6}
 
-/* ═══ FOOTER ═══ */
-.footer{
-  padding:40px var(--pad);
-  display:flex;justify-content:space-between;align-items:center;
-  border-top:1px solid var(--border);
-  font-size:13px;color:var(--grey);
-  flex-wrap:wrap;gap:20px;
-}
-.footer-left{display:flex;align-items:center;gap:28px}
-.footer-logo{font-family:var(--serif);font-size:18px;color:var(--black)}
+/* FOOTER */
+.footer{padding:32px var(--pad);display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);font-size:12px;color:var(--fg-muted);flex-wrap:wrap;gap:16px}
+.footer-left{display:flex;align-items:center;gap:24px}
+.footer-logo{font-family:var(--serif);font-size:18px;color:var(--fg)}
 .footer-social{display:flex;gap:20px;list-style:none}
-.footer-social a{transition:color .2s}
-.footer-social a:hover{color:var(--black)}
+.footer-social a{transition:color .3s}
+.footer-social a:hover{color:var(--blue)}
+.footer-legal{display:flex;gap:16px}
+.footer-legal a{transition:color .3s}
+.footer-legal a:hover{color:var(--fg)}
 
-/* ═══ RESPONSIVE ═══ */
+/* RESPONSIVE */
 @media(max-width:900px){
-  .services-grid{grid-template-columns:1fr}
-  .svc:nth-child(even){padding-left:0;border-left:none}
-  .svc:nth-child(2){border-top:1px solid var(--border)}
-  .svc:nth-child(odd){padding-right:0}
+  .about-inner{grid-template-columns:1fr}
+  .about-stats{margin-top:40px}
+  .svc-desc{max-width:200px}
+  .hero-top{flex-direction:column;gap:12px}
+  .hero-loc{text-align:left}
 }
 @media(max-width:768px){
   .nav-links{display:none}
   .nav-toggle{display:block}
-  .hero-loc{
-    position:relative;bottom:auto;right:auto;
-    text-align:left;margin-top:48px;
-  }
-  .proj-cat{display:none}
+  .proj{grid-template-columns:auto 1fr auto}
+  .proj-cat,.proj-year{display:none}
   .footer{flex-direction:column;align-items:flex-start}
+  .contact-row{flex-direction:column;align-items:flex-start}
+  .contact-loc{text-align:left}
+  .hero-bottom{flex-direction:column;align-items:flex-start}
+  .hero-cta{margin-top:4px}
 }
 @media(max-width:480px){
-  .hero{padding-top:100px;min-height:auto;padding-bottom:48px}
+  .hero{padding-bottom:48px}
+  .hero-scroll{display:none}
+  .about-stats{grid-template-columns:1fr 1fr}
+  .stat{padding:16px}
 }
 </style>
 </head>
 <body>
+
+<div class="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <div class="loader-word">moyo</div>
+    <div class="loader-bar"></div>
+  </div>
+</div>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
 
 <a href="#main" class="skip">Aller au contenu</a>
 
 <nav class="nav" aria-label="Navigation principale">
   <a href="#" class="nav-logo" aria-label="moyo — Accueil">moyo</a>
   <ul class="nav-links">
-    <li><a href="#projets">Projets</a></li>
-    <li><a href="#expertises">Expertises</a></li>
-    <li><a href="#studio">Studio</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#projets"><span class="nav-num">/01</span>Projets</a></li>
+    <li><a href="#studio"><span class="nav-num">/02</span>Studio</a></li>
+    <li><a href="#expertises"><span class="nav-num">/03</span>Expertises</a></li>
+    <li><a href="#contact"><span class="nav-num">/04</span>Contact</a></li>
   </ul>
   <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
     <span></span><span></span><span></span>
@@ -397,29 +362,33 @@ button{font:inherit;border:none;background:none;cursor:pointer}
 </nav>
 
 <div class="mobile-menu" role="dialog" aria-label="Menu" aria-hidden="true">
-  <a href="#projets">Projets</a>
-  <a href="#expertises">Expertises</a>
-  <a href="#studio">Studio</a>
-  <a href="#contact">Contact</a>
+  <a href="#projets"><span class="mob-num">/01</span>Projets</a>
+  <a href="#studio"><span class="mob-num">/02</span>Studio</a>
+  <a href="#expertises"><span class="mob-num">/03</span>Expertises</a>
+  <a href="#contact"><span class="mob-num">/04</span>Contact</a>
 </div>
 
 <main id="main">
 
-  <!-- HERO -->
   <section class="hero">
+    <div class="hero-top">
+      <div class="hero-tag">Studio créatif<br>multidisciplinaire<br>Côte d'Azur</div>
+      <div class="hero-loc" aria-label="Coordonnées">
+        <span>43.7102° N</span>
+        <span>7.2620° E</span>
+      </div>
+    </div>
     <h1 class="hero-wordmark"><span>m</span><span>o</span><span>y</span><span>o</span></h1>
-    <div class="hero-line" aria-hidden="true"></div>
-    <p class="hero-sub">
-      Studio créatif multidisciplinaire sur la Côte d'Azur.
-      Nous façonnons des identités et des expériences numériques sur mesure.
-    </p>
-    <div class="hero-loc" aria-label="Localisation">
-      <span>Nice, Côte d'Azur</span>
-      <span>43.7102° N, 7.2620° E</span>
+    <div class="hero-bottom">
+      <p class="hero-sub">Identités visuelles, expériences numériques et contenus audiovisuels — façonnés sur mesure depuis la Riviera.</p>
+      <a href="#contact" class="hero-cta"><span class="hero-cta-line"></span>Démarrer un projet</a>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="hero-scroll-line"></div>
+      Scroll
     </div>
   </section>
 
-  <!-- MARQUEE -->
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
       <span>Branding</span><span class="dot">●</span>
@@ -441,117 +410,84 @@ button{font:inherit;border:none;background:none;cursor:pointer}
     </div>
   </div>
 
-  <!-- PROJECTS -->
   <section id="projets" class="sec">
     <p class="sec-label r">Projets sélectionnés</p>
     <div class="projects-list">
       <article class="proj r">
-        <div class="proj-left">
-          <h2 class="proj-name">Villa Riviera</h2>
-          <span class="proj-cat">Branding, Web Design</span>
-        </div>
-        <span class="proj-arrow" aria-hidden="true">→</span>
+        <span class="proj-num">01</span>
+        <div class="proj-center"><h2 class="proj-name">Villa Riviera</h2><span class="proj-cat">Branding, Web</span></div>
+        <span class="proj-year">2024</span>
+        <span class="proj-arrow" aria-hidden="true">↗</span>
         <a href="#" class="proj-link" aria-label="Voir le projet Villa Riviera"></a>
       </article>
       <article class="proj r">
-        <div class="proj-left">
-          <h2 class="proj-name">Azur Yachting</h2>
-          <span class="proj-cat">Branding, Motion Design</span>
-        </div>
-        <span class="proj-arrow" aria-hidden="true">→</span>
+        <span class="proj-num">02</span>
+        <div class="proj-center"><h2 class="proj-name">Azur Yachting</h2><span class="proj-cat">Branding, Motion</span></div>
+        <span class="proj-year">2024</span>
+        <span class="proj-arrow" aria-hidden="true">↗</span>
         <a href="#" class="proj-link" aria-label="Voir le projet Azur Yachting"></a>
       </article>
       <article class="proj r">
-        <div class="proj-left">
-          <h2 class="proj-name">Maison Lune</h2>
-          <span class="proj-cat">VFX, 3D</span>
-        </div>
-        <span class="proj-arrow" aria-hidden="true">→</span>
+        <span class="proj-num">03</span>
+        <div class="proj-center"><h2 class="proj-name">Maison Lune</h2><span class="proj-cat">VFX, 3D</span></div>
+        <span class="proj-year">2023</span>
+        <span class="proj-arrow" aria-hidden="true">↗</span>
         <a href="#" class="proj-link" aria-label="Voir le projet Maison Lune"></a>
       </article>
       <article class="proj r">
-        <div class="proj-left">
-          <h2 class="proj-name">Nîmes Festival</h2>
-          <span class="proj-cat">Production Vidéo, Social Media</span>
-        </div>
-        <span class="proj-arrow" aria-hidden="true">→</span>
+        <span class="proj-num">04</span>
+        <div class="proj-center"><h2 class="proj-name">Nîmes Festival</h2><span class="proj-cat">Vidéo, Social</span></div>
+        <span class="proj-year">2023</span>
+        <span class="proj-arrow" aria-hidden="true">↗</span>
         <a href="#" class="proj-link" aria-label="Voir le projet Nîmes Festival"></a>
       </article>
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section id="studio" class="sec about">
     <p class="sec-label r">À propos</p>
-    <p class="about-text r">
-      Basé entre Nice et la Côte d'Azur, moyo est un studio créatif
-      qui refuse les approches génériques. Chaque projet est une
-      collaboration <em>sur mesure</em>, où la rigueur technique
-      rencontre une sensibilité visuelle forgée par la lumière
-      méditerranéenne.
-    </p>
-  </section>
-
-  <!-- SERVICES -->
-  <section id="expertises" class="sec">
-    <p class="sec-label r">Ce que nous faisons</p>
-    <h2 class="sec-title r">Une approche multidisciplinaire, pensée pour durer.</h2>
-    <div class="services-grid">
-      <div class="svc r">
-        <h3 class="svc-name">Branding</h3>
-        <p class="svc-desc">Identité visuelle, direction artistique, systèmes de marque et guidelines.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">Motion Design</h3>
-        <p class="svc-desc">Animation graphique, habillage vidéo, contenus animés pour le digital.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">VFX</h3>
-        <p class="svc-desc">Effets visuels, compositing et intégration pour le cinéma et la publicité.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">Web Design</h3>
-        <p class="svc-desc">Sites vitrines, e-commerce et plateformes sur mesure, mobile-first.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">3D</h3>
-        <p class="svc-desc">Modélisation, rendu photoréaliste, animation et expériences immersives.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">Production Vidéo</h3>
-        <p class="svc-desc">Captation, montage, post-production et diffusion multi-plateformes.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">Social Media</h3>
-        <p class="svc-desc">Stratégie de contenu, création visuelle et gestion de communautés.</p>
-      </div>
-      <div class="svc r">
-        <h3 class="svc-name">Communication</h3>
-        <p class="svc-desc">Stratégie globale, campagnes et relations presse.</p>
+    <div class="about-inner">
+      <p class="about-text r">Basé entre Nice et la Côte d'Azur, moyo est un studio créatif qui refuse les approches génériques. Chaque projet est une collaboration <em>sur mesure</em>, où la rigueur technique rencontre une sensibilité visuelle forgée par la lumière méditerranéenne.</p>
+      <div class="about-stats r">
+        <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Projets<br>livrés</div></div>
+        <div class="stat"><div class="stat-num">8</div><div class="stat-label">Expertises<br>intégrées</div></div>
+        <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Projets<br>sur mesure</div></div>
+        <div class="stat"><div class="stat-num">2020</div><div class="stat-label">Depuis<br>la Riviera</div></div>
       </div>
     </div>
   </section>
 
-  <!-- TESTIMONIAL -->
-  <section class="sec testi">
-    <p class="sec-label r">Ce qu'on dit de nous</p>
-    <blockquote class="testi-quote r">
-      Travailler avec moyo a transformé notre vision. Leur approche mêle
-      rigueur créative et sensibilité méditerranéenne — le résultat dépasse
-      toujours ce qu'on imagine.
-    </blockquote>
-    <p class="testi-credit r">
-      <strong>Sophie Laurent</strong><br>
-      Directrice — Villa Riviera
-    </p>
+  <section id="expertises" class="sec">
+    <p class="sec-label r">Ce que nous faisons</p>
+    <h2 class="sec-title r">Une approche multidisciplinaire,<br>pensée pour durer.</h2>
+    <div class="services-list">
+      <div class="svc r"><h3 class="svc-name">Branding</h3><p class="svc-desc">Identité visuelle, direction artistique et systèmes de marque</p></div>
+      <div class="svc r"><h3 class="svc-name">Motion Design</h3><p class="svc-desc">Animation graphique, habillage vidéo et contenus animés</p></div>
+      <div class="svc r"><h3 class="svc-name">VFX</h3><p class="svc-desc">Effets visuels, compositing et intégration cinéma</p></div>
+      <div class="svc r"><h3 class="svc-name">Web Design</h3><p class="svc-desc">Sites vitrines, e-commerce et plateformes sur mesure</p></div>
+      <div class="svc r"><h3 class="svc-name">3D</h3><p class="svc-desc">Modélisation, rendu photoréaliste et expériences immersives</p></div>
+      <div class="svc r"><h3 class="svc-name">Production Vidéo</h3><p class="svc-desc">Captation, montage et post-production multi-plateformes</p></div>
+      <div class="svc r"><h3 class="svc-name">Social Media</h3><p class="svc-desc">Stratégie de contenu et gestion de communautés</p></div>
+      <div class="svc r"><h3 class="svc-name">Communication</h3><p class="svc-desc">Stratégie globale, campagnes et relations presse</p></div>
+    </div>
   </section>
 
-  <!-- CONTACT -->
-  <section id="contact" class="sec">
+  <section class="sec testi">
+    <p class="sec-label r">Ce qu'on dit de nous</p>
+    <blockquote class="testi-quote r">Travailler avec moyo a transformé notre vision. Leur approche mêle rigueur créative et sensibilité méditerranéenne — le résultat dépasse toujours ce qu'on imagine.</blockquote>
+    <p class="testi-credit r"><strong>Sophie Laurent</strong><br>Directrice — Villa Riviera</p>
+  </section>
+
+  <section id="contact" class="sec contact">
     <p class="sec-label r">Contact</p>
-    <h2 class="contact-heading r">Envie de collaborer ?<br>Parlons de votre projet.</h2>
-    <a href="mailto:hello@moyo.studio" class="contact-email r">hello@moyo.studio</a>
-    <p class="contact-note r">Chaque projet est unique — sur devis.</p>
+    <h2 class="contact-heading r">Envie de<br>collaborer ?</h2>
+    <div class="contact-row">
+      <div>
+        <a href="mailto:hello@moyo.studio" class="contact-email r">hello@moyo.studio</a>
+        <p class="contact-note r">Chaque projet est unique — sur devis.</p>
+      </div>
+      <div class="contact-loc r">Nice, France<br>Côte d'Azur</div>
+    </div>
   </section>
 
 </main>
@@ -559,24 +495,59 @@ button{font:inherit;border:none;background:none;cursor:pointer}
 <footer class="footer">
   <div class="footer-left">
     <span class="footer-logo">moyo</span>
-    <span>© 2024</span>
+    <span>© 2026</span>
   </div>
   <ul class="footer-social">
     <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
     <li><a href="https://behance.net" target="_blank" rel="noopener noreferrer">Behance</a></li>
     <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
   </ul>
-  <div><a href="#">Mentions légales</a></div>
+  <div class="footer-legal">
+    <a href="#">Mentions légales</a>
+    <a href="#">Politique de confidentialité</a>
+  </div>
 </footer>
 
 <script>
-// Nav scroll
+// LOADER
+const loader=document.querySelector('.loader');
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    loader.classList.add('done');
+    setTimeout(()=>loader.remove(),600);
+    document.querySelectorAll('.hero-wordmark span').forEach(s=>s.classList.add('on'));
+    setTimeout(()=>document.querySelector('.hero-sub')?.classList.add('on'),600);
+    setTimeout(()=>document.querySelector('.hero-cta')?.classList.add('on'),800);
+  },1600);
+});
+
+// CURSOR
+if(matchMedia('(pointer:fine)').matches){
+  const cur=document.querySelector('.cursor');
+  let cx=0,cy=0,px=0,py=0;
+  document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY},{passive:true});
+  (function loop(){
+    px+=(cx-px)*.15;py+=(cy-py)*.15;
+    cur.style.transform='translate3d('+px+'px,'+py+'px,0)';
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('a,button,.proj').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cur.classList.add('hover'));
+    el.addEventListener('mouseleave',()=>cur.classList.remove('hover'));
+  });
+}
+
+// NAV hide on scroll down
 const nav=document.querySelector('.nav');
+let lastY=0;
 window.addEventListener('scroll',()=>{
-  nav.classList.toggle('scrolled',scrollY>40);
+  const y=scrollY;
+  nav.classList.toggle('scrolled',y>60);
+  if(y>400){nav.classList.toggle('hidden',y>lastY)}else{nav.classList.remove('hidden')}
+  lastY=y;
 },{passive:true});
 
-// Mobile menu
+// MOBILE MENU
 const tog=document.querySelector('.nav-toggle');
 const mm=document.querySelector('.mobile-menu');
 tog.addEventListener('click',()=>{
@@ -587,26 +558,31 @@ tog.addEventListener('click',()=>{
   document.body.style.overflow=o?'hidden':'';
 });
 mm.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
-  tog.classList.remove('open');
-  mm.classList.remove('open');
-  mm.setAttribute('aria-hidden','true');
-  tog.setAttribute('aria-expanded','false');
+  tog.classList.remove('open');mm.classList.remove('open');
+  mm.setAttribute('aria-hidden','true');tog.setAttribute('aria-expanded','false');
   document.body.style.overflow='';
 }));
 
-// Scroll reveal with stagger
+// SCROLL REVEAL
 if(!matchMedia('(prefers-reduced-motion:reduce)').matches){
   const obs=new IntersectionObserver((entries)=>{
-    const visible=entries.filter(e=>e.isIntersecting);
-    visible.forEach((e,i)=>{
-      setTimeout(()=>e.target.classList.add('v'),i*80);
+    entries.filter(e=>e.isIntersecting).forEach((e,i)=>{
+      setTimeout(()=>e.target.classList.add('v'),i*60);
       obs.unobserve(e.target);
     });
-  },{threshold:.12,rootMargin:'0px 0px -32px 0px'});
+  },{threshold:.1,rootMargin:'0px 0px -40px 0px'});
   document.querySelectorAll('.r').forEach(el=>obs.observe(el));
 }else{
   document.querySelectorAll('.r').forEach(el=>el.classList.add('v'));
 }
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
 </script>
 
 </body>
