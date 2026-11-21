@@ -12,6 +12,17 @@ Contact : contact.moyostudio@gmail.com
 - Aucune ville dans le titre, le contact ni les métadonnées. La section « Lumière » reste calculée pour Nice.
 - Mouvement lent : scroll fluide (Lenis), parallax, volets sur les titres, boutons à store.
 
+## Aperçu
+
+![Hero : la fenêtre fermée, le soleil du jour et la barre de navigation](docs/screens/01-hero.jpg)
+
+| | |
+| --- | --- |
+| ![Projets](docs/screens/02-projets.jpg) | ![Studio](docs/screens/03-studio.jpg) |
+| ![Lumière](docs/screens/04-lumiere.jpg) | ![Pied de page](docs/screens/05-pied-de-page.jpg) |
+
+Captures prises en bureau 1440 px le 22 novembre 2026 ; les heures du soleil changent chaque jour.
+
 ## Contenu de la page
 
 | Section | Contenu |
@@ -77,6 +88,10 @@ Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clie
 - Valider la phrase qui relie le mot « moyo » (cœur, vie, courage) au studio : elle est de ma plume.
 - Mesurer la fluidité sur un vrai GPU : l'environnement de test n'en a pas.
 - Ajouter d'autres moyens de contact si besoin (réseaux, téléphone).
+
+## Historique
+
+Le dossier `archive/` garde les versions précédentes, les scripts de modification et les anciens tests. Voir `archive/README.md`.
 
 ## Crédits et licences
 
