@@ -419,7 +419,7 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 #yearNote{max-width:34ch;color:var(--soft)}
 
 /* Footer */
-.foot{padding-block:clamp(64px,10vh,120px) 0;overflow:clip;border-top:1px solid var(--paper-line)}
+.foot{padding-block:clamp(64px,10vh,120px) 0;overflow:clip}
 .foot-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px clamp(16px,2vw,32px)}
 .fcol{grid-column:span 3;min-width:0}
 .fh{font-size:var(--fs-small);font-weight:600;letter-spacing:0;margin-bottom:16px;color:var(--paper)}
@@ -600,6 +600,20 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .ld-line b{position:absolute;inset:0;background:var(--klein);transform:scaleX(0);transform-origin:0 50%}
 html.loading{overflow:hidden}
 html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
+
+/* Footer top: evaporation + liquid glass.
+   .evap sits just above the footer. Its background goes from opaque Klein (bottom) to transparent (top),
+   and backdrop-filter blurs whatever scrolls behind it. The mask (a soft wave × a vertical fade) cuts out the colour
+   AND the blur together, so the blur fades with the blue and stops exactly at the wavy edge. */
+.foot{overflow:visible;overflow-x:clip;position:relative}
+.evap{position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:clamp(140px,22vh,260px);pointer-events:none;z-index:1;
+  background:linear-gradient(to top,var(--klein) 0%,color-mix(in oklab,var(--klein) 82%,transparent) 30%,color-mix(in oklab,var(--klein) 35%,transparent) 65%,transparent 100%);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 260' preserveAspectRatio='none'%3E%3Cpath d='M0 92 C 180 40 330 128 520 96 S 860 22 1040 70 S 1330 132 1440 64 V260 H0 Z'/%3E%3C/svg%3E"),linear-gradient(to top,#000 35%,transparent 100%);
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 260' preserveAspectRatio='none'%3E%3Cpath d='M0 92 C 180 40 330 128 520 96 S 860 22 1040 70 S 1330 132 1440 64 V260 H0 Z'/%3E%3C/svg%3E"),linear-gradient(to top,#000 35%,transparent 100%);
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.evap{background:linear-gradient(to top,var(--klein) 10%,transparent 100%)}}
 
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
@@ -1024,6 +1038,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </main>
 
 <footer class="sec blue foot" id="foot" data-sec="contact" data-tone="blue" aria-label="Pied de page" data-ia="footAria">
+  <div class="evap" aria-hidden="true"></div>
   <div class="wrap foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>

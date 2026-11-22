@@ -159,6 +159,20 @@ html.is-dialog{overflow:hidden}
   .dlg-desc,.dlg-plate{grid-column:1/-1}
   .dlg-facts{grid-template-columns:1fr}
 }
+
+/* Footer top: evaporation + liquid glass.
+   .evap sits just above the footer. Its background goes from opaque Klein (bottom) to transparent (top),
+   and backdrop-filter blurs whatever scrolls behind it. The mask (a soft wave × a vertical fade) cuts out the colour
+   AND the blur together, so the blur fades with the blue and stops exactly at the wavy edge. */
+.foot{overflow:visible;overflow-x:clip;position:relative}
+.evap{position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:clamp(140px,22vh,260px);pointer-events:none;z-index:1;
+  background:linear-gradient(to top,var(--klein) 0%,color-mix(in oklab,var(--klein) 82%,transparent) 30%,color-mix(in oklab,var(--klein) 35%,transparent) 65%,transparent 100%);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 260' preserveAspectRatio='none'%3E%3Cpath d='M0 92 C 180 40 330 128 520 96 S 860 22 1040 70 S 1330 132 1440 64 V260 H0 Z'/%3E%3C/svg%3E"),linear-gradient(to top,#000 35%,transparent 100%);
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 260' preserveAspectRatio='none'%3E%3Cpath d='M0 92 C 180 40 330 128 520 96 S 860 22 1040 70 S 1330 132 1440 64 V260 H0 Z'/%3E%3C/svg%3E"),linear-gradient(to top,#000 35%,transparent 100%);
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.evap{background:linear-gradient(to top,var(--klein) 10%,transparent 100%)}}
 </style>
 </head>
 <body>
@@ -185,6 +199,7 @@ html.is-dialog{overflow:hidden}
 </main>
 
 <footer class="foot" aria-label="Pied de page" data-ia="footAria">
+  <div class="evap" aria-hidden="true"></div>
   <div class="foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>
