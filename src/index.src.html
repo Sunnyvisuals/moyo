@@ -429,26 +429,27 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 
 .idx{display:flex;align-items:center;gap:14px;margin-bottom:clamp(48px,9vh,112px);font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;line-height:1}
 .idx .n{font-variant-numeric:tabular-nums;opacity:.55}
-.idx .sq{flex:none;display:block;width:9px;height:9px;background:currentColor;rotate:calc(var(--p,.5) * 180deg)}
+.idx .sq{flex:none;display:block;width:18px;height:7px;border-block:1px solid currentColor}
 .idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22;transform-origin:0 50%;scale:var(--p2,1) 1}
 
 .sec{--p:.5;--p2:1}
 .sec>.wrap{position:relative;z-index:1}
-.geo{position:absolute;z-index:0;pointer-events:none;width:clamp(150px,22vw,360px);height:auto;overflow:visible;color:var(--klein)}
-.blue .geo{color:var(--paper)}
-.geo *{vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:50% 50%}
-.geo .g-sq{fill:none;stroke:currentColor;stroke-width:1;opacity:.55;rotate:calc(var(--p) * 90deg)}
-.geo .g-ci{fill:none;stroke:currentColor;stroke-width:1;opacity:.55;scale:calc(.35 + var(--p) * .9)}
-.geo .g-ln{stroke:currentColor;stroke-width:1;opacity:.35;transform-origin:0 50%;scale:var(--p) 1}
-.geo .g-dot{fill:currentColor;rotate:calc(var(--p) * -270deg);translate:calc((var(--p) - .5) * 180px) 0}
-.geo-a{right:var(--m);bottom:clamp(64px,12vh,160px)}
-.geo-b{left:var(--m);bottom:clamp(40px,8vh,96px);width:clamp(110px,11vw,180px)}
-.geo-c{right:var(--m);bottom:clamp(48px,9vh,120px);width:clamp(110px,11vw,180px)}
-.geo-d{right:var(--m);top:clamp(120px,22vh,280px)}
-.geo-e{right:var(--m);bottom:clamp(40px,8vh,100px);width:clamp(120px,13vw,220px)}
-.geo-f{right:var(--m);top:50%;translate:0 -50%}
-.geo-e .g-sq{fill:currentColor;opacity:.08}
-.geo-d .g-ci{fill:currentColor;opacity:.1}
+/* Colour blocks, Tetris-like: flat pieces in shades of Klein and lime, across the full width at the foot of a section.
+   As the band enters (JS sets --bp 0→1), each piece drops into place after the previous one (--d) and its colour
+   turns from one shade to its own. Without JS or with reduced motion, --bp stays 1: the band is simply composed. */
+.sec.has-band{padding-bottom:0}
+.blocks{--bp:1;position:relative;z-index:1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(72px,12vh,152px);grid-auto-flow:dense;overflow:clip;
+  margin:clamp(96px,16vh,200px) calc(var(--m) * -1) 0;
+  --c1:var(--klein);--c2:color-mix(in oklab,var(--klein) 74%,#000a2a);--c3:color-mix(in oklab,var(--klein) 42%,var(--chaux));--c4:color-mix(in oklab,var(--klein) 16%,var(--chaux));--c5:var(--wash)}
+.blue .blocks{--c1:color-mix(in oklab,var(--klein) 70%,#000a2a);--c2:color-mix(in oklab,var(--klein) 84%,var(--chaux));--c3:color-mix(in oklab,var(--klein) 52%,var(--chaux));--c4:var(--chaux);--c5:color-mix(in oklab,var(--klein) 24%,var(--chaux))}
+.blocks i{grid-column:span var(--s);grid-row:span var(--r);--q:clamp(0,calc((var(--bp) - var(--d)) * 2.2),1);
+  background:color-mix(in oklab,var(--to) calc(var(--q) * 100%),var(--from));translate:0 calc((1 - var(--q)) * -42%)}
+.blocks .k1{--to:var(--c1);--from:var(--c3)}
+.blocks .k2{--to:var(--c2);--from:var(--c4)}
+.blocks .k3{--to:var(--c3);--from:var(--c1)}
+.blocks .k4{--to:var(--c4);--from:var(--c2)}
+.blocks .k5{--to:var(--c5);--from:var(--c3)}
+@media (max-width:820px){.blocks{grid-auto-rows:clamp(44px,8vh,88px)}}
 
 /* Approach: a larger statement, nothing else */
 .intro{padding-top:clamp(120px,22vh,280px)}
@@ -489,24 +490,21 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 /* Footer */
 .fh{text-transform:uppercase;letter-spacing:.09em;font-size:.75rem;font-weight:500;color:var(--paper-soft)}
 
-/* Section squares, right edge: the current one fills and turns into a diamond */
-.dots{position:fixed;z-index:79;right:max(6px,calc(var(--m) * .45));top:50%;translate:0 -50%;display:grid;gap:4px;color:var(--klein);transition:color var(--dur-3) var(--ease-enter),opacity var(--dur-3)}
+/* Section slats, right edge: like the slats of a blind. The current one opens wide. */
+.dots{position:fixed;z-index:79;right:max(6px,calc(var(--m) * .5));top:50%;translate:0 -50%;display:grid;color:var(--klein);transition:color var(--dur-3) var(--ease-enter),opacity var(--dur-3)}
 .dots[data-tone="paper"]{color:var(--paper)}
-.dots a{display:grid;place-items:center;width:24px;height:24px}
-.dots a::before{content:"";width:7px;height:7px;border:1px solid currentColor;transition:background var(--dur-3) var(--ease-enter),rotate var(--dur-4) var(--ease-enter),scale var(--dur-4) var(--ease-enter)}
-.dots a:hover::before{background:currentColor}
-.dots a[aria-current="true"]::before{background:currentColor;rotate:45deg;scale:1.25}
+.dots a{display:flex;align-items:center;justify-content:flex-end;width:44px;height:18px}
+.dots a::before{content:"";width:12px;height:1px;background:currentColor;opacity:.4;transition:width var(--dur-4) var(--ease-enter),opacity var(--dur-3),height var(--dur-3)}
+.dots a:hover::before{width:20px;opacity:.9}
+.dots a[aria-current="true"]::before{width:34px;height:2px;opacity:1}
 .dots :focus-visible{outline-offset:0}
 html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 
 @media (max-width:1000px){
   .figs{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .geo-b,.geo-c{display:none}
 }
 @media (max-width:820px){
   .dots{display:none}
-  .geo{width:clamp(110px,34vw,180px);opacity:.7}
-  .geo-a,.geo-d,.geo-f{display:none}
 }
 @media (max-width:480px){.figs{grid-template-columns:1fr}}
 
@@ -606,8 +604,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </section>
 
 <!-- Approche -->
-<section class="sec blue intro" id="approche" data-sec="intro" data-tone="blue" aria-labelledby="introT">
-  <svg class="geo geo-a" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
+<section class="sec has-band blue intro" id="approche" data-sec="intro" data-tone="blue" aria-labelledby="introT">
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">01</span><span data-i="sec.intro">Approche</span></p>
     <div class="cols">
@@ -615,11 +612,12 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <div class="lead-link"><a class="link" href="#projets" data-i="introL">Voir les projets</a></div>
     </div>
   </div>
+
+  <div class="blocks blocks-a" aria-hidden="true"><i class="k1" style="--s:5;--r:2;--d:0"></i><i class="k3" style="--s:3;--r:1;--d:0.1"></i><i class="k4" style="--s:4;--r:1;--d:0.2"></i><i class="k5" style="--s:2;--r:1;--d:0.3"></i><i class="k2" style="--s:5;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Projets -->
 <section class="sec" id="projets" data-sec="projects" data-tone="paper" aria-labelledby="projT">
-  <svg class="geo geo-b" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">02</span><span data-i="sec.projects">Projets</span></p>
     <div class="sec-head">
@@ -633,8 +631,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </section>
 
 <!-- Services et méthode -->
-<section class="sec" id="services" data-sec="services" data-tone="paper" aria-label="Services et méthode" data-ia="svcAria">
-  <svg class="geo geo-c" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
+<section class="sec has-band" id="services" data-sec="services" data-tone="paper" aria-label="Services et méthode" data-ia="svcAria">
   <div class="wrap two">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">03</span><span data-i="sec.services">Services</span></p>
     <section aria-labelledby="svcT">
@@ -656,11 +653,12 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       </ol>
     </section>
   </div>
+
+  <div class="blocks blocks-b" aria-hidden="true"><i class="k4" style="--s:3;--r:1;--d:0"></i><i class="k1" style="--s:6;--r:2;--d:0.12"></i><i class="k3" style="--s:3;--r:1;--d:0.24"></i><i class="k2" style="--s:3;--r:1;--d:0.32"></i><i class="k5" style="--s:3;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Studio -->
 <section class="sec blue studio" id="studio" data-sec="studio" data-tone="blue" aria-labelledby="stuT">
-  <svg class="geo geo-d" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">04</span><span data-i="sec.studio">Studio</span></p>
     <h2 class="display par shut" id="stuT" style="--a:44px" data-i="stuT">Le studio.</h2>
@@ -687,8 +685,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </section>
 
 <!-- Lumière -->
-<section class="sec" id="lumiere" data-sec="light" data-tone="paper" aria-labelledby="lumT">
-  <svg class="geo geo-e" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
+<section class="sec has-band" id="lumiere" data-sec="light" data-tone="paper" aria-labelledby="lumT">
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">05</span><span data-i="sec.light">Lumière</span></p>
     <div class="sec-head">
@@ -703,11 +700,12 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     </dl>
     <p class="sol" id="yearNote"></p>
   </div>
+
+  <div class="blocks blocks-c" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="k5" style="--s:4;--r:1;--d:0.1"></i><i class="k1" style="--s:4;--r:2;--d:0.2"></i><i class="k3" style="--s:6;--r:1;--d:0.3"></i><i class="k4" style="--s:2;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Contact -->
 <section class="sec blue contact" id="contact" data-sec="contact" data-tone="blue" aria-labelledby="ctT">
-  <svg class="geo geo-f" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap top" style="width:100%">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">06</span><span data-i="sec.contact">Contact</span></p>
     <h2 class="display shut" id="ctT" data-i="ctT">Parlons lumière.</h2>
@@ -948,6 +946,8 @@ function frame(){
   if(sunCur!==w) more=true;
   updateBar();
   coverStack();
+  // a band sits at the foot of a section that then stops: it is complete once it is fully on screen
+  if(!reduce) for(const b of bands){ const t=b.getBoundingClientRect().top; setV(b,'--bp',clamp((innerHeight-t)/Math.max(1,b.offsetHeight)).toFixed(3)); }
   if(pxEls.length&&parallax()) more=true;
   if(more) raf=requestAnimationFrame(frame);
 }
@@ -990,6 +990,7 @@ bar.addEventListener('focusin',()=>bar.classList.remove('away'));
 /* ---------- Stacking: each section stops once its end is reached, the next one slides over it ---------- */
 const stackOn=!reduce&&CSS.supports('position','sticky');
 const stack=$$('main > .sec');
+const bands=$$('.blocks');
 function layoutStack(){
   if(!stackOn) return;
   // a section taller than the screen sticks only when its bottom reaches the bottom of the screen
