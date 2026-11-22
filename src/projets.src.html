@@ -9,6 +9,8 @@
 <meta name="description" content="Tous les projets du studio moyo, rangés par catégorie : identités, sites, données, motion.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<script>/* page transitions can be cut short by a fast click: that is not an error */
+for(const t of ['pagereveal','pageswap']) addEventListener(t,e=>{const v=e.viewTransition; if(v) for(const p of [v.ready,v.finished,v.updateCallbackDone]) p&&p.catch(()=>{})});</script>
 <style>
 @font-face{font-family:"Hanken Grotesk";src:url(/fonts/hanken-grotesk.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 :root{
@@ -113,6 +115,17 @@ footer{padding:32px var(--m);border-top:1px solid var(--line);display:flex;flex-
   ::view-transition-group(*){animation-duration:600ms;animation-timing-function:var(--ease-enter)}
 }
 @keyframes itemIn{from{opacity:0;translate:0 24px}}
+
+/* Page change (home ↔ /projets): same transition as on the home page */
+@view-transition{navigation:auto;types:page}
+@media (prefers-reduced-motion:no-preference){
+  html:active-view-transition-type(page)::view-transition{background:color-mix(in oklab,var(--klein) 38%,#000614)}
+  html:active-view-transition-type(page)::view-transition-group(root){animation-duration:1300ms}
+  html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1300ms cubic-bezier(.76,0,.24,1) both;transform-origin:50% 50%}
+  html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1300ms cubic-bezier(.76,0,.24,1) both}
+}
+@keyframes pgOut{to{scale:.86;border-radius:28px;filter:brightness(.5)}}
+@keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
 @media (max-width:1000px){.projects{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){
   .head h1,.head p{grid-column:1/-1}

@@ -22,6 +22,14 @@ export async function onRequest({ request, env, next }) {
       .transform(res);
   }
 
+  // contact form posted without JavaScript: say so on the page it lands on
+  if (page === 'home' && isHTML && res.ok && (url.searchParams.has('envoye') || url.searchParams.has('erreur'))) {
+    const ok = url.searchParams.has('envoye');
+    res = new HTMLRewriter()
+      .on('#ctStatus', { element: el => { el.setInnerContent(ok ? 'Message envoyé. Merci !' : 'Le message n’a pas pu partir. Vérifiez les champs et réessayez.'); if (!ok) el.setAttribute('class', 'f-status err'); } })
+      .transform(res);
+  }
+
   res = new Response(res.body, res);
   const h = res.headers;
   h.set('X-Content-Type-Options', 'nosniff');

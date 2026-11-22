@@ -12,6 +12,8 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"Moyo","description":"Studio de design et de développement : sites, identités et visualisations de données.","email":"contact.moyostudio@gmail.com","knowsLanguage":["fr","en"]}</script>
+<script>/* page transitions can be cut short by a fast click: that is not an error */
+for(const t of ['pagereveal','pageswap']) addEventListener(t,e=>{const v=e.viewTransition; if(v) for(const p of [v.ready,v.finished,v.updateCallbackDone]) p&&p.catch(()=>{})});</script>
 <style>
 @font-face{font-family:"Hanken Grotesk";src:url(data:font/woff2;base64,__FONT__) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 
@@ -92,10 +94,6 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .bar-mark{font-size:1.125rem;font-weight:550;letter-spacing:-.02em;text-decoration:none}
 .bar-now{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.62;padding-left:clamp(16px,2.4vw,40px);border-left:1px solid currentColor;line-height:1;transition:opacity var(--dur-3)}
 .bar-r{margin-left:auto;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px)}
-.bar-time{display:flex;align-items:center;gap:9px;font-weight:400;font-variant-numeric:tabular-nums}
-.bar-time .dial{flex:none;width:24px;height:14px;overflow:visible}
-.bar-time .dial .arc,.bar-time .dial .hz{fill:none;stroke:currentColor;stroke-opacity:.5;stroke-width:1.1}
-.bar-time .dial circle{fill:currentColor}
 .bar button{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:24px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
 .bar button:hover{background-size:100% 1px}
 .bar-menu{background:none!important}
@@ -103,7 +101,6 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .bar-menu path{stroke:currentColor;stroke-width:1.2;transition:d var(--dur-3) var(--ease-enter)}
 .bar-menu:hover path{d:path("M0 1h22M6 9h16")}
 @media (max-width:700px){.bar-now{display:none}}
-@media (max-width:380px){.bar-time .dial{display:none}}
 
 /* Menu (popover) */
 #menu{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--klein);color:var(--paper);overflow:auto;clip-path:inset(0);
@@ -371,14 +368,19 @@ html.is-dialog{overflow:hidden}
 
 /* Stacking: sections stop at their end and the next one slides over. --st is set by JS (0 or negative for tall sections),
    --cv (0→1) is how much of the section is already covered: it dims and rises a little, slowly. */
-/* Cards: a covered section recedes (scales down around the middle of the screen, rounds its corners);
-   the incoming one arrives with rounded top corners that flatten once it fills the screen (--in 0→1). */
-html.stack,html.stack body{background:color-mix(in oklab,var(--klein) 38%,#000614)}
-html.stack main>.sec{position:sticky;top:var(--st,0px);overflow:clip;
-  transform-origin:50% calc(100% - 50vh);
-  transform:translateY(calc(var(--cv,0) * -2.5vh)) scale(calc(1 - var(--cv,0) * .075));
-  border-radius:max(calc((1 - var(--in,1)) * 28px),calc(var(--cv,0) * 22px)) max(calc((1 - var(--in,1)) * 28px),calc(var(--cv,0) * 22px)) calc(var(--cv,0) * 22px) calc(var(--cv,0) * 22px)}
-html.stack main>.sec::after{border-radius:inherit}
+html.stack main>.sec{position:sticky;top:var(--st,0px);transform:translateY(calc(var(--cv,0) * -9vh))}
+
+/* Page change (home ↔ /projets): the page you leave recedes like a card, the next one rises over it.
+   Native cross-document View Transitions; scoped to the "page" type so in-page transitions (project dialog) are untouched. */
+@view-transition{navigation:auto;types:page}
+@media (prefers-reduced-motion:no-preference){
+  html:active-view-transition-type(page)::view-transition{background:color-mix(in oklab,var(--klein) 38%,#000614)}
+  html:active-view-transition-type(page)::view-transition-group(root){animation-duration:1300ms}
+  html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1300ms cubic-bezier(.76,0,.24,1) both;transform-origin:50% 50%}
+  html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1300ms cubic-bezier(.76,0,.24,1) both}
+}
+@keyframes pgOut{to{scale:.86;border-radius:28px;filter:brightness(.5)}}
+@keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
 html.stack main>.sec:not(.blue){background:var(--chaux)}
 html.stack main>.sec+.sec{box-shadow:0 -1px 0 var(--line),0 -40px 80px -40px rgb(0 18 70 / .22)}
 html.stack main>.sec.blue+.sec:not(.blue){box-shadow:0 -40px 80px -40px rgb(0 10 50 / .35)}
@@ -441,22 +443,33 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 
 .sec{--p:.5;--p2:1}
 .sec>.wrap{position:relative;z-index:1}
-/* Colour blocks, Tetris-like: flat pieces in shades of Klein and lime, across the full width at the foot of a section.
-   As the band enters (JS sets --bp 0→1), each piece drops into place after the previous one (--d) and its colour
-   turns from one shade to its own. Without JS or with reduced motion, --bp stays 1: the band is simply composed. */
-.sec.has-band{padding-bottom:0}
-.blocks{--bp:1;position:relative;z-index:1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(72px,12vh,152px);grid-auto-flow:dense;overflow:clip;
-  margin:clamp(96px,16vh,200px) calc(var(--m) * -1) 0;
+/* Scattered colour blocks: irregular flat pieces (sometimes paired like Tetris pieces) along the edges of every section,
+   generated by JS from a fixed seed so the layout is the same on every visit. Each piece slides in from its edge and turns
+   from one shade to its own as it enters (--q 0→1), then drifts at its own speed (--py). Decorative, behind the text. */
+.scatter{position:absolute;inset:0;z-index:0;overflow:clip;pointer-events:none;
   --c1:var(--klein);--c2:color-mix(in oklab,var(--klein) 74%,#000a2a);--c3:color-mix(in oklab,var(--klein) 42%,var(--chaux));--c4:color-mix(in oklab,var(--klein) 16%,var(--chaux));--c5:var(--wash)}
-.blue .blocks{--c1:color-mix(in oklab,var(--klein) 70%,#000a2a);--c2:color-mix(in oklab,var(--klein) 84%,var(--chaux));--c3:color-mix(in oklab,var(--klein) 52%,var(--chaux));--c4:var(--chaux);--c5:color-mix(in oklab,var(--klein) 24%,var(--chaux))}
-.blocks i{grid-column:span var(--s);grid-row:span var(--r);--q:clamp(0,calc((var(--bp) - var(--d)) * 2.2),1);
-  background:color-mix(in oklab,var(--to) calc(var(--q) * 100%),var(--from));translate:0 calc((1 - var(--q)) * -42%)}
-.blocks .k1{--to:var(--c1);--from:var(--c3)}
-.blocks .k2{--to:var(--c2);--from:var(--c4)}
-.blocks .k3{--to:var(--c3);--from:var(--c1)}
-.blocks .k4{--to:var(--c4);--from:var(--c2)}
-.blocks .k5{--to:var(--c5);--from:var(--c3)}
-@media (max-width:820px){.blocks{grid-auto-rows:clamp(44px,8vh,88px)}}
+.blue .scatter{--c1:color-mix(in oklab,var(--klein) 68%,#000a2a);--c2:color-mix(in oklab,var(--klein) 82%,#000a2a);--c3:color-mix(in oklab,var(--klein) 80%,var(--chaux));--c4:color-mix(in oklab,var(--klein) 64%,var(--chaux));--c5:color-mix(in oklab,var(--klein) 90%,var(--chaux))}
+.scatter i{position:absolute;display:block;--q:1;
+  background:color-mix(in oklab,var(--to) calc(var(--q) * 100%),var(--from));
+  transform:translate3d(calc((1 - var(--q)) * var(--dx,0%)),var(--py,0px),0) scaleX(calc(.3 + var(--q) * .7));transform-origin:var(--ox,0) 50%}
+.scatter .k1{--to:var(--c1);--from:var(--c3)}
+.scatter .k2{--to:var(--c2);--from:var(--c4)}
+.scatter .k3{--to:var(--c3);--from:var(--c1)}
+.scatter .k4{--to:var(--c4);--from:var(--c2)}
+.scatter .k5{--to:var(--c5);--from:var(--c3)}
+
+/* Text reveal: a roller blind going up, in one piece (no slats). Replaces the old shutters. */
+.shut,#proj .dlg-in>h3{-webkit-mask-image:none;mask-image:none}
+@keyframes blind{from{clip-path:inset(-.25em -.1em 100% -.1em)}to{clip-path:inset(-.25em -.1em -.3em -.1em)}}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .shut{animation:blind linear both;animation-timeline:view();animation-range:entry 15% cover 32%}
+    .shut.par{animation:par linear both,blind linear both;animation-timeline:--v,view();animation-range:cover 0% cover 100%,entry 15% cover 32%}
+  }
+}
+@media (prefers-reduced-motion:no-preference){
+  #proj[open] .dlg-in>h3{animation:itemIn 1900ms var(--spring) both,blind 1600ms var(--ease-enter) 500ms both}
+}
 
 /* Gradient text filled by the scroll: a wide gradient clipped to the letters, with a fine dot screen (dithering) on top.
    JS sets --g from 0 (text arriving, mostly faded) to 1 (fully lit). Without JS or with reduced motion, --g stays 1. */
@@ -500,9 +513,54 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .figs .fs{font-size:var(--fs-small);color:var(--soft);max-width:24ch;min-height:2.9em}
 .sol{margin-top:clamp(56px,10vh,128px);font-size:var(--fs-lead);max-width:44ch}
 
-/* Contact */
+/* Contact: the invitation on the left, a quiet form on the right. Lines, not boxes. */
 .contact{padding-top:clamp(120px,22vh,280px)}
-.mail{font-weight:250;border-bottom-width:1px}
+.ct-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:56px clamp(16px,2vw,32px);align-items:start}
+.ct-side{grid-column:1/6}
+.ct-form{grid-column:7/-1}
+.ct-lead{font-size:var(--fs-lead);max-width:34ch;margin-top:clamp(24px,4vh,40px)}
+.ct-alt{margin-top:clamp(40px,7vh,80px);font-size:var(--fs-small);line-height:1.8}
+.ct-mail{font-size:1.125rem;text-decoration:none;background:linear-gradient(currentColor,currentColor) 0 100%/100% 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
+.ct-mail:hover{background-size:0 1px;background-position:100% 100%}
+.ct-side .copy{margin-top:20px}
+.fl{display:block;font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--paper-soft);margin-bottom:10px;padding:0}
+.f-two{display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(16px,2vw,32px)}
+.fld{display:block;margin-bottom:clamp(28px,4.5vh,44px)}
+.fld input,.fld textarea{display:block;width:100%;font:inherit;font-size:clamp(1.125rem,1.5vw,1.375rem);font-weight:300;color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;padding:6px 0 12px;outline:none;transition:border-color var(--dur-1)}
+.fld textarea{resize:vertical;min-height:7.5em;line-height:1.45}
+.fld input:focus,.fld textarea:focus{border-bottom-color:var(--paper);box-shadow:0 1px 0 var(--paper)}
+.fld input:-webkit-autofill{-webkit-text-fill-color:var(--paper);transition:background-color 99999s}
+.fld [aria-invalid="true"]{border-bottom-color:#ffb4a8}
+.chips{border:0;margin:0 0 clamp(28px,4.5vh,44px);padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips legend{float:left;width:100%}
+.chips label{position:relative}
+.chips input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chips span{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid var(--paper-line);font-size:var(--fs-small);font-weight:500;transition:background var(--dur-1),color var(--dur-1),border-color var(--dur-1)}
+.chips label:hover span{border-color:var(--paper)}
+.chips input:checked+span{background:var(--paper);color:var(--klein);border-color:var(--paper)}
+.chips input:focus-visible+span{outline:2px solid var(--paper);outline-offset:3px}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
+.f-foot{display:flex;align-items:center;justify-content:space-between;gap:20px 32px;flex-wrap:wrap;margin-top:8px}
+.f-note{font-size:.8125rem;color:var(--paper-soft);max-width:30ch}
+.send{display:inline-flex;align-items:center;justify-content:space-between;gap:48px;min-height:64px;padding:0 28px;min-width:min(280px,100%);background:var(--paper);color:var(--klein);font-size:1rem;font-weight:550;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
+.send svg{width:24px;height:12px;overflow:visible}
+.send path{fill:none;stroke:currentColor;stroke-width:1.4}
+.send:hover{gap:64px;background:color-mix(in oklab,var(--paper) 90%,var(--klein))}
+.send:disabled{opacity:.6;cursor:progress}
+.send:focus-visible{outline:2px solid var(--paper);outline-offset:4px}
+.f-status{margin-top:18px;min-height:1.5em;font-size:var(--fs-small)}
+.f-status.err{color:#ffd2ca}
+.f-done{padding:clamp(32px,6vh,64px) 0;border-top:1px solid var(--paper-line)}
+.f-done h3{font-size:clamp(1.75rem,3vw,2.75rem);font-weight:300;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px}
+.f-done p{color:var(--paper-soft);max-width:36ch}
+@media (max-width:1000px){.ct-side,.ct-form{grid-column:1/-1}}
+@media (max-width:560px){.f-two{grid-template-columns:1fr}}
+
+/* Footer language switch */
+.flang{display:inline-flex;gap:14px}
+.flang button{min-height:32px;color:var(--paper-soft);background:linear-gradient(currentColor,currentColor) 0 calc(100% - 6px)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter),color var(--dur-1)}
+.flang button:hover{color:var(--paper)}
+.flang button[aria-pressed="true"]{color:var(--paper);background-size:100% 1px}
 
 /* Footer */
 .fh{text-transform:uppercase;letter-spacing:.09em;font-size:.75rem;font-weight:500;color:var(--paper-soft)}
@@ -555,7 +613,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
 </style>
-<noscript><style>#langBtn,.sunui,.bar-time,.hint{display:none}</style></noscript>
+<noscript><style>#langBtn,.sunui,.hint{display:none}</style></noscript>
 </head>
 <body>
 <a class="skip" href="#main" data-i="skip">Aller au contenu</a>
@@ -563,9 +621,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 
 <header class="bar" id="bar" data-tone="klein">
   <a class="bar-mark" href="#top" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
-  <span class="bar-now" id="barNow" data-i="sec.top" aria-hidden="true">Accueil</span>
   <nav class="bar-r" aria-label="Navigation principale" data-ia="nav">
-    <span class="bar-time" id="barTime" aria-hidden="true"><svg class="dial" viewBox="0 0 28 16" aria-hidden="true"><path class="arc" d="M2 14A12 12 0 0 1 26 14"/><line class="hz" x1="0" y1="14.6" x2="28" y2="14.6"/><circle id="dialSun" cx="2" cy="14" r="2.5"/></svg><span id="barT">12:00</span></span>
     <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
     <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span data-i="menu">Menu</span><svg viewBox="0 0 22 10" aria-hidden="true"><path d="M0 1h22M0 9h22"/></svg></button>
   </nav>
@@ -621,7 +677,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </section>
 
 <!-- Approche -->
-<section class="sec has-band blue intro" id="approche" data-sec="intro" data-tone="blue" aria-labelledby="introT">
+<section class="sec blue intro" id="approche" data-sec="intro" data-tone="blue" aria-labelledby="introT">
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">01</span><span data-i="sec.intro">Approche</span></p>
     <div class="cols">
@@ -629,8 +685,6 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <div class="lead-link"><a class="link" href="#projets" data-i="introL">Voir les projets</a></div>
     </div>
   </div>
-
-  <div class="blocks blocks-a" aria-hidden="true"><i class="k1" style="--s:5;--r:2;--d:0"></i><i class="k3" style="--s:3;--r:1;--d:0.1"></i><i class="k4" style="--s:4;--r:1;--d:0.2"></i><i class="k5" style="--s:2;--r:1;--d:0.3"></i><i class="k2" style="--s:5;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Projets -->
@@ -648,7 +702,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </section>
 
 <!-- Services et méthode -->
-<section class="sec has-band" id="services" data-sec="services" data-tone="paper" aria-label="Services et méthode" data-ia="svcAria">
+<section class="sec" id="services" data-sec="services" data-tone="paper" aria-label="Services et méthode" data-ia="svcAria">
   <div class="wrap two">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">03</span><span data-i="sec.services">Services</span></p>
     <section aria-labelledby="svcT">
@@ -658,6 +712,9 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
         <li><h3 data-i="s2t">Sites immersifs</h3><p data-i="s2p">Scroll narratif, WebGL quand il sert le sujet, lisibles sans souris ni animation.</p></li>
         <li><h3 data-i="s3t">Visualisation de données</h3><p data-i="s3p">Des graphiques que l’on explore, avec leurs sources et une version en tableau.</p></li>
         <li><h3 data-i="s4t">Identités en mouvement</h3><p data-i="s4p">Logos, grilles et animations pour les marques qui vivent sur écran.</p></li>
+        <li><h3 data-i="s5t">Audiovisuel</h3><p data-i="s5p">Films de marque, captation, montage et motion design, du storyboard à l’étalonnage.</p></li>
+        <li><h3 data-i="s6t">Communication</h3><p data-i="s6p">Stratégie, campagnes et réseaux sociaux : un message clair, tenu sur chaque support.</p></li>
+        <li><h3 data-i="s7t">Édition &amp; print</h3><p data-i="s7p">Affiches, catalogues, signalétique : la même rigueur sur le papier que sur l’écran.</p></li>
       </ul>
     </section>
     <section class="par" style="--a:30px" aria-labelledby="mthT">
@@ -670,8 +727,6 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       </ol>
     </section>
   </div>
-
-  <div class="blocks blocks-b" aria-hidden="true"><i class="k4" style="--s:3;--r:1;--d:0"></i><i class="k1" style="--s:6;--r:2;--d:0.12"></i><i class="k3" style="--s:3;--r:1;--d:0.24"></i><i class="k2" style="--s:3;--r:1;--d:0.32"></i><i class="k5" style="--s:3;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Studio -->
@@ -702,7 +757,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </section>
 
 <!-- Lumière -->
-<section class="sec has-band" id="lumiere" data-sec="light" data-tone="paper" aria-labelledby="lumT">
+<section class="sec" id="lumiere" data-sec="light" data-tone="paper" aria-labelledby="lumT">
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">05</span><span data-i="sec.light">Lumière</span></p>
     <div class="sec-head">
@@ -717,18 +772,53 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     </dl>
     <p class="sol" id="yearNote"></p>
   </div>
-
-  <div class="blocks blocks-c" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="k5" style="--s:4;--r:1;--d:0.1"></i><i class="k1" style="--s:4;--r:2;--d:0.2"></i><i class="k3" style="--s:6;--r:1;--d:0.3"></i><i class="k4" style="--s:2;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Contact -->
 <section class="sec blue contact" id="contact" data-sec="contact" data-tone="blue" aria-labelledby="ctT">
   <div class="wrap top" style="width:100%">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">06</span><span data-i="sec.contact">Contact</span></p>
-    <h2 class="display shut grad" id="ctT" data-i="ctT">Parlons lumière.</h2>
-    <a class="mail" id="mail" href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><br>
-    <button class="link copy" id="copy" type="button" data-i="copy">Copier l’adresse</button>
-    <span class="sr" id="copyMsg" role="status"></span>
+    <div class="ct-grid">
+      <div class="ct-side">
+        <h2 class="display shut grad" id="ctT" data-i="ctT">Parlons lumière.</h2>
+        <p class="ct-lead" data-i="ctLead">Un lieu, un événement, une marque&nbsp;? Racontez-nous le projet. Nous répondons sous 48&nbsp;heures.</p>
+        <p class="ct-alt"><span class="muted" data-i="ctAlt">Ou directement</span><br><a class="ct-mail" id="mail" href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a></p>
+        <button class="link copy" id="copy" type="button" data-i="copy">Copier l’adresse</button>
+        <span class="sr" id="copyMsg" role="status"></span>
+      </div>
+      <form class="ct-form" id="ctForm" action="/api/contact" method="post" novalidate>
+        <div class="f-two">
+          <label class="fld"><span class="fl" data-i="fName">Nom</span><input name="name" autocomplete="name" required maxlength="120"></label>
+          <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+        </div>
+        <fieldset class="chips">
+          <legend class="fl" data-i="fType">Le projet</legend>
+          <label><input type="radio" name="type" value="identite"><span data-i="tId">Identité</span></label>
+          <label><input type="radio" name="type" value="site"><span data-i="tSite">Site</span></label>
+          <label><input type="radio" name="type" value="donnees"><span data-i="tData">Données</span></label>
+          <label><input type="radio" name="type" value="motion"><span data-i="tMotion">Motion</span></label>
+          <label><input type="radio" name="type" value="audiovisuel"><span data-i="tAv">Audiovisuel</span></label>
+          <label><input type="radio" name="type" value="communication"><span data-i="tCom">Communication</span></label>
+          <label><input type="radio" name="type" value="autre"><span data-i="tOther">Autre</span></label>
+        </fieldset>
+        <fieldset class="chips">
+          <legend class="fl" data-i="fBudget">Budget</legend>
+          <label><input type="radio" name="budget" value="lt5"><span>&lt; 5 k€</span></label>
+          <label><input type="radio" name="budget" value="5-15"><span>5 – 15 k€</span></label>
+          <label><input type="radio" name="budget" value="15-40"><span>15 – 40 k€</span></label>
+          <label><input type="radio" name="budget" value="gt40"><span>40 k€ +</span></label>
+          <label><input type="radio" name="budget" value="tbd"><span data-i="bTbd">À définir</span></label>
+        </fieldset>
+        <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="4" required minlength="10" maxlength="5000"></textarea></label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="lang" value="fr" id="ctLang">
+        <div class="f-foot">
+          <p class="f-note" data-i="fNote">Vos informations servent uniquement à vous répondre.</p>
+          <button class="send" type="submit"><span data-i="fSend">Envoyer</span><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M0 6h22M17 1l5 5-5 5"/></svg></button>
+        </div>
+        <p class="f-status" id="ctStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -766,6 +856,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <div class="wrap foot-base small">
     <span>© 2026 moyo</span>
     <span class="muted" id="fDate"></span>
+    <span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span>
     <a href="#top" data-i="top">Retour en haut</a>
   </div>
   <div class="mono-wrap" aria-hidden="true"><div class="monument grad">moyo</div></div>
@@ -808,7 +899,14 @@ try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else
 
 /* ---------- Dictionary (French stays in the HTML) ---------- */
 const EN={
- 'skip':'Skip to content','nav':'Main navigation','homeAria':'moyo, home','dotsAria':'Sections','menu':'Menu','close':'Close',
+ 'skip':'Skip to content','nav':'Main navigation','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
+ 'ctLead':'A place, an event, a brand? Tell us about the project. We reply within 48 hours.','ctAlt':'Or directly',
+ 'fName':'Name','fMail':'Email','fType':'The project','tId':'Identity','tSite':'Website','tData':'Data','tMotion':'Motion','tOther':'Other',
+ 's5t':'Audiovisual','s5p':'Brand films, shooting, editing and motion design, from storyboard to grading.',
+ 's6t':'Communication','s6p':'Strategy, campaigns and social media: one clear message, held on every medium.',
+ 's7t':'Print & publishing','s7p':'Posters, catalogues, signage: the same rigour on paper as on screen.',
+ 'tAv':'Audiovisual','tCom':'Communication',
+ 'fBudget':'Budget','bTbd':'To be defined','fMsg':'Message','fNote':'Your details are only used to reply to you.','fSend':'Send','menu':'Menu','close':'Close',
  'sec.top':'Home','sec.intro':'Approach','sec.projects':'Projects','sec.services':'Services','sec.studio':'Studio','sec.light':'Light','sec.contact':'Contact',
  'h1':'<span class="ln" style="--i:0">A design studio</span> <span class="ln" style="--i:1">that draws</span> <span class="ln" style="--i:2">with light.</span>',
  'h1p':'Websites, identities and data visualisations. An independent design and development studio.',
@@ -894,8 +992,8 @@ const hm=min=>pad(Math.floor(min/60))+':'+pad(((Math.round(min)%60)+60)%60);
 const hmLen=h=>{const m=Math.round(h*60);return Math.floor(m/60)+' h '+pad(m%60)};
 
 /* ---------- Sun: shadow, weight of the title, the day passes as you scroll ---------- */
-const stage=$('#stage'), sun=$('#sun'), sunT=$('#sunT'), sunInfo=$('#sunInfo'), barTime=$('#barT'), dialSun=$('#dialSun');
-const bar=$('#bar'), barNow=$('#barNow'), win=$('.win'), mono=$('.monument');
+const stage=$('#stage'), sun=$('#sun'), sunT=$('#sunT'), sunInfo=$('#sunInfo');
+const bar=$('#bar'), win=$('.win'), mono=$('.monument');
 const secs=$$('[data-sec]');
 const DICT_FR={};
 let curSec='top', touched=false, lastKey='', lastInfo='', lenis=null;
@@ -925,7 +1023,7 @@ function applySun(min){
     stage.style.setProperty('--sunw',sw);
   }
   const t=hm(min);
-  if(sunT.textContent!==t){sunT.textContent=t;barTime.textContent=t;const fr=(min-SUN_MIN)/(SUN_MAX-SUN_MIN),up=fr>=0&&fr<=1,c=clamp(fr,0,1);dialSun.setAttribute('cx',(14-12*Math.cos(Math.PI*c)).toFixed(2));dialSun.setAttribute('cy',(14-12*Math.sin(Math.PI*c)).toFixed(2));dialSun.style.opacity=up?1:.4}
+  if(sunT.textContent!==t) sunT.textContent=t;
   const dir=COMP[lang][Math.round(az/(Math.PI/8))%16];
   const date=new Intl.DateTimeFormat(lang==='en'?'en-GB':'fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'}).format(new Date(localMidnightMs+12*3600000));
   const deg=Math.round(el/R);
@@ -965,7 +1063,12 @@ function frame(){
   coverStack();
   // a band sits at the foot of a section that then stops: it is complete once it is fully on screen
   if(!reduce) for(const t of grads){ const r=t.getBoundingClientRect(); setV(t,'--g',clamp((innerHeight-r.top)/(innerHeight*.75+r.height*.5)).toFixed(3)); }
-  if(!reduce) for(const b of bands){ const t=b.getBoundingClientRect().top; setV(b,'--bp',clamp((innerHeight-t)/Math.max(1,b.offsetHeight)).toFixed(3)); }
+  if(!reduce) for(const p of pieces){
+    const r=p.el.getBoundingClientRect(), top=r.top-p.py, H=innerHeight;
+    if(top>H*1.3||top+r.height<-H*.5) continue;
+    setV(p.el,'--q',clamp((H-top)/(H*.55)).toFixed(3));
+    p.py=-(top+r.height/2-H/2)*p.sp; setV(p.el,'--py',p.py.toFixed(1)+'px');
+  }
   if(pxEls.length&&parallax()) more=true;
   if(more) raf=requestAnimationFrame(frame);
 }
@@ -995,7 +1098,7 @@ function updateBar(){
   const away=!reduce&&y>innerHeight*.6&&dy>0&&y-upAt>80&&!menu.matches(':popover-open')&&!bar.contains(document.activeElement);
   if(dy!==0||y<innerHeight*.6) bar.classList.toggle('away',away);
   bar.classList.toggle('solid',y>innerHeight*2.2);
-  if(key!==curSec){curSec=key;barNow.dataset.i='sec.'+key;barNow.innerHTML=lang==='en'?EN['sec.'+key]:DICT_FR['sec.'+key];
+  if(key!==curSec){curSec=key;
     dots.forEach(a=>a.setAttribute('aria-current',String(a.dataset.k===key)));}
   let dTone=found.dataset.tone;
   if(key==='top') dTone=openCur>.6?'blue':'paper';
@@ -1008,7 +1111,43 @@ bar.addEventListener('focusin',()=>bar.classList.remove('away'));
 /* ---------- Stacking: each section stops once its end is reached, the next one slides over it ---------- */
 const stackOn=!reduce&&CSS.supports('position','sticky');
 const stack=$$('main > .sec');
-const bands=$$('.blocks'), grads=$$('.grad');
+const grads=$$('.grad');
+
+/* Scattered blocks: a seeded random layout per section (same on every visit), kept to the edges so the text stays clear.
+   Paper sections take mostly light shades; deep shades only peek in from the edge. */
+function seeded(seed){return()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const pieces=[];
+stack.forEach((sec,si)=>{
+  const R=seeded(si*7919+31), blue=sec.classList.contains('blue'), small=innerWidth<820;
+  const host=document.createElement('div'); host.className='scatter'; host.setAttribute('aria-hidden','true');
+  const n=small?2:Math.max(3,Math.min(7,Math.round(sec.offsetHeight/(innerHeight*.5))));
+  const add=(side,top,w,h,k,out)=>{
+    const el=document.createElement('i'); el.className='k'+k;
+    el.style.cssText=`${side}:${(-out).toFixed(2)}vw;top:${top.toFixed(2)}%;width:${w.toFixed(2)}vw;height:${h.toFixed(2)}vh;--dx:${side==='left'?'-':''}70%;--ox:${side==='left'?'0':'100%'}`;
+    host.appendChild(el); pieces.push({el,sp:(R()-.5)*.32,py:0});
+  };
+  for(let k=0;k<n;k++){
+    const side=(k%2===0)!==(R()<.3)?'left':'right';
+    const top=((k+.1+R()*.75)/n)*100;
+    const deep=R()<(blue?.5:.35);
+    // light sections: dark shades (k1-k3) only as a sliver at the edge, wide pieces in the palest shades (k4-k5)
+    const k1=blue?1+Math.floor(R()*5):deep?1+Math.floor(R()*3):4+Math.floor(R()*2);
+    const w=small?4+R()*6:(deep?6:8)+R()*(deep?8:16);
+    const vis=small?2+R()*2:blue?(deep?2.5+R()*4:4+R()*9):(deep?1.2+R()*1.6:4+R()*8);   // how much shows inside the page (vw)
+    const h=small?4+R()*8:5+R()*24;
+    add(side,top,w,h,k1,Math.max(0,w-vis));
+    if(R()<.5&&!small){ // a second piece docked to the first, like a Tetris piece
+      const w2=w*(.35+R()*.6), h2=h*(.35+R()*.6), below=!blue||R()<.6;
+      const k2=1+((k1+1+Math.floor(R()*3))%5);
+      // paper: the docked piece keeps to the sliver width when dark, pale otherwise
+      const k2p=k2<4?(R()<.5?4:5):k2, vis2=blue?vis*(.4+R()*.6):(k2p<4?Math.min(vis,2.8):vis*(.5+R()*.5));
+      if(below) add(side,top,w2,h2,blue?k2:k2p,Math.max(0,w2-vis2));
+      else add(side,top,Math.min(w2,6),h2,k2,-vis);   // blue sections only: docked against the inner edge
+      const last=host.lastChild; if(below) last.style.top=`calc(${top.toFixed(2)}% + ${h.toFixed(2)}vh)`;
+    }
+  }
+  sec.prepend(host);
+});
 function layoutStack(){
   if(!stackOn) return;
   // a section taller than the screen sticks only when its bottom reaches the bottom of the screen
@@ -1028,7 +1167,6 @@ function coverStack(){
       setV(s,'--p2',clamp((y+H*.9-n.top)/(H*.7)).toFixed(3));
     }
     if(!stackOn) continue;
-    setV(s,'--in',clamp((H-s.getBoundingClientRect().top)/H).toFixed(3));
     const nx=stack[i+1]; let c=0;
     if(nx){const t=nx.getBoundingClientRect().top; c=clamp((H-t)/H)}
     setV(s,'--cv',c.toFixed(3));
@@ -1050,7 +1188,7 @@ function naturalTop(el){
 const PX=[
   ['.sec-head h2',.10],['.intro .display',.08],['.intro .lead-link',.16],['.statement',.07],['.entry-w',-.10],['.entry-d',.06],
   ['.beliefs',.05],['.names',.04],['.list',.035],['.today .tr',.06],['.projects li:nth-child(even)',.09],['.projects li:nth-child(odd)',.03],
-  ['.proj-more',.06],['.contact h2',.10],['.mail',.05],['.foot-grid',.04]
+  ['.proj-more',.06],['.contact h2',.08],['.ct-form',.04],['.foot-grid',.04]
 ];
 const pxEls=[];
 if(!reduce) PX.forEach(([sel,sp])=>$$(sel).forEach(el=>{ if(!el.closest('.par')&&!el.classList.contains('par')) pxEls.push({el,sp,cur:0}) }));
@@ -1104,6 +1242,8 @@ function applyLang(l){
     if(!('frAria' in el.dataset)) el.dataset.frAria=el.getAttribute('aria-label')||'';
     el.setAttribute('aria-label',l==='en'&&EN[k]?EN[k]:el.dataset.frAria);
   });
+  $$('.flang button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.l===l)));
+  if($('#ctLang')) $('#ctLang').value=l;
   const b=$('#langBtn'); b.textContent=l==='en'?'FR':'EN'; b.lang=l==='en'?'fr':'en'; b.setAttribute('aria-label',l==='en'?'Passer en français':'Switch to English');
   $$('.row').forEach((r,i)=>{ if(!PROJ[i]) return; const t=txt(PROJ[i],l); $('.r-title',r).textContent=t.title; $('.r-type',r).textContent=t.type; $('.r-place',r).textContent=t.place });
   document.title='Moyo Studio';
@@ -1113,6 +1253,39 @@ function applyLang(l){
   try{localStorage.setItem('hb-lang',l)}catch(e){}
 }
 $('#langBtn').addEventListener('click',()=>applyLang(lang==='fr'?'en':'fr'));
+$$('.flang button').forEach(x=>x.addEventListener('click',()=>{ if(x.dataset.l!==lang) applyLang(x.dataset.l) }));
+
+/* ---------- Contact form: sent with fetch; without JavaScript it posts normally and comes back with ?envoye=1 ---------- */
+const ctForm=$('#ctForm');
+if(ctForm){
+  const st=$('#ctStatus');
+  const say=(t,err)=>{st.textContent=t;st.classList.toggle('err',!!err)};
+  const q=new URLSearchParams(location.search);
+  if(q.has('envoye')) say(lang==='en'?'Message sent. Thank you!':'Message envoyé. Merci !');
+  if(q.has('erreur')) say(lang==='en'?'The message could not be sent. Check the fields and try again.':'Le message n’a pas pu partir. Vérifiez les champs et réessayez.',true);
+  ctForm.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const en=lang==='en', f=ctForm.elements;
+    [f.name,f.email,f.message].forEach(x=>x.removeAttribute('aria-invalid'));
+    const bad=!f.name.value.trim()?f.name:!f.email.validity.valid||!f.email.value?f.email:f.message.value.trim().length<10?f.message:null;
+    if(bad){
+      bad.setAttribute('aria-invalid','true'); bad.focus();
+      say(bad===f.name?(en?'Please enter your name.':'Indiquez votre nom.'):bad===f.email?(en?'Please enter a valid email address.':'Indiquez une adresse e-mail valide.'):(en?'Your message is a little short.':'Votre message est un peu court.'),true);
+      return;
+    }
+    const btn=$('.send',ctForm); btn.disabled=true; say(en?'Sending…':'Envoi…');
+    try{
+      const res=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(ctForm)))});
+      const r=await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(r.message||'');
+      ctForm.innerHTML=`<div class="f-done" tabindex="-1"><h3>${en?'Thank you. Message received.':'Merci. Message bien reçu.'}</h3><p>${en?'We will get back to you within 48 hours, at the address you gave.':'Nous vous répondons sous 48 heures, à l’adresse indiquée.'}</p></div>`;
+      $('.f-done',ctForm).focus({preventScroll:true});
+    }catch(err){
+      btn.disabled=false;
+      say(err.message||(en?'Sending failed. Write to contact.moyostudio@gmail.com.':'L’envoi a échoué. Écrivez à contact.moyostudio@gmail.com.'),true);
+    }
+  });
+}
 
 /* ---------- Today + chart ---------- */
 

@@ -116,6 +116,12 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
 .cats li{display:grid;grid-template-columns:150px 1fr 1fr auto;gap:10px;align-items:end;padding:10px 0;border-bottom:1px solid var(--line)}
 .cats .n{font-size:.75rem;color:var(--soft);padding-bottom:10px;white-space:nowrap}
 
+.msgs li{padding:20px 0;border-bottom:1px solid var(--line)}
+.msgs .mh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:8px}
+.msgs .mn{font-weight:600}
+.msgs .mm{white-space:pre-wrap;max-width:70ch;margin:10px 0 12px}
+.msgs .tags{display:flex;gap:6px;flex-wrap:wrap}
+.msgs .tag{font-size:.75rem;padding:2px 8px;background:var(--wash)}
 .danger-zone{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .toast{position:fixed;left:50%;bottom:20px;translate:-50% 0;z-index:50;max-width:min(560px,calc(100vw - 32px));padding:12px 18px;background:var(--klein);color:var(--paper);font-size:var(--fs-small);white-space:pre-line;box-shadow:0 8px 30px rgb(0 20 80 / .25)}
 .toast.err{background:var(--danger)}
@@ -162,6 +168,7 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
       <div class="side-head">
         <button class="btn primary" type="button" id="addBtn">+ Nouveau projet</button>
         <button class="btn" type="button" id="catsBtn">Catégories</button>
+        <button class="btn" type="button" id="msgsBtn">Messages <span id="msgCount" class="muted"></span></button>
       </div>
       <ol class="plist" id="plist" aria-label="Projets"></ol>
       <p class="small muted">★ = affiché sur l’accueil. L’ordre de la liste est l’ordre du site.</p>
@@ -216,7 +223,7 @@ async function showApp(){
   const d=await api('/api/projects');
   data=d; savedJSON=JSON.stringify(d); savedImages=imagesOf(d);
   sel=data.projects[0]?.id||null;
-  renderList(); renderEditor(); refreshDirty();
+  renderList(); renderEditor(); refreshDirty(); loadMsgs();
 }
 
 function renderList(){
@@ -247,9 +254,35 @@ function field(id,label,val,{req,area,hint,lang}={}){
   return `<div><label for="${id}" class="${req?'req':''}">${l}${label}</label>${input}${hint?`<p class="hint">${hint}</p>`:''}</div>`;
 }
 
+/* ---------- contact messages ---------- */
+const TYPE_FR={identite:'Identité',site:'Site',donnees:'Données',motion:'Motion',audiovisuel:'Audiovisuel',communication:'Communication',autre:'Autre'};
+const BUDGET_FR={lt5:'< 5 k€','5-15':'5 – 15 k€','15-40':'15 – 40 k€',gt40:'40 k€ +',tbd:'Budget à définir'};
+let msgs=null;
+async function loadMsgs(){
+  try{ const r=await api('/api/messages'); msgs=r.messages; $('#msgCount').textContent=r.total?`(${r.total})`:''; }
+  catch(e){ msgs=[]; }
+}
+async function renderMsgs(){
+  const E=$('#editor');
+  E.innerHTML='<h2>Messages</h2><p class="small muted">Chargement…</p>';
+  await loadMsgs(); if(sel!=='__msgs') return;
+  const fmt=new Intl.DateTimeFormat('fr-FR',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Paris'});
+  E.innerHTML=`<h2>Messages</h2><p class="small muted">Envoyés depuis le formulaire de contact du site, du plus récent au plus ancien.</p>
+  ${msgs.length?`<ul class="msgs section">${msgs.map(m=>`<li data-id="${esc(m.id)}">
+    <div class="mh"><span class="mn">${esc(m.name)}</span><a href="mailto:${esc(m.email)}">${esc(m.email)}</a><span class="small muted">${esc(fmt.format(new Date(m.at)))}</span></div>
+    <div class="tags">${m.type?`<span class="tag">${esc(TYPE_FR[m.type]||m.type)}</span>`:''}${m.budget?`<span class="tag">${esc(BUDGET_FR[m.budget]||m.budget)}</span>`:''}${m.lang==='en'?'<span class="tag">EN</span>':''}</div>
+    <p class="mm">${esc(m.message)}</p>
+    <a class="btn sm" href="mailto:${esc(m.email)}?subject=${encodeURIComponent('moyo · votre message')}">Répondre</a>
+    <button type="button" class="btn danger sm" data-act="rmMsg">Supprimer</button>
+  </li>`).join('')}</ul>`:'<div class="empty-state">Aucun message pour l’instant.</div>'}
+  <p class="section"><button type="button" class="btn" data-act="back">← Retour aux projets</button></p>`;
+}
+$('#msgsBtn').addEventListener('click',()=>{sel='__msgs';renderList();renderEditor()});
+
 function renderEditor(){
   const E=$('#editor');
   if(sel==='__cats') return renderCats();
+  if(sel==='__msgs') return renderMsgs();
   const p=data.projects.find(p=>p.id===sel);
   if(!p){E.innerHTML='<div class="empty-state"><p>Aucun projet sélectionné.</p><p class="small">Créez un projet avec « + Nouveau projet ».</p></div>';return}
   E.innerHTML=`
@@ -363,6 +396,11 @@ E.addEventListener('click',e=>{
     if(act==='cats'){ sel='__cats'; renderList(); renderEditor(); return; }
     if(act==='back'){ sel=data.projects[0]?.id||null; renderList(); renderEditor(); return; }
     if(act==='rm'){ const id=b.closest('li').dataset.id; data.categories=data.categories.filter(c=>c.id!==id); renderCats(); refreshDirty(); return; }
+    if(act==='rmMsg'){
+      const li=b.closest('li'); if(!confirm('Supprimer ce message ? Il ne pourra pas être récupéré.')) return;
+      api('/api/messages/'+encodeURIComponent(li.dataset.id),{method:'DELETE'}).then(()=>{li.remove();toast('Message supprimé.');loadMsgs()}).catch(err=>toast(err.message,true));
+      return;
+    }
     const p=curP(); if(!p) return;
     if(act==='rmCover'){ const old=p.cover; p.cover=null; dropIfUnsaved(old); renderEditor(); renderList(); refreshDirty(); return; }
     if(act==='delete'){
