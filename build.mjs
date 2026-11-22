@@ -15,6 +15,7 @@ const out = (p, s) => { fs.mkdirSync(path.dirname(r(p)), { recursive: true }); f
 const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k).join(v), s);
 
 const { rowsHTML, cardsHTML, featuredOf, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
+const { CHROME_CSS, chromeHead } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
 const renderSrc = read('shared/render.js').replace(/^export \{[^}]*\};?\s*$/m, '');
 if (/^\s*export\b/m.test(renderSrc)) throw new Error('shared/render.js: keep `export` on the last line only');
@@ -36,12 +37,15 @@ const sizes = {
   'projets.html': out('dist/projets.html', fill(read('src/projets.src.html'), {
     __RENDER__: renderSrc,
     __ROWS__: rowsHTML(seed.projects, 'fr'),
-    __DATA__: dataJSON(seed)
+    __DATA__: dataJSON(seed),
+    __CHROME_CSS__: CHROME_CSS,
+    __CHROME_HEAD__: chromeHead(2)
   })),
   'admin/index.html': out('dist/admin/index.html', read('src/admin.html')),
   'robots.txt': out('dist/robots.txt', 'User-agent: *\nDisallow: /admin\nDisallow: /api/\n')
 };
 out('dist/cursor.js', read('src/cursor.js'));
+out('dist/chrome.js', read('src/chrome-rt.js'));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });
 fs.copyFileSync(r('fonts/hanken-grotesk-latin-wght-normal.woff2'), r('dist/fonts/hanken-grotesk.woff2'));
 

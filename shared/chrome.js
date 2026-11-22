@@ -1,0 +1,147 @@
+/* Shared site chrome (header bar + arc dropdown menu), used on pages other than the home:
+   - build.mjs injects CHROME_CSS and CHROME_HEAD into src/projets.src.html,
+   - functions/equipe/[id].js inlines them too.
+   The behaviour lives in dist/chrome.js (built from src/chrome-rt.js). Keep `export` on the last line only. */
+
+const CHROME_CSS = `
+/* Header bar (minimal): logo, EN, burger. Fixed, blue text on the light pages. */
+.bar{position:fixed;z-index:90;top:0;left:0;right:0;height:var(--hdr);display:flex;align-items:center;padding:0 var(--m);color:var(--klein);gap:clamp(16px,2.4vw,40px);pointer-events:auto}
+.bar,.bar *{transition-property:color,translate,opacity,background-size;transition-duration:.9s;transition-timing-function:cubic-bezier(.25,1,.5,1)}
+.bar.away{translate:0 -100%}
+.bar-mark{display:flex;align-items:center;text-decoration:none;color:inherit;font-size:clamp(1.625rem,2.1vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1}
+.bar-r{margin-left:auto;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px)}
+.bar button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;font-weight:500;background:none}
+#langBtn{font-size:var(--fs-small);background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
+#langBtn:hover{background-size:100% 1px}
+.bar :focus-visible{outline:2px solid currentColor;outline-offset:4px}
+
+/* Menu (popover): comes down like a blind */
+#menu{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--klein);color:var(--paper);overflow:auto;clip-path:inset(0);
+  transition:clip-path var(--dur-4) var(--ease-move,cubic-bezier(.76,0,.24,1)),overlay var(--dur-4) allow-discrete,display var(--dur-4) allow-discrete}
+#menu:not(:popover-open){clip-path:inset(0 0 100% 0)}
+@starting-style{#menu:popover-open{clip-path:inset(0 0 100% 0)}}
+#menu::backdrop{background:transparent}
+.menu-in{min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--m) var(--m);display:flex;flex-direction:column;justify-content:center;position:relative;isolation:isolate}
+.menu-mark{font-size:clamp(1.625rem,2.1vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1;position:absolute;left:var(--m);top:calc((var(--hdr) - 1.2em) / 2 + .1em);color:var(--paper)}
+.menu-close{position:absolute;z-index:2;top:0;right:var(--m);height:var(--hdr);display:inline-flex;align-items:center;color:var(--paper);min-width:44px;justify-content:center;background:none}
+.menu-list{list-style:none;margin:0;padding:0}
+.menu-list a{position:relative;isolation:isolate;overflow:hidden;padding:12px 0;display:block;text-decoration:none;color:var(--paper);transition:color .7s cubic-bezier(.76,0,.24,1)!important;background:none!important}
+.menu-list a::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--paper);transform:scaleY(0);transform-origin:50% 100%;transition:transform .7s cubic-bezier(.76,0,.24,1)}
+.menu-list a::after{content:"→";position:absolute;right:clamp(8px,2vw,24px);top:50%;font-size:clamp(1.5rem,3vw,2.5rem);font-weight:300;line-height:1;translate:-24px -50%;opacity:0;transition:translate .7s cubic-bezier(.76,0,.24,1),opacity .4s}
+.menu-list a:hover,.menu-list a:focus-visible{color:var(--klein)}
+.menu-list a:hover::before,.menu-list a:focus-visible::before{transform:scaleY(1)}
+.menu-list a:hover::after,.menu-list a:focus-visible::after{translate:0 -50%;opacity:1}
+.menu-list .mn{font-size:clamp(2.25rem,7vw,4.5rem);font-weight:350;letter-spacing:-.03em;line-height:1.05}
+.menu-list .roll{position:relative;display:inline-block;overflow:hidden;vertical-align:top;padding-left:.04em}
+.menu-list .roll .r2{position:absolute;left:.04em;top:0}
+.menu-list .roll .c{display:inline-block;white-space:pre;transition:transform .7s cubic-bezier(.76,0,.24,1);transition-delay:calc(var(--i) * 18ms)}
+.menu-list .roll .r2 .c{transform:translateY(105%)}
+@media (prefers-reduced-motion:no-preference){
+  .menu-list a:hover .r1 .c,.menu-list a:focus-visible .r1 .c{transform:translateY(-105%)}
+  .menu-list a:hover .r2 .c,.menu-list a:focus-visible .r2 .c{transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){.menu-list .roll .r2{display:none}}
+.menu-close svg{width:28px;height:28px;overflow:visible}
+.menu-close path{stroke:currentColor;stroke-width:1.1}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* Arc carousel (desktop) */
+@media (min-width:821px){
+  #menu{--arc-on:var(--paper);--arc-off:color-mix(in srgb,var(--paper) 22%,transparent);--arc-frame:#A3A7AF}
+  #menu .menu-in{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:clamp(24px,4vw,80px);padding:0 var(--m);min-height:100%;height:100%}
+  .menu-list.arc{position:relative;flex:none;width:clamp(300px,30vw,520px);height:100svh;margin:0;padding:0}
+  .menu-list.arc li{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity}
+  .menu-list.arc a{transform-origin:0 50%;border:0!important;padding:0!important;white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;color:var(--arc-off);overflow:visible;outline:none!important;transition:none!important}
+  .menu-list.arc .mn,.menu-list.arc .c{transition:none!important}
+  .menu-list.arc a::before{display:none!important}
+  .menu-list.arc a::after{content:"↗";position:static;display:inline-block;font-size:.42em;font-weight:400;opacity:var(--arw,0);
+    translate:calc((var(--arw,0) - 1) * .12em) calc((1 - var(--arw,0)) * .12em);transition:none}
+  .menu-list.arc .mn{font-size:clamp(2rem,3.2vw,3.5rem);font-weight:280;line-height:1.08;letter-spacing:-.025em}
+  .menu-list.arc .roll{overflow:visible}
+  .menu-list.arc .roll .r2{display:none}
+  .menu-list.arc .roll .c{transform:none!important;transition:none}
+  .menu-list.arc a:hover,.menu-list.arc a:focus-visible{background:none!important}
+  #menu .menu-list.arc li{transition:none!important;translate:none!important}
+  .menu-pv{flex:none;width:clamp(220px,20vw,330px);will-change:transform}
+  .pv-frame{display:block;cursor:pointer;position:relative;aspect-ratio:4/5;transform-origin:50% 50%}
+  .pv-l{position:absolute;left:0;right:0;top:-12%;bottom:-12%;background:var(--arc-frame) var(--img,none) 50% var(--py,50%)/cover no-repeat;clip-path:inset(12% 0)}
+  .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:10px}
+  .pv-cw{height:50px;overflow:hidden;flex:1;min-width:0}
+  .pv-ci{height:50px;overflow:hidden}
+  .pv-cs,.pv-ns{display:block;will-change:transform}
+  .pv-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.6875rem;line-height:1.35;opacity:.6;max-width:28ch}
+  .pv-name{margin-top:2px;font-size:.8125rem;font-weight:600}
+  .pv-n{font-size:.6875rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pv-nw{display:inline-block;height:1.3em;line-height:1.3em;overflow:hidden;vertical-align:top}
+  .pv-ns>span{display:block;height:1.3em}
+  .pv-t{opacity:.5}
+  @keyframes pvRise{from{clip-path:inset(100% -10% 0 -10%);translate:0 2.5rem}to{clip-path:inset(-20% -10%);translate:0 0}}
+  @keyframes pvFade{from{opacity:0}}
+  #menu:popover-open .pv-frame{animation:pvRise 1.2s cubic-bezier(.22,1,.36,1) .35s both}
+  #menu:popover-open .pv-cap{animation:pvFade .8s ease .9s both}
+}
+@media (min-width:821px) and (prefers-reduced-motion:reduce){#menu:popover-open .pv-frame,#menu:popover-open .pv-cap{animation:none}}
+@media (max-width:820px){.menu-pv,.menu-list .arc-clone{display:none}}
+
+/* Burger: three lines folding into a cross */
+#menuBtn{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px}
+#menuBtn .bx,#menuClose .bx{display:flex;flex-direction:column;justify-content:center;gap:5px;width:24px;height:24px;transition:rotate .5s cubic-bezier(.25,1,.5,1)}
+#menuBtn .bx i,#menuClose .bx i{display:block;width:24px;height:1.5px;background:currentColor;transform-origin:50% 50%}
+#menuBtn .bx i:nth-of-type(2){transition:scale .45s cubic-bezier(.25,1,.5,1);transform-origin:100% 50%}
+#menuBtn:hover .bx i:nth-of-type(2){scale:.6 1}
+#menuClose .bx i:nth-of-type(1){transform:translateY(6.5px) rotate(45deg)}
+#menuClose .bx i:nth-of-type(2){opacity:0}
+#menuClose .bx i:nth-of-type(3){transform:translateY(-6.5px) rotate(-45deg)}
+#menuClose:hover .bx{rotate:90deg}
+@keyframes bxA{0%{transform:none}45%{transform:translateY(6.5px)}100%{transform:translateY(6.5px) rotate(45deg)}}
+@keyframes bxB{0%,40%{opacity:1}41%,100%{opacity:0}}
+@keyframes bxC{0%{transform:none}45%{transform:translateY(-6.5px)}100%{transform:translateY(-6.5px) rotate(-45deg)}}
+@keyframes xbA{0%{transform:translateY(6.5px) rotate(45deg)}55%{transform:translateY(6.5px)}100%{transform:none}}
+@keyframes xbB{0%,59%{opacity:0}60%,100%{opacity:1}}
+@keyframes xbC{0%{transform:translateY(-6.5px) rotate(-45deg)}55%{transform:translateY(-6.5px)}100%{transform:none}}
+@media (prefers-reduced-motion:no-preference){
+  #menu:popover-open #menuClose .bx i:nth-of-type(1){animation:bxA .6s cubic-bezier(.65,0,.35,1) both}
+  #menu:popover-open #menuClose .bx i:nth-of-type(2){animation:bxB .6s linear both}
+  #menu:popover-open #menuClose .bx i:nth-of-type(3){animation:bxC .6s cubic-bezier(.65,0,.35,1) both}
+  #menuBtn.unx .bx i:nth-of-type(1){animation:xbA .6s cubic-bezier(.65,0,.35,1) both}
+  #menuBtn.unx .bx i:nth-of-type(2){animation:xbB .6s linear both}
+  #menuBtn.unx .bx i:nth-of-type(3){animation:xbC .6s cubic-bezier(.65,0,.35,1) both}
+}
+html.menu-lock{overflow:hidden}
+`;
+
+/* Header + menu markup. `start` = the arc card the menu opens on (page's own section). */
+const chromeHead = (start = 0) => `<header class="bar" id="bar">
+  <a class="bar-mark" href="/" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
+  <nav class="bar-r" aria-label="Navigation principale" data-ia="nav">
+    <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
+    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span class="sr" data-i="menu">Menu</span><span class="bx" aria-hidden="true"><i></i><i></i><i></i></span></button>
+  </nav>
+</header>
+<nav id="menu" popover aria-label="Menu" data-ia="menu" data-start="${start}">
+  <div class="menu-in">
+    <ol class="menu-list arc">
+      <li><a href="/"><span class="mn" data-i="sec.top">Accueil</span></a></li>
+      <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets</span></a></li>
+      <li><a href="/projets"><span class="mn" data-i="sec.all">Tous les projets</span></a></li>
+      <li><a href="/#services"><span class="mn" data-i="sec.services">Services</span></a></li>
+      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Studio</span></a></li>
+      <li><a href="/#equipe"><span class="mn" data-i="sec.team">L’équipe</span></a></li>
+      <li><a href="/#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
+    </ol>
+    <div class="menu-pv" aria-hidden="true">
+      <a class="pv-frame" id="pvLink" href="/" tabindex="-1"><span class="pv-l" id="pvB"></span><span class="pv-l" id="pvA"></span></a>
+      <div class="pv-cap">
+        <div class="pv-cw"><div class="pv-cs" id="pvCS">
+          <div class="pv-ci"><p class="pv-desc"></p><p class="pv-name"></p></div>
+          <div class="pv-ci"><p class="pv-desc"></p><p class="pv-name"></p></div>
+        </div></div>
+        <p class="pv-n"><span class="pv-nw"><span class="pv-ns" id="pvNS"><span>01</span><span>02</span></span></span><span class="pv-t" id="pvTot">/07</span></p>
+      </div>
+    </div>
+  </div>
+  <span class="menu-mark" aria-hidden="true">moyo</span>
+  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i><i></i></span></button>
+</nav>`;
+
+export { CHROME_CSS, chromeHead };

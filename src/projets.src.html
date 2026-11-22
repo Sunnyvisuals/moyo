@@ -197,18 +197,13 @@ html.is-dialog{overflow:hidden}
 .foot-grid,.foot-subwrap,.foot-base{transform:translateY(calc((1 - var(--fp,1)) * 40px))}
 .foot .mono-wrap{transform:translateY(calc((1 - var(--fp,1)) * 90px))}
 @media (prefers-reduced-motion:reduce){.foot-grid,.foot-subwrap,.foot-base,.foot .mono-wrap{transform:none}}
+
+__CHROME_CSS__
 </style>
 </head>
 <body>
 <a class="skip" href="#main" data-i="skip">Aller au contenu</a>
-<header class="top">
-  <a class="wordmark" href="/" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
-  <nav aria-label="Navigation" data-ia="nav">
-    <a href="/" data-i="home">Accueil</a>
-    <a href="/#contact" data-i="contact">Contact</a>
-    <button type="button" id="langBtn" lang="en" aria-label="Switch to English" hidden>EN</button>
-  </nav>
-</header>
+__CHROME_HEAD__
 
 <main id="main">
   <p class="idx" aria-hidden="true"><i class="sq"></i><span data-i="idxL">Index des projets</span></p>
@@ -296,7 +291,7 @@ const ALL=DATA.projects||[];
 const EN={idxL:'Project index',skip:'Skip to content',home:'Home',contact:'Contact',title:'All projects.',empty:'No project in this category yet.',back:'Back to home',
   fRole:'Role',fYear:'Year',fPlace:'Place',prev:'Previous',next:'Next',close:'Close',all:'All',
   homeAria:'moyo, home',nav:'Navigation',filtersAria:'Filter by category',
-  fStudio:'Studio',allL:'All projects',sTeam:'The team',fLive:'The light, right now',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',fStudioP:'An independent design and development studio, based on the French Riviera: websites, identities, audiovisual and communication.',fNav:'Site map',
+  'sec.top':'Home','sec.projects':'Projects','sec.all':'All projects','sec.services':'Services','sec.studio':'Studio','sec.team':'The team','sec.contact':'Contact',menu:'Menu',close:'Close',fStudio:'Studio',allL:'All projects',sTeam:'The team',fLive:'The light, right now',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',fStudioP:'An independent design and development studio, based on the French Riviera: websites, identities, audiovisual and communication.',fNav:'Site map',
   sIntro:'Approach',sProj:'Projects',sSvc:'Services',sStu:'Studio',fWrite:'Write to the studio',top:'Back to top',footAria:'Site footer',langAria:'Language'};
 const FR={all:'Tous'};
 let lang='fr';
@@ -480,6 +475,7 @@ if(subForm) subForm.addEventListener('submit',async e=>{
 applyLang(lang);
 })();
 </script>
+<script src="/chrome.js" defer></script>
 <script src="/cursor.js" defer></script>
 </body>
 </html>
