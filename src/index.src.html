@@ -732,6 +732,24 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   #menuBtn.unx .bx i:nth-of-type(3){animation:xbC .6s cubic-bezier(.65,0,.35,1) both}
 }
 
+/* Footer newsletter sign-up, in the site's hand: an underlined field and a flat cream button with a sliding arrow,
+   left-aligned with the footer columns. */
+.foot-subwrap{margin-top:clamp(44px,7vh,96px)}
+.foot-sub{max-width:520px}
+.fh2{font-size:var(--fs-lead);font-weight:400;line-height:1.15;margin:0 0 20px;color:var(--paper)}
+.sub-row{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.sub-row input[type=email]{flex:1 1 220px;min-width:0;font:inherit;font-size:clamp(1.125rem,1.4vw,1.375rem);font-weight:300;color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;padding:6px 0 12px;outline:none;transition:border-color var(--dur-1)}
+.sub-row input[type=email]::placeholder{color:color-mix(in oklab,var(--paper) 45%,transparent)}
+.sub-row input[type=email]:focus-visible{border-color:var(--paper)}
+.sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:var(--paper);color:var(--klein);font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
+.sub-btn::after{content:"→"}
+.sub-btn:hover{gap:26px;background:color-mix(in oklab,var(--paper) 90%,var(--klein))}
+.sub-btn:focus-visible{outline:2px solid var(--paper);outline-offset:4px}
+.sub-btn:disabled{opacity:.6;cursor:progress;gap:16px}
+.sub-msg{margin-top:16px;min-height:1.3em;opacity:.85}
+.sub-msg.err{color:color-mix(in oklab,var(--paper) 80%,#ffb3b3)}
+@media (max-width:560px){.sub-btn{flex:1 1 100%;justify-content:space-between}}
+
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -1191,7 +1209,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <ul><li><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a></li></ul>
     </div>
   </div>
-  <form class="foot-sub" id="subForm" novalidate><h2 class="fh2" data-i="subH">Inscrivez-vous pour un peu de joie.</h2><div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" data-i="subBtn">S’inscrire</button></div><p class="sub-msg small" id="subMsg" role="status" aria-live="polite"></p></form>
+  <div class="wrap foot-subwrap"><form class="foot-sub" id="subForm" novalidate><h2 class="fh2" data-i="subH">Inscrivez-vous pour un peu de joie.</h2><div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" data-i="subBtn">S’inscrire</button></div><p class="sub-msg small" id="subMsg" role="status" aria-live="polite"></p></form></div>
   <div class="wrap foot-base small">
     <span>© 2026 moyo</span>
     <span class="muted" id="fDate"></span>
