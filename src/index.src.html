@@ -419,7 +419,7 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 #yearNote{max-width:34ch;color:var(--soft)}
 
 /* Footer */
-.foot{padding-block:clamp(64px,10vh,120px) 0;overflow:clip}
+.foot{padding-block:clamp(64px,10vh,120px) 0;overflow:clip;border-top:1px solid var(--paper-line)}
 .foot-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px clamp(16px,2vw,32px)}
 .fcol{grid-column:span 3;min-width:0}
 .fh{font-size:var(--fs-small);font-weight:600;letter-spacing:0;margin-bottom:16px;color:var(--paper)}
@@ -600,26 +600,6 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .ld-line b{position:absolute;inset:0;background:var(--klein);transform:scaleX(0);transform-origin:0 50%}
 html.loading{overflow:hidden}
 html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
-
-/* Liquid glass above the footer: a sharp wave edge, a light rim along it, a second fainter rim for the thickness,
-   and glass that blurs, saturates and brightens what passes behind. The wave and its rim drift slowly sideways. */
-.foot{overflow:visible;overflow-x:clip;position:relative}
-.evap{position:absolute;left:0;right:0;bottom:calc(100% - 6px);height:clamp(150px,22vh,240px);pointer-events:none;z-index:1;overflow:hidden;
-  background:linear-gradient(180deg,rgb(255 255 255 / .30) 0%,rgb(255 255 255 / .10) 26%,color-mix(in oklab,var(--klein) 45%,transparent) 58%,var(--klein) 100%);
-  -webkit-backdrop-filter:blur(12px) saturate(1.9) brightness(1.18);backdrop-filter:blur(12px) saturate(1.9) brightness(1.18);
-  -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%201440%20240%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M0%2086%20C%20240%2034%20480%20138%20720%2086%20S%201200%2034%201440%2086%20V240%20H0%20Z%27%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%201440%20240%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M0%2086%20C%20240%2034%20480%20138%20720%2086%20S%201200%2034%201440%2086%20V240%20H0%20Z%27%2F%3E%3C%2Fsvg%3E");
-  -webkit-mask-size:100vw 100%;mask-size:100vw 100%;-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;-webkit-mask-position:0 0;mask-position:0 0}
-.evap-rim{position:absolute;top:0;left:-100vw;width:200vw;height:100%;overflow:visible}
-.evap-rim path{fill:none;vector-effect:non-scaling-stroke}
-.evap-rim .r1{stroke:rgb(255 255 255 / .85);stroke-width:3}
-.evap-rim .r2{stroke:rgb(255 255 255 / .22);stroke-width:1.5}
-@media (prefers-reduced-motion:no-preference){
-  .evap{animation:evapDrift 26s linear infinite}
-  .evap-rim{animation:rimDrift 26s linear infinite}
-}
-@keyframes evapDrift{to{-webkit-mask-position:100vw 0;mask-position:100vw 0}}
-@keyframes rimDrift{to{translate:100vw 0}}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.evap{background:linear-gradient(180deg,color-mix(in oklab,var(--klein) 55%,var(--chaux)) 0%,var(--klein) 60%)}}
 
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
@@ -1044,7 +1024,6 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </main>
 
 <footer class="sec blue foot" id="foot" data-sec="contact" data-tone="blue" aria-label="Pied de page" data-ia="footAria">
-  <div class="evap" aria-hidden="true"><svg class="evap-rim" viewBox="0 0 2880 240" preserveAspectRatio="none" aria-hidden="true"><path class="r1" d="M0 86 C 240 34 480 138 720 86 S 1200 34 1440 86  C 1680 34 1920 138 2160 86 S 2640 34 2880 86"/><path class="r2" d="M0 98 C 240 46 480 150 720 98 S 1200 46 1440 98 C 1680 46 1920 150 2160 98 S 2640 46 2880 98"/></svg></div>
   <div class="wrap foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>
