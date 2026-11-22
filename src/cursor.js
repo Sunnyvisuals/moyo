@@ -8,7 +8,7 @@
 html.has-cur,html.has-cur *{cursor:none}
 html.has-cur input,html.has-cur textarea,html.has-cur select{cursor:text}
 html.cur-off,html.cur-off *{cursor:auto}
-html.cur-off a,html.cur-off button,html.cur-off label{cursor:pointer}
+html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-off button *,html.cur-off label *{cursor:pointer}
 .cur{position:fixed;left:0;top:0;z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .3s}
 .cur.on{opacity:1}
 .cur::before{content:"";position:absolute;left:-4px;top:-4px;width:8px;height:8px;background:#002FA7;border:1px solid transparent;box-sizing:border-box;
