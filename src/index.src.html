@@ -134,13 +134,13 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .menu-mark{position:fixed;top:0;left:var(--m);height:var(--hdr);display:flex;align-items:center;font-size:1.125rem;font-weight:550;letter-spacing:-.02em;color:var(--paper)}
 
 /* Hero: the window */
-.hero{position:relative;height:calc(100svh + 200svh)}
+.hero{position:relative;height:calc(100svh + 40svh)}
 .stage{--wl:58vw;--wr:10vw;--wt:11svh;--wb:21svh;--D:calc(clamp(18px,3.2vw,46px) * (1 - var(--open)));
   --sx:.22;--sy:.9;--a:.26;--blur:10px;
   position:sticky;top:0;height:100svh;overflow:clip;background:var(--chaux)}
 @supports (animation-timeline:scroll()){
   @media (prefers-reduced-motion:no-preference){
-    .stage{animation:open linear both;animation-timeline:scroll(root block);animation-range:0px 200svh}
+    .stage{animation:open linear both;animation-timeline:scroll(root block);animation-range:0px 40svh}
   }
 }
 @keyframes open{from{--open:0}to{--open:1}}
@@ -1278,7 +1278,7 @@ function wanted(){
 function frame(){
   raf=0; let more=false;
   if(drive){
-    const t=clamp(scrollY/(innerHeight*2));
+    const t=clamp(scrollY/(innerHeight*.4));
     const d=t-openCur;
     openCur=Math.abs(d)<.0006?t:openCur+d*(lenis?.2:.075);
     stage.style.setProperty('--open',openCur.toFixed(4));
