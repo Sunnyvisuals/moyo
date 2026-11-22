@@ -568,7 +568,9 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .bar[data-sec="contact"]{--hm-bg:var(--klein);--hm-fg:var(--paper);--h1:var(--klein);--h2:color-mix(in oklab,var(--klein) 78%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 56%,var(--chaux));
   --hl-bg:color-mix(in oklab,var(--klein) 30%,var(--chaux));--hl-fg:var(--klein);--hk-bg:var(--chaux);--hk-fg:var(--klein)}
 .bar-mark,.tile,#langBtn,.bar-menu{transition:width .7s cubic-bezier(.76,0,.24,1),background-color .9s cubic-bezier(.25,1,.5,1),color .9s cubic-bezier(.25,1,.5,1)!important}
-.bar-mark{display:flex;align-items:center;height:56px;padding:0 22px;background:var(--hm-bg);color:var(--hm-fg);font-size:1.125rem}
+/* the wordmark stays plain text: blue over lime, lime over blue */
+.bar-mark{display:flex;align-items:center;height:56px;padding:0 6px;background:none;color:var(--klein);font-size:1.125rem}
+.bar[data-tone="paper"] .bar-mark,.bar[data-sec="contact"] .bar-mark{color:var(--paper)}
 .bar-r{gap:0;margin-left:auto}
 .tile,#langBtn,.bar-menu{height:56px;min-width:56px;min-height:56px;padding:0;margin:0;background-image:none!important;border-radius:0}
 .tile{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;width:56px;padding:0 0 0 16px;overflow:hidden;white-space:nowrap;text-decoration:none;color:var(--paper);
