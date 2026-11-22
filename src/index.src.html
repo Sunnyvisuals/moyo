@@ -626,6 +626,30 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
 .team .names li{border-bottom:1px solid var(--line)}
 .team .studio-cta{margin-top:clamp(40px,7vh,80px)}
 
+/* Menu hover: the letters roll up and their copy arrives from below, a fill rises like a blind, an arrow slides in.
+   JS wraps each label (after every language change); reduced motion keeps only the colour change. */
+.menu-list a{position:relative;isolation:isolate;overflow:hidden;padding:12px 0;transition:color .7s cubic-bezier(.76,0,.24,1)!important;background:none!important}
+.menu-list a::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--paper);transform:scaleY(0);transform-origin:50% 100%;transition:transform .7s cubic-bezier(.76,0,.24,1)}
+.menu-list a::after{content:"→";position:absolute;right:clamp(8px,2vw,24px);top:50%;font-size:clamp(1.5rem,3vw,2.5rem);font-weight:300;line-height:1;translate:-24px -50%;opacity:0;transition:translate .7s cubic-bezier(.76,0,.24,1),opacity .4s}
+.menu-list a:hover,.menu-list a:focus-visible{color:var(--klein)}
+.menu-list a:hover::before,.menu-list a:focus-visible::before{transform:scaleY(1)}
+.menu-list a:hover::after,.menu-list a:focus-visible::after{translate:0 -50%;opacity:1}
+#menu[data-tone="paper"] .menu-list a::before{background:var(--klein)}
+#menu[data-tone="paper"] .menu-list a:hover,#menu[data-tone="paper"] .menu-list a:focus-visible{color:var(--paper)}
+.menu-list .roll{position:relative;display:inline-block;overflow:hidden;vertical-align:top;padding-left:.04em}
+.menu-list .roll .r2{position:absolute;left:.04em;top:0}
+.menu-list .roll .c{display:inline-block;white-space:pre;transition:transform .7s cubic-bezier(.76,0,.24,1);transition-delay:calc(var(--i) * 18ms)}
+.menu-list .roll .r2 .c{transform:translateY(105%)}
+@media (prefers-reduced-motion:no-preference){
+  .menu-list a:hover .r1 .c,.menu-list a:focus-visible .r1 .c{transform:translateY(-105%)}
+  .menu-list a:hover .r2 .c,.menu-list a:focus-visible .r2 .c{transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){.menu-list .roll .r2{display:none}}
+/* close: larger cross, no word */
+.menu-close svg{width:28px!important;height:28px!important}
+.menu-close path{stroke-width:1.1}
+.menu-close{min-width:44px;justify-content:center}
+
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -859,7 +883,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     </ol>
   </div>
   <span class="menu-mark" aria-hidden="true">moyo</span>
-  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span data-i="close">Fermer</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
+  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
 </nav>
 
 <nav class="dots" id="dots" aria-label="Sections" data-ia="dotsAria">
@@ -1440,6 +1464,13 @@ function splitLines(el){
   let rt=0; addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>$$('.lines').forEach(splitLines),150); });
 })();
 
+/* ---------- Menu letter roll ---------- */
+function splitRoll(el){
+  const text=el.textContent.trim(); if(!text) return;
+  const chars=[...text].map((ch,i)=>'<span class="c" style="--i:'+i+'">'+(ch===' '?' ':esc(ch))+'</span>').join('');
+  el.innerHTML='<span class="sr">'+esc(text)+'</span><span class="roll" aria-hidden="true"><span class="r1">'+chars+'</span><span class="r2">'+chars+'</span></span>';
+}
+
 /* ---------- Language ---------- */
 function applyLang(l){
   lang=l; root.lang=l;
@@ -1451,6 +1482,7 @@ function applyLang(l){
   });
   $$('.words').forEach(splitWords);
   $$('.lines').forEach(splitLines);
+  $$('.menu-list .mn').forEach(splitRoll);
   $$('[data-ia]').forEach(el=>{
     const k=el.dataset.ia;
     if(!('frAria' in el.dataset)) el.dataset.frAria=el.getAttribute('aria-label')||'';
