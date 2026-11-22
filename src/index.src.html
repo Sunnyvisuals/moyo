@@ -659,50 +659,44 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 /* halftone: a fine screen of blue dots over the lime letters */
 
-/* Menu as an arc text carousel: the links sit on an arc of a circle centred far to the left. The active one is large and
-   bold, its neighbours tilt along the curve, shrink and fade. Wheel, hover or arrow keys turn the arc; a panel on the
-   right shows the active section. Under 820px the plain list stays. */
+/* Menu as an arc text carousel, on the rules of the original component: each link sits on a circle whose centre is
+   far to the left (radius 1.7 × the list height), at angle (i − pos) × line spacing / radius. A "lens" centred on the
+   active link sets weight (280 → 720) and colour (20 % → full); links fade near the top and bottom edges. While the arc
+   turns the text leans with its speed; a link held under the pointer runs a weight wave through its letters.
+   Under 820px the plain list stays. */
 @media (min-width:821px){
   #menu .menu-in{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:center;gap:clamp(24px,4vw,72px);padding-top:var(--hdr);min-height:100%;justify-content:stretch}
-  .menu-list.arc{position:relative;height:min(78vh,720px);margin:0}
-  .menu-list.arc li{position:absolute;left:clamp(56px,9vw,170px);top:50%;transform-origin:0 50%;will-change:transform,opacity}
-  .menu-list.arc a{border:0!important;padding:.06em 0!important;white-space:nowrap;display:inline-flex;align-items:baseline;gap:.4em}
+  #menu{--arc-on:var(--paper);--arc-off:color-mix(in srgb,var(--paper) 20%,transparent)}
+  #menu[data-tone="paper"]{--arc-on:var(--klein);--arc-off:color-mix(in srgb,var(--klein) 20%,transparent)}
+  .menu-list.arc{position:relative;height:min(80vh,760px);margin:0;padding-left:clamp(8px,3vw,48px);touch-action:pan-x}
+  .menu-list.arc li{position:absolute;left:clamp(8px,3vw,48px);top:0;transform-origin:0 0;will-change:transform,opacity}
+  .menu-list.arc a{border:0!important;padding:0!important;white-space:nowrap;display:inline-flex;align-items:baseline;gap:.35em;color:var(--arc-off);overflow:visible}
   .menu-list.arc a::before{display:none!important}
-  .menu-list.arc a::after{content:"↗";position:static;font-size:.5em;translate:0 0;opacity:0;transition:opacity .4s}
-  .menu-list.arc li.on a::after{opacity:1}
-  .menu-list.arc .mn{font-size:clamp(2.75rem,5.4vw,5.5rem);font-weight:300;transition:font-weight .5s cubic-bezier(.25,1,.5,1)}
-  .menu-list.arc li.on .mn{font-weight:600}
+  .menu-list.arc a::after{content:"↗";position:static;display:inline-block;font-size:.42em;font-weight:400;opacity:var(--arw,0);
+    translate:calc((var(--arw,0) - 1) * .12em) calc((1 - var(--arw,0)) * .12em);transition:none}
+  .menu-list.arc .mn{font-size:clamp(2.5rem,5vw,5.25rem);font-weight:280;line-height:1.08;letter-spacing:-.03em}
+  .menu-list.arc .roll{overflow:visible}
   .menu-list.arc .roll .r2{display:none}
   .menu-list.arc .roll .c{transform:none!important;transition:none}
-  .menu-list.arc a:hover,.menu-list.arc a:focus-visible{color:inherit;background:none!important}
+  .menu-list.arc a:hover,.menu-list.arc a:focus-visible{background:none!important}
+  .menu-list.arc a:focus-visible{outline:1px solid currentColor;outline-offset:6px}
   .menu-pv{align-self:center;max-width:420px;padding-right:var(--m)}
   .pv-n{font-size:clamp(3.5rem,7vw,7rem);font-weight:250;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
   .pv-t{font-size:.22em;letter-spacing:.06em;opacity:.55;vertical-align:top}
-  .pv-name{margin-top:clamp(20px,4vh,40px);padding-top:14px;border-top:1px solid currentColor;font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase}
+  .pv-name{margin-top:clamp(20px,4vh,40px);padding-top:14px;position:relative;font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase}
+  .pv-name::before{content:"";position:absolute;left:0;top:0;width:100%;height:1px;background:currentColor;transform-origin:0 50%;transition:transform .9s cubic-bezier(.22,1,.36,1)}
   .pv-desc{margin-top:12px;font-size:var(--fs-lead);max-width:30ch;opacity:.85}
   .pv-go{margin-top:clamp(24px,5vh,48px);font-size:var(--fs-small);font-weight:500}
-  .menu-list.arc a{transition:opacity .2s linear}
-  .menu-list.arc a::after{display:inline-block;transition:opacity .4s,translate .6s cubic-bezier(.34,1.4,.5,1);translate:-.3em .3em}
-  .menu-list.arc li.on a::after{translate:0 0}
-  .menu-list.arc li.on a:hover::after{translate:.12em -.12em}
-  /* the letters of the item that becomes active rise one after the other */
-  @keyframes arcCh{from{translate:0 .5em;opacity:.15}to{translate:0 0;opacity:1}}
-  .menu-list.arc li.pop .r1 .c{animation:arcCh .75s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i) * 28ms)}
-  /* preview panel: each line leaves and comes back with a short stagger; it also arrives in steps when the menu opens */
-  .menu-pv>*{transition:opacity .35s,translate .6s cubic-bezier(.22,1,.36,1),clip-path .6s cubic-bezier(.22,1,.36,1);clip-path:inset(-.2em -.1em -.3em -.1em)}
+  .menu-pv>*{transition:opacity .35s,translate .6s cubic-bezier(.22,1,.36,1)}
   .menu-pv>:nth-child(2){transition-delay:50ms}.menu-pv>:nth-child(3){transition-delay:100ms}.menu-pv>:nth-child(4){transition-delay:150ms}
   .menu-pv.swap>*{opacity:0;translate:0 .6em;transition-duration:.16s;transition-delay:0ms}
-  .pv-n #pvN{display:inline-block}
+  .menu-pv.swap .pv-name::before{transform:scaleX(.15)}
   @keyframes pvIn{from{opacity:0;translate:0 1.2rem}}
   #menu:popover-open .menu-pv>*{animation:pvIn 1.1s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(550ms + (sibling-index() - 1) * 110ms)}
-  /* the line under the number draws itself */
-  .pv-name{border-top:0;position:relative}
-  .pv-name::before{content:"";position:absolute;left:0;top:0;width:100%;height:1px;background:currentColor;transform-origin:0 50%;transform:scaleX(1);transition:transform .9s cubic-bezier(.22,1,.36,1)}
-  .menu-pv.swap .pv-name::before{transform:scaleX(.15)}
+  /* the arc does its own entrance: the list's staggered rise would fight it */
+  #menu .menu-list.arc li{transition:none!important;translate:none!important}
 }
-@media (min-width:821px) and (prefers-reduced-motion:reduce){
-  .menu-list.arc li.pop .r1 .c,#menu:popover-open .menu-pv>*{animation:none}
-}
+@media (min-width:821px) and (prefers-reduced-motion:reduce){#menu:popover-open .menu-pv>*{animation:none}}
 @media (max-width:820px){.menu-pv{display:none}}
 
 /* Sections slide over each other with flat edges: no shadow, no line */
@@ -937,7 +931,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <li><a href="#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
     <div class="menu-pv" aria-hidden="true">
-      <p class="pv-n"><span id="pvN">01</span><span class="pv-t"> / 07</span></p>
+      <p class="pv-n"><span id="pvN">01</span><span class="pv-t" id="pvTot"> / 07</span></p>
       <p class="pv-name" id="pvName"></p>
       <p class="pv-desc" id="pvDesc"></p>
       <p class="pv-go"><span data-i="pvGo">Aller à la section</span> →</p>
@@ -1551,66 +1545,138 @@ function blurText(){
 }
 
 /* ---------- Menu arc carousel ---------- */
-const arcItems=$$('.menu-list.arc li'), arcMQ=matchMedia('(min-width:821px)');
+/* Port of the original component's loop. pos/target are in items; the lens (lensC) follows the hovered link when the arc
+   is at rest, else pos. Constants are the component's defaults: curve 60, spacing 1.08, edge fade 16 %, ease 50. */
+const arcList=$('.menu-list.arc'), arcItems=$$('.menu-list.arc li'), arcMQ=matchMedia('(min-width:821px)');
 const ARC_DESC={
   fr:['La fenêtre qui s’ouvre et le soleil de Nice.','Une sélection de nos travaux récents.','Tous les projets, rangés par catégorie.','Direction artistique, sites, données, audiovisuel, communication.','Le studio, sa méthode, ses principes.','Zahia et Yacine : les profils.','Parlons de votre projet.'],
   en:['The opening window and the sun of Nice.','A selection of recent work.','Every project, sorted by category.','Art direction, websites, data, audiovisual, communication.','The studio, its method, its principles.','Zahia and Yacine: the profiles.','Let’s talk about your project.']
 };
-let arcA=0, arcT=0, arcRaf=0, arcShown=-1, arcWheel=0, arcSlow=false;
-function arcRender(){
-  const big=arcMQ.matches;
+const ARC={curve:60,spacing:1.08,edgeFade:16,wRest:280,wFocus:720,spread:1,omega:(3+50*.09)*1.5,waveDur:.7,wheelTau:80};
+const A={pos:0,target:0,av:0,pv:0,lastPos:0,lean:0,lensC:0,lensV:0,lensAmp:1,hoverK:null,focusK:null,moving:false,
+  wOn:false,wFrom:0,wRaw:0,wR:0,wLast:0,wCount:0,wheelT:-1e9,waves:new Map,waveRel:new Map,waveK:null,waveCand:null,waveCandT:0,
+  introT:-1e9,raf:0,last:0,shown:-1,chars:[]};
+const arcN=arcItems.length, arcClampT=v=>clamp(v,0,arcN-1);
+function arcChars(){ A.chars=arcItems.map(li=>[...li.querySelectorAll('.r1 .c')]); }
+function arcWheelStep(t){            // the component's wheel smoothing: snaps to whole items once the gesture calms
+  const n=t-A.wLast, r=Math.abs(A.wRaw), sg=Math.sign(A.wRaw);
+  const a=r>=.08?Math.max(1,Math.ceil(r-.3)):+(r>.001&&A.wCount<=2&&n>110);
+  const o=A.wFrom+sg*a, s=A.wFrom+A.wRaw;
+  if(n>260){ A.target=arcClampT(o); A.wOn=false; return; }
+  const c=A.wR*Math.exp(-Math.max(0,n)/ARC.wheelTau)/(ARC.wheelTau/1e3);
+  const l=Math.max(clamp(1-c/3),clamp((n-40)/200));
+  A.target=arcClampT(s+(o-s)*l*l*(3-2*l));
+}
+function arcFrame(t){
+  A.raf=0;
+  if(!menu.matches(':popover-open')||!arcMQ.matches) return;
+  const dt=clamp((t-(A.last||t))/1e3,1/240,1/20); A.last=t;
+  if(A.wOn) arcWheelStep(t);
+  if(reduce){ A.pos+=(A.target-A.pos)*(1-Math.exp(-60*dt)); A.av=0; }
+  else{ const P=ARC.omega, k=Math.ceil(dt/(1/240)), h=dt/k;
+    for(let i=0;i<k;i++){ A.av+=(P*P*(A.target-A.pos)-2*P*A.av)*h; A.pos+=A.av*h; } }
+  if(Math.abs(A.target-A.pos)<5e-4&&Math.abs(A.av)<.02){ A.pos=A.target; A.av=0; }
+  const v=(A.pos-A.lastPos)/dt; A.lastPos=A.pos; A.pv+=(v-A.pv)*(1-Math.exp(-14*dt));
+  const leanT=reduce?0:clamp(-A.pv*1.6,-8,8); A.lean+=(leanT-A.lean)*(1-Math.exp(-10*dt));
+  if(Math.abs(leanT-A.lean)<.02&&Math.abs(leanT)<.02) A.lean=0;
+  if(A.lensAmp<1){ const g=t-A.introT>120?1-Math.exp(-(reduce?60:3.2)*dt):0; A.lensAmp+=(1-A.lensAmp)*g; if(1-A.lensAmp<.002) A.lensAmp=1; }
+  A.moving=A.wOn||Math.abs(A.target-A.pos)>.004||Math.abs(A.av)>.05||t-A.wheelT<160;
+  A.focusK=A.moving?null:A.hoverK;
+  // lens: critically damped spring towards the hovered link (soft) or the arc position (firm)
+  const lt=A.focusK??A.pos;
+  if(reduce){ A.lensC=lt; A.lensV=0; }
+  else{ const K=A.focusK==null&&A.moving?320:140, D=2*Math.sqrt(K), k=Math.ceil(dt/(1/120)), h=dt/k;
+    for(let i=0;i<k;i++){ A.lensV+=(K*(lt-A.lensC)-D*A.lensV)*h; A.lensC+=A.lensV*h; }
+    if(Math.abs(lt-A.lensC)<5e-4&&Math.abs(A.lensV)<.01){ A.lensC=lt; A.lensV=0; } }
+  // wave: a link held under the pointer for 110 ms
+  const fk=A.focusK==null?null:Math.round(A.focusK);
+  if(!reduce&&!A.moving){
+    if(fk==null) A.waveK=null;
+    if(fk===A.waveCand){ if(fk!=null&&fk!==A.waveK&&t-A.waveCandT>110){ A.waveK=fk; A.waves.set(fk,t); A.waveRel.delete(fk); } }
+    else{ A.waveCand=fk; A.waveCandT=t; }
+  }
+  arcRender(t,fk);
+  const busy=A.moving||A.lensC!==lt||A.lensAmp<1||A.lean!==0||A.waves.size>0||t-A.introT<450||A.waveCand!==A.waveK;
+  if(busy) A.raf=requestAnimationFrame(arcFrame); else A.last=0;
+}
+function arcRender(t,fk){
+  const H=arcList.clientHeight, size=parseFloat(getComputedStyle(arcItems[0].querySelector('.mn')).fontSize);
+  const lineH=size*1.08, sp=size*ARC.spacing, R=H*(3.2-ARC.curve/100*2.5), cy=H/2, pivotX=-R;
+  const intro=clamp((t-A.introT)/320), skew=Math.abs(A.lean)>.05?' skewX('+A.lean.toFixed(2)+'deg)':'';
+  const steps=Math.abs(A.lensV)>.8||A.lensAmp<1?64:192;
   arcItems.forEach((li,i)=>{
-    const a=li.firstElementChild;
-    if(!big){ li.style.transform=''; a.style.opacity=''; li.classList.remove('on','pop'); return; }
-    const d=i-arcA, ad=Math.abs(d), th=d*.145, Rr=Math.min(innerWidth*.8,1050);
-    const x=Rr*Math.cos(th)-Rr, y=Rr*Math.sin(th);
-    li.style.transform='translate('+x.toFixed(1)+'px,calc('+y.toFixed(1)+'px - 50%)) rotate('+th.toFixed(4)+'rad) scale('+Math.max(.55,1-ad*.11).toFixed(3)+')';
-    a.style.opacity=Math.max(.08,1-ad*.3).toFixed(3);   // on the link: the li keeps the menu's staggered fade-in
-    const on=ad<.5;
-    if(on&&!li.classList.contains('on')){ li.classList.remove('pop'); void li.offsetWidth; li.classList.add('pop'); }
-    li.classList.toggle('on',on);
+    const l=(i-A.pos)*sp/R, vis=Math.abs(l)<1.45;
+    li.style.visibility=vis?'visible':'hidden'; if(!vis) return;
+    li.style.transform='translate3d('+pivotX.toFixed(1)+'px,'+cy.toFixed(1)+'px,0) rotate('+(l*180/Math.PI).toFixed(3)+'deg) translate3d('+R.toFixed(1)+'px,0,0)'+skew+' translate3d(0,'+(-lineH/2).toFixed(1)+'px,0)';
+    const p=Math.abs(cy+Math.sin(l)*R-H/2);
+    const op=clamp((H/2-p-lineH*.6)/(H*(ARC.edgeFade/100)))*intro;
+    const hh=(i-A.lensC)/ARC.spread, g=Math.round(A.lensAmp*Math.exp(-hh*hh)*steps)/steps;
+    const mn=li.querySelector('.mn'), a=li.firstElementChild;
+    const w=Math.round(ARC.wRest+(ARC.wFocus-ARC.wRest)*g), c=Math.round(g**1.25*100);
+    mn.style.fontWeight=String(w);
+    a.style.color=c>=100?'var(--arc-on)':c<=0?'var(--arc-off)':'color-mix(in srgb,var(--arc-on) '+c+'%,var(--arc-off))';
+    a.style.pointerEvents=op>.3?'auto':'none';
+    li.style.opacity=op.toFixed(3);
+    const e=clamp((g-.55)/.4), sm=e*e*(3-2*e); li.style.setProperty('--arw',sm.toFixed(3));
+    // letter wave
+    const t0=A.waves.get(i);
+    if(t0!=null){
+      const cs=A.chars[i]||[], n=cs.length, ld=Math.min(.045,.4/Math.max(1,n)), d=(t-t0)/1e3;
+      let rel=A.waveRel.get(i); if(rel==null&&i!==fk){ rel=t; A.waveRel.set(i,t); }
+      const pr=rel==null?1:Math.max(0,1-(t-rel)/120)**2;
+      if(d>(n-1)*ld+ARC.waveDur||pr<=0){ cs.forEach(ch=>ch.style.fontWeight=''); A.waves.delete(i); A.waveRel.delete(i); }
+      else{ const room=Math.max(0,Math.min(90,1e3-w)), amp=g*pr;
+        cs.forEach((ch,r)=>{ const x=(d-r*ld)/ARC.waveDur, b=x<=0||x>=1?0:.5-.5*Math.cos(x*Math.PI*2), q=Math.round(b*amp*8)/8;
+          ch.style.fontWeight=q<=0?'':String(Math.round((w+room*q)/4)*4); }); }
+    }
   });
-  const k=Math.round(arcA);
-  if(k!==arcShown){
-    arcShown=k;
-    const pv=$('.menu-pv'); pv.classList.add('swap');
-    setTimeout(()=>{
-      setT('pvN',String(k+1).padStart(2,'0'));
+  const k=clamp(Math.round(A.focusK??A.pos),0,arcN-1);
+  if(k!==A.shown){
+    A.shown=k; const pv=$('.menu-pv'); pv.classList.add('swap');
+    setTimeout(()=>{ setT('pvN',pad(k+1)); setT('pvTot',' / '+pad(arcN));
       setT('pvName',arcItems[k].querySelector('.sr')?.textContent||arcItems[k].textContent.trim());
-      setT('pvDesc',ARC_DESC[lang][k]||'');
-      pv.classList.remove('swap');
-    },reduce?0:160);
+      setT('pvDesc',ARC_DESC[lang][k]||''); pv.classList.remove('swap'); },reduce?0:160);
   }
 }
-function arcTick(){
-  arcA+= (arcT-arcA)*(reduce?1:arcSlow?.06:.14);
-  if(Math.abs(arcT-arcA)<.002){ arcA=arcT; arcSlow=false; }
-  arcRender();
-  arcRaf=arcA!==arcT?requestAnimationFrame(arcTick):0;
-}
-function arcGo(t){ arcT=clamp(Math.round(t),0,arcItems.length-1); if(!arcRaf) arcRaf=requestAnimationFrame(arcTick); }
-// hover only on a real mouse move: when the arc turns under a still cursor, the browser fires enter events too
-arcItems.forEach((li,i)=>{ li.addEventListener('pointermove',e=>{ if((e.movementX||e.movementY)&&!arcSlow&&arcT!==i) arcGo(i); }); li.addEventListener('focusin',()=>arcGo(i)); });
+function arcKick(){ if(!A.raf) A.raf=requestAnimationFrame(arcFrame); }
+function arcTo(i){ A.target=arcClampT(Math.round(i)); A.wOn=false; arcKick(); }
+function arcReset(){ arcItems.forEach(li=>{ li.style.cssText=''; li.firstElementChild.style.cssText=''; li.querySelector('.mn').style.fontWeight=''; }); }
+arcList.addEventListener('pointermove',e=>{
+  if(!arcMQ.matches||e.pointerType!=='mouse'||!(e.movementX||e.movementY)) return;   // a still cursor under a turning arc is not a hover
+  const li=e.target.closest('li'); A.hoverK=li?arcItems.indexOf(li):null; arcKick();
+});
+arcList.addEventListener('pointerleave',()=>{ A.hoverK=null; arcKick(); });
+arcItems.forEach((li,i)=>li.addEventListener('focusin',()=>{ if(arcMQ.matches&&!li.matches(':hover')) arcTo(i); }));
 menu.addEventListener('wheel',e=>{
   if(!arcMQ.matches) return;
+  const d=Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX; if(!d) return;
   e.preventDefault();
-  const now=performance.now(); if(now-arcWheel<260) return; arcWheel=now;
-  arcGo(arcT+(e.deltaY>0?1:-1));
+  const now=performance.now(), size=parseFloat(getComputedStyle(arcItems[0].querySelector('.mn')).fontSize);
+  if(!A.wOn){ A.wOn=true; A.wFrom=Math.round(A.target); A.wRaw=0; A.wR=0; A.wCount=0; }
+  const i=e.deltaMode===1?d/3:e.deltaMode===2?Math.sign(d):d/Math.max(90,size*ARC.spacing*1.6);
+  A.wR=A.wR*Math.exp(-(now-A.wLast)/ARC.wheelTau)+Math.abs(i);
+  A.wRaw=clamp(A.wRaw+i,-A.wFrom,arcN-1-A.wFrom); A.wLast=now; A.wCount++; A.wheelT=now; A.hoverK=null;
+  arcKick();
 },{passive:false});
 menu.addEventListener('keydown',e=>{
-  if(!arcMQ.matches) return;
-  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); arcGo(arcT+(e.key==='ArrowDown'?1:-1)); arcItems[arcT].querySelector('a').focus({preventScroll:true}); }
+  if(!arcMQ.matches||(e.key!=='ArrowDown'&&e.key!=='ArrowUp')) return;
+  e.preventDefault(); arcTo(Math.round(A.target)+(e.key==='ArrowDown'?1:-1));
+  arcItems[A.target].firstElementChild.focus({preventScroll:true});
 });
 menu.addEventListener('toggle',e=>{
-  if(e.newState!=='open') return;
+  if(e.newState!=='open'){ cancelAnimationFrame(A.raf); A.raf=0; A.last=0; return; }
+  if(!arcMQ.matches){ arcReset(); return; }
+  arcChars();
   const map={top:0,intro:0,projects:1,services:3,studio:4,team:5,contact:6};
-  arcT=map[curSec]??0; arcShown=-1;
-  arcA=reduce||!arcMQ.matches?arcT:arcT+2.6;           // the arc spins in to the current section as the menu opens
-  arcItems.forEach(li=>li.classList.remove('on','pop'));
-  arcRender(); cancelAnimationFrame(arcRaf); arcRaf=0;
-  setTimeout(()=>{ arcSlow=true; arcGo(arcT); arcItems[arcT].firstElementChild.focus({preventScroll:true}); },120);
+  const k=map[curSec]??0;
+  A.target=k; A.pos=A.lastPos=reduce?k:k-1.6; A.av=0; A.pv=0; A.lean=0; A.hoverK=A.focusK=null; A.wOn=false;
+  A.lensC=A.pos; A.lensV=0; A.lensAmp=reduce?1:0; A.waves.clear(); A.waveRel.clear(); A.waveK=A.waveCand=null;
+  A.introT=performance.now()+(reduce?-1e4:80); A.shown=-1; A.last=0;
+  arcItems[k].firstElementChild.focus({preventScroll:true});
+  arcKick();
 });
-addEventListener('resize',()=>{ if(menu.matches(':popover-open')) arcRender(); });
+arcMQ.addEventListener?.('change',()=>{ if(!arcMQ.matches) arcReset(); else if(menu.matches(':popover-open')){ arcChars(); A.shown=-1; arcKick(); } });
+addEventListener('resize',()=>{ if(!arcMQ.matches) arcReset(); else if(menu.matches(':popover-open')){ if(!arcItems[0].style.transform){ arcChars(); A.shown=-1; } arcKick(); } });
 
 /* ---------- Language ---------- */
 function applyLang(l){
@@ -1637,7 +1703,7 @@ function applyLang(l){
   document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio based on the French Riviera. Websites, identities, audiovisual and communication, drawn with light.':'Moyo, studio de design et de développement basé en Provence-Alpes-Côte d\u2019Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.';
   applySun(sunCur); fillToday(); renderChart(); if(proj.open) fillProject(pIdx);
   curSec=''; updateBar();
-  if(typeof arcShown!=='undefined'){ arcShown=-1; if(menu.matches(':popover-open')) arcRender(); }
+  if(typeof A!=='undefined'&&A.chars){ arcChars(); A.shown=-1; A.waves.clear(); if(menu.matches(':popover-open')) arcKick(); }
   try{localStorage.setItem('hb-lang',l)}catch(e){}
 }
 /* switch language through a soft view transition when the browser supports it */
