@@ -43,6 +43,26 @@ function featuredOf(data) {
   return f.length ? f : all.slice(0, 6);
 }
 
+function cardHTML(p, i, lang) {
+  const t = txt(p, lang);
+  const media = p.cover
+    ? `<img class="acard-img" src="${imgURL(p.cover)}" alt="${escHTML(t.title || '')}" loading="lazy" decoding="async">`
+    : plateInner(p, t.title);
+  const desc = t.desc || t.place || '';
+  return `<article class="acard" data-p="${i}" data-id="${escHTML(p.id)}" tabindex="0" role="button" aria-label="${escHTML(t.title || '')}">` +
+    `<span class="acard-media row-bg"${p.cover ? '' : ' data-noimg'}${plateAttrs(p)} aria-hidden="true">${media}</span>` +
+    `<span class="acard-grad" aria-hidden="true"></span>` +
+    `<span class="acard-no" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>` +
+    (t.type ? `<span class="acard-tag">${escHTML(t.type)}</span>` : '') +
+    `<span class="acard-body"><span class="acard-title">${escHTML(t.title)}</span>` +
+    `<span class="acard-rule" aria-hidden="true"></span>` +
+    `<span class="acard-desc">${escHTML(desc)}</span></span></article>`;
+}
+
+function cardsHTML(list, lang) {
+  return list.map((p, i) => cardHTML(p, i, lang)).join('');
+}
+
 function rowsHTML(list, lang) {
   return list.map((p, i) => rowHTML(p, i, lang)).join('');
 }
@@ -52,4 +72,4 @@ function dataJSON(data) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
-export { escHTML, FALLBACK_PLATE, imgURL, catLabel, txt, plateInner, plateAttrs, rowHTML, featuredOf, rowsHTML, dataJSON };
+export { escHTML, FALLBACK_PLATE, imgURL, catLabel, txt, plateInner, plateAttrs, rowHTML, cardHTML, cardsHTML, featuredOf, rowsHTML, dataJSON };

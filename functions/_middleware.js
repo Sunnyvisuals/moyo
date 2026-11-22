@@ -3,7 +3,7 @@
      are replaced on the fly with the current ones, so the pages stay complete without JavaScript.
    - Adds a few security headers everywhere, and keeps /admin out of search engines. */
 import { getData, hasStored } from './_lib/store.js';
-import { rowsHTML, featuredOf, dataJSON } from '../shared/render.js';
+import { rowsHTML, cardsHTML, featuredOf, dataJSON } from '../shared/render.js';
 
 const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all' };
 
@@ -17,7 +17,7 @@ export async function onRequest({ request, env, next }) {
     const data = await getData(env);
     const list = page === 'home' ? featuredOf(data) : data.projects;
     res = new HTMLRewriter()
-      .on('#projects', { element: el => { el.setInnerContent(rowsHTML(list, 'fr'), { html: true }); } })
+      .on('#projects', { element: el => { el.setInnerContent((page === 'home' ? cardsHTML : rowsHTML)(list, 'fr'), { html: true }); } })
       .on('script#moyo-data', { element: el => { el.setInnerContent(dataJSON(data), { html: true }); } })
       .transform(res);
   }
