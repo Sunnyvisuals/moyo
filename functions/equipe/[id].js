@@ -35,7 +35,7 @@ h1,h2,p,ul{margin:0}ul{padding:0;list-style:none}a{color:inherit}
 :focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .top{display:flex;justify-content:space-between;align-items:center;padding:var(--m) var(--m) 0}
 .top a,.top button{font:inherit;font-size:.875rem;font-weight:500;color:inherit;background:none;border:0;cursor:pointer;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding:0 12px}
-.mark{font-size:1.125rem!important;font-weight:550!important;letter-spacing:-.02em;padding:0!important}
+.mark{font-size:clamp(1.625rem,2.1vw,1.875rem)!important;font-weight:700!important;letter-spacing:-.045em;line-height:1;padding:0!important}
 main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;padding:clamp(56px,10vh,120px) var(--m) clamp(72px,12vh,140px);max-width:calc(1500px + 2 * var(--m));margin:0 auto}
 .idx{grid-column:1/-1;display:flex;align-items:center;gap:14px;font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;margin-bottom:clamp(24px,5vh,56px)}
 .idx i{width:18px;height:7px;border-block:1px solid currentColor}.idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22}
