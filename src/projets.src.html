@@ -286,13 +286,10 @@ applyLang(lang);
 
 /* Tetris band: image pieces take project visuals; pieces drop in as the band enters */
 (()=>{
-  // real photos only; without photos the piece stays a plain colour block
-  const photos=[];
-  ALL.forEach(p=>{ if(p.cover) photos.push(p.cover); (p.images||[]).forEach(id=>photos.push(id)); });
-  $$('.blocks .pic').forEach((el,i)=>{
-    if(!photos.length){ el.className=['k1','k4'][i%2]; return; }
-    el.innerHTML=`<img src="${imgURL(photos[(+el.dataset.pic||0)%photos.length])}" alt="" loading="lazy" decoding="async">`;
-  });
+  const vis=[];
+  ALL.forEach(p=>{ if(p.cover) vis.push({cover:p.cover}); (p.images||[]).forEach(id=>vis.push({cover:id})); });
+  ALL.forEach(p=>{ if(!p.cover&&p.plate) vis.push({plate:p.plate,tone:p.tone}); });
+  if(vis.length) $$('.blocks .pic').forEach(el=>{ const v=vis[(+el.dataset.pic||0)%vis.length]; el.innerHTML=plateInner(v); if(plateAttrs(v)) el.dataset.t='wash'; });
   const band=$('.blocks'); if(!band||reduce) return;
   const upd=()=>{ const t=band.getBoundingClientRect().top; band.style.setProperty('--bp',Math.min(1,Math.max(0,(innerHeight-t)/(band.offsetHeight||1))).toFixed(3)); };
   addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true}); addEventListener('resize',upd); upd();
