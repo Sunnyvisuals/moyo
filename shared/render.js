@@ -22,11 +22,11 @@ function txt(p, lang) {
 
 function plateInner(p, alt) {
   if (p.cover) return `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}" loading="lazy" decoding="async">`;
-  return p.plate || FALLBACK_PLATE;
+  return '';  // no cover -> plain grey block
 }
 
 function plateAttrs(p) {
-  return (!p.cover && p.tone === 'wash') ? ' data-t="wash"' : '';
+  return '';  // placeholders are plain grey now
 }
 
 function rowHTML(p, i, lang) {
