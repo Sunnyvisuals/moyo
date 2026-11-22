@@ -513,6 +513,45 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .monument.grad{padding-bottom:.196em;margin-bottom:0}
 .foot.sec{padding-bottom:0}
 .foot .mono-wrap{margin-bottom:0}
+/* Wide tile buttons: full-width bar, two tiles in two blues (number + label), a square tile with four small squares.
+   Hover: the tile lightens, an arrow slides in. */
+.cta-bar{display:grid;grid-template-columns:1fr 1fr clamp(72px,7vw,104px);margin:clamp(72px,12vh,140px) calc(var(--m) * -1) 0;min-height:clamp(84px,11vh,112px)}
+.cta,.cta-ic{position:relative;display:flex;text-decoration:none;transition:background var(--dur-1) var(--ease-enter)}
+.cta{flex-direction:column;justify-content:center;gap:6px;padding:0 clamp(20px,2.4vw,40px);color:var(--paper);overflow:clip}
+.cta .n{font-size:.6875rem;font-weight:600;letter-spacing:.06em;opacity:.75}
+.cta .t{font-size:clamp(1rem,1.4vw,1.375rem);font-weight:600;letter-spacing:.01em;text-transform:uppercase;line-height:1.1}
+.cta::after{content:"";position:absolute;right:clamp(20px,2.4vw,40px);top:50%;width:22px;height:11px;margin-top:-5px;background:currentColor;opacity:0;translate:-12px 0;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 11'%3E%3Cpath d='M0 5.5h20M15.5 1l4.5 4.5-4.5 4.5' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 11'%3E%3Cpath d='M0 5.5h20M15.5 1l4.5 4.5-4.5 4.5' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition:opacity var(--dur-1),translate var(--dur-3) var(--ease-enter)}
+.cta:hover::after,.cta:focus-visible::after{opacity:1;translate:0 0}
+.cta:nth-child(1){background:color-mix(in oklab,var(--klein) 58%,#000614)}
+.cta:nth-child(2){background:var(--klein)}
+.cta:nth-child(1):hover{background:color-mix(in oklab,var(--klein) 70%,#000614)}
+.cta:nth-child(2):hover{background:color-mix(in oklab,var(--klein) 86%,var(--chaux))}
+.cta-ic{display:grid;grid-template-columns:repeat(2,8px);gap:6px;place-content:center;background:var(--wash);color:var(--klein)}
+.cta-ic i{display:block;width:8px;height:8px;background:currentColor;transition:translate var(--dur-3) var(--ease-enter)}
+.cta-ic:hover{background:color-mix(in oklab,var(--klein) 22%,var(--chaux))}
+.cta-ic:hover i:nth-child(1){translate:-3px -3px}.cta-ic:hover i:nth-child(2){translate:3px -3px}.cta-ic:hover i:nth-child(3){translate:-3px 3px}.cta-ic:hover i:nth-child(4){translate:3px 3px}
+.blue .cta:nth-child(2){background:color-mix(in oklab,var(--klein) 80%,var(--chaux))}
+.blue .cta-ic{background:var(--chaux)}
+.cta:focus-visible,.cta-ic:focus-visible{outline:2px solid currentColor;outline-offset:-6px}
+@media (max-width:640px){.cta-bar{grid-template-columns:1fr 64px}.cta-bar .cta:nth-child(2){grid-column:1;grid-row:2}.cta-ic{grid-row:1/3;grid-column:2}}
+
+/* Scroll cue: appears after 15 s without scrolling, bottom centre, in the same glass as the header */
+.hint{display:none!important}
+.scroll-cue{position:fixed;z-index:78;left:50%;bottom:clamp(20px,4vh,40px);display:flex;align-items:center;gap:16px;margin:0;padding:14px 24px;border-radius:50px;
+  font-size:.8125rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--klein);pointer-events:none;
+  background:rgb(255 255 255 / .55);border:1px solid rgb(0 47 167 / .12);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  box-shadow:inset 0 1px 1px rgb(255 255 255 / .7),0 4px 30px rgb(0 0 0 / .1);
+  opacity:0;translate:-50% 16px;transition:opacity var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter),color var(--dur-3),background var(--dur-3)}
+.scroll-cue[data-tone="paper"]{color:#fff;background:rgb(255 255 255 / .08);border-color:rgb(255 255 255 / .18)}
+.scroll-cue.on{opacity:1;translate:-50% 0}
+.scroll-cue i{position:relative;display:block;width:1px;height:28px;background:currentColor;opacity:.35}
+.scroll-cue b{position:absolute;left:-3px;top:0;width:7px;height:7px;background:currentColor}
+@media (prefers-reduced-motion:no-preference){.scroll-cue.on b{animation:cue 1.8s var(--ease-enter) infinite}}
+@keyframes cue{0%{translate:0 0;opacity:0}20%{opacity:1}80%{opacity:1}100%{translate:0 21px;opacity:0}}
+
 /* No visible scrollbar (the page still scrolls by wheel, trackpad, keyboard and touch) */
 html,#menu,#proj{scrollbar-width:none}
 html::-webkit-scrollbar,#menu::-webkit-scrollbar,#proj::-webkit-scrollbar{display:none}
@@ -702,6 +741,8 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <a href="#contact" data-k="contact"><span class="lbl" data-i="sec.contact">Contact</span></a>
 </nav>
 
+<p class="scroll-cue" id="scrollCue" aria-hidden="true"><span data-i="cue">Défiler</span><i><b></b></i></p>
+
 <main id="main">
 
 <!-- Accueil -->
@@ -747,7 +788,11 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <p class="small muted" data-i="projN">Une sélection. Tous les projets sont rangés par catégorie.</p>
     </div>
     <ol class="projects" id="projects">__ROWS__</ol>
-    <div class="proj-more"><a class="link" href="/projets" data-i="allL">Tous les projets, par catégorie</a></div>
+    <nav class="cta-bar" aria-label="Suite" data-ia="ctaAria">
+      <a class="cta" href="/projets"><span class="n">01</span><span class="t" data-i="allL">Tous les projets, par catégorie</span></a>
+      <a class="cta" href="#contact"><span class="n">02</span><span class="t" data-i="ctaTalk">Parler de votre projet</span></a>
+      <a class="cta-ic" href="#top" aria-label="Retour en haut" data-ia="top"><i></i><i></i><i></i><i></i></a>
+    </nav>
     <script type="application/json" id="moyo-data">__DATA__</script>
   </div>
 </section>
@@ -809,7 +854,11 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <li><span class="nm par shut" style="--a:40px">Zahia Bougouffa</span></li>
       <li><span class="nm par shut" style="--a:-26px">Yacine Bouabdallah</span></li>
     </ul>
-    <div class="studio-cta"><a class="link" href="#contact" data-i="stuL">Écrire au studio</a></div>
+    <nav class="cta-bar" aria-label="Suite" data-ia="ctaAria">
+      <a class="cta" href="#contact"><span class="n">01</span><span class="t" data-i="stuL">Écrire au studio</span></a>
+      <a class="cta" href="/projets"><span class="n">02</span><span class="t" data-i="ctaSee">Voir les projets</span></a>
+      <a class="cta-ic" href="#top" aria-label="Retour en haut" data-ia="top"><i></i><i></i><i></i><i></i></a>
+    </nav>
   </div>
 </section>
 
@@ -959,7 +1008,7 @@ try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else
 
 /* ---------- Dictionary (French stays in the HTML) ---------- */
 const EN={
- 'skip':'Skip to content','nav':'Main navigation','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
+ 'skip':'Skip to content','nav':'Main navigation','cue':'Scroll','ctaAria':'Next','ctaTalk':'Talk about your project','ctaSee':'See the projects','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
  'ctLead':'A place, an event, a brand? Tell us about the project. We reply within 48 hours.','ctAlt':'Or directly',
  'fName':'Name','fMail':'Email','fType':'The project','tId':'Identity','tSite':'Website','tData':'Data','tMotion':'Motion','tOther':'Other',
  's5t':'Audiovisual','s5p':'Brand films, shooting, editing and motion design, from storyboard to grading.',
@@ -1168,6 +1217,19 @@ function updateBar(){
 }
 const dotsNav=$('#dots'), dots=$$('#dots a');
 bar.addEventListener('focusin',()=>bar.classList.remove('away'));
+
+/* Scroll cue: shown after 15 s without scrolling (never at the end of the page, nor over the menu or a project) */
+const cue=$('#scrollCue');
+let cueT=0;
+function armCue(){
+  clearTimeout(cueT); cue.classList.remove('on');
+  cueT=setTimeout(()=>{
+    const atEnd=scrollY+innerHeight>=document.documentElement.scrollHeight-innerHeight*.6;
+    if(!atEnd&&!menu.matches(':popover-open')&&!$('#proj').open){ cue.dataset.tone=bar.dataset.tone; cue.classList.add('on'); }
+  },15000);
+}
+['scroll','wheel','touchstart','keydown'].forEach(ev=>addEventListener(ev,armCue,{passive:true}));
+armCue();
 
 /* ---------- Stacking: each section stops once its end is reached, the next one slides over it ---------- */
 const stackOn=!reduce&&CSS.supports('position','sticky');
