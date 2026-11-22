@@ -451,6 +451,16 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .blocks .k5{--to:var(--c5);--from:var(--c3)}
 @media (max-width:820px){.blocks{grid-auto-rows:clamp(44px,8vh,88px)}}
 
+/* Gradient text filled by the scroll: a wide gradient clipped to the letters, with a fine dot screen (dithering) on top.
+   JS sets --g from 0 (text arriving, mostly faded) to 1 (fully lit). Without JS or with reduced motion, --g stays 1. */
+.grad{--g:1;--g1:var(--paper);--g2:color-mix(in oklab,var(--klein) 52%,var(--paper));--g3:color-mix(in oklab,var(--klein) 82%,var(--paper));--dot:rgb(0 47 167 / .28);
+  background-image:radial-gradient(circle at 50% 50%,var(--dot) .7px,#0000 1.1px),linear-gradient(90deg,var(--g1) 0%,var(--g1) 38%,var(--g2) 56%,var(--g3) 78%,var(--g3) 100%);
+  background-size:4px 4px,260% 100%;background-position:0 0,calc((1 - var(--g)) * 100%) 0;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--g1)}
+.grad-p{--g1:var(--klein);--g2:color-mix(in oklab,var(--klein) 42%,var(--chaux));--g3:color-mix(in oklab,var(--klein) 14%,var(--chaux));--dot:rgb(241 243 242 / .35)}
+.grad .w,.grad .c,.grad .ln{-webkit-text-fill-color:transparent}
+@media (forced-colors:active){.grad{background:none;-webkit-text-fill-color:currentColor}}
+
 /* Approach: a larger statement, nothing else */
 .intro{padding-top:clamp(120px,22vh,280px)}
 .intro .display{max-width:20ch}
@@ -608,7 +618,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">01</span><span data-i="sec.intro">Approche</span></p>
     <div class="cols">
-      <h2 class="display words" id="introT" data-i="introT">Nous mesurons la lumière avant de la dessiner. Chaque projet commence par des relevés, puis une idée simple, construite avec soin.</h2>
+      <h2 class="display words grad" id="introT" data-i="introT">Nous mesurons la lumière avant de la dessiner. Chaque projet commence par des relevés, puis une idée simple, construite avec soin.</h2>
       <div class="lead-link"><a class="link" href="#projets" data-i="introL">Voir les projets</a></div>
     </div>
   </div>
@@ -664,7 +674,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <h2 class="display par shut" id="stuT" style="--a:44px" data-i="stuT">Le studio.</h2>
     <p class="statement words" data-i="stuP">Moyo est un studio de design et de développement. Nous concevons des sites et des identités pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
     <div class="entry">
-      <p class="entry-w par" style="--a:64px" aria-hidden="true"><span class="c">m</span><span class="c">o</span><span class="c">y</span><span class="c">o</span></p>
+      <p class="entry-w par grad" style="--a:64px" aria-hidden="true"><span class="c">m</span><span class="c">o</span><span class="c">y</span><span class="c">o</span></p>
       <div class="entry-d">
         <p class="entry-t" data-i="enT">Moyo, nom. Un mot d’origine bantoue.</p>
         <dl>
@@ -689,7 +699,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">05</span><span data-i="sec.light">Lumière</span></p>
     <div class="sec-head">
-      <h2 class="display par shut" id="lumT" style="--a:36px" data-i="lumT">La lumière de Nice, en direct.</h2>
+      <h2 class="display par shut grad grad-p" id="lumT" style="--a:36px" data-i="lumT">La lumière de Nice, en direct.</h2>
       <p class="small muted" data-i="lumN">Ce site calcule la position réelle du soleil. Voici les valeurs d’aujourd’hui.</p>
     </div>
     <dl class="figs">
@@ -708,7 +718,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 <section class="sec blue contact" id="contact" data-sec="contact" data-tone="blue" aria-labelledby="ctT">
   <div class="wrap top" style="width:100%">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">06</span><span data-i="sec.contact">Contact</span></p>
-    <h2 class="display shut" id="ctT" data-i="ctT">Parlons lumière.</h2>
+    <h2 class="display shut grad" id="ctT" data-i="ctT">Parlons lumière.</h2>
     <a class="mail" id="mail" href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><br>
     <button class="link copy" id="copy" type="button" data-i="copy">Copier l’adresse</button>
     <span class="sr" id="copyMsg" role="status"></span>
@@ -751,7 +761,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <span class="muted" id="fDate"></span>
     <a href="#top" data-i="top">Retour en haut</a>
   </div>
-  <div class="mono-wrap" aria-hidden="true"><div class="monument">moyo</div></div>
+  <div class="mono-wrap" aria-hidden="true"><div class="monument grad">moyo</div></div>
 </footer>
 
 <dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent>
@@ -947,6 +957,7 @@ function frame(){
   updateBar();
   coverStack();
   // a band sits at the foot of a section that then stops: it is complete once it is fully on screen
+  if(!reduce) for(const t of grads){ const r=t.getBoundingClientRect(); setV(t,'--g',clamp((innerHeight-r.top)/(innerHeight*.75+r.height*.5)).toFixed(3)); }
   if(!reduce) for(const b of bands){ const t=b.getBoundingClientRect().top; setV(b,'--bp',clamp((innerHeight-t)/Math.max(1,b.offsetHeight)).toFixed(3)); }
   if(pxEls.length&&parallax()) more=true;
   if(more) raf=requestAnimationFrame(frame);
@@ -990,7 +1001,7 @@ bar.addEventListener('focusin',()=>bar.classList.remove('away'));
 /* ---------- Stacking: each section stops once its end is reached, the next one slides over it ---------- */
 const stackOn=!reduce&&CSS.supports('position','sticky');
 const stack=$$('main > .sec');
-const bands=$$('.blocks');
+const bands=$$('.blocks'), grads=$$('.grad');
 function layoutStack(){
   if(!stackOn) return;
   // a section taller than the screen sticks only when its bottom reaches the bottom of the screen
