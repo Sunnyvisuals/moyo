@@ -687,10 +687,13 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   .pv-l{position:absolute;left:0;right:0;top:-12%;bottom:-12%;background:var(--arc-frame) var(--img,none) 50% var(--py,50%)/cover no-repeat;clip-path:inset(12% 0)}
   .pv-l:empty{background-size:cover}
   .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:10px}
-  .pv-cap p{clip-path:inset(-.3em -.3em -.4em -.3em);transition:translate .7s cubic-bezier(.22,1,.36,1),clip-path .7s cubic-bezier(.22,1,.36,1),opacity .45s ease}
-  .pv-cap .pv-n{transition-delay:40ms}.pv-cap .pv-name{transition-delay:80ms}
-  .menu-pv.swap .pv-cap p{translate:0 -.7em;clip-path:inset(0 0 100% 0);opacity:0;transition-duration:.18s;transition-delay:0ms}
-  .menu-pv.enter .pv-cap p{translate:0 .9em;clip-path:inset(100% 0 0 0);opacity:0;transition:none}
+  .pv-cw{height:50px;overflow:hidden;flex:1;min-width:0}
+  .pv-ci{height:50px;overflow:hidden}
+  .pv-cs,.pv-ns{display:block;will-change:transform}
+  .pv-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .pv-nw{display:inline-block;height:1.3em;line-height:1.3em;overflow:hidden;vertical-align:top}
+  .pv-ns>span{display:block;height:1.3em}
+  .menu-pv{will-change:transform}
   .pv-desc{font-size:.6875rem;line-height:1.35;opacity:.6;max-width:28ch}
   .pv-name{margin-top:2px;font-size:.8125rem;font-weight:600}
   .pv-n{font-size:.6875rem;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -700,7 +703,7 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   #menu:popover-open .pv-frame{animation:pvRise 1.2s cubic-bezier(.22,1,.36,1) .35s both}
   #menu:popover-open .pv-cap{animation:pvFade .8s ease .9s both}
 }
-@media (min-width:821px) and (prefers-reduced-motion:reduce){#menu:popover-open .pv-frame,#menu:popover-open .pv-cap{animation:none}.pv-cap p{transition:none!important}}
+@media (min-width:821px) and (prefers-reduced-motion:reduce){#menu:popover-open .pv-frame,#menu:popover-open .pv-cap{animation:none}}
 @media (max-width:820px){.menu-pv,.menu-list .arc-clone{display:none}}
 
 /* Sections slide over each other with flat edges: no shadow, no line */
@@ -937,8 +940,11 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <div class="menu-pv" aria-hidden="true">
       <a class="pv-frame" id="pvLink" href="#top" tabindex="-1"><span class="pv-l" id="pvB"></span><span class="pv-l" id="pvA"></span></a>
       <div class="pv-cap">
-        <div><p class="pv-desc" id="pvDesc"></p><p class="pv-name" id="pvName"></p></div>
-        <p class="pv-n"><span id="pvN">01</span><span class="pv-t" id="pvTot">/07</span></p>
+        <div class="pv-cw"><div class="pv-cs" id="pvCS">
+          <div class="pv-ci"><p class="pv-desc"></p><p class="pv-name"></p></div>
+          <div class="pv-ci"><p class="pv-desc"></p><p class="pv-name"></p></div>
+        </div></div>
+        <p class="pv-n"><span class="pv-nw"><span class="pv-ns" id="pvNS"><span>01</span><span>02</span></span></span><span class="pv-t" id="pvTot">/07</span></p>
       </div>
     </div>
   </div>
@@ -1568,9 +1574,10 @@ const ARC_DESC={
 const ARC={curve:60,spacing:1.08,edgeFade:16,wRest:280,wFocus:720,spread:1,omega:(3+50*.09)*1.5,waveDur:.7,wheelTau:80};
 const A={pos:0,target:0,av:0,pv:0,lastPos:0,lean:0,lensC:0,lensV:0,lensAmp:1,hoverK:null,focusK:null,moving:false,
   wOn:false,wFrom:0,wRaw:0,wR:0,wLast:0,wCount:0,wheelT:-1e9,waves:new Map,waveRel:new Map,waveK:null,waveCand:null,waveCandT:0,
-  introT:-1e9,raf:0,last:0,shown:-1,chars:[],stp:0,stv:0,sdir:1};
+  introT:-1e9,raf:0,last:0,shown:-1,chars:[],stp:0,stv:0,sdir:1,pin:false,mx:0,my:0,cx:0,cy:0,cvx:0,cvy:0};
 const ARC_IMG=[];                                           // one picture per section later (URL), grey until then
-const pvA=$('#pvA'), pvB=$('#pvB'), pvFrame=$('#pvLink');
+const pvA=$('#pvA'), pvB=$('#pvB'), pvFrame=$('#pvLink'), pvPanel=$('.menu-pv'), pvCS=$('#pvCS'), pvNS=$('#pvNS');
+const pvCI=[...pvCS.children], pvNI=[...pvNS.children];
 function arcCard(dt){
   const c=A.focusK??A.pos;
   if(reduce){ A.stp=c; A.stv=0; }
@@ -1579,8 +1586,17 @@ function arcCard(dt){
   if(Math.abs(c-A.stp)<4e-4&&Math.abs(A.stv)<.02){ A.stp=c; A.stv=0; }
   if(Math.abs(A.stv)>.25) A.sdir+=((A.stv>0?1:-1)-A.sdir)*(1-Math.exp(-10*dt));
   const amt=reduce?0:.6, v=clamp(A.stv*.16,-1.6,1.6)*amt, st=1+Math.abs(v)*.07;
-  const tilt=clamp(-clamp(A.stv,-12,12)*.2,-2.5,2.5);
-  pvFrame.style.transform=Math.abs(tilt)>.01?'perspective(1000px) rotateX('+tilt.toFixed(2)+'deg)':'';
+  // pointer follow: the card drifts towards the cursor on a spring and tilts with that drift
+  let tx=0, ty=0;
+  if(A.pin&&!reduce){ const r=pvPanel.getBoundingClientRect(), fh=pvFrame.clientHeight;
+    tx=clamp((A.mx-(r.left-A.cx+r.width/2))*.03,-18,18); ty=clamp((A.my-innerHeight/2)*.05,-fh*.08,fh*.08); }
+  if(reduce){ A.cx=tx; A.cy=ty; A.cvx=A.cvy=0; }
+  else{ const K=120, D=2*Math.sqrt(K)*.9, k=Math.ceil(dt/(1/120)), h=dt/k;
+    for(let i=0;i<k;i++){ A.cvx+=(K*(tx-A.cx)-D*A.cvx)*h; A.cvy+=(K*(ty-A.cy)-D*A.cvy)*h; A.cx+=A.cvx*h; A.cy+=A.cvy*h; } }
+  const followBusy=Math.abs(tx-A.cx)>.05||Math.abs(ty-A.cy)>.05||Math.abs(A.cvx)>.05||Math.abs(A.cvy)>.05;
+  if(!followBusy){ A.cx=tx; A.cy=ty; A.cvx=A.cvy=0; }
+  const ry=clamp(A.cvx*.02,-6,6), rx=clamp(-A.cvy*.02,-6,6)+clamp(-clamp(A.stv,-12,12)*.2,-2.5,2.5);
+  pvPanel.style.transform=(A.cx||A.cy||rx||ry)?'translate3d('+A.cx.toFixed(2)+'px,'+A.cy.toFixed(2)+'px,0) perspective(1000px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg)':'';
   const y=Math.floor(A.stp+1e-6); let fr=A.stp-y; if(fr<4e-4) fr=0;
   const ia=arcMod(y,arcN), ib=arcMod(y+1,arcN);
   const W=pvFrame.clientWidth, H=pvFrame.clientHeight, off=H*.12, N=18;
@@ -1599,7 +1615,14 @@ function arcCard(dt){
   const img=i=>ARC_IMG[i]?'url("'+ARC_IMG[i]+'")':'none';
   if(pvA.dataset.i!==String(ia)){ pvA.dataset.i=ia; pvA.style.setProperty('--img',img(ia)); }
   if(pvB.dataset.i!==String(ib)){ pvB.dataset.i=ib; pvB.style.setProperty('--img',img(ib)); }
-  return A.stp!==c||A.stv!==0;
+  const key=ia+'|'+ib+'|'+lang;
+  if(pvCS.dataset.k!==key){ pvCS.dataset.k=key;
+    [ia,ib].forEach((it,j)=>{ const ps=pvCI[j].children; ps[0].textContent=ARC_DESC[lang][it]||'';
+      ps[1].textContent=arcReal[it].querySelector('.sr')?.textContent||arcReal[it].textContent.trim(); pvNI[j].textContent=pad(it+1); });
+    setT('pvTot','/'+pad(arcN)); }
+  pvCS.style.transform='translate3d(0,'+(-fr*pvCI[0].offsetHeight).toFixed(2)+'px,0)';
+  pvNS.style.transform='translate3d(0,'+(-fr*pvNI[0].offsetHeight).toFixed(2)+'px,0)';
+  return A.stp!==c||A.stv!==0||followBusy;
 }
 const arcWrap=x=>x-arcM*Math.round(x/arcM);                 // signed distance between rows, around the loop
 const arcMod=(x,n)=>((x%n)+n)%n;
@@ -1685,15 +1708,12 @@ function arcRender(t,fk){
   });
   const k=arcMod(Math.round(A.focusK??A.pos),arcN);
   if(k!==A.shown){
-    A.shown=k; const pv=$('.menu-pv'); pv.classList.add('swap');
-    $('#pvLink').setAttribute('href',arcReal[k].querySelector('a').getAttribute('href'));
-    setTimeout(()=>{ setT('pvN',pad(k+1)); setT('pvTot','/'+pad(arcN));
-      setT('pvName',arcReal[k].querySelector('.sr')?.textContent||arcReal[k].textContent.trim());
-      setT('pvDesc',ARC_DESC[lang][k]||'');
-      pv.classList.add('enter'); pv.classList.remove('swap'); void pv.offsetWidth; pv.classList.remove('enter'); },reduce?0:180);
+    A.shown=k; $('#pvLink').setAttribute('href',arcReal[k].querySelector('a').getAttribute('href'));
   }
 }
 $('#pvLink').addEventListener('click',()=>menu.hidePopover?.());
+menu.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse'||!arcMQ.matches) return; A.mx=e.clientX; A.my=e.clientY; A.pin=true; arcKick(); });
+menu.addEventListener('pointerleave',()=>{ A.pin=false; arcKick(); });
 function arcKick(){ if(!A.raf) A.raf=requestAnimationFrame(arcFrame); }
 function arcTo(row){ A.target=Math.round(row); A.wOn=false; arcKick(); }
 function arcNearest(idx){ const cur=arcMod(Math.round(A.target),arcN); let d=idx-cur; if(d>arcN/2) d-=arcN; if(d<-arcN/2) d+=arcN; return Math.round(A.target)+d; }
@@ -1728,7 +1748,7 @@ menu.addEventListener('toggle',e=>{
   const map={top:0,intro:0,projects:1,services:3,studio:4,team:5,contact:6};
   const k=map[curSec]??0, row=arcN+k;
   A.target=row; A.pos=A.lastPos=reduce?row:row-1.6; A.av=0; A.pv=0; A.lean=0; A.hoverK=A.focusK=null; A.wOn=false;
-  A.lensC=A.pos; A.lensV=0; A.lensAmp=reduce?1:0; A.stp=A.pos; A.stv=0;
+  A.lensC=A.pos; A.lensV=0; A.lensAmp=reduce?1:0; A.stp=A.pos; A.stv=0; A.cx=A.cy=A.cvx=A.cvy=0; A.pin=false;
   A.introT=performance.now()+(reduce?-1e4:80); A.shown=-1; A.last=0;
   arcReal[k].firstElementChild.focus({preventScroll:true});
   arcKick();
@@ -1761,7 +1781,7 @@ function applyLang(l){
   document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio based on the French Riviera. Websites, identities, audiovisual and communication, drawn with light.':'Moyo, studio de design et de développement basé en Provence-Alpes-Côte d\u2019Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.';
   applySun(sunCur); fillToday(); renderChart(); if(proj.open) fillProject(pIdx);
   curSec=''; updateBar();
-  if(typeof A!=='undefined'&&A.chars){ A.waves.clear(); A.waveRel.clear(); arcChars(); A.shown=-1; if(menu.matches(':popover-open')) arcKick(); }
+  if(typeof A!=='undefined'&&A.chars){ pvCS.dataset.k=''; A.waves.clear(); A.waveRel.clear(); arcChars(); A.shown=-1; if(menu.matches(':popover-open')) arcKick(); }
   try{localStorage.setItem('hb-lang',l)}catch(e){}
 }
 /* switch language through a soft view transition when the browser supports it */
