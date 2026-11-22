@@ -583,6 +583,13 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .bar :focus-visible{outline:2px solid currentColor;outline-offset:4px}
 @media (max-width:700px){.tile{display:none}}
 
+/* Menu opened over a blue section: lime background, blue text (blue on blue would not read) */
+#menu[data-tone="paper"]{background:var(--chaux);color:var(--klein)}
+#menu[data-tone="paper"] .menu-list a{border-bottom-color:var(--line)}
+#menu[data-tone="paper"] .menu-list a:hover,#menu[data-tone="paper"] .menu-list a:focus-visible{background:var(--klein);color:var(--paper)}
+#menu[data-tone="paper"] .menu-close,#menu[data-tone="paper"] .menu-mark{color:var(--klein)}
+#menu[data-tone="paper"] :focus-visible{outline-color:var(--klein)}
+
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -1356,6 +1363,7 @@ const menu=$('#menu');
 $$('.menu-list a').forEach(a=>a.addEventListener('click',()=>{menu.hidePopover?.()}));
 menu.addEventListener('beforetoggle',e=>{
   const open=e.newState==='open';
+  if(open){ updateBar(); menu.dataset.tone=bar.dataset.sec==='contact'?'klein':bar.dataset.tone; }
   $('#main').inert=open; $('#foot').inert=open; bar.inert=open; if(!open) setTimeout(updateBar,0);
   if(lenis){open?lenis.stop():lenis.start()}
   $('#menuBtn').setAttribute('aria-expanded',open);
