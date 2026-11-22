@@ -683,8 +683,9 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   .menu-list.arc a:hover,.menu-list.arc a:focus-visible{background:none!important}
   #menu .menu-list.arc li{transition:none!important;translate:none!important}   /* the arc does its own entrance */
   .menu-pv{flex:none;width:clamp(220px,20vw,330px)}
-  .pv-frame{position:relative;aspect-ratio:4/5;background:var(--arc-frame);overflow:hidden;transition:scale .7s cubic-bezier(.22,1,.36,1)}
+  .pv-frame{display:block;cursor:pointer;position:relative;aspect-ratio:4/5;background:var(--arc-frame);overflow:hidden;transition:scale .7s cubic-bezier(.22,1,.36,1)}
   .pv-frame i{position:absolute;inset:0;background:rgb(255 255 255 / .14);transform:scaleY(0);transform-origin:50% 0;transition:transform .55s cubic-bezier(.76,0,.24,1)}
+  .pv-frame:hover{scale:1.015}
   .menu-pv.swap .pv-frame{scale:.975}
   .menu-pv.swap .pv-frame i{transform:scaleY(1);transform-origin:50% 100%;transition-duration:.16s}
   .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:10px;transition:opacity .3s}
@@ -933,7 +934,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <li><a href="#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
     <div class="menu-pv" aria-hidden="true">
-      <div class="pv-frame"><i></i></div>
+      <a class="pv-frame" id="pvLink" href="#top" tabindex="-1"><i></i></a>
       <div class="pv-cap">
         <div><p class="pv-desc" id="pvDesc"></p><p class="pv-name" id="pvName"></p></div>
         <p class="pv-n"><span id="pvN">01</span><span class="pv-t" id="pvTot">/07</span></p>
@@ -1650,11 +1651,13 @@ function arcRender(t,fk){
   const k=arcMod(Math.round(A.focusK??A.pos),arcN);
   if(k!==A.shown){
     A.shown=k; const pv=$('.menu-pv'); pv.classList.add('swap');
+    $('#pvLink').setAttribute('href',arcReal[k].querySelector('a').getAttribute('href'));
     setTimeout(()=>{ setT('pvN',pad(k+1)); setT('pvTot','/'+pad(arcN));
       setT('pvName',arcReal[k].querySelector('.sr')?.textContent||arcReal[k].textContent.trim());
       setT('pvDesc',ARC_DESC[lang][k]||''); pv.classList.remove('swap'); },reduce?0:170);
   }
 }
+$('#pvLink').addEventListener('click',()=>menu.hidePopover?.());
 function arcKick(){ if(!A.raf) A.raf=requestAnimationFrame(arcFrame); }
 function arcTo(row){ A.target=Math.round(row); A.wOn=false; arcKick(); }
 function arcNearest(idx){ const cur=arcMod(Math.round(A.target),arcN); let d=idx-cur; if(d>arcN/2) d-=arcN; if(d<-arcN/2) d+=arcN; return Math.round(A.target)+d; }
