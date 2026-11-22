@@ -143,5 +143,45 @@
     "type": "Atlas"
    }
   }
+ ],
+ "team": [
+  {
+   "id": "zahia-bougouffa",
+   "name": "Zahia Bougouffa",
+   "photo": null,
+   "fr": {
+    "role": "Cofondation, moyo",
+    "bio": "Profil à compléter depuis l’administration du site."
+   },
+   "en": {
+    "role": "Co-founder, moyo",
+    "bio": "Profile to be completed from the site administration."
+   },
+   "links": [
+    {
+     "label": "E-mail",
+     "url": "mailto:contact.moyostudio@gmail.com"
+    }
+   ]
+  },
+  {
+   "id": "yacine-bouabdallah",
+   "name": "Yacine Bouabdallah",
+   "photo": null,
+   "fr": {
+    "role": "Cofondation, moyo",
+    "bio": "Profil à compléter depuis l’administration du site."
+   },
+   "en": {
+    "role": "Co-founder, moyo",
+    "bio": "Profile to be completed from the site administration."
+   },
+   "links": [
+    {
+     "label": "E-mail",
+     "url": "mailto:contact.moyostudio@gmail.com"
+    }
+   ]
+  }
  ]
 }

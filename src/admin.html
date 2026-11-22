@@ -168,6 +168,7 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
       <div class="side-head">
         <button class="btn primary" type="button" id="addBtn">+ Nouveau projet</button>
         <button class="btn" type="button" id="catsBtn">Catégories</button>
+        <button class="btn" type="button" id="teamBtn">Équipe</button>
         <button class="btn" type="button" id="msgsBtn">Messages <span id="msgCount" class="muted"></span></button>
       </div>
       <ol class="plist" id="plist" aria-label="Projets"></ol>
@@ -279,10 +280,76 @@ async function renderMsgs(){
 }
 $('#msgsBtn').addEventListener('click',()=>{sel='__msgs';renderList();renderEditor()});
 
+/* ---------- team profiles (/equipe/<id>) ---------- */
+function renderTeam(){
+  const E=$('#editor'); data.team||=[];
+  E.innerHTML=`<h2>Équipe</h2>
+  <p class="small muted">Chaque personne a sa page profil, ouverte en cliquant sur son nom dans la section Studio. Les champs anglais vides reprennent le français.</p>
+  ${data.team.map((m,i)=>`<div class="section" data-tm="${i}">
+    <div class="danger-zone" style="margin-bottom:12px"><h3 style="margin:0">${esc(m.name||'Nouveau profil')}</h3>
+      <span><a class="btn sm" href="/equipe/${esc(m.id)}" target="_blank" rel="noopener">Voir la page ↗</a> <button type="button" class="btn danger sm" data-act="tmDel">Retirer</button></span></div>
+    <div class="cover">
+      <div class="preview" style="aspect-ratio:4/5">${m.photo?`<img src="${imgURL(m.photo)}" alt="">`:''}</div>
+      <div class="actions">
+        <label class="btn" style="margin:0">${m.photo?'Remplacer la photo':'Ajouter une photo'}<input type="file" accept="image/*" hidden data-k="photo"></label>
+        ${m.photo?'<button type="button" class="btn danger sm" data-act="tmPhotoRm">Retirer la photo</button>':''}
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div><label class="req">Nom</label><input type="text" data-k="name" value="${esc(m.name)}"></div>
+      <div><label>Identifiant (URL)</label><input type="text" data-k="id" value="${esc(m.id)}"><p class="hint">/equipe/${esc(m.id)}</p></div>
+      <div><label><span class="lang">FR</span>Rôle</label><input type="text" data-k="fr.role" value="${esc(m.fr?.role)}"></div>
+      <div><label><span class="lang">EN</span>Rôle</label><input type="text" data-k="en.role" value="${esc(m.en?.role)}"></div>
+      <div><label><span class="lang">FR</span>Présentation</label><textarea data-k="fr.bio">${esc(m.fr?.bio)}</textarea></div>
+      <div><label><span class="lang">EN</span>Présentation</label><textarea data-k="en.bio">${esc(m.en?.bio)}</textarea></div>
+    </div>
+    <h3 style="margin:18px 0 8px;font-size:.95rem">Liens (Instagram, LinkedIn, site, e-mail…)</h3>
+    ${(m.links||[]).map((l,j)=>`<div class="grid3" data-ln="${j}" style="grid-template-columns:1fr 2fr auto;align-items:end;margin-bottom:8px">
+      <div><label>Libellé</label><input type="text" data-k="link.label" value="${esc(l.label)}"></div>
+      <div><label>Adresse</label><input type="text" data-k="link.url" value="${esc(l.url)}" placeholder="https://…"></div>
+      <button type="button" class="icon" data-act="lnDel" aria-label="Supprimer ce lien" style="color:var(--danger)">✕</button></div>`).join('')}
+    <button type="button" class="btn sm" data-act="lnAdd">+ Ajouter un lien</button>
+  </div>`).join('')}
+  <p class="section"><button type="button" class="btn primary" data-act="tmAdd">+ Ajouter une personne</button> <button type="button" class="btn" data-act="back">← Retour aux projets</button></p>`;
+}
+$('#teamBtn').addEventListener('click',()=>{sel='__team';renderList();renderEditor()});
+$('#editor').addEventListener('input',e=>{
+  if(sel!=='__team') return;
+  const box=e.target.closest('[data-tm]'); if(!box) return;
+  const m=data.team[+box.dataset.tm], k=e.target.dataset.k; if(!k||k==='photo') return;
+  if(k==='name') m.name=e.target.value;
+  else if(k==='id') m.id=slugify(e.target.value);
+  else if(k==='link.label'||k==='link.url'){ const j=+e.target.closest('[data-ln]').dataset.ln; m.links[j][k.split('.')[1]]=e.target.value; }
+  else { const [lg,f]=k.split('.'); (m[lg]||={})[f]=e.target.value; }
+  refreshDirty();
+});
+$('#editor').addEventListener('change',async e=>{
+  if(sel!=='__team'||e.target.dataset.k!=='photo') return;
+  const m=data.team[+e.target.closest('[data-tm]').dataset.tm], f=e.target.files[0]; if(!f) return;
+  try{ const id=await upload(f); const old=m.photo; m.photo=id; dropIfUnsaved(old); renderTeam(); refreshDirty(); toast('Photo ajoutée. Pensez à publier.'); }
+  catch(err){ toast(err.message,true); }
+});
+$('#editor').addEventListener('click',e=>{
+  if(sel!=='__team') return;
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const box=b.closest('[data-tm]'), m=box&&data.team[+box.dataset.tm];
+  switch(b.dataset.act){
+    case 'tmAdd': data.team.push({id:uniqueTeamId('profil'),name:'',photo:null,fr:{role:'',bio:''},en:{role:'',bio:''},links:[]}); break;
+    case 'tmDel': if(!confirm(`Retirer « ${m.name||m.id} » de l’équipe ? Sa page disparaîtra à la prochaine publication.`)) return; dropIfUnsaved(m.photo); data.team.splice(+box.dataset.tm,1); break;
+    case 'tmPhotoRm': { const old=m.photo; m.photo=null; dropIfUnsaved(old); break; }
+    case 'lnAdd': (m.links||=[]).push({label:'',url:''}); break;
+    case 'lnDel': m.links.splice(+b.closest('[data-ln]').dataset.ln,1); break;
+    default: return;
+  }
+  renderTeam(); refreshDirty();
+});
+function uniqueTeamId(base){let id=base,n=2;while(data.team.some(m=>m.id===id)) id=base+'-'+n++;return id}
+
 function renderEditor(){
   const E=$('#editor');
   if(sel==='__cats') return renderCats();
   if(sel==='__msgs') return renderMsgs();
+  if(sel==='__team') return renderTeam();
   const p=data.projects.find(p=>p.id===sel);
   if(!p){E.innerHTML='<div class="empty-state"><p>Aucun projet sélectionné.</p><p class="small">Créez un projet avec « + Nouveau projet ».</p></div>';return}
   E.innerHTML=`

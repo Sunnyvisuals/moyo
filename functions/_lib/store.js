@@ -5,7 +5,10 @@ export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif)$/;
 
 export async function getData(env) {
   const stored = env.MOYO ? await env.MOYO.get('projects', 'json') : null;
-  return stored || seed;
+  if (!stored) return seed;
+  // documents saved before profiles existed: start from the seed team
+  if (!Array.isArray(stored.team)) stored.team = seed.team || [];
+  return stored;
 }
 
 export async function hasStored(env) {
@@ -22,6 +25,7 @@ export function imagesOf(data) {
     if (p.cover) s.add(p.cover);
     for (const i of p.images || []) s.add(i);
   }
+  for (const m of data.team || []) if (m.photo) s.add(m.photo);
   return s;
 }
 
@@ -84,5 +88,23 @@ export function validate(input) {
       en
     });
   }
-  return { errors, data: { version: 1, categories, projects } };
+  // Team: one profile page each (/equipe/<id>)
+  const team = [];
+  for (const m of Array.isArray(input.team) ? input.team.slice(0, 12) : []) {
+    const id = str(m?.id, 60);
+    const name = str(m?.name, 80);
+    if (!SLUG.test(id) || !name) { errors.push(`Équipe : profil « ${name || id} » incomplet (nom et identifiant).`); continue; }
+    if (team.some(x => x.id === id)) { errors.push(`Équipe : identifiant en double ${id}.`); continue; }
+    const links = (Array.isArray(m.links) ? m.links : []).slice(0, 6)
+      .map(l => ({ label: str(l?.label, 40), url: str(l?.url, 300) }))
+      .filter(l => l.label && /^(https?:\/\/|mailto:)/i.test(l.url));
+    team.push({
+      id, name,
+      photo: typeof m.photo === 'string' && IMAGE_ID.test(m.photo) ? m.photo : null,
+      fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000) },
+      en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000) },
+      links
+    });
+  }
+  return { errors, data: { version: 1, categories, projects, team } };
 }

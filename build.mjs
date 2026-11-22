@@ -41,6 +41,7 @@ const sizes = {
   'admin/index.html': out('dist/admin/index.html', read('src/admin.html')),
   'robots.txt': out('dist/robots.txt', 'User-agent: *\nDisallow: /admin\nDisallow: /api/\n')
 };
+out('dist/cursor.js', read('src/cursor.js'));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });
 fs.copyFileSync(r('fonts/hanken-grotesk-latin-wght-normal.woff2'), r('dist/fonts/hanken-grotesk.woff2'));
 

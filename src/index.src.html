@@ -491,8 +491,9 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 @keyframes blind{from{clip-path:inset(-.25em -.1em 100% -.1em)}to{clip-path:inset(-.25em -.1em -.3em -.1em)}}
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
-    .shut{animation:blind linear both;animation-timeline:view();animation-range:entry 15% cover 32%}
-    .shut.par{animation:par linear both,blind linear both;animation-timeline:--v,view();animation-range:cover 0% cover 100%,entry 15% cover 32%}
+    /* the blind completes as soon as the text has fully entered the screen (sections that stop must not freeze it half-open) */
+    .shut{animation:blind linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+    .shut.par{animation:par linear both,blind linear both;animation-timeline:--v,view();animation-range:cover 0% cover 100%,entry 0% entry 100%}
   }
 }
 @media (prefers-reduced-motion:no-preference){
@@ -537,6 +538,66 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .blue .cta-ic{background:var(--chaux)}
 .cta:focus-visible,.cta-ic:focus-visible{outline:2px solid currentColor;outline-offset:-6px}
 @media (max-width:640px){.cta-bar{grid-template-columns:1fr 64px}.cta-bar .cta:nth-child(2){grid-column:1;grid-row:2}.cta-ic{grid-row:1/3;grid-column:2}}
+
+/* Hero on a strict 12-column grid: 40px margins, 24px gutters.
+   Column width c = (100vw - 2×40 - 11×24) / 12. Text in columns 1–6, the window in 7–12 (top aligned with the title),
+   the clock in 1–4 at the bottom left, the scroll cue in column 12 at the bottom right. */
+@media (min-width:821px){
+  .stage{--gp:40px;--gg:24px;--gc:calc((100vw - 2 * var(--gp) - 11 * var(--gg)) / 12);--ht:clamp(112px,17svh,190px);
+    --wl:calc(var(--gp) + 6 * (var(--gc) + var(--gg)));--wr:var(--gp);--wt:var(--ht);--wb:clamp(128px,18svh,190px)}
+  .hero-copy{left:var(--gp);top:var(--ht);width:calc(5 * (var(--gc) + var(--gg)));translate:0 calc(var(--open) * -40px)}
+  .hero-copy h1{margin-top:-.12em}
+  .sunui{left:var(--gp);bottom:var(--gp);width:calc(4 * var(--gc) + 3 * var(--gg))}
+  .scroll-cue{left:auto;right:var(--gp);bottom:var(--gp);translate:0 16px}
+  .scroll-cue.on{translate:0 0}
+  .dots{right:10px;gap:6px}
+  .dots a{height:20px}
+}
+
+/* Header in tiles (replaces the glass): square tiles at rest that widen on hover to show their label, then fold back.
+   Each tile has its own blue, so the header reads the same over lime and over blue sections. */
+.bar,.bar[data-tone="paper"]{top:16px;left:16px;right:16px;height:56px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;text-shadow:none;
+  -webkit-backdrop-filter:none;backdrop-filter:none;color:var(--paper);gap:0}
+.bar.scrolled{scale:1;-webkit-backdrop-filter:none;backdrop-filter:none}
+/* Header palette follows the section underneath (set by JS: data-tone, data-sec) */
+.bar{--navy:color-mix(in oklab,var(--klein) 58%,#000614);
+  --hm-bg:var(--klein);--hm-fg:var(--paper);--h1:var(--navy);--h2:color-mix(in oklab,var(--klein) 84%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 64%,var(--chaux));
+  --hl-bg:color-mix(in oklab,var(--klein) 14%,var(--chaux));--hl-fg:var(--klein);--hk-bg:var(--klein);--hk-fg:var(--paper)}
+.bar[data-tone="paper"]{--hm-bg:var(--chaux);--hm-fg:var(--klein);--h1:var(--navy);--h2:color-mix(in oklab,var(--klein) 72%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 48%,var(--chaux));
+  --hl-bg:var(--navy);--hl-fg:var(--paper);--hk-bg:var(--chaux);--hk-fg:var(--klein)}
+.bar[data-sec="contact"]{--hm-bg:var(--klein);--hm-fg:var(--paper);--h1:var(--klein);--h2:color-mix(in oklab,var(--klein) 78%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 56%,var(--chaux));
+  --hl-bg:color-mix(in oklab,var(--klein) 30%,var(--chaux));--hl-fg:var(--klein);--hk-bg:var(--chaux);--hk-fg:var(--klein)}
+.bar-mark,.tile,#langBtn,.bar-menu{transition:width .7s cubic-bezier(.76,0,.24,1),background-color .9s cubic-bezier(.25,1,.5,1),color .9s cubic-bezier(.25,1,.5,1)!important}
+.bar-mark{display:flex;align-items:center;height:56px;padding:0 22px;background:var(--hm-bg);color:var(--hm-fg);font-size:1.125rem}
+.bar-r{gap:0;margin-left:auto}
+.tile,#langBtn,.bar-menu{height:56px;min-width:56px;min-height:56px;padding:0;margin:0;background-image:none!important;border-radius:0}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;width:56px;padding:0 0 0 16px;overflow:hidden;white-space:nowrap;text-decoration:none;color:var(--paper);
+  transition:width .7s cubic-bezier(.76,0,.24,1),background .45s}
+.tile .n{font-size:.6875rem;font-weight:600;letter-spacing:.06em;opacity:.8}
+.tile .t{font-size:.875rem;font-weight:600;letter-spacing:.02em;text-transform:uppercase;opacity:0;translate:-8px 0;transition:opacity .35s,translate .6s cubic-bezier(.25,1,.5,1)}
+.tile:hover,.tile:focus-visible{width:168px}
+.tile:hover .t,.tile:focus-visible .t{opacity:1;translate:0 0;transition-delay:.12s}
+.tile:nth-child(1){background:var(--h1)}
+.tile:nth-child(2){background:var(--h2)}
+.tile:nth-child(3){background:var(--h3)}
+#langBtn{justify-content:center;background-color:var(--hl-bg)!important;color:var(--hl-fg);font-size:.75rem;font-weight:600;letter-spacing:.06em}
+#langBtn:hover{filter:brightness(1.08)}
+.bar-menu{display:grid!important;grid-template-columns:repeat(2,7px);gap:5px;place-content:center;background-color:var(--hk-bg)!important;color:var(--hk-fg)}
+.bar-menu i{display:block;width:7px;height:7px;background:currentColor;transition:translate .45s cubic-bezier(.25,1,.5,1)}
+.bar-menu:hover i:nth-of-type(1){translate:-3px -3px}.bar-menu:hover i:nth-of-type(2){translate:3px -3px}.bar-menu:hover i:nth-of-type(3){translate:-3px 3px}.bar-menu:hover i:nth-of-type(4){translate:3px 3px}
+.bar :focus-visible{outline:2px solid var(--paper);outline-offset:-5px}
+#langBtn:focus-visible,.bar-menu:focus-visible{outline-color:var(--klein)}
+@media (max-width:700px){.tile{display:none}}
+
+/* Team names lead to each profile page */
+.nm-link{display:flex;align-items:baseline;justify-content:space-between;gap:24px;text-decoration:none;color:inherit}
+.nm-go{flex:none;display:inline-flex;align-items:center;gap:12px;font-size:var(--fs-small);font-weight:500;opacity:.7;transition:opacity var(--dur-1),gap var(--dur-3) var(--ease-enter)}
+.nm-go::after{content:"→";font-size:1.1em}
+.nm-link:hover .nm-go,.nm-link:focus-visible .nm-go{opacity:1;gap:20px}
+.nm-link:hover .nm{font-style:normal;letter-spacing:-.05em}
+.nm{transition:letter-spacing var(--dur-3) var(--ease-enter)}
+.fnames a{min-height:0!important;font-size:inherit}
+@media (max-width:640px){.nm-go{display:none}}
 
 /* Scroll cue: appears after 15 s without scrolling, bottom centre, in the same glass as the header */
 .hint{display:none!important}
@@ -709,8 +770,11 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 <header class="bar" id="bar" data-tone="klein">
   <a class="bar-mark" href="#top" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
   <nav class="bar-r" aria-label="Navigation principale" data-ia="nav">
+    <a class="tile" href="#projets"><span class="n">01</span><span class="t" data-i="sec.projects">Projets</span></a>
+    <a class="tile" href="#studio"><span class="n">02</span><span class="t" data-i="sec.studio">Studio</span></a>
+    <a class="tile" href="#contact"><span class="n">03</span><span class="t" data-i="sec.contact">Contact</span></a>
     <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
-    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span class="sr" data-i="menu">Menu</span><svg viewBox="0 0 22 10" aria-hidden="true"><path d="M0 1h22M0 9h22"/></svg></button>
+    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span class="sr" data-i="menu">Menu</span><i></i><i></i><i></i><i></i></button>
   </nav>
 </header>
 
@@ -851,8 +915,8 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     
     <h3 class="team-t" data-i="teamT">L’équipe.</h3>
     <ul class="names" aria-label="Équipe" data-ia="teamAria">
-      <li><span class="nm par shut" style="--a:40px">Zahia Bougouffa</span></li>
-      <li><span class="nm par shut" style="--a:-26px">Yacine Bouabdallah</span></li>
+      <li><a class="nm-link" href="/equipe/zahia-bougouffa"><span class="nm par shut" style="--a:40px">Zahia Bougouffa</span><span class="nm-go" data-i="profile">Voir le profil</span></a></li>
+      <li><a class="nm-link" href="/equipe/yacine-bouabdallah"><span class="nm par shut" style="--a:-26px">Yacine Bouabdallah</span><span class="nm-go" data-i="profile">Voir le profil</span></a></li>
     </ul>
     <nav class="cta-bar" aria-label="Suite" data-ia="ctaAria">
       <a class="cta" href="#contact"><span class="n">01</span><span class="t" data-i="stuL">Écrire au studio</span></a>
@@ -937,7 +1001,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <div class="wrap foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>
-      <ul class="fnames"><li>Zahia Bougouffa</li><li>Yacine Bouabdallah</li></ul>
+      <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
       <p class="small muted" data-i="fStudioP">Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
@@ -992,6 +1056,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   </div>
 </dialog>
 
+<script src="/cursor.js" defer></script>
 <script>__LENIS__</script>
 <script>
 (() => {
@@ -1008,7 +1073,7 @@ try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else
 
 /* ---------- Dictionary (French stays in the HTML) ---------- */
 const EN={
- 'skip':'Skip to content','nav':'Main navigation','cue':'Scroll','ctaAria':'Next','ctaTalk':'Talk about your project','ctaSee':'See the projects','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
+ 'skip':'Skip to content','nav':'Main navigation','cue':'Scroll','profile':'See the profile','ctaAria':'Next','ctaTalk':'Talk about your project','ctaSee':'See the projects','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
  'ctLead':'A place, an event, a brand? Tell us about the project. We reply within 48 hours.','ctAlt':'Or directly',
  'fName':'Name','fMail':'Email','fType':'The project','tId':'Identity','tSite':'Website','tData':'Data','tMotion':'Motion','tOther':'Other',
  's5t':'Audiovisual','s5p':'Brand films, shooting, editing and motion design, from storyboard to grading.',
@@ -1200,6 +1265,7 @@ function updateBar(){
   let tone=foundUnder.dataset.tone;
   if(foundUnder.dataset.sec==='top'){const r=win.getBoundingClientRect(); tone=(under>=r.top&&under<=r.bottom&&innerWidth*.5>=r.left&&innerWidth*.5<=r.right)||openCur>.92?'blue':'paper'}
   bar.dataset.tone=tone==='blue'?'paper':'klein';
+  bar.dataset.sec=foundUnder.dataset.sec;
   const y=scrollY, dy=y-lastY; lastY=y;
   if(dy<-2) upAt=y;
   // hidden on the landing screen (the hero speaks alone); then it hides while reading down and returns on the way up
