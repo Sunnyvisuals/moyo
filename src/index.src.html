@@ -603,7 +603,10 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 /* Section slats, right edge: like the slats of a blind. The current one opens wide. */
 .dots{position:fixed;z-index:79;right:max(6px,calc(var(--m) * .5));top:50%;translate:0 -50%;display:grid;color:var(--klein);transition:color var(--dur-3) var(--ease-enter),opacity var(--dur-3)}
 .dots[data-tone="paper"]{color:var(--paper)}
-.dots a{display:flex;align-items:center;justify-content:flex-end;width:44px;height:18px}
+.dots a{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:44px;height:18px;text-decoration:none}
+.dots .lbl{font-size:.6875rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;opacity:0;translate:6px 0;transition:opacity var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter)}
+.dots a[aria-current="true"] .lbl,.dots a:hover .lbl,.dots a:focus-visible .lbl{opacity:1;translate:0 0}
+.dots a:hover:not([aria-current="true"]) .lbl{opacity:.7}
 .dots a::before{content:"";width:12px;height:1px;background:currentColor;opacity:.4;transition:width var(--dur-4) var(--ease-enter),opacity var(--dur-3),height var(--dur-3)}
 .dots a:hover::before{width:20px;opacity:.9}
 .dots a[aria-current="true"]::before{width:34px;height:2px;opacity:1}
@@ -680,13 +683,13 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </nav>
 
 <nav class="dots" id="dots" aria-label="Sections" data-ia="dotsAria">
-  <a href="#top" data-k="top"><span class="sr" data-i="sec.top">Accueil</span></a>
-  <a href="#approche" data-k="intro"><span class="sr" data-i="sec.intro">Approche</span></a>
-  <a href="#projets" data-k="projects"><span class="sr" data-i="sec.projects">Projets</span></a>
-  <a href="#services" data-k="services"><span class="sr" data-i="sec.services">Services</span></a>
-  <a href="#studio" data-k="studio"><span class="sr" data-i="sec.studio">Studio</span></a>
-  <a href="#lumiere" data-k="light"><span class="sr" data-i="sec.light">Lumière</span></a>
-  <a href="#contact" data-k="contact"><span class="sr" data-i="sec.contact">Contact</span></a>
+  <a href="#top" data-k="top"><span class="lbl" data-i="sec.top">Accueil</span></a>
+  <a href="#approche" data-k="intro"><span class="lbl" data-i="sec.intro">Approche</span></a>
+  <a href="#projets" data-k="projects"><span class="lbl" data-i="sec.projects">Projets</span></a>
+  <a href="#services" data-k="services"><span class="lbl" data-i="sec.services">Services</span></a>
+  <a href="#studio" data-k="studio"><span class="lbl" data-i="sec.studio">Studio</span></a>
+  <a href="#lumiere" data-k="light"><span class="lbl" data-i="sec.light">Lumière</span></a>
+  <a href="#contact" data-k="contact"><span class="lbl" data-i="sec.contact">Contact</span></a>
 </nav>
 
 <main id="main">
