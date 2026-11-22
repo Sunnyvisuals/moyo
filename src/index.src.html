@@ -395,6 +395,9 @@ html.stack main>.sec{position:sticky;top:var(--st,0px);transform:translateY(calc
 @keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
 html.stack main>.sec:not(.blue){background:var(--chaux)}
 html.stack main>.sec+.sec{box-shadow:0 -1px 0 var(--line),0 -40px 80px -40px rgb(0 18 70 / .22)}
+/* the footer slides over Contact too: <main> stops being the sticky container, so Contact stays put until the page ends */
+html.stack main{display:contents}
+html.stack .foot{position:relative;z-index:2;box-shadow:0 -40px 80px -40px rgb(0 6 40 / .5)}
 html.stack main>.sec.blue+.sec:not(.blue){box-shadow:0 -40px 80px -40px rgb(0 10 50 / .35)}
 html.stack main>.sec::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:#000838;opacity:calc(var(--cv,0) * .38)}
 html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,0) * .14)}
@@ -661,7 +664,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 <noscript><style>#langBtn,.sunui,.hint{display:none}</style></noscript>
 </head>
 <body>
-<a class="skip" href="#main" data-i="skip">Aller au contenu</a>
+<a class="skip" href="#top" data-i="skip">Aller au contenu</a>
 <div id="tip" role="status"></div>
 
 <header class="bar" id="bar" data-tone="klein">
@@ -1189,7 +1192,7 @@ function coverStack(){
       setV(s,'--p2',clamp((y+H*.9-n.top)/(H*.7)).toFixed(3));
     }
     if(!stackOn) continue;
-    const nx=stack[i+1]; let c=0;
+    const nx=stack[i+1]||$('#foot'); let c=0;
     if(nx){const t=nx.getBoundingClientRect().top; c=clamp((H-t)/H)}
     setV(s,'--cv',c.toFixed(3));
   }
