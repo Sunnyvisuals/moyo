@@ -67,6 +67,14 @@ footer a{color:var(--paper)}
 @keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
 @media (max-width:820px){.role,.photo,.bio,.links{grid-column:1/-1}.photo{grid-row:auto}}
 [data-l]{display:none}html[lang=fr] [data-l=fr],html[lang=en] [data-l=en]{display:revert}
+
+/* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
+@media (prefers-reduced-motion:no-preference){
+  html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
+  html:active-view-transition-type(lang)::view-transition-new(root){animation:langIn .7s cubic-bezier(.25,1,.5,1) .12s both}
+}
+@keyframes langOut{to{opacity:0;filter:blur(8px)}}
+@keyframes langIn{from{opacity:0;filter:blur(8px)}}
 </style>
 <script>for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTransition;if(v)for(const p of[v.ready,v.finished,v.updateCallbackDone])p&&p.catch(()=>{})});
 try{if(localStorage.getItem('hb-lang')==='en')document.documentElement.lang='en'}catch(e){}</script>
@@ -90,7 +98,7 @@ try{if(localStorage.getItem('hb-lang')==='en')document.documentElement.lang='en'
   <a href="/" aria-label="Accueil"><i></i><i></i><i></i><i></i></a>
 </nav>
 <footer><span>© 2026 moyo · Provence-Alpes-Côte d’Azur</span><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><a href="/"><span data-l="fr">Retour à l’accueil</span><span data-l="en">Back to home</span></a></footer>
-<script>document.getElementById('lang').addEventListener('click',()=>{const l=document.documentElement.lang==='en'?'fr':'en';document.documentElement.lang=l;try{localStorage.setItem('hb-lang',l)}catch(e){}});</script>
+<script>document.getElementById('lang').addEventListener('click',()=>{const l=document.documentElement.lang==='en'?'fr':'en';const set=()=>{document.documentElement.lang=l};if(document.startViewTransition&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{document.startViewTransition({update:set,types:['lang']}).finished.catch(()=>{})}catch(e){set()}}else set();try{localStorage.setItem('hb-lang',l)}catch(e){}});</script>
 <script src="/cursor.js" defer></script>
 </body>
 </html>`;

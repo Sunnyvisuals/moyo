@@ -778,6 +778,14 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   .hint{display:none}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
+
+/* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
+@media (prefers-reduced-motion:no-preference){
+  html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
+  html:active-view-transition-type(lang)::view-transition-new(root){animation:langIn .7s cubic-bezier(.25,1,.5,1) .12s both}
+}
+@keyframes langOut{to{opacity:0;filter:blur(8px)}}
+@keyframes langIn{from{opacity:0;filter:blur(8px)}}
 </style>
 <noscript><style>#langBtn,.sunui,.hint{display:none}</style></noscript>
 </head>
@@ -1112,7 +1120,7 @@ const EN={
  'fBudget':'Budget','bTbd':'To be defined','fMsg':'Message','fNote':'Your details are only used to reply to you.','fSend':'Send','menu':'Menu','close':'Close',
  'sec.top':'Home','sec.intro':'Approach','sec.projects':'Projects','sec.services':'Services','sec.studio':'Studio','sec.light':'Light','sec.contact':'Contact',
  'h1':'<span class="ln" style="--i:0">A design studio</span> <span class="ln" style="--i:1">that draws</span> <span class="ln" style="--i:2">with light.</span>',
- 'h1p':'Websites, identities and data visualisations. An independent design and development studio, based in Provence-Alpes-Côte d\u2019Azur.',
+ 'h1p':'Websites, identities and data visualisations. An independent design and development studio, based on the French Riviera.',
  'sunLabel':'Time in Nice','hint':'Scroll',
  'introT':'We measure light before we draw it. Every project starts with readings, then one simple idea, built with care.',
  'introL':'See the projects',
@@ -1131,7 +1139,7 @@ const EN={
  'm3t':'Draw','m3p':'Grid, type and motion, on 390 and 1440 pixel screens.',
  'm4t':'Build','m4p':'Code without needless dependencies, tested by keyboard, without animation, without JavaScript.',
  'stuT':'The studio.',
- 'stuP':'Moyo is a design and development studio based in Provence-Alpes-Côte d\u2019Azur. We design websites and identities for places, events and brands that have something precise to show.',
+ 'stuP':'Moyo is a design and development studio based on the French Riviera. We design websites and identities for places, events and brands that have something precise to show.',
  'b1t':'One idea per project.','b1p':'We choose a single strong idea, then hold it from the first screen to the last line of code.',
  'b2t':'Time for light.','b2p':'Slow movement, pauses, air. A site is meant to be read, not endured.',
  'b3t':'Accessible from the start.','b3p':'Keyboard, contrast, reduced motion, no JavaScript: designed states, not afterthought fixes.',
@@ -1142,7 +1150,7 @@ const EN={
  'todayN':'Calculated in your browser for 43.70\u00b0 N, 7.26\u00b0 E, Paris time.',
  'chartT':'Hours of sun per month in Nice','tbl':'See the data as a table','tblAria':'Hours of sun per month',
  'srcT':'2,725 hours of sun a year on average, 1991 to 2020. Source: ',
- 'footAria':'Site footer','fStudio':'Studio','fStudioP':'An independent design and development studio, based in Provence-Alpes-Côte d\u2019Azur: websites, identities, audiovisual and communication.','fNav':'Site map','fLive':'The light, right now','fAbout':'About this site','fA1':'A single page under 200 KB, with no cookies and no trackers.','fA2':'Readable by keyboard, without JavaScript, and with animations reduced.','fA3':'Typeface Hanken Grotesk, smooth scroll by Lenis.','fA4':'Sun position: a simplified calculation, made in your browser.','lMid':'Solar noon','lGold':'Golden hour, evening','lShadow':'Shadow at noon (1.70 m)','yearT':'Day length through the year',
+ 'footAria':'Site footer','fStudio':'Studio','fStudioP':'An independent design and development studio, based on the French Riviera: websites, identities, audiovisual and communication.','fNav':'Site map','fLive':'The light, right now','fAbout':'About this site','fA1':'A single page under 200 KB, with no cookies and no trackers.','fA2':'Readable by keyboard, without JavaScript, and with animations reduced.','fA3':'Typeface Hanken Grotesk, smooth scroll by Lenis.','fA4':'Sun position: a simplified calculation, made in your browser.','lMid':'Solar noon','lGold':'Golden hour, evening','lShadow':'Shadow at noon (1.70 m)','yearT':'Day length through the year',
  'ctT':'Let\u2019s talk about light.','copy':'Copy the address','top':'Back to top',
  'fRole':'Role','fYear':'Year','fPlace':'Place','prev':'Previous','next':'Next'
 };
@@ -1430,13 +1438,21 @@ function applyLang(l){
   const b=$('#langBtn'); b.textContent=l==='en'?'FR':'EN'; b.lang=l==='en'?'fr':'en'; b.setAttribute('aria-label',l==='en'?'Passer en français':'Switch to English');
   $$('.row').forEach((r,i)=>{ if(!PROJ[i]) return; const t=txt(PROJ[i],l); $('.r-title',r).textContent=t.title; $('.r-type',r).textContent=t.type; $('.r-place',r).textContent=t.place });
   document.title='Moyo Studio';
-  document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio based in Provence-Alpes-Côte d\u2019Azur. Websites, identities, audiovisual and communication, drawn with light.':'Moyo, studio de design et de développement basé en Provence-Alpes-Côte d\u2019Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.';
+  document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio based on the French Riviera. Websites, identities, audiovisual and communication, drawn with light.':'Moyo, studio de design et de développement basé en Provence-Alpes-Côte d\u2019Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.';
   applySun(sunCur); fillToday(); renderChart(); if(proj.open) fillProject(pIdx);
   curSec=''; updateBar();
   try{localStorage.setItem('hb-lang',l)}catch(e){}
 }
-$('#langBtn').addEventListener('click',()=>applyLang(lang==='fr'?'en':'fr'));
-$$('.flang button').forEach(x=>x.addEventListener('click',()=>{ if(x.dataset.l!==lang) applyLang(x.dataset.l) }));
+/* switch language through a soft view transition when the browser supports it */
+function swapLang(l){
+  if(l===lang) return;
+  const run=()=>applyLang(l);
+  if(!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches) return run();
+  try{ const vt=document.startViewTransition({update:run,types:['lang']}); vt.finished.catch(()=>{}); vt.ready.catch(()=>{}); }
+  catch(e){ const vt=document.startViewTransition(run); vt.finished.catch(()=>{}); }
+}
+$('#langBtn').addEventListener('click',()=>swapLang(lang==='fr'?'en':'fr'));
+$$('.flang button').forEach(x=>x.addEventListener('click',()=>swapLang(x.dataset.l)));
 
 /* ---------- Contact form: sent with fetch; without JavaScript it posts normally and comes back with ?envoye=1 ---------- */
 const ctForm=$('#ctForm');

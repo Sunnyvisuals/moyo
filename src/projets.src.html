@@ -159,6 +159,14 @@ html.is-dialog{overflow:hidden}
   .dlg-desc,.dlg-plate{grid-column:1/-1}
   .dlg-facts{grid-template-columns:1fr}
 }
+
+/* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
+@media (prefers-reduced-motion:no-preference){
+  html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
+  html:active-view-transition-type(lang)::view-transition-new(root){animation:langIn .7s cubic-bezier(.25,1,.5,1) .12s both}
+}
+@keyframes langOut{to{opacity:0;filter:blur(8px)}}
+@keyframes langIn{from{opacity:0;filter:blur(8px)}}
 </style>
 </head>
 <body>
@@ -249,7 +257,7 @@ const ALL=DATA.projects||[];
 const EN={idxL:'Project index',skip:'Skip to content',home:'Home',contact:'Contact',title:'All projects.',empty:'No project in this category yet.',back:'Back to home',
   fRole:'Role',fYear:'Year',fPlace:'Place',prev:'Previous',next:'Next',close:'Close',all:'All',
   homeAria:'moyo, home',nav:'Navigation',filtersAria:'Filter by category',
-  fStudio:'Studio',fStudioP:'An independent design and development studio, based in Provence-Alpes-Côte d\u2019Azur: websites, identities, audiovisual and communication.',fNav:'Site map',
+  fStudio:'Studio',fStudioP:'An independent design and development studio, based on the French Riviera: websites, identities, audiovisual and communication.',fNav:'Site map',
   sIntro:'Approach',sProj:'Projects',sSvc:'Services',sStu:'Studio',fWrite:'Write to the studio',top:'Back to top',footAria:'Site footer',langAria:'Language'};
 const FR={all:'Tous'};
 let lang='fr';
@@ -297,8 +305,16 @@ function applyLang(l){
   if(dlg.open) fill(cur);
   try{localStorage.setItem('hb-lang',l)}catch(e){}
 }
-$('#langBtn').addEventListener('click',()=>applyLang(lang==='fr'?'en':'fr'));
-$$('.flang button').forEach(x=>x.addEventListener('click',()=>{ if(x.dataset.l!==lang) applyLang(x.dataset.l) }));
+/* switch language through a soft view transition when the browser supports it */
+function swapLang(l){
+  if(l===lang) return;
+  const run=()=>applyLang(l);
+  if(!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches) return run();
+  try{ const vt=document.startViewTransition({update:run,types:['lang']}); vt.finished.catch(()=>{}); vt.ready.catch(()=>{}); }
+  catch(e){ const vt=document.startViewTransition(run); vt.finished.catch(()=>{}); }
+}
+$('#langBtn').addEventListener('click',()=>swapLang(lang==='fr'?'en':'fr'));
+$$('.flang button').forEach(x=>x.addEventListener('click',()=>swapLang(x.dataset.l)));
 
 /* Dialog: previous / next stay inside the current filter */
 const dlg=$('#proj');
