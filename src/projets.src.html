@@ -106,6 +106,17 @@ html:not(.js) .filters{display:none}
 .idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22}
 html.is-dialog{overflow:hidden}
 
+/* Tetris band before the footer, as on the home page; image pieces show project visuals */
+.blocks{--bp:1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(64px,11vh,140px);grid-auto-flow:dense;overflow:clip;
+  --c1:var(--klein);--c2:color-mix(in oklab,var(--klein) 74%,#000a2a);--c3:color-mix(in oklab,var(--klein) 42%,var(--chaux));--c4:color-mix(in oklab,var(--klein) 16%,var(--chaux));--c5:var(--wash)}
+.blocks i{grid-column:span var(--s);grid-row:span var(--r);--q:clamp(0,calc((var(--bp) - var(--d)) * 2.2),1);
+  background:color-mix(in oklab,var(--to) calc(var(--q) * 100%),var(--from));translate:0 calc((1 - var(--q)) * -42%)}
+.blocks .k1{--to:var(--c1);--from:var(--c3)}.blocks .k2{--to:var(--c2);--from:var(--c4)}.blocks .k4{--to:var(--c4);--from:var(--c2)}.blocks .k5{--to:var(--c5);--from:var(--c3)}
+.blocks .pic{--to:var(--klein);--from:var(--klein);position:relative;overflow:clip;color:var(--chaux)}
+.blocks .pic[data-t="wash"]{--to:var(--wash);--from:var(--wash);color:var(--klein)}
+.blocks .pic>*{position:absolute;inset:0;width:100%;height:100%;display:block;scale:calc(1.18 - var(--q) * .18)}
+.blocks .pic>svg{inset:-12% 0;height:124%}
+.blocks .pic>img{object-fit:cover}
 footer{padding:32px var(--m);border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:var(--fs-small)}
 
 @media (prefers-reduced-motion:no-preference){
@@ -158,6 +169,7 @@ footer{padding:32px var(--m);border-top:1px solid var(--line);display:flex;flex-
   <p class="empty" id="empty" hidden data-i="empty">Aucun projet dans cette catégorie pour l’instant.</p>
   <script type="application/json" id="moyo-data">__DATA__</script>
 </main>
+<div class="blocks" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="pic" data-pic="0" style="--s:3;--r:2;--d:.1"></i><i class="k4" style="--s:5;--r:1;--d:.2"></i><i class="k1" style="--s:2;--r:1;--d:.28"></i><i class="k5" style="--s:2;--r:1;--d:.34"></i><i class="pic" data-pic="1" style="--s:5;--r:1;--d:.42"></i></div>
 
 <footer>
   <span>© 2026 moyo</span>
@@ -271,6 +283,17 @@ $('#pPrev').addEventListener('click',()=>step(-1));
 dlg.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') step(1); else if(e.key==='ArrowLeft') step(-1); });
 
 applyLang(lang);
+
+/* Tetris band: image pieces take project visuals; pieces drop in as the band enters */
+(()=>{
+  const vis=[];
+  ALL.forEach(p=>{ if(p.cover) vis.push({cover:p.cover}); (p.images||[]).forEach(id=>vis.push({cover:id})); });
+  ALL.forEach(p=>{ if(!p.cover&&p.plate) vis.push({plate:p.plate,tone:p.tone}); });
+  if(vis.length) $$('.blocks .pic').forEach(el=>{ const v=vis[(+el.dataset.pic||0)%vis.length]; el.innerHTML=plateInner(v); if(plateAttrs(v)) el.dataset.t='wash'; });
+  const band=$('.blocks'); if(!band||reduce) return;
+  const upd=()=>{ const t=band.getBoundingClientRect().top; band.style.setProperty('--bp',Math.min(1,Math.max(0,(innerHeight-t)/(band.offsetHeight||1))).toFixed(3)); };
+  addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true}); addEventListener('resize',upd); upd();
+})();
 })();
 </script>
 </body>
