@@ -14,6 +14,21 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const getLang = () => document.documentElement.lang === 'en' ? 'en' : 'fr';
 let lang = getLang();
 
+/* The chrome owns its own labels so it works on any page, whatever that page's own language system. */
+const I18N = {
+  fr: { 'sec.top': 'Accueil', 'sec.projects': 'Projets', 'sec.all': 'Tous les projets', 'sec.services': 'Services', 'sec.studio': 'Studio', 'sec.team': 'L’équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
+  en: { 'sec.top': 'Home', 'sec.projects': 'Projects', 'sec.all': 'All projects', 'sec.services': 'Services', 'sec.studio': 'Studio', 'sec.team': 'The team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
+};
+const ARIA = { fr: { homeAria: 'moyo, accueil', nav: 'Navigation principale', menu: 'Menu' }, en: { homeAria: 'moyo, home', nav: 'Main navigation', menu: 'Menu' } };
+const bar = document.getElementById('bar');
+function applyChromeLang(l){
+  [bar, menu].forEach(root => { if (!root) return;
+    root.querySelectorAll('[data-i]').forEach(el => { const k = el.dataset.i; if (I18N[l][k] != null) el.textContent = I18N[l][k]; });
+    root.querySelectorAll('[data-ia]').forEach(el => { const k = el.dataset.ia; if (ARIA[l][k] != null) el.setAttribute('aria-label', ARIA[l][k]); });
+  });
+  const lb = document.getElementById('langBtn'); if (lb) { lb.textContent = l === 'en' ? 'FR' : 'EN'; lb.lang = l === 'en' ? 'fr' : 'en'; lb.setAttribute('aria-label', l === 'en' ? 'Passer en français' : 'Switch to English'); }
+}
+
 /* letter-roll split for each menu label */
 function splitRoll(el){
   const text = el.textContent.trim(); if (!text) return;
@@ -24,6 +39,7 @@ function splitRoll(el){
 /* ---------- Menu arc carousel ---------- */
 const arcList = $('.menu-list.arc'), arcMQ = matchMedia('(min-width:821px)');
 const arcReal = $$('.menu-list.arc li'), arcN = arcReal.length, arcM = arcN * 3;
+applyChromeLang(lang);
 arcReal.forEach(li => $('.mn', li) && splitRoll($('.mn', li)));
 const arcClone = li => { const c = li.cloneNode(true); c.classList.add('arc-clone'); c.setAttribute('aria-hidden', 'true');
   const a = c.querySelector('a'); a.tabIndex = -1; a.addEventListener('click', () => menu.hidePopover?.()); return c; };
@@ -229,8 +245,8 @@ addEventListener('resize', () => { if (!arcMQ.matches) arcReset(); else if (menu
 arcChars();
 new MutationObserver(() => {
   const l = getLang(); if (l === lang) return; lang = l;
-  arcReal.forEach(li => $('.mn', li) && splitRoll($('.mn', li)));
-  arcItems.forEach(li => { const mn = $('.mn', li); if (mn && !$('.roll', mn)) splitRoll(mn); });
+  applyChromeLang(l);
+  arcItems.forEach(li => { const mn = $('.mn', li); if (mn) splitRoll(mn); });
   arcChars(); A.shown = -1; pvCS.dataset.k = '';
   if (menu.matches(':popover-open')) arcKick();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
