@@ -656,6 +656,29 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
 .monument.blurtext{padding-bottom:.196em;margin-bottom:0;background:none!important;-webkit-text-fill-color:currentColor;color:var(--paper)}
 .monument.blurtext .bl{display:inline-block;filter:blur(var(--b,0px))}
 
+/* Right side: a minimal metric counter. The section number rolls like an odometer (slight overshoot, motion blur),
+   a thin line fills with the page progress and ends in a small square, the section name sits underneath.
+   The slats stay for keyboard and screen readers but are visually hidden. */
+.dots{position:fixed!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap}
+.dots:focus-within{width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important}
+.meter{position:fixed;z-index:79;right:clamp(14px,2vw,28px);top:50%;translate:0 -50%;display:grid;justify-items:end;gap:14px;color:var(--klein);pointer-events:none;
+  font-variant-numeric:tabular-nums;transition:color .9s cubic-bezier(.25,1,.5,1),opacity .6s}
+.meter[data-tone="paper"]{color:var(--paper)}
+.meter.off,html.is-dialog .meter{opacity:0}
+.m-row{display:flex;align-items:flex-start;gap:5px}
+.m-num{display:flex;height:1em;overflow:hidden;font-size:clamp(1.5rem,2vw,2rem);font-weight:300;letter-spacing:-.05em;line-height:1}
+.m-d{display:flex;flex-direction:column;transition:transform 1s cubic-bezier(.34,1.32,.5,1),filter .45s}
+.m-d i{display:block;height:1em;font-style:normal}
+.meter.rolling .m-d{filter:blur(1.6px)}
+.m-tot{font-size:.6875rem;font-weight:500;letter-spacing:.06em;opacity:.55;padding-top:3px}
+.m-track{position:relative;width:1px;height:clamp(90px,14vh,140px)}
+.m-track::before{content:"";position:absolute;inset:0;background:currentColor;opacity:.22}
+.m-track b{position:absolute;left:0;top:0;width:1px;height:calc(var(--sp,0) * 100%);background:currentColor}
+.m-track b::after{content:"";position:absolute;left:-3px;bottom:-3px;width:7px;height:7px;background:currentColor}
+.m-lbl{font-size:.6875rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.m-d{transition:none}.meter.rolling .m-d{filter:none}}
+@media (max-width:820px){.meter{display:none}}
+
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -901,6 +924,12 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <a href="#equipe" data-k="team"><span class="lbl" data-i="sec.team">L’équipe</span></a>
   <a href="#contact" data-k="contact"><span class="lbl" data-i="sec.contact">Contact</span></a>
 </nav>
+<div class="meter" id="meter" aria-hidden="true">
+  <span class="m-row"><span class="m-num"><span class="m-d"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span><span class="m-d"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span><span class="m-tot">/06</span></span>
+  <span class="m-track"><b></b></span>
+  <span class="m-lbl"></span>
+</div>
+
 
 
 <main id="main">
@@ -1360,6 +1389,7 @@ function updateBar(){
   if(key==='top') dTone=openCur>.6?'blue':'paper';
   dotsNav.dataset.tone=dTone==='blue'?'paper':'klein';
   dotsNav.classList.toggle('off',mono.getBoundingClientRect().top<innerHeight*.85);
+  updateMeter(key);
 }
 const dotsNav=$('#dots'), dots=$$('#dots a');
 bar.addEventListener('focusin',()=>bar.classList.remove('away'));
@@ -1495,6 +1525,26 @@ function blurText(){
   });
 }
 
+/* ---------- Right-side metric counter ---------- */
+const meterEl=$('#meter'), meterDigits=meterEl?[...meterEl.querySelectorAll('.m-d')]:[], meterLbl=meterEl&&meterEl.querySelector('.m-lbl');
+const METER_ORDER=['top','intro','projects','services','studio','team','contact'];
+let meterKey='', meterT=0;
+function updateMeter(key){
+  if(!meterEl) return;
+  meterEl.dataset.tone=dotsNav.dataset.tone;
+  meterEl.classList.toggle('off',dotsNav.classList.contains('off'));
+  const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  setV(meterEl,'--sp',clamp(scrollY/max).toFixed(4));
+  const lbl=(lang==='en'?EN['sec.'+key]:DICT_FR['sec.'+key])||'';
+  if(meterLbl.textContent!==lbl) meterLbl.textContent=lbl;
+  if(key===meterKey) return;
+  meterKey=key;
+  const idx=Math.max(0,METER_ORDER.indexOf(key));
+  meterDigits[0].style.transform='translateY('+(-Math.floor(idx/10)*10)+'%)';
+  meterDigits[1].style.transform='translateY('+(-(idx%10)*10)+'%)';
+  meterEl.classList.add('rolling'); clearTimeout(meterT); meterT=setTimeout(()=>meterEl.classList.remove('rolling'),450);
+}
+
 /* ---------- Language ---------- */
 function applyLang(l){
   lang=l; root.lang=l;
@@ -1519,7 +1569,7 @@ function applyLang(l){
   document.title='Moyo Studio';
   document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio based on the French Riviera. Websites, identities, audiovisual and communication, drawn with light.':'Moyo, studio de design et de développement basé en Provence-Alpes-Côte d\u2019Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.';
   applySun(sunCur); fillToday(); renderChart(); if(proj.open) fillProject(pIdx);
-  curSec=''; updateBar();
+  curSec=''; meterKey=''; updateBar();
   try{localStorage.setItem('hb-lang',l)}catch(e){}
 }
 /* switch language through a soft view transition when the browser supports it */
