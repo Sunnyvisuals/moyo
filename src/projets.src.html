@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F1F3F2">
 <title>Projets · Moyo Studio</title>
-<meta name="description" content="Tous les projets du studio moyo, rangés par catégorie : identités, sites, données, motion.">
+<meta name="description" content="Tous les projets de moyo, studio de design basé en Provence-Alpes-Côte d’Azur, rangés par catégorie : identités, sites, données, motion.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <script>/* page transitions can be cut short by a fast click: that is not an error */
@@ -31,7 +31,9 @@ for(const t of ['pagereveal','pageswap']) addEventListener(t,e=>{const v=e.viewT
   color-scheme:light;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{background:var(--chaux);-webkit-text-size-adjust:100%}
+html{background:var(--chaux);-webkit-text-size-adjust:100%;scrollbar-width:none}
+html::-webkit-scrollbar,#proj::-webkit-scrollbar{display:none}
+#proj{scrollbar-width:none}
 body{margin:0;background:var(--chaux);color:var(--klein);font-family:var(--sans);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 h1,h2,h3,p,ol,ul,dl,dd{margin:0}
 ol,ul{padding:0;list-style:none}
@@ -187,7 +189,7 @@ html.is-dialog{overflow:hidden}
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>
       <ul class="fnames"><li>Zahia Bougouffa</li><li>Yacine Bouabdallah</li></ul>
-      <p class="fp" data-i="fStudioP">Studio indépendant de design et de développement : sites, identités, audiovisuel et communication.</p>
+      <p class="fp" data-i="fStudioP">Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
       <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
@@ -247,7 +249,7 @@ const ALL=DATA.projects||[];
 const EN={idxL:'Project index',skip:'Skip to content',home:'Home',contact:'Contact',title:'All projects.',empty:'No project in this category yet.',back:'Back to home',
   fRole:'Role',fYear:'Year',fPlace:'Place',prev:'Previous',next:'Next',close:'Close',all:'All',
   homeAria:'moyo, home',nav:'Navigation',filtersAria:'Filter by category',
-  fStudio:'Studio',fStudioP:'An independent design and development studio: websites, identities, audiovisual and communication.',fNav:'Site map',
+  fStudio:'Studio',fStudioP:'An independent design and development studio, based in Provence-Alpes-Côte d\u2019Azur: websites, identities, audiovisual and communication.',fNav:'Site map',
   sIntro:'Approach',sProj:'Projects',sSvc:'Services',sStu:'Studio',fWrite:'Write to the studio',top:'Back to top',footAria:'Site footer',langAria:'Language'};
 const FR={all:'Tous'};
 let lang='fr';

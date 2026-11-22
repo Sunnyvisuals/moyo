@@ -6,12 +6,12 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#002FA7">
 <title>Moyo Studio</title>
-<meta name="description" content="Moyo, studio de design et de développement. Sites, identités et visualisations de données, dessinés avec la lumière.">
+<meta name="description" content="Moyo, studio de design et de développement basé en Provence-Alpes-Côte d’Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.">
 <meta property="og:title" content="Moyo Studio">
-<meta property="og:description" content="Studio de design et de développement. Un site éclairé par le vrai soleil.">
+<meta property="og:description" content="Studio de design et de développement basé en Provence-Alpes-Côte d’Azur. Un site éclairé par le vrai soleil.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"Moyo","description":"Studio de design et de développement : sites, identités et visualisations de données.","email":"contact.moyostudio@gmail.com","knowsLanguage":["fr","en"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"Moyo","description":"Studio de design et de développement basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.","areaServed":"Provence-Alpes-Côte d’Azur","address":{"@type":"PostalAddress","addressRegion":"Provence-Alpes-Côte d’Azur","addressCountry":"FR"},"email":"contact.moyostudio@gmail.com","knowsLanguage":["fr","en"]}</script>
 <script>/* page transitions can be cut short by a fast click: that is not an error */
 for(const t of ['pagereveal','pageswap']) addEventListener(t,e=>{const v=e.viewTransition; if(v) for(const p of [v.ready,v.finished,v.updateCallbackDone]) p&&p.catch(()=>{})});</script>
 <style>
@@ -510,6 +510,13 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .monument.grad{padding-bottom:.196em;margin-bottom:0}
 .foot.sec{padding-bottom:0}
 .foot .mono-wrap{margin-bottom:0}
+/* No visible scrollbar (the page still scrolls by wheel, trackpad, keyboard and touch) */
+html,#menu,#proj{scrollbar-width:none}
+html::-webkit-scrollbar,#menu::-webkit-scrollbar,#proj::-webkit-scrollbar{display:none}
+
+/* Contact on navy blue: deeper than the Klein blue of the footer that follows */
+.contact.blue{background:color-mix(in oklab,var(--klein) 50%,#000614)}
+.contact .chips input:checked+span,.contact .send{color:color-mix(in oklab,var(--klein) 50%,#000614)}
 /* the hero window is flat: no cast shadow, no shadow under the slats */
 .win{box-shadow:none}
 .lat-shadow{display:none}
@@ -699,7 +706,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <div class="stage" id="stage">
     <div class="hero-copy">
       <h1 class="display" id="h1" data-i="h1"><span class="ln" style="--i:0">Un studio de design</span> <span class="ln" style="--i:1">qui dessine</span> <span class="ln" style="--i:2">avec la lumière.</span></h1>
-      <p class="lead" data-i="h1p">Sites, identités et visualisations de données. Studio indépendant de design et de développement.</p>
+      <p class="lead" data-i="h1p">Sites, identités et visualisations de données. Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur.</p>
     </div>
     <div class="win" aria-hidden="true">
       <svg class="lat lat-shadow" viewBox="0 0 100 100" preserveAspectRatio="none"><g stroke="rgb(0 8 60 / .5)" stroke-width="9"><line x1="0" y1="33.33" x2="100" y2="33.33"/><line x1="0" y1="66.67" x2="100" y2="66.67"/></g></svg>
@@ -781,7 +788,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">04</span><span data-i="sec.studio">Studio</span></p>
     <h2 class="display par shut" id="stuT" style="--a:44px" data-i="stuT">Le studio.</h2>
-    <p class="statement words" data-i="stuP">Moyo est un studio de design et de développement. Nous concevons des sites et des identités pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
+    <p class="statement words" data-i="stuP">Moyo est un studio de design et de développement basé en Provence-Alpes-Côte d’Azur. Nous concevons des sites et des identités pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
     <div class="entry">
       <p class="entry-w par grad" style="--a:64px" aria-hidden="true"><span class="c">m</span><span class="c">o</span><span class="c">y</span><span class="c">o</span></p>
       <div class="entry-d">
@@ -879,7 +886,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>
       <ul class="fnames"><li>Zahia Bougouffa</li><li>Yacine Bouabdallah</li></ul>
-      <p class="small muted" data-i="fStudioP">Studio indépendant de design et de développement : sites, identités et visualisations de données.</p>
+      <p class="small muted" data-i="fStudioP">Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
       <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
@@ -959,7 +966,7 @@ const EN={
  'fBudget':'Budget','bTbd':'To be defined','fMsg':'Message','fNote':'Your details are only used to reply to you.','fSend':'Send','menu':'Menu','close':'Close',
  'sec.top':'Home','sec.intro':'Approach','sec.projects':'Projects','sec.services':'Services','sec.studio':'Studio','sec.light':'Light','sec.contact':'Contact',
  'h1':'<span class="ln" style="--i:0">A design studio</span> <span class="ln" style="--i:1">that draws</span> <span class="ln" style="--i:2">with light.</span>',
- 'h1p':'Websites, identities and data visualisations. An independent design and development studio.',
+ 'h1p':'Websites, identities and data visualisations. An independent design and development studio, based in Provence-Alpes-Côte d\u2019Azur.',
  'sunLabel':'Time in Nice','hint':'Scroll',
  'introT':'We measure light before we draw it. Every project starts with readings, then one simple idea, built with care.',
  'introL':'See the projects',
@@ -978,7 +985,7 @@ const EN={
  'm3t':'Draw','m3p':'Grid, type and motion, on 390 and 1440 pixel screens.',
  'm4t':'Build','m4p':'Code without needless dependencies, tested by keyboard, without animation, without JavaScript.',
  'stuT':'The studio.',
- 'stuP':'Moyo is a design and development studio. We design websites and identities for places, events and brands that have something precise to show.',
+ 'stuP':'Moyo is a design and development studio based in Provence-Alpes-Côte d\u2019Azur. We design websites and identities for places, events and brands that have something precise to show.',
  'b1t':'One idea per project.','b1p':'We choose a single strong idea, then hold it from the first screen to the last line of code.',
  'b2t':'Time for light.','b2p':'Slow movement, pauses, air. A site is meant to be read, not endured.',
  'b3t':'Accessible from the start.','b3p':'Keyboard, contrast, reduced motion, no JavaScript: designed states, not afterthought fixes.',
@@ -989,7 +996,7 @@ const EN={
  'todayN':'Calculated in your browser for 43.70\u00b0 N, 7.26\u00b0 E, Paris time.',
  'chartT':'Hours of sun per month in Nice','tbl':'See the data as a table','tblAria':'Hours of sun per month',
  'srcT':'2,725 hours of sun a year on average, 1991 to 2020. Source: ',
- 'footAria':'Site footer','fStudio':'Studio','fStudioP':'An independent design and development studio: websites, identities and data visualisations.','fNav':'Site map','fLive':'The light, right now','fAbout':'About this site','fA1':'A single page under 200 KB, with no cookies and no trackers.','fA2':'Readable by keyboard, without JavaScript, and with animations reduced.','fA3':'Typeface Hanken Grotesk, smooth scroll by Lenis.','fA4':'Sun position: a simplified calculation, made in your browser.','lMid':'Solar noon','lGold':'Golden hour, evening','lShadow':'Shadow at noon (1.70 m)','yearT':'Day length through the year',
+ 'footAria':'Site footer','fStudio':'Studio','fStudioP':'An independent design and development studio, based in Provence-Alpes-Côte d\u2019Azur: websites, identities, audiovisual and communication.','fNav':'Site map','fLive':'The light, right now','fAbout':'About this site','fA1':'A single page under 200 KB, with no cookies and no trackers.','fA2':'Readable by keyboard, without JavaScript, and with animations reduced.','fA3':'Typeface Hanken Grotesk, smooth scroll by Lenis.','fA4':'Sun position: a simplified calculation, made in your browser.','lMid':'Solar noon','lGold':'Golden hour, evening','lShadow':'Shadow at noon (1.70 m)','yearT':'Day length through the year',
  'ctT':'Let\u2019s talk about light.','copy':'Copy the address','top':'Back to top',
  'fRole':'Role','fYear':'Year','fPlace':'Place','prev':'Previous','next':'Next'
 };
@@ -1143,8 +1150,11 @@ function updateBar(){
   bar.dataset.tone=tone==='blue'?'paper':'klein';
   const y=scrollY, dy=y-lastY; lastY=y;
   if(dy<-2) upAt=y;
-  const away=!reduce&&y>innerHeight*.6&&dy>0&&y-upAt>80&&!menu.matches(':popover-open')&&!bar.contains(document.activeElement);
-  if(dy!==0||y<innerHeight*.6) bar.classList.toggle('away',away);
+  // hidden on the landing screen (the hero speaks alone); then it hides while reading down and returns on the way up
+  const busy=menu.matches(':popover-open')||bar.contains(document.activeElement);
+  const onLanding=y<innerHeight*.85;
+  const away=!busy&&(onLanding||(!reduce&&dy>0&&y-upAt>80));
+  if(dy!==0||onLanding) bar.classList.toggle('away',away);
   bar.classList.toggle('scrolled',y>20);
   if(key!==curSec){curSec=key;
     dots.forEach(a=>a.setAttribute('aria-current',String(a.dataset.k===key)));}
@@ -1259,7 +1269,7 @@ function applyLang(l){
   const b=$('#langBtn'); b.textContent=l==='en'?'FR':'EN'; b.lang=l==='en'?'fr':'en'; b.setAttribute('aria-label',l==='en'?'Passer en français':'Switch to English');
   $$('.row').forEach((r,i)=>{ if(!PROJ[i]) return; const t=txt(PROJ[i],l); $('.r-title',r).textContent=t.title; $('.r-type',r).textContent=t.type; $('.r-place',r).textContent=t.place });
   document.title='Moyo Studio';
-  document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio. Websites, identities and data visualisations, drawn with light.':'Moyo, studio de design et de développement. Sites, identités et visualisations de données, dessinés avec la lumière.';
+  document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio based in Provence-Alpes-Côte d\u2019Azur. Websites, identities, audiovisual and communication, drawn with light.':'Moyo, studio de design et de développement basé en Provence-Alpes-Côte d\u2019Azur. Sites, identités, audiovisuel et communication, dessinés avec la lumière.';
   applySun(sunCur); fillToday(); renderChart(); if(proj.open) fillProject(pIdx);
   curSec=''; updateBar();
   try{localStorage.setItem('hb-lang',l)}catch(e){}
