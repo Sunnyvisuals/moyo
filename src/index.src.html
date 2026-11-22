@@ -86,17 +86,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   transition:color var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter)}
 .bar>*,.bar-r>*{pointer-events:auto}
 .bar[data-tone="paper"]{color:var(--paper)}
-/* Liquid glass: a floating capsule that blurs and saturates what passes under it, with a light rim and a soft shadow.
-   Tinted white over lime sections, blue over blue ones. */
-.bar{top:10px;left:max(10px,calc(var(--m) * .5));right:max(10px,calc(var(--m) * .5));height:58px;padding:0 clamp(18px,2vw,28px);border-radius:29px;pointer-events:auto;
-  background:linear-gradient(180deg,rgb(255 255 255 / .55),rgb(255 255 255 / .28));
-  -webkit-backdrop-filter:blur(18px) saturate(1.8);backdrop-filter:blur(18px) saturate(1.8);
-  box-shadow:inset 0 1px 0 rgb(255 255 255 / .75),inset 0 -1px 0 rgb(0 47 167 / .06),0 0 0 1px rgb(0 47 167 / .08),0 10px 34px -10px rgb(0 18 70 / .28);
-  transition:color var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter),background var(--dur-3) var(--ease-enter),box-shadow var(--dur-3) var(--ease-enter)}
-.bar[data-tone="paper"]{background:linear-gradient(180deg,rgb(255 255 255 / .2),rgb(255 255 255 / .06));
-  box-shadow:inset 0 1px 0 rgb(255 255 255 / .45),inset 0 -1px 0 rgb(255 255 255 / .08),0 0 0 1px rgb(255 255 255 / .16),0 10px 34px -10px rgb(0 6 40 / .45)}
-.bar.away{translate:0 calc(-100% - 14px)}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bar{background:rgb(241 243 242 / .94)}.bar[data-tone="paper"]{background:rgb(0 47 167 / .94)}}
+.bar::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--chaux);opacity:0;transition:opacity var(--dur-1),background var(--dur-3) var(--ease-enter)}
+.bar[data-tone="paper"]::before{background:var(--klein)}
+.bar.solid::before{opacity:1}
 .bar.away{translate:0 -100%}
 .bar :focus-visible{outline-color:currentColor;outline-offset:4px}
 .bar-mark{font-size:1.125rem;font-weight:550;letter-spacing:-.02em;text-decoration:none}
@@ -466,14 +458,6 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .blocks .k3{--to:var(--c3);--from:var(--c1)}
 .blocks .k4{--to:var(--c4);--from:var(--c2)}
 .blocks .k5{--to:var(--c5);--from:var(--c3)}
-/* Image pieces: a project's visual (its cover photo, or its drawn plate) inside a Tetris piece. Filled by JS from the
-   project data, so they follow what the admin publishes. The visual settles from a slight zoom as the piece lands. */
-.blocks .pic{--to:var(--klein);--from:var(--klein);position:relative;overflow:clip;color:var(--chaux)}
-.blue .blocks .pic{--to:color-mix(in oklab,var(--klein) 70%,#000a2a);--from:var(--to)}
-.blocks .pic[data-t="wash"]{--to:var(--wash);--from:var(--wash);color:var(--klein)}
-.blocks .pic>*{position:absolute;inset:0;width:100%;height:100%;display:block;scale:calc(1.18 - var(--q) * .18);transform-origin:50% 50%}
-.blocks .pic>svg{inset:-12% 0;height:124%}
-.blocks .pic>img{object-fit:cover}
 @media (max-width:820px){.blocks{grid-auto-rows:clamp(44px,8vh,88px)}}
 
 /* Buttons: a thin outline; on hover a solid fill rises from the bottom like a blind, the arrow slides. No stripes. */
@@ -510,8 +494,7 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .grad .w,.grad .c,.grad .ln{-webkit-text-fill-color:transparent}
 /* the gradient only paints inside the box: give descenders (the "y" of moyo) room below, without moving the layout */
 .grad{padding-bottom:.14em;margin-bottom:-.14em}
-.monument.grad{padding-bottom:.3em;margin-bottom:-.06em}
-.foot.sec{padding-bottom:0}
+.monument.grad{padding-bottom:.3em;margin-bottom:calc(.192em - .3em)}
 .entry-w.grad{padding-bottom:.42em;margin-bottom:-.12em}
 @media (forced-colors:active){.grad{background:none;-webkit-text-fill-color:currentColor}}
 
@@ -590,27 +573,6 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 @media (max-width:1000px){.ct-side,.ct-form{grid-column:1/-1}}
 @media (max-width:560px){.f-two{grid-template-columns:1fr}}
 
-/* Footer: the columns become Tetris tiles in shades of blue, with air inside */
-.foot-grid{gap:0;grid-auto-rows:minmax(clamp(150px,20vh,240px),auto)}
-.foot-grid>.fcol{padding:clamp(24px,3vw,48px);min-width:0}
-.foot-grid>.fcol:nth-child(1){grid-column:span 5;grid-row:span 2;background:color-mix(in oklab,var(--klein) 70%,#000a2a)}
-.foot-grid>.fcol:nth-child(2){grid-column:span 3;grid-row:span 2;background:color-mix(in oklab,var(--klein) 88%,var(--chaux))}
-.foot-grid>.fcol:nth-child(3){grid-column:span 4;background:color-mix(in oklab,var(--klein) 74%,var(--chaux))}
-.foot-grid>.fcol:nth-child(4){grid-column:span 4;background:var(--chaux);color:var(--klein)}
-.foot-grid>.fcol:nth-child(4) .fh{color:var(--soft)}
-.foot-grid>.fcol:nth-child(4) a{color:var(--klein);font-size:1.125rem}
-.foot-grid .fnames li{font-size:clamp(1.375rem,2vw,1.875rem)}
-@supports (animation-timeline:view()){
-  @media (prefers-reduced-motion:no-preference){
-    .foot-grid>.fcol{animation:blind linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
-    .foot-grid>.fcol:nth-child(2){animation-range:entry 8% entry 78%}
-    .foot-grid>.fcol:nth-child(3){animation-range:entry 14% entry 84%}
-    .foot-grid>.fcol:nth-child(4){animation-range:entry 20% entry 90%}
-  }
-}
-@media (max-width:900px){.foot-grid>.fcol:nth-child(n){grid-column:span 6;grid-row:auto}}
-@media (max-width:560px){.foot-grid>.fcol:nth-child(n){grid-column:1/-1}}
-
 /* Footer language switch */
 .flang{display:inline-flex;gap:14px}
 .flang button{min-height:32px;color:var(--paper-soft);background:linear-gradient(currentColor,currentColor) 0 calc(100% - 6px)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter),color var(--dur-1)}
@@ -623,10 +585,7 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 /* Section slats, right edge: like the slats of a blind. The current one opens wide. */
 .dots{position:fixed;z-index:79;right:max(6px,calc(var(--m) * .5));top:50%;translate:0 -50%;display:grid;color:var(--klein);transition:color var(--dur-3) var(--ease-enter),opacity var(--dur-3)}
 .dots[data-tone="paper"]{color:var(--paper)}
-.dots a{display:flex;align-items:center;justify-content:flex-end;gap:12px;width:auto;min-width:44px;height:18px;text-decoration:none}
-.dots .lbl{font-size:.6875rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;opacity:0;translate:6px 0;transition:opacity var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter)}
-.dots a[aria-current="true"] .lbl,.dots a:hover .lbl,.dots a:focus-visible .lbl{opacity:1;translate:0 0}
-.dots a:hover:not([aria-current="true"]) .lbl{opacity:.7}
+.dots a{display:flex;align-items:center;justify-content:flex-end;width:44px;height:18px}
 .dots a::before{content:"";width:12px;height:1px;background:currentColor;opacity:.4;transition:width var(--dur-4) var(--ease-enter),opacity var(--dur-3),height var(--dur-3)}
 .dots a:hover::before{width:20px;opacity:.9}
 .dots a[aria-current="true"]::before{width:34px;height:2px;opacity:1}
@@ -703,13 +662,13 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 </nav>
 
 <nav class="dots" id="dots" aria-label="Sections" data-ia="dotsAria">
-  <a href="#top" data-k="top"><span class="lbl" data-i="sec.top">Accueil</span></a>
-  <a href="#approche" data-k="intro"><span class="lbl" data-i="sec.intro">Approche</span></a>
-  <a href="#projets" data-k="projects"><span class="lbl" data-i="sec.projects">Projets</span></a>
-  <a href="#services" data-k="services"><span class="lbl" data-i="sec.services">Services</span></a>
-  <a href="#studio" data-k="studio"><span class="lbl" data-i="sec.studio">Studio</span></a>
-  <a href="#lumiere" data-k="light"><span class="lbl" data-i="sec.light">Lumière</span></a>
-  <a href="#contact" data-k="contact"><span class="lbl" data-i="sec.contact">Contact</span></a>
+  <a href="#top" data-k="top"><span class="sr" data-i="sec.top">Accueil</span></a>
+  <a href="#approche" data-k="intro"><span class="sr" data-i="sec.intro">Approche</span></a>
+  <a href="#projets" data-k="projects"><span class="sr" data-i="sec.projects">Projets</span></a>
+  <a href="#services" data-k="services"><span class="sr" data-i="sec.services">Services</span></a>
+  <a href="#studio" data-k="studio"><span class="sr" data-i="sec.studio">Studio</span></a>
+  <a href="#lumiere" data-k="light"><span class="sr" data-i="sec.light">Lumière</span></a>
+  <a href="#contact" data-k="contact"><span class="sr" data-i="sec.contact">Contact</span></a>
 </nav>
 
 <main id="main">
@@ -744,11 +703,12 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     </div>
   </div>
 
-  <div class="blocks blocks-a" aria-hidden="true"><i class="k1" style="--s:5;--r:2;--d:0"></i><i class="k3" style="--s:3;--r:1;--d:0.1"></i><i class="pic" data-pic="0" style="--s:4;--r:1;--d:0.2"></i><i class="k5" style="--s:2;--r:1;--d:0.3"></i><i class="k2" style="--s:5;--r:1;--d:0.4"></i></div>
+
+  <div class="blocks blocks-a" aria-hidden="true"><i class="k1" style="--s:5;--r:2;--d:0"></i><i class="k3" style="--s:3;--r:1;--d:0.1"></i><i class="k4" style="--s:4;--r:1;--d:0.2"></i><i class="k5" style="--s:2;--r:1;--d:0.3"></i><i class="k2" style="--s:5;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Projets -->
-<section class="sec has-band" id="projets" data-sec="projects" data-tone="paper" aria-labelledby="projT">
+<section class="sec" id="projets" data-sec="projects" data-tone="paper" aria-labelledby="projT">
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">02</span><span data-i="sec.projects">Projets</span></p>
     <div class="sec-head">
@@ -759,8 +719,6 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <div class="proj-more"><a class="link" href="/projets" data-i="allL">Tous les projets, par catégorie</a></div>
     <script type="application/json" id="moyo-data">__DATA__</script>
   </div>
-
-  <div class="blocks blocks-d" aria-hidden="true"><i class="pic" data-pic="1" style="--s:3;--r:2;--d:0"></i><i class="k4" style="--s:4;--r:1;--d:0.1"></i><i class="k1" style="--s:5;--r:1;--d:0.2"></i><i class="k5" style="--s:2;--r:1;--d:0.3"></i><i class="k3" style="--s:7;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Services et méthode -->
@@ -782,22 +740,20 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <section class="par" style="--a:30px" aria-labelledby="mthT">
       <h2 class="display shut" id="mthT" data-i="mthT">Comment nous travaillons.</h2>
       <ol class="list steps">
-        <li><div><h3 data-i="m0t">Écouter</h3><p data-i="m0p">Un premier échange pour comprendre le lieu, le public, les contraintes et le calendrier.</p></div></li>
         <li><div><h3 data-i="m1t">Relever</h3><p data-i="m1p">Nous visitons, mesurons et collectons les chiffres réels.</p></div></li>
         <li><div><h3 data-i="m2t">Choisir</h3><p data-i="m2p">Nous retenons une seule idée, et ce qu’elle exclut.</p></div></li>
         <li><div><h3 data-i="m3t">Dessiner</h3><p data-i="m3p">Grille, typographie et mouvement, sur des écrans de 390 et 1440 pixels.</p></div></li>
         <li><div><h3 data-i="m4t">Construire</h3><p data-i="m4p">Du code sans dépendance inutile, testé au clavier, sans animation, sans JavaScript.</p></div></li>
-        <li><div><h3 data-i="m5t">Lancer</h3><p data-i="m5p">Mise en ligne, tournage ou impression, avec une prise en main pour votre équipe.</p></div></li>
-        <li><div><h3 data-i="m6t">Accompagner</h3><p data-i="m6p">Nous restons là après le lancement : mesures, ajustements, nouveaux contenus.</p></div></li>
       </ol>
     </section>
   </div>
 
-  <div class="blocks blocks-b" aria-hidden="true"><i class="k4" style="--s:3;--r:1;--d:0"></i><i class="pic" data-pic="2" style="--s:6;--r:2;--d:0.12"></i><i class="k3" style="--s:3;--r:1;--d:0.24"></i><i class="k2" style="--s:3;--r:1;--d:0.32"></i><i class="k5" style="--s:3;--r:1;--d:0.4"></i></div>
+
+  <div class="blocks blocks-b" aria-hidden="true"><i class="k4" style="--s:3;--r:1;--d:0"></i><i class="k1" style="--s:6;--r:2;--d:0.12"></i><i class="k3" style="--s:3;--r:1;--d:0.24"></i><i class="k2" style="--s:3;--r:1;--d:0.32"></i><i class="k5" style="--s:3;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Studio -->
-<section class="sec has-band blue studio" id="studio" data-sec="studio" data-tone="blue" aria-labelledby="stuT">
+<section class="sec blue studio" id="studio" data-sec="studio" data-tone="blue" aria-labelledby="stuT">
   <div class="wrap">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">04</span><span data-i="sec.studio">Studio</span></p>
     <h2 class="display par shut" id="stuT" style="--a:44px" data-i="stuT">Le studio.</h2>
@@ -821,8 +777,6 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     </ul>
     <div class="studio-cta"><a class="link" href="#contact" data-i="stuL">Écrire au studio</a></div>
   </div>
-
-  <div class="blocks blocks-e" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="k1" style="--s:2;--r:2;--d:0.1"></i><i class="pic" data-pic="3" style="--s:6;--r:1;--d:0.2"></i><i class="k5" style="--s:4;--r:1;--d:0.3"></i><i class="k3" style="--s:6;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Lumière -->
@@ -842,11 +796,12 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <p class="sol" id="yearNote"></p>
   </div>
 
-  <div class="blocks blocks-c" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="k5" style="--s:4;--r:1;--d:0.1"></i><i class="pic" data-pic="4" style="--s:4;--r:2;--d:0.2"></i><i class="k3" style="--s:6;--r:1;--d:0.3"></i><i class="k4" style="--s:2;--r:1;--d:0.4"></i></div>
+
+  <div class="blocks blocks-c" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="k5" style="--s:4;--r:1;--d:0.1"></i><i class="k1" style="--s:4;--r:2;--d:0.2"></i><i class="k3" style="--s:6;--r:1;--d:0.3"></i><i class="k4" style="--s:2;--r:1;--d:0.4"></i></div>
 </section>
 
 <!-- Contact -->
-<section class="sec has-band blue contact" id="contact" data-sec="contact" data-tone="blue" aria-labelledby="ctT">
+<section class="sec blue contact" id="contact" data-sec="contact" data-tone="blue" aria-labelledby="ctT">
   <div class="wrap top" style="width:100%">
     <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">06</span><span data-i="sec.contact">Contact</span></p>
     <div class="ct-grid">
@@ -891,8 +846,6 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       </form>
     </div>
   </div>
-
-  <div class="blocks blocks-f" aria-hidden="true"><i class="k3" style="--s:6;--r:1;--d:0"></i><i class="pic" data-pic="5" style="--s:3;--r:2;--d:0.12"></i><i class="k1" style="--s:3;--r:1;--d:0.2"></i><i class="k5" style="--s:2;--r:1;--d:0.3"></i><i class="k2" style="--s:4;--r:1;--d:0.36"></i><i class="k4" style="--s:3;--r:1;--d:0.44"></i></div>
 </section>
 
 </main>
@@ -993,9 +946,6 @@ const EN={
  's3t':'Data visualisation','s3p':'Charts you can explore, with their sources and a table version.',
  's4t':'Moving identities','s4p':'Logos, grids and animation for brands that live on screen.',
  'mthT':'How we work.',
- 'm0t':'Listen','m0p':'A first conversation to understand the place, the audience, the constraints and the timeline.',
- 'm5t':'Launch','m5p':'Going live, shooting or printing, with a hand-over for your team.',
- 'm6t':'Support','m6p':'We stay on after launch: measuring, adjusting, new content.',
  'm1t':'Survey','m1p':'We visit, measure and collect the real figures.',
  'm2t':'Choose','m2p':'We keep one idea, and what it rules out.',
  'm3t':'Draw','m3p':'Grid, type and motion, on 390 and 1440 pixel screens.',
@@ -1183,18 +1133,6 @@ bar.addEventListener('focusin',()=>bar.classList.remove('away'));
 const stackOn=!reduce&&CSS.supports('position','sticky');
 const stack=$$('main > .sec');
 const bands=$$('.blocks'), grads=$$('.grad');
-/* Image pieces take the projects' visuals in turn: photos first (covers and gallery), then the drawn plates. */
-(()=>{
-  const all=DATA.projects||[], vis=[];
-  all.forEach(p=>{ if(p.cover) vis.push({cover:p.cover}); (p.images||[]).forEach(id=>vis.push({cover:id})); });
-  all.forEach(p=>{ if(!p.cover&&p.plate) vis.push({plate:p.plate,tone:p.tone}); });
-  if(!vis.length) return;
-  $$('.blocks .pic').forEach(el=>{
-    const v=vis[(+el.dataset.pic||0)%vis.length];
-    el.innerHTML=plateInner(v);
-    if(plateAttrs(v)) el.dataset.t='wash';
-  });
-})();
 function layoutStack(){
   if(!stackOn) return;
   // a section taller than the screen sticks only when its bottom reaches the bottom of the screen
