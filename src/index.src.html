@@ -671,7 +671,7 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   #menu .menu-in{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:clamp(24px,4vw,80px);padding:0 var(--m);min-height:100%;height:100%}
   .menu-list.arc{position:relative;flex:none;width:clamp(300px,30vw,520px);height:100svh;margin:0;padding:0}
   .menu-list.arc li{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity}
-  .menu-list.arc a{border:0!important;padding:0!important;white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;color:var(--arc-off);overflow:visible;outline:none!important;transition:none!important}
+  .menu-list.arc a{transform-origin:0 50%;border:0!important;padding:0!important;white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;color:var(--arc-off);overflow:visible;outline:none!important;transition:none!important}
   .menu-list.arc .mn,.menu-list.arc .c{transition:none!important}
   .menu-list.arc a::before{display:none!important}
   .menu-list.arc a::after{content:"↗";position:static;display:inline-block;font-size:.42em;font-weight:400;opacity:var(--arw,0);
@@ -683,18 +683,16 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   .menu-list.arc a:hover,.menu-list.arc a:focus-visible{background:none!important}
   #menu .menu-list.arc li{transition:none!important;translate:none!important}   /* the arc does its own entrance */
   .menu-pv{flex:none;width:clamp(220px,20vw,330px)}
-  .pv-frame{display:block;cursor:pointer;position:relative;aspect-ratio:4/5;background:var(--arc-frame);overflow:hidden;transition:scale .7s cubic-bezier(.22,1,.36,1)}
-  .pv-frame i{position:absolute;inset:0;background:rgb(255 255 255 / .14);transform:scaleY(0);transform-origin:50% 0;transition:transform .55s cubic-bezier(.76,0,.24,1)}
-  .pv-frame:hover{scale:1.015}
-  .menu-pv.swap .pv-frame{scale:.975}
-  .menu-pv.swap .pv-frame i{transform:scaleY(1);transform-origin:50% 100%;transition-duration:.16s}
+  .pv-frame{display:block;cursor:pointer;position:relative;aspect-ratio:4/5;transform-origin:50% 50%}
+  .pv-l{position:absolute;left:0;right:0;top:-12%;bottom:-12%;background:var(--arc-frame) var(--img,none) 50% var(--py,50%)/cover no-repeat;clip-path:inset(12% 0)}
+  .pv-l:empty{background-size:cover}
   .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:10px;transition:opacity .3s}
   .menu-pv.swap .pv-cap{opacity:0;transition-duration:.12s}
   .pv-desc{font-size:.6875rem;line-height:1.35;opacity:.6;max-width:28ch}
   .pv-name{margin-top:2px;font-size:.8125rem;font-weight:600}
   .pv-n{font-size:.6875rem;font-variant-numeric:tabular-nums;white-space:nowrap}
   .pv-t{opacity:.5}
-  @keyframes pvRise{from{clip-path:inset(100% 0 0 0);translate:0 2.5rem}to{clip-path:inset(0);translate:0 0}}
+  @keyframes pvRise{from{clip-path:inset(100% -10% 0 -10%);translate:0 2.5rem}to{clip-path:inset(-20% -10%);translate:0 0}}
   @keyframes pvFade{from{opacity:0}}
   #menu:popover-open .pv-frame{animation:pvRise 1.2s cubic-bezier(.22,1,.36,1) .35s both}
   #menu:popover-open .pv-cap{animation:pvFade .8s ease .9s both}
@@ -934,7 +932,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       <li><a href="#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
     <div class="menu-pv" aria-hidden="true">
-      <a class="pv-frame" id="pvLink" href="#top" tabindex="-1"><i></i></a>
+      <a class="pv-frame" id="pvLink" href="#top" tabindex="-1"><span class="pv-l" id="pvB"></span><span class="pv-l" id="pvA"></span></a>
       <div class="pv-cap">
         <div><p class="pv-desc" id="pvDesc"></p><p class="pv-name" id="pvName"></p></div>
         <p class="pv-n"><span id="pvN">01</span><span class="pv-t" id="pvTot">/07</span></p>
@@ -1567,7 +1565,39 @@ const ARC_DESC={
 const ARC={curve:60,spacing:1.08,edgeFade:16,wRest:280,wFocus:720,spread:1,omega:(3+50*.09)*1.5,waveDur:.7,wheelTau:80};
 const A={pos:0,target:0,av:0,pv:0,lastPos:0,lean:0,lensC:0,lensV:0,lensAmp:1,hoverK:null,focusK:null,moving:false,
   wOn:false,wFrom:0,wRaw:0,wR:0,wLast:0,wCount:0,wheelT:-1e9,waves:new Map,waveRel:new Map,waveK:null,waveCand:null,waveCandT:0,
-  introT:-1e9,raf:0,last:0,shown:-1,chars:[]};
+  introT:-1e9,raf:0,last:0,shown:-1,chars:[],stp:0,stv:0,sdir:1};
+const ARC_IMG=[];                                           // one picture per section later (URL), grey until then
+const pvA=$('#pvA'), pvB=$('#pvB'), pvFrame=$('#pvLink');
+function arcCard(dt){
+  const c=A.focusK??A.pos;
+  if(reduce){ A.stp=c; A.stv=0; }
+  else{ const K=A.moving?480:120, D=2*Math.sqrt(K), k=Math.ceil(dt/(1/120)), h=dt/k;   // rollK 120, ×4 while the arc turns
+    for(let i=0;i<k;i++){ A.stv+=(K*(c-A.stp)-D*A.stv)*h; A.stp+=A.stv*h; } }
+  if(Math.abs(c-A.stp)<4e-4&&Math.abs(A.stv)<.02){ A.stp=c; A.stv=0; }
+  if(Math.abs(A.stv)>.25) A.sdir+=((A.stv>0?1:-1)-A.sdir)*(1-Math.exp(-10*dt));
+  const amt=reduce?0:.6, v=clamp(A.stv*.16,-1.6,1.6)*amt, st=1+Math.abs(v)*.07;
+  const tilt=clamp(-clamp(A.stv,-12,12)*.2,-2.5,2.5);
+  pvFrame.style.transform=Math.abs(tilt)>.01?'perspective(1000px) rotateX('+tilt.toFixed(2)+'deg)':'';
+  const y=Math.floor(A.stp+1e-6); let fr=A.stp-y; if(fr<4e-4) fr=0;
+  const ia=arcMod(y,arcN), ib=arcMod(y+1,arcN);
+  const W=pvFrame.clientWidth, H=pvFrame.clientHeight, off=H*.12, N=18;
+  const sy=(q,x)=>(((q-.5)*st+.5-v*.042*Math.sin(x*Math.PI))*H+off);          // card coordinate → layer pixels
+  const sn=Math.sin(fr*Math.PI), t=performance.now()/1e3;
+  const yb=x=>1-fr-sn*(.09*Math.sin(x*Math.PI)+.035*Math.sin(x*7+fr*9+t*1.9))*(.35+amt)*A.sdir;
+  const top=[], mid=[], bot=[];
+  for(let j=0;j<=N;j++){ const x=j/N, px=(x*W).toFixed(1);
+    top.push(px+'px '+sy(0,x).toFixed(1)+'px'); bot.push(px+'px '+sy(1,x).toFixed(1)+'px');
+    mid.push(px+'px '+sy(clamp(yb(x),0,1),x).toFixed(1)+'px'); }
+  const rev=a=>a.slice().reverse();
+  pvA.style.clipPath='polygon('+top.concat(rev(mid)).join(',')+')';
+  pvB.style.clipPath=fr>0?'polygon('+mid.concat(rev(bot)).join(',')+')':'inset(100% 0 0 0)';
+  pvA.style.filter=fr>0?'brightness('+(1-.42*fr).toFixed(3)+')':'';
+  pvA.style.setProperty('--py',(50-fr*22).toFixed(1)+'%'); pvB.style.setProperty('--py',(50+(1-fr)*22).toFixed(1)+'%');
+  const img=i=>ARC_IMG[i]?'url("'+ARC_IMG[i]+'")':'none';
+  if(pvA.dataset.i!==String(ia)){ pvA.dataset.i=ia; pvA.style.setProperty('--img',img(ia)); }
+  if(pvB.dataset.i!==String(ib)){ pvB.dataset.i=ib; pvB.style.setProperty('--img',img(ib)); }
+  return A.stp!==c||A.stv!==0;
+}
 const arcWrap=x=>x-arcM*Math.round(x/arcM);                 // signed distance between rows, around the loop
 const arcMod=(x,n)=>((x%n)+n)%n;
 function arcChars(){ A.chars=arcItems.map(li=>[...li.querySelectorAll('.r1 .c')]); }
@@ -1575,7 +1605,7 @@ function arcClearWaves(){ A.chars.forEach(cs=>cs.forEach(ch=>ch.style.fontWeight
 function arcNormalize(){                                     // keep the resting arc on the real copy
   if(A.wOn||A.waves.size) return;
   const q=Math.floor((Math.round(A.pos)-arcN)/arcN); if(!q) return;
-  const d=q*arcN; A.pos-=d; A.target-=d; A.lastPos-=d; A.lensC-=d; A.wFrom-=d;
+  const d=q*arcN; A.pos-=d; A.target-=d; A.lastPos-=d; A.lensC-=d; A.wFrom-=d; A.stp-=d;
   if(A.hoverK!=null) A.hoverK-=d; if(A.focusK!=null) A.focusK-=d;
 }
 function arcWheelStep(t){            // the component's wheel smoothing: snaps to whole rows once the gesture calms
@@ -1614,8 +1644,9 @@ function arcFrame(t){
     else{ A.waveCand=fk; A.waveCandT=t; }
   }
   arcRender(t,fk);
-  if(!A.moving) arcNormalize();
-  const busy=A.moving||A.lensC!==lt||A.lensAmp<1||A.lean!==0||A.waves.size>0||t-A.introT<450||A.waveCand!==A.waveK;
+  const cardBusy=arcCard(dt);
+  if(!A.moving&&!cardBusy) arcNormalize();
+  const busy=cardBusy||A.moving||A.lensC!==lt||A.lensAmp<1||A.lean!==0||A.waves.size>0||t-A.introT<450||A.waveCand!==A.waveK;
   if(busy) A.raf=requestAnimationFrame(arcFrame); else A.last=0;
 }
 function arcRender(t,fk){
@@ -1633,6 +1664,7 @@ function arcRender(t,fk){
     const mn=li.querySelector('.mn'), a=li.firstElementChild;
     const w=Math.round(ARC.wRest+(ARC.wFocus-ARC.wRest)*g), c=Math.round(g**1.25*100);
     mn.style.fontWeight=String(w);
+    a.style.transform='scaleX('+((78+40*g)/118).toFixed(3)+')';
     a.style.color=c>=100?'var(--arc-on)':c<=0?'var(--arc-off)':'color-mix(in srgb,var(--arc-on) '+c+'%,var(--arc-off))';
     a.style.pointerEvents=op>.3?'auto':'none';
     li.style.opacity=op.toFixed(3);
@@ -1692,7 +1724,7 @@ menu.addEventListener('toggle',e=>{
   const map={top:0,intro:0,projects:1,services:3,studio:4,team:5,contact:6};
   const k=map[curSec]??0, row=arcN+k;
   A.target=row; A.pos=A.lastPos=reduce?row:row-1.6; A.av=0; A.pv=0; A.lean=0; A.hoverK=A.focusK=null; A.wOn=false;
-  A.lensC=A.pos; A.lensV=0; A.lensAmp=reduce?1:0;
+  A.lensC=A.pos; A.lensV=0; A.lensAmp=reduce?1:0; A.stp=A.pos; A.stv=0;
   A.introT=performance.now()+(reduce?-1e4:80); A.shown=-1; A.last=0;
   arcReal[k].firstElementChild.focus({preventScroll:true});
   arcKick();
