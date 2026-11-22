@@ -371,7 +371,14 @@ html.is-dialog{overflow:hidden}
 
 /* Stacking: sections stop at their end and the next one slides over. --st is set by JS (0 or negative for tall sections),
    --cv (0→1) is how much of the section is already covered: it dims and rises a little, slowly. */
-html.stack main>.sec{position:sticky;top:var(--st,0px);transform:translateY(calc(var(--cv,0) * -9vh))}
+/* Cards: a covered section recedes (scales down around the middle of the screen, rounds its corners);
+   the incoming one arrives with rounded top corners that flatten once it fills the screen (--in 0→1). */
+html.stack,html.stack body{background:color-mix(in oklab,var(--klein) 38%,#000614)}
+html.stack main>.sec{position:sticky;top:var(--st,0px);overflow:clip;
+  transform-origin:50% calc(100% - 50vh);
+  transform:translateY(calc(var(--cv,0) * -2.5vh)) scale(calc(1 - var(--cv,0) * .075));
+  border-radius:max(calc((1 - var(--in,1)) * 28px),calc(var(--cv,0) * 22px)) max(calc((1 - var(--in,1)) * 28px),calc(var(--cv,0) * 22px)) calc(var(--cv,0) * 22px) calc(var(--cv,0) * 22px)}
+html.stack main>.sec::after{border-radius:inherit}
 html.stack main>.sec:not(.blue){background:var(--chaux)}
 html.stack main>.sec+.sec{box-shadow:0 -1px 0 var(--line),0 -40px 80px -40px rgb(0 18 70 / .22)}
 html.stack main>.sec.blue+.sec:not(.blue){box-shadow:0 -40px 80px -40px rgb(0 10 50 / .35)}
@@ -1021,6 +1028,7 @@ function coverStack(){
       setV(s,'--p2',clamp((y+H*.9-n.top)/(H*.7)).toFixed(3));
     }
     if(!stackOn) continue;
+    setV(s,'--in',clamp((H-s.getBoundingClientRect().top)/H).toFixed(3));
     const nx=stack[i+1]; let c=0;
     if(nx){const t=nx.getBoundingClientRect().top; c=clamp((H-t)/H)}
     setV(s,'--cv',c.toFixed(3));
