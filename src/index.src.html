@@ -554,42 +554,37 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
   .dots a{height:20px}
 }
 
-/* Header in tiles (replaces the glass): square tiles at rest that widen on hover to show their label, then fold back.
-   Each tile has its own blue, so the header reads the same over lime and over blue sections. */
-.bar,.bar[data-tone="paper"]{top:16px;left:16px;right:16px;height:56px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;text-shadow:none;
-  -webkit-backdrop-filter:none;backdrop-filter:none;color:var(--paper);gap:0}
+/* Minimalist header: one line of text, no boxes. Blue over lime sections, lime over blue ones.
+   Links: a fine underline grows on hover. The menu is a small grid of four squares. */
+.bar,.bar[data-tone="paper"]{top:0;left:0;right:0;height:var(--hdr);padding:0 var(--m);border:0;border-radius:0;background:none;box-shadow:none;text-shadow:none;
+  -webkit-backdrop-filter:none;backdrop-filter:none;gap:clamp(16px,2.4vw,40px);color:var(--klein)}
+.bar[data-tone="paper"],.bar[data-sec="contact"]{color:var(--paper)}
 .bar.scrolled{scale:1;-webkit-backdrop-filter:none;backdrop-filter:none}
-/* Header palette follows the section underneath (set by JS: data-tone, data-sec) */
-.bar{--navy:color-mix(in oklab,var(--klein) 58%,#000614);
-  --hm-bg:var(--klein);--hm-fg:var(--paper);--h1:var(--navy);--h2:color-mix(in oklab,var(--klein) 84%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 64%,var(--chaux));
-  --hl-bg:color-mix(in oklab,var(--klein) 14%,var(--chaux));--hl-fg:var(--klein);--hk-bg:var(--klein);--hk-fg:var(--paper)}
-.bar[data-tone="paper"]{--hm-bg:var(--chaux);--hm-fg:var(--klein);--h1:var(--navy);--h2:color-mix(in oklab,var(--klein) 72%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 48%,var(--chaux));
-  --hl-bg:var(--navy);--hl-fg:var(--paper);--hk-bg:var(--chaux);--hk-fg:var(--klein)}
-.bar[data-sec="contact"]{--hm-bg:var(--klein);--hm-fg:var(--paper);--h1:var(--klein);--h2:color-mix(in oklab,var(--klein) 78%,var(--chaux));--h3:color-mix(in oklab,var(--klein) 56%,var(--chaux));
-  --hl-bg:color-mix(in oklab,var(--klein) 30%,var(--chaux));--hl-fg:var(--klein);--hk-bg:var(--chaux);--hk-fg:var(--klein)}
-.bar-mark,.tile,#langBtn,.bar-menu{transition:width .7s cubic-bezier(.76,0,.24,1),background-color .9s cubic-bezier(.25,1,.5,1),color .9s cubic-bezier(.25,1,.5,1)!important}
-/* the wordmark stays plain text: blue over lime, lime over blue */
-.bar-mark{display:flex;align-items:center;height:56px;padding:0 6px;background:none;color:var(--klein);font-size:1.125rem}
-.bar[data-tone="paper"] .bar-mark,.bar[data-sec="contact"] .bar-mark{color:var(--paper)}
-.bar-r{gap:0;margin-left:auto}
-.tile,#langBtn,.bar-menu{height:56px;min-width:56px;min-height:56px;padding:0;margin:0;background-image:none!important;border-radius:0}
-.tile{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;width:56px;padding:0 0 0 16px;overflow:hidden;white-space:nowrap;text-decoration:none;color:var(--paper);
-  transition:width .7s cubic-bezier(.76,0,.24,1),background .45s}
-.tile .n{font-size:.6875rem;font-weight:600;letter-spacing:.06em;opacity:.8}
-.tile .t{font-size:.875rem;font-weight:600;letter-spacing:.02em;text-transform:uppercase;opacity:0;translate:-8px 0;transition:opacity .35s,translate .6s cubic-bezier(.25,1,.5,1)}
-.tile:hover,.tile:focus-visible{width:168px}
-.tile:hover .t,.tile:focus-visible .t{opacity:1;translate:0 0;transition-delay:.12s}
-.tile:nth-child(1){background:var(--h1)}
-.tile:nth-child(2){background:var(--h2)}
-.tile:nth-child(3){background:var(--h3)}
-#langBtn{justify-content:center;background-color:var(--hl-bg)!important;color:var(--hl-fg);font-size:.75rem;font-weight:600;letter-spacing:.06em}
-#langBtn:hover{filter:brightness(1.08)}
-.bar-menu{display:grid!important;grid-template-columns:repeat(2,7px);gap:5px;place-content:center;background-color:var(--hk-bg)!important;color:var(--hk-fg)}
-.bar-menu i{display:block;width:7px;height:7px;background:currentColor;transition:translate .45s cubic-bezier(.25,1,.5,1)}
-.bar-menu:hover i:nth-of-type(1){translate:-3px -3px}.bar-menu:hover i:nth-of-type(2){translate:3px -3px}.bar-menu:hover i:nth-of-type(3){translate:-3px 3px}.bar-menu:hover i:nth-of-type(4){translate:3px 3px}
-.bar :focus-visible{outline:2px solid var(--paper);outline-offset:-5px}
-#langBtn:focus-visible,.bar-menu:focus-visible{outline-color:var(--klein)}
+.bar,.bar *{transition-property:color,translate,background-size,opacity;transition-duration:.9s;transition-timing-function:cubic-bezier(.25,1,.5,1)}
+.bar-mark{display:flex;align-items:center;padding:0;background:none;color:inherit;font-size:1.125rem}
+.bar-r{gap:clamp(18px,2.4vw,36px);margin-left:auto}
+.tile,#langBtn,.bar-menu{display:inline-flex;align-items:center;min-height:44px;padding:0;margin:0;background-color:transparent!important;color:inherit;text-decoration:none;
+  font-size:var(--fs-small);font-weight:500;background-image:linear-gradient(currentColor,currentColor)!important;background-repeat:no-repeat;background-position:0 calc(50% + .8em);background-size:0 1px}
+.tile:hover,.tile:focus-visible,#langBtn:hover,#langBtn:focus-visible{background-size:100% 1px}
+.tile .n{display:none}
+/* colour code: a small square in front of each link, one blue per section; light shades over blue sections */
+.bar{--c1:color-mix(in oklab,var(--klein) 58%,#000614);--c2:var(--klein);--c3:color-mix(in oklab,var(--klein) 55%,var(--chaux))}
+.bar[data-tone="paper"],.bar[data-sec="contact"]{--c1:var(--chaux);--c2:color-mix(in oklab,var(--klein) 45%,var(--chaux));--c3:color-mix(in oklab,var(--klein) 22%,var(--chaux))}
+.tile{gap:10px}
+.tile::before{content:"";flex:none;width:9px;height:9px;background:var(--c1);transition:rotate .6s cubic-bezier(.25,1,.5,1),background-color .9s}
+.tile:nth-child(2)::before{background:var(--c2)}
+.tile:nth-child(3)::before{background:var(--c3)}
+.tile:hover::before,.tile:focus-visible::before{rotate:45deg}
+.tile{background-position:19px calc(50% + .8em)}
+.tile:hover,.tile:focus-visible{background-size:calc(100% - 19px) 1px}
+.bar-menu{display:grid!important;grid-template-columns:repeat(2,5px);gap:4px;place-content:center;min-width:44px;background-image:none!important}
+.bar-menu i{display:block;width:5px;height:5px;background:currentColor;transition:translate .45s cubic-bezier(.25,1,.5,1)}
+.bar-menu:hover i:nth-of-type(1){translate:-2px -2px}.bar-menu:hover i:nth-of-type(2){translate:2px -2px}.bar-menu:hover i:nth-of-type(3){translate:-2px 2px}.bar-menu:hover i:nth-of-type(4){translate:2px 2px}
+.bar :focus-visible{outline:2px solid currentColor;outline-offset:4px}
 @media (max-width:700px){.tile{display:none}}
+
+/* Sections slide over each other with flat edges: no shadow, no line */
+html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
 /* Team names lead to each profile page */
 .nm-link{display:flex;align-items:baseline;justify-content:space-between;gap:24px;text-decoration:none;color:inherit}
