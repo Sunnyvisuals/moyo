@@ -621,6 +621,11 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   html.js-lines .reveal-lines.in .lead-link{opacity:1;translate:0 0}
 }
 
+/* Team section (on lime): lines and labels in blue */
+.team .names{border-top:1px solid var(--line);margin-top:clamp(8px,2vh,24px)}
+.team .names li{border-bottom:1px solid var(--line)}
+.team .studio-cta{margin-top:clamp(40px,7vh,80px)}
+
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -863,7 +868,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <a href="#projets" data-k="projects"><span class="lbl" data-i="sec.projects">Projets</span></a>
   <a href="#services" data-k="services"><span class="lbl" data-i="sec.services">Services</span></a>
   <a href="#studio" data-k="studio"><span class="lbl" data-i="sec.studio">Studio</span></a>
-  <a href="#lumiere" data-k="light"><span class="lbl" data-i="sec.light">Lumière</span></a>
+  <a href="#equipe" data-k="team"><span class="lbl" data-i="sec.team">L’équipe</span></a>
   <a href="#contact" data-k="contact"><span class="lbl" data-i="sec.contact">Contact</span></a>
 </nav>
 
@@ -970,32 +975,23 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
       </div>
     </div>
     
-    <h3 class="team-t" id="equipe" data-i="teamT">L’équipe.</h3>
+  </div>
+</section>
+
+<!-- Équipe -->
+<section class="sec has-band team" id="equipe" data-sec="team" data-tone="paper" aria-labelledby="teamH">
+  <div class="wrap">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">05</span><span data-i="sec.team">L’équipe</span></p>
+    <div class="sec-head">
+      <h2 class="display par shut grad grad-p" id="teamH" style="--a:36px" data-i="teamH">L’équipe.</h2>
+      <p class="small muted" data-i="teamN">Deux personnes, un studio. Cliquez sur un nom pour découvrir chaque profil.</p>
+    </div>
     <ul class="names" aria-label="Équipe" data-ia="teamAria">
       <li><a class="nm-link" href="/equipe/zahia-bougouffa"><span class="nm par shut" style="--a:40px">Zahia Bougouffa</span><span class="nm-go" data-i="profile">Voir le profil</span></a></li>
       <li><a class="nm-link" href="/equipe/yacine-bouabdallah"><span class="nm par shut" style="--a:-26px">Yacine Bouabdallah</span><span class="nm-go" data-i="profile">Voir le profil</span></a></li>
     </ul>
     <div class="studio-cta"><a class="link" href="#contact" data-i="stuL">Écrire au studio</a></div>
   </div>
-</section>
-
-<!-- Lumière -->
-<section class="sec has-band" id="lumiere" data-sec="light" data-tone="paper" aria-labelledby="lumT">
-  <div class="wrap">
-    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">05</span><span data-i="sec.light">Lumière</span></p>
-    <div class="sec-head">
-      <h2 class="display par shut grad grad-p" id="lumT" style="--a:36px" data-i="lumT">La lumière de Nice, en direct.</h2>
-      <p class="small muted" data-i="lumN">Ce site calcule la position réelle du soleil. Voici les valeurs d’aujourd’hui.</p>
-    </div>
-    <dl class="figs">
-      <div><dt data-i="rise">Lever</dt><dd id="dRise">--:--</dd><p class="fs" id="dRiseS"></p></div>
-      <div><dt data-i="set">Coucher</dt><dd id="dSet">--:--</dd><p class="fs" id="dSetS"></p></div>
-      <div><dt data-i="len">Durée du jour</dt><dd id="dLen">--</dd><p class="fs" id="dLenS"></p></div>
-      <div><dt data-i="elmax">Soleil au plus haut</dt><dd id="dEl">--</dd><p class="fs"><span data-i="lMid">Midi solaire</span> <span id="dNoon">--:--</span></p></div>
-    </dl>
-    <p class="sol" id="yearNote"></p>
-  </div>
-
 
   <div class="blocks blocks-c" aria-hidden="true"><i class="k2" style="--s:4;--r:1;--d:0"></i><i class="k5" style="--s:4;--r:1;--d:0.1"></i><i class="k1" style="--s:4;--r:2;--d:0.2"></i><i class="k3" style="--s:6;--r:1;--d:0.3"></i><i class="k4" style="--s:2;--r:1;--d:0.4"></i></div>
 </section>
@@ -1065,7 +1061,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
         <li><a href="/projets" data-i="sec.all">Tous les projets</a></li>
         <li><a href="#services" data-i="sec.services">Services</a></li>
         <li><a href="#studio" data-i="sec.studio">Studio</a></li>
-        <li><a href="#lumiere" data-i="sec.light">Lumière</a></li>
+        <li><a href="#equipe" data-i="sec.team">L’équipe</a></li>
         <li><a href="#contact" data-i="sec.contact">Contact</a></li>
       </ul>
     </nav>
@@ -1126,7 +1122,7 @@ try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else
 
 /* ---------- Dictionary (French stays in the HTML) ---------- */
 const EN={
- 'skip':'Skip to content','nav':'Main navigation','cue':'Scroll','sec.team':'The team','profile':'See the profile','ctaAria':'Next','ctaTalk':'Talk about your project','ctaSee':'See the projects','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
+ 'skip':'Skip to content','nav':'Main navigation','cue':'Scroll','sec.team':'The team','teamH':'The team.','teamN':'Two people, one studio. Click a name to see each profile.','profile':'See the profile','ctaAria':'Next','ctaTalk':'Talk about your project','ctaSee':'See the projects','homeAria':'moyo, home','dotsAria':'Sections','langAria':'Language',
  'ctLead':'A place, an event, a brand? Tell us about the project. We reply within 48 hours.','ctAlt':'Or directly',
  'fName':'Name','fMail':'Email','fType':'The project','tId':'Identity','tSite':'Website','tData':'Data','tMotion':'Motion','tOther':'Other',
  's5t':'Audiovisual','s5p':'Brand films, shooting, editing and motion design, from storyboard to grading.',
