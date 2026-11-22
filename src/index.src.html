@@ -1183,16 +1183,13 @@ bar.addEventListener('focusin',()=>bar.classList.remove('away'));
 const stackOn=!reduce&&CSS.supports('position','sticky');
 const stack=$$('main > .sec');
 const bands=$$('.blocks'), grads=$$('.grad');
-/* Image pieces take the projects' visuals in turn: photos first (covers and gallery), then the drawn plates. */
+/* Image pieces show real photos only (project covers and galleries from the admin). Without photos, they stay plain colour pieces. */
 (()=>{
-  const all=DATA.projects||[], vis=[];
-  all.forEach(p=>{ if(p.cover) vis.push({cover:p.cover}); (p.images||[]).forEach(id=>vis.push({cover:id})); });
-  all.forEach(p=>{ if(!p.cover&&p.plate) vis.push({plate:p.plate,tone:p.tone}); });
-  if(!vis.length) return;
-  $$('.blocks .pic').forEach(el=>{
-    const v=vis[(+el.dataset.pic||0)%vis.length];
-    el.innerHTML=plateInner(v);
-    if(plateAttrs(v)) el.dataset.t='wash';
+  const photos=[];
+  (DATA.projects||[]).forEach(p=>{ if(p.cover) photos.push(p.cover); (p.images||[]).forEach(id=>photos.push(id)); });
+  $$('.blocks .pic').forEach((el,i)=>{
+    if(!photos.length){ el.className='k'+(1+(i*2)%5); return; }
+    el.innerHTML=`<img src="${imgURL(photos[(+el.dataset.pic||0)%photos.length])}" alt="" loading="lazy" decoding="async">`;
   });
 })();
 function layoutStack(){
