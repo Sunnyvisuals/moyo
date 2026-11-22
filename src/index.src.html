@@ -492,6 +492,10 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--g1)}
 .grad-p{--g1:var(--klein);--g2:color-mix(in oklab,var(--klein) 42%,var(--chaux));--g3:color-mix(in oklab,var(--klein) 14%,var(--chaux));--dot:rgb(241 243 242 / .35)}
 .grad .w,.grad .c,.grad .ln{-webkit-text-fill-color:transparent}
+/* the gradient only paints inside the box: give descenders (the "y" of moyo) room below, without moving the layout */
+.grad{padding-bottom:.14em;margin-bottom:-.14em}
+.monument.grad{padding-bottom:.3em;margin-bottom:calc(.192em - .3em)}
+.entry-w.grad{padding-bottom:.42em;margin-bottom:-.12em}
 @media (forced-colors:active){.grad{background:none;-webkit-text-fill-color:currentColor}}
 
 /* Approach: a larger statement, nothing else */
