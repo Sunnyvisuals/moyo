@@ -1,3 +1,7 @@
 node_modules/
 tests/out/
 __pycache__/
+dist/
+.wrangler/
+.dev.vars
+MOT-DE-PASSE-ADMIN.txt

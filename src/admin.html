@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<title>Admin · Moyo Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:"Hanken Grotesk";src:url(/fonts/hanken-grotesk.woff2) format("woff2");font-weight:100 900;font-display:swap}
+:root{
+  --chaux:#F1F3F2;--klein:#002FA7;--paper:#F1F3F2;--white:#fff;
+  --soft:color-mix(in oklab,var(--klein) 74%,var(--chaux));
+  --line:color-mix(in oklab,var(--klein) 24%,var(--chaux));
+  --wash:color-mix(in oklab,var(--klein) 7%,var(--chaux));
+  --danger:#B42318;
+  --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --m:clamp(16px,2.4vw,40px);
+  --fs-small:.875rem;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{background:var(--chaux)}
+body{margin:0;color:var(--klein);font-family:var(--sans);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+h1,h2,h3,p,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit;text-underline-offset:3px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--klein);outline-offset:2px}
+[hidden]{display:none!important}
+.small{font-size:var(--fs-small)}
+.muted{color:var(--soft)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 16px;border:1px solid var(--klein);background:transparent;font-size:var(--fs-small);font-weight:550;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--wash)}
+.btn.primary{background:var(--klein);color:var(--paper)}
+.btn.primary:hover{background:color-mix(in oklab,var(--klein) 86%,#000)}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.danger:hover{background:color-mix(in oklab,var(--danger) 8%,var(--chaux))}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:32px;padding:4px 10px}
+.icon{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);background:var(--white);font-size:.95rem;line-height:1}
+.icon:hover{border-color:var(--klein)}
+.icon:disabled{opacity:.35;cursor:not-allowed}
+
+/* Login */
+.login{min-height:100svh;display:grid;place-items:center;padding:var(--m)}
+.login form{width:min(380px,100%);display:grid;gap:16px}
+.login h1{font-size:2.25rem;font-weight:350;letter-spacing:-.03em;line-height:1.05}
+
+/* Fields */
+label{display:block;font-size:var(--fs-small);font-weight:550;margin-bottom:4px}
+input[type=text],input[type=password],input:not([type]),select,textarea{width:100%;min-height:40px;padding:8px 10px;border:1px solid var(--line);background:var(--white);border-radius:0}
+input:focus,select:focus,textarea:focus{border-color:var(--klein);outline:none;box-shadow:0 0 0 1px var(--klein)}
+textarea{min-height:140px;resize:vertical;line-height:1.5}
+.check{display:flex;align-items:center;gap:10px;font-weight:500;font-size:1rem;margin:0}
+.check input{width:20px;height:20px;accent-color:var(--klein)}
+.hint{font-size:.8125rem;color:var(--soft);margin-top:4px}
+
+/* App layout */
+.appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px var(--m);background:var(--klein);color:var(--paper)}
+.appbar .brand{font-weight:600;letter-spacing:-.01em;margin-right:auto}
+.appbar .brand span{font-weight:400;opacity:.75}
+.appbar .btn{border-color:var(--paper);color:var(--paper)}
+.appbar .btn:hover{background:color-mix(in oklab,var(--klein) 80%,var(--paper))}
+.appbar .btn.primary{background:var(--paper);color:var(--klein)}
+.appbar .btn.primary:hover{background:color-mix(in oklab,var(--paper) 88%,var(--klein))}
+.appbar :focus-visible{outline-color:var(--paper)}
+.status{font-size:var(--fs-small);opacity:.9}
+.layout{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:var(--m);padding:var(--m);max-width:1400px;margin:0 auto;align-items:start}
+.side{position:sticky;top:76px;display:grid;gap:12px}
+.side-head{display:flex;gap:8px;flex-wrap:wrap}
+.plist{border:1px solid var(--line);background:var(--white);max-height:calc(100svh - 200px);overflow:auto}
+.plist li{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line);padding:6px 6px 6px 0}
+.plist li:last-child{border-bottom:0}
+.plist li.on{background:var(--wash);box-shadow:inset 3px 0 0 var(--klein)}
+.plist .pick{flex:1;min-width:0;display:grid;grid-template-columns:44px minmax(0,1fr);gap:2px 10px;align-items:center;text-align:left;background:none;border:0;padding:4px 0 4px 10px}
+.plist .thumb{grid-row:span 2;width:44px;height:35px;position:relative;overflow:hidden;background:var(--klein);color:var(--chaux)}
+.plist .thumb[data-t=wash]{background:var(--wash);color:var(--klein)}
+.plist .thumb svg{position:absolute;inset:0;width:100%;height:100%}
+.plist .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.plist .t{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plist .s{font-size:.75rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plist .star{color:var(--klein)}
+.plist .mv{display:flex;flex-direction:column;gap:2px}
+.plist .mv .icon{width:26px;height:22px;font-size:.7rem}
+
+.panel{background:var(--white);border:1px solid var(--line);padding:clamp(16px,2.4vw,32px)}
+.panel h2{font-size:1.75rem;font-weight:400;letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}
+.section{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+.section>h3{font-size:1rem;font-weight:600;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.lang{display:inline-block;font-size:.6875rem;font-weight:700;letter-spacing:.06em;padding:1px 5px;margin-right:6px;background:var(--wash);vertical-align:1px}
+.req::after{content:" *";color:var(--danger)}
+
+/* Images */
+.cover{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:20px;align-items:start}
+.preview{position:relative;aspect-ratio:5/4;overflow:hidden;background:var(--klein);color:var(--chaux)}
+.preview[data-t=wash]{background:var(--wash);color:var(--klein)}
+.preview svg{position:absolute;left:0;top:-12%;width:100%;height:124%}
+.preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover .actions{display:grid;gap:10px;justify-items:start}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gallery li{border:1px solid var(--line);background:var(--chaux)}
+.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.gallery .bar{display:flex;justify-content:space-between;padding:4px;gap:4px}
+.drop{border:1px dashed var(--soft);padding:18px;text-align:center;color:var(--soft);font-size:var(--fs-small)}
+.drop.over{background:var(--wash);border-color:var(--klein);color:var(--klein)}
+.busy{font-size:var(--fs-small);color:var(--soft)}
+
+/* Categories */
+.cats li{display:grid;grid-template-columns:150px 1fr 1fr auto;gap:10px;align-items:end;padding:10px 0;border-bottom:1px solid var(--line)}
+.cats .n{font-size:.75rem;color:var(--soft);padding-bottom:10px;white-space:nowrap}
+
+.danger-zone{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:20px;translate:-50% 0;z-index:50;max-width:min(560px,calc(100vw - 32px));padding:12px 18px;background:var(--klein);color:var(--paper);font-size:var(--fs-small);white-space:pre-line;box-shadow:0 8px 30px rgb(0 20 80 / .25)}
+.toast.err{background:var(--danger)}
+.empty-state{padding:48px 0;text-align:center;color:var(--soft)}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr}
+  .side{position:static}
+  .plist{max-height:320px}
+  .grid2,.grid3,.cover{grid-template-columns:1fr}
+  .cats li{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<section class="login" id="loginView" hidden>
+  <form id="loginForm">
+    <h1>moyo<br><span class="muted">administration</span></h1>
+    <p class="small muted" id="loginNote">Entrez le mot de passe du studio pour modifier les projets.</p>
+    <div>
+      <label for="pw">Mot de passe</label>
+      <input id="pw" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="btn primary" type="submit" id="loginBtn">Se connecter</button>
+    <p class="small" role="alert" id="loginErr" style="color:var(--danger)"></p>
+    <a class="small" href="/">← Retour au site</a>
+  </form>
+</section>
+
+<!-- App -->
+<div id="appView" hidden>
+  <header class="appbar">
+    <p class="brand">moyo <span>· admin</span></p>
+    <span class="status" id="status" aria-live="polite"></span>
+    <button class="btn primary" type="button" id="saveBtn" disabled>Enregistrer et publier</button>
+    <a class="btn" href="/" target="_blank" rel="noopener">Voir le site ↗</a>
+    <button class="btn" type="button" id="logoutBtn">Déconnexion</button>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <div class="side-head">
+        <button class="btn primary" type="button" id="addBtn">+ Nouveau projet</button>
+        <button class="btn" type="button" id="catsBtn">Catégories</button>
+      </div>
+      <ol class="plist" id="plist" aria-label="Projets"></ol>
+      <p class="small muted">★ = affiché sur l’accueil. L’ordre de la liste est l’ordre du site.</p>
+    </aside>
+
+    <main id="editor" class="panel" aria-live="polite"></main>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const H={'X-Moyo-Admin':'1'};
+const imgURL=id=>'/img/'+encodeURIComponent(id);
+const FALLBACK='<svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><rect x="110" y="70" width="280" height="76"/><rect x="110" y="162" width="280" height="76"/><rect x="110" y="254" width="280" height="76"/></g></svg>';
+
+let data=null;        // working copy
+let savedJSON='';     // last saved version, to know if something changed
+let savedImages=new Set();
+let sel=null;         // selected project id, or '__cats'
+
+/* ---------- helpers ---------- */
+let toastT;
+function toast(msg,err){const t=$('#toast');t.textContent=msg;t.classList.toggle('err',!!err);t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,err?7000:3200)}
+async function api(path,opt={}){
+  const res=await fetch(path,{credentials:'same-origin',...opt,headers:{...H,...(opt.headers||{})}});
+  let body=null; try{body=await res.json()}catch(e){}
+  if(res.status===401&&path!=='/api/login'){showLogin('Session expirée, reconnectez-vous.');throw new Error('401')}
+  if(!res.ok) throw new Error(body?.message||('Erreur '+res.status));
+  return body;
+}
+const slugify=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'projet';
+function uniqueId(base,except){let id=base,n=2;while(data.projects.some(p=>p.id===id&&p!==except)) id=(base.slice(0,56)+'-'+n++);return id}
+const imagesOf=d=>{const s=new Set();for(const p of d.projects){if(p.cover)s.add(p.cover);(p.images||[]).forEach(i=>s.add(i))}return s};
+const dirty=()=>JSON.stringify(data)!==savedJSON;
+function refreshDirty(){const d=dirty();$('#saveBtn').disabled=!d;$('#status').textContent=d?'Modifications non publiées':'Tout est publié'}
+const catName=id=>data.categories.find(c=>c.id===id)?.fr||'Sans catégorie';
+function plateHTML(p){return p.cover?`<img src="${imgURL(p.cover)}" alt="">`:(p.plate||FALLBACK)}
+
+/* ---------- views ---------- */
+function showLogin(note){
+  $('#appView').hidden=true; $('#loginView').hidden=false;
+  if(note) $('#loginNote').textContent=note;
+  $('#pw').value=''; $('#pw').focus();
+}
+async function showApp(){
+  $('#loginView').hidden=true; $('#appView').hidden=false;
+  const d=await api('/api/projects');
+  data=d; savedJSON=JSON.stringify(d); savedImages=imagesOf(d);
+  sel=data.projects[0]?.id||null;
+  renderList(); renderEditor(); refreshDirty();
+}
+
+function renderList(){
+  const L=$('#plist');
+  if(!data.projects.length){L.innerHTML='<li class="empty-state" style="display:block;padding:24px">Aucun projet.</li>';return}
+  L.innerHTML=data.projects.map((p,i)=>`<li class="${p.id===sel?'on':''}" data-id="${esc(p.id)}">
+    <button type="button" class="pick" data-act="pick" aria-current="${p.id===sel}">
+      <span class="thumb"${!p.cover&&p.tone==='wash'?' data-t="wash"':''} aria-hidden="true">${plateHTML(p)}</span>
+      <span class="t">${p.featured?'<span class="star" title="Sur l’accueil">★ </span>':''}${esc(p.fr.title||'(sans titre)')}</span>
+      <span class="s">${esc([p.year,catName(p.category)].filter(Boolean).join(' · '))}</span>
+    </button>
+    <span class="mv"><button type="button" class="icon" data-act="up" aria-label="Monter ${esc(p.fr.title)}" ${i===0?'disabled':''}>▲</button><button type="button" class="icon" data-act="down" aria-label="Descendre ${esc(p.fr.title)}" ${i===data.projects.length-1?'disabled':''}>▼</button></span>
+  </li>`).join('');
+}
+$('#plist').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const id=b.closest('li').dataset.id, i=data.projects.findIndex(p=>p.id===id);
+  if(b.dataset.act==='pick'){sel=id;renderList();renderEditor();$('#editor').scrollIntoView({block:'start',behavior:'smooth'});return}
+  const j=b.dataset.act==='up'?i-1:i+1; if(j<0||j>=data.projects.length) return;
+  [data.projects[i],data.projects[j]]=[data.projects[j],data.projects[i]];
+  renderList(); refreshDirty();
+  $(`#plist li[data-id="${CSS.escape(id)}"] [data-act="${b.dataset.act}"]`)?.focus();
+});
+
+function field(id,label,val,{req,area,hint,lang}={}){
+  const l=lang?`<span class="lang">${lang}</span>`:'';
+  const input=area?`<textarea id="${id}" name="${id}">${esc(val)}</textarea>`:`<input type="text" id="${id}" name="${id}" value="${esc(val)}"${req?' required':''}>`;
+  return `<div><label for="${id}" class="${req?'req':''}">${l}${label}</label>${input}${hint?`<p class="hint">${hint}</p>`:''}</div>`;
+}
+
+function renderEditor(){
+  const E=$('#editor');
+  if(sel==='__cats') return renderCats();
+  const p=data.projects.find(p=>p.id===sel);
+  if(!p){E.innerHTML='<div class="empty-state"><p>Aucun projet sélectionné.</p><p class="small">Créez un projet avec « + Nouveau projet ».</p></div>';return}
+  E.innerHTML=`
+  <h2>${esc(p.fr.title||'Nouveau projet')}</h2>
+  <p class="small muted">Les champs anglais vides reprennent le texte français.</p>
+
+  <div class="section"><h3>Textes</h3>
+    <div class="grid2">
+      ${field('fr_title','Titre',p.fr.title,{req:1,lang:'FR'})}${field('en_title','Titre',p.en.title,{lang:'EN'})}
+      ${field('fr_type','Type de projet',p.fr.type,{lang:'FR',hint:'Ex. : Identité et site, Atlas, Installation…'})}${field('en_type','Type de projet',p.en.type,{lang:'EN'})}
+      ${field('fr_role','Rôle du studio',p.fr.role,{lang:'FR'})}${field('en_role','Rôle du studio',p.en.role,{lang:'EN'})}
+      ${field('fr_place','Lieu',p.fr.place,{lang:'FR'})}${field('en_place','Lieu',p.en.place,{lang:'EN'})}
+      ${field('fr_desc','Description',p.fr.desc,{area:1,lang:'FR'})}${field('en_desc','Description',p.en.desc,{area:1,lang:'EN'})}
+    </div>
+  </div>
+
+  <div class="section"><h3>Classement</h3>
+    <div class="grid3">
+      ${field('year','Année',p.year)}
+      <div><label for="category">Catégorie</label><select id="category">
+        <option value="">Sans catégorie</option>
+        ${data.categories.map(c=>`<option value="${esc(c.id)}"${c.id===p.category?' selected':''}>${esc(c.fr)}</option>`).join('')}
+      </select><p class="hint"><button type="button" class="btn sm" data-act="cats" style="margin-top:4px">Gérer les catégories</button></p></div>
+      <div><label for="pid">Identifiant (URL)</label><input type="text" id="pid" value="${esc(p.id)}" pattern="[a-z0-9][a-z0-9-]*"><p class="hint">Minuscules, chiffres et tirets.</p></div>
+    </div>
+    <p style="margin-top:16px"><label class="check"><input type="checkbox" id="featured"${p.featured?' checked':''}> Afficher sur la page d’accueil</label></p>
+  </div>
+
+  <div class="section"><h3>Image principale</h3>
+    <div class="cover">
+      <div class="preview"${!p.cover&&p.tone==='wash'?' data-t="wash"':''} id="coverPrev">${plateHTML(p)}</div>
+      <div class="actions">
+        <p class="small muted">${p.cover?'Photo de couverture.':(p.plate?'Pas de photo : le motif dessiné du projet est affiché.':'Pas de photo : un motif par défaut est affiché.')}</p>
+        <label class="btn" style="margin:0">${p.cover?'Remplacer la photo':'Choisir une photo'}<input type="file" id="coverIn" accept="image/*" hidden></label>
+        ${p.cover?'<button type="button" class="btn danger sm" data-act="rmCover">Retirer la photo</button>':''}
+        ${!p.cover?`<div><label for="tone">Fond du motif</label><select id="tone"><option value="klein"${p.tone!=='wash'?' selected':''}>Bleu Klein</option><option value="wash"${p.tone==='wash'?' selected':''}>Blanc de chaux</option></select></div>`:''}
+        <span class="busy" id="coverBusy"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section"><h3>Galerie <span class="muted small">(${(p.images||[]).length} image${(p.images||[]).length>1?'s':''})</span></h3>
+    <ul class="gallery" id="gallery">${(p.images||[]).map((id,i,a)=>`<li data-img="${esc(id)}"><img src="${imgURL(id)}" alt="Image ${i+1}" loading="lazy">
+      <div class="bar"><span><button type="button" class="icon" data-act="gl" aria-label="Déplacer l’image ${i+1} à gauche" ${i===0?'disabled':''}>←</button> <button type="button" class="icon" data-act="gr" aria-label="Déplacer l’image ${i+1} à droite" ${i===a.length-1?'disabled':''}>→</button></span>
+      <button type="button" class="icon" data-act="gx" aria-label="Supprimer l’image ${i+1}" style="color:var(--danger)">✕</button></div></li>`).join('')}</ul>
+    <div class="drop" id="drop" style="margin-top:12px">Glissez des images ici, ou <label style="display:inline;font-weight:600;text-decoration:underline;cursor:pointer">choisissez des fichiers<input type="file" id="galIn" accept="image/*" multiple hidden></label>.<br><span class="small">Elles sont redimensionnées (2400 px max) avant l’envoi.</span></div>
+    <p class="busy" id="galBusy"></p>
+  </div>
+
+  <div class="section danger-zone">
+    <p class="small muted">Rien n’est en ligne tant que vous n’avez pas cliqué sur « Enregistrer et publier ».</p>
+    <button type="button" class="btn danger" data-act="delete">Supprimer ce projet</button>
+  </div>`;
+}
+
+/* Editor events: delegated once on #editor (its content is redrawn often). */
+const E=$('#editor');
+const curP=()=>data&&sel!=='__cats'?data.projects.find(p=>p.id===sel):null;
+const KEYS=['title','type','role','place','desc'];
+E.addEventListener('input',e=>{
+  if(sel==='__cats'){
+    const li=e.target.closest('#cats li'); if(!li) return;
+    const c=data.categories.find(c=>c.id===li.dataset.id); if(!c) return;
+    c[e.target.dataset.k]=e.target.value; refreshDirty(); renderList(); return;
+  }
+  const p=curP(); if(!p) return;
+  const t=e.target, id=t.id, m=id.match(/^(fr|en)_(\w+)$/);
+  if(m&&KEYS.includes(m[2])){ p[m[1]][m[2]]=t.value; if(id==='fr_title'){ $('h2',E).textContent=t.value||'Nouveau projet'; renderList(); } }
+  else if(id==='year') p.year=t.value;
+  else if(id==='category'){ p.category=t.value; renderList(); }
+  else if(id==='featured'){ p.featured=t.checked; renderList(); }
+  else if(id==='tone'){ p.tone=t.value; $('#coverPrev').dataset.t=t.value==='wash'?'wash':''; renderList(); }
+  else return;
+  refreshDirty();
+});
+E.addEventListener('change',async e=>{
+  const p=curP(); if(!p) return;
+  const t=e.target;
+  if(t.id==='pid'){ const id=uniqueId(slugify(t.value),p); t.value=id; p.id=id; sel=id; renderList(); refreshDirty(); }
+  else if(t.id==='coverIn'){
+    const f=t.files[0]; if(!f) return;
+    $('#coverBusy').textContent='Envoi en cours…';
+    try{ const id=await upload(f); const old=p.cover; p.cover=id; dropIfUnsaved(old); if(curP()===p) renderEditor(); renderList(); refreshDirty(); toast('Photo ajoutée. Pensez à publier.'); }
+    catch(err){ if($('#coverBusy')) $('#coverBusy').textContent=''; toast(err.message,true); }
+  }
+  else if(t.id==='galIn') addFiles(p,t.files);
+});
+E.addEventListener('dragover',e=>{const d=e.target.closest('#drop'); if(d){e.preventDefault();d.classList.add('over')}});
+E.addEventListener('dragleave',e=>{e.target.closest('#drop')?.classList.remove('over')});
+E.addEventListener('drop',e=>{const d=e.target.closest('#drop'); if(!d) return; e.preventDefault(); d.classList.remove('over'); const p=curP(); if(p) addFiles(p,e.dataTransfer.files)});
+async function addFiles(p,files){
+  files=[...files].filter(f=>f.type.startsWith('image/')); if(!files.length) return;
+  let ok=0;
+  for(const [k,f] of files.entries()){
+    if($('#galBusy')) $('#galBusy').textContent=`Envoi ${k+1} / ${files.length}…`;
+    try{ const id=await upload(f); (p.images||=[]).push(id); ok++; }catch(err){ toast(f.name+' : '+err.message,true); }
+  }
+  if(curP()===p) renderEditor(); refreshDirty(); if(ok) toast(`${ok} image${ok>1?'s':''} ajoutée${ok>1?'s':''}. Pensez à publier.`);
+}
+E.addEventListener('submit',e=>{
+  if(e.target.id!=='catAdd') return;
+  e.preventDefault();
+  const fr=$('#newFr').value.trim(); if(!fr) return;
+  let id=slugify(fr), n=2; const base=id; while(data.categories.some(c=>c.id===id)) id=base+'-'+n++;
+  data.categories.push({id,fr,en:$('#newEn').value.trim()||fr});
+  renderCats(); refreshDirty(); $('#newFr').focus();
+});
+E.addEventListener('click',e=>{
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    const act=b.dataset.act;
+    if(act==='cats'){ sel='__cats'; renderList(); renderEditor(); return; }
+    if(act==='back'){ sel=data.projects[0]?.id||null; renderList(); renderEditor(); return; }
+    if(act==='rm'){ const id=b.closest('li').dataset.id; data.categories=data.categories.filter(c=>c.id!==id); renderCats(); refreshDirty(); return; }
+    const p=curP(); if(!p) return;
+    if(act==='rmCover'){ const old=p.cover; p.cover=null; dropIfUnsaved(old); renderEditor(); renderList(); refreshDirty(); return; }
+    if(act==='delete'){
+      if(!confirm(`Supprimer « ${p.fr.title||p.id} » ? Le projet disparaîtra du site à la prochaine publication.`)) return;
+      const i=data.projects.indexOf(p); data.projects.splice(i,1);
+      [p.cover,...(p.images||[])].forEach(dropIfUnsaved);
+      sel=data.projects[Math.min(i,data.projects.length-1)]?.id||null; renderList(); renderEditor(); refreshDirty(); return;
+    }
+    const li=b.closest('[data-img]'); if(!li) return;
+    const i=p.images.indexOf(li.dataset.img);
+    if(act==='gx'){ const [old]=p.images.splice(i,1); dropIfUnsaved(old); }
+    else { const j=act==='gl'?i-1:i+1; [p.images[i],p.images[j]]=[p.images[j],p.images[i]]; }
+    renderEditor(); refreshDirty();
+});
+
+/* Uploaded but never published, then removed: delete it from storage now. */
+function dropIfUnsaved(id){
+  if(!id||savedImages.has(id)||imagesOf(data).has(id)) return;
+  api('/api/images/'+encodeURIComponent(id),{method:'DELETE'}).catch(()=>{});
+}
+
+/* Resize in the browser before upload: long side 2400 px, WebP (JPEG if WebP is not available). GIFs are sent as is. */
+async function upload(file){
+  let blob=file;
+  if(file.type!=='image/gif'){
+    try{
+      const bmp=await createImageBitmap(file);
+      const s=Math.min(1,2400/Math.max(bmp.width,bmp.height));
+      const c=document.createElement('canvas'); c.width=Math.round(bmp.width*s); c.height=Math.round(bmp.height*s);
+      c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+      blob=await new Promise(r=>c.toBlob(r,'image/webp',.86));
+      if(!blob||blob.type!=='image/webp') blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.88));
+    }catch(e){ blob=file; }
+  }
+  if(blob.size>10*1024*1024) throw new Error('Image trop lourde (10 Mo maximum).');
+  const r=await api('/api/images',{method:'POST',headers:{'Content-Type':blob.type},body:blob});
+  return r.id;
+}
+
+/* ---------- categories ---------- */
+function renderCats(){
+  const E=$('#editor');
+  const count=id=>data.projects.filter(p=>p.category===id).length;
+  E.innerHTML=`<h2>Catégories</h2>
+  <p class="small muted">Elles servent de filtres sur la page « Tous les projets ». Une catégorie sans projet n’y est pas affichée.</p>
+  <ul class="cats section" id="cats">${data.categories.map(c=>`<li data-id="${esc(c.id)}">
+    <div><label>Identifiant</label><input type="text" value="${esc(c.id)}" disabled></div>
+    <div><label for="c_fr_${esc(c.id)}"><span class="lang">FR</span>Nom</label><input type="text" id="c_fr_${esc(c.id)}" data-k="fr" value="${esc(c.fr)}"></div>
+    <div><label for="c_en_${esc(c.id)}"><span class="lang">EN</span>Nom</label><input type="text" id="c_en_${esc(c.id)}" data-k="en" value="${esc(c.en)}"></div>
+    <div style="display:flex;gap:8px;align-items:center"><span class="n">${count(c.id)} projet${count(c.id)>1?'s':''}</span><button type="button" class="btn danger sm" data-act="rm" ${count(c.id)?'disabled title="Retirez d’abord cette catégorie de ses projets"':''}>Supprimer</button></div>
+  </li>`).join('')}</ul>
+  <form id="catAdd" class="section" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
+    <div><label for="newFr" class="req"><span class="lang">FR</span>Nouvelle catégorie</label><input type="text" id="newFr" required></div>
+    <div><label for="newEn"><span class="lang">EN</span>Nom anglais</label><input type="text" id="newEn"></div>
+    <button class="btn primary" type="submit">Ajouter</button>
+  </form>
+  <p class="section"><button type="button" class="btn" data-act="back">← Retour aux projets</button></p>`;
+}
+
+/* ---------- top-level actions ---------- */
+$('#addBtn').addEventListener('click',()=>{
+  const id=uniqueId('nouveau-projet');
+  const p={id,year:String(new Date().getFullYear()),category:data.categories[0]?.id||'',featured:false,tone:'klein',cover:null,images:[],plate:'',
+    fr:{title:'',type:'',role:'',place:'',desc:''},en:{title:'',type:'',role:'',place:'',desc:''}};
+  data.projects.unshift(p); sel=id; renderList(); renderEditor(); refreshDirty();
+  const t=$('#fr_title'); t.focus();
+  t.addEventListener('change',()=>{ if(p.id.startsWith('nouveau-projet')&&t.value){ p.id=uniqueId(slugify(t.value),p); sel=p.id; $('#pid').value=p.id; renderList(); refreshDirty(); } },{once:true});
+});
+$('#catsBtn').addEventListener('click',()=>{sel='__cats';renderList();renderEditor()});
+
+$('#saveBtn').addEventListener('click',async()=>{
+  const missing=data.projects.find(p=>!p.fr.title.trim());
+  if(missing){ sel=missing.id; renderList(); renderEditor(); $('#fr_title').focus(); toast('Chaque projet doit avoir un titre en français.',true); return; }
+  const b=$('#saveBtn'); b.disabled=true; $('#status').textContent='Publication…';
+  try{
+    const r=await api('/api/projects',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    data=r.data; savedJSON=JSON.stringify(data); savedImages=imagesOf(data);
+    if(sel!=='__cats'&&!data.projects.some(p=>p.id===sel)) sel=data.projects[0]?.id||null;
+    renderList(); renderEditor(); refreshDirty();
+    toast('Publié. Le site est à jour.');
+  }catch(err){ refreshDirty(); if(err.message!=='401') toast(err.message,true); }
+});
+
+$('#logoutBtn').addEventListener('click',async()=>{
+  if(dirty()&&!confirm('Des modifications ne sont pas publiées. Se déconnecter quand même ?')) return;
+  await api('/api/logout',{method:'POST'}).catch(()=>{});
+  data=null; savedJSON=''; showLogin('Vous êtes déconnecté.');
+});
+addEventListener('beforeunload',e=>{ if(data&&dirty()){ e.preventDefault(); e.returnValue=''; } });
+addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='s'&&data){ e.preventDefault(); if(!$('#saveBtn').disabled) $('#saveBtn').click(); } });
+
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const b=$('#loginBtn'); b.disabled=true; $('#loginErr').textContent='';
+  try{ await api('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#pw').value})}); await showApp(); }
+  catch(err){ $('#loginErr').textContent=err.message; }
+  finally{ b.disabled=false; }
+});
+
+/* ---------- start ---------- */
+(async()=>{
+  try{
+    const me=await api('/api/me');
+    if(!me.configured){ showLogin(); $('#loginForm').innerHTML='<h1>moyo<br><span class="muted">administration</span></h1><p>Le mot de passe admin n’est pas encore défini. Ajoutez la variable secrète <b>ADMIN_PASSWORD</b> au projet Cloudflare Pages, puis redéployez.</p>'; return; }
+    if(me.admin) await showApp(); else showLogin();
+  }catch(err){ if(err.message!=='401'){ showLogin(); $('#loginErr').textContent='Le serveur ne répond pas ('+err.message+').'; } }
+})();
+})();
+</script>
+</body>
+</html>

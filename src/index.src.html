@@ -36,6 +36,7 @@
   --fs-display:clamp(2.125rem,3.9vw,3.75rem);
     --dur-1:450ms; --dur-3:950ms; --dur-4:1500ms; --dur-5:2400ms;
   --barw:min(380px,calc(100vw - 24px));
+  --hdr:clamp(64px,8vh,84px);
   --spring:linear(0,.2 8%,.62 22%,.92 38%,1.03 52%,1.01 66%,1 80%,1);
   --ease-enter:cubic-bezier(.25,1,.5,1);
   --ease-move:cubic-bezier(.76,0,.24,1);
@@ -77,37 +78,51 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .blue :focus-visible{outline-color:var(--paper)}
 .blue ::selection{background:var(--paper);color:var(--klein)}
 
-/* Bar */
-.bar{--rail:3px;box-shadow:calc(var(--sx,.22) * 7px) calc(var(--sy,.9) * 7px) 0 0 rgb(0 8 60 / calc(var(--a,.26) * 1.05));position:fixed;z-index:80;left:50%;bottom:clamp(12px,2vw,20px);width:var(--barw);height:56px;transform:translateX(-50%);display:flex;align-items:stretch;gap:var(--rail);padding:var(--rail);background:var(--paper);color:var(--paper);transition:background var(--dur-3) var(--ease-enter),transform var(--dur-3) var(--ease-enter)}
-.bar[data-tone="paper"]{background:var(--klein)}
-.bar.away{transform:translate(-50%,calc(100% + 28px));visibility:hidden;transition:transform var(--dur-3) var(--ease-enter),visibility 0s linear var(--dur-3)}
-.bar :focus-visible{outline-color:currentColor;outline-offset:-4px}
-.bar>*{display:flex;align-items:center;padding:0 16px;font-size:var(--fs-small);font-weight:500;white-space:nowrap;background:var(--klein);color:var(--paper);transition:background var(--dur-3) var(--ease-enter),color var(--dur-3) var(--ease-enter)}
-.bar[data-tone="paper"]>*{background:var(--paper);color:var(--klein)}
-.bar-now{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.bar>.bar-time{gap:9px;padding:0 13px;justify-content:center;font-weight:400;font-variant-numeric:tabular-nums}
-.bar-time .dial{flex:none;width:28px;height:16px;overflow:visible}
-.bar-time .dial .arc{fill:none;stroke:currentColor;stroke-opacity:.45;stroke-width:1.2}
-.bar-time .dial .hz{stroke:currentColor;stroke-opacity:.45;stroke-width:1.2}
+/* Header: one thin line of text over the page. Its colour follows what is under it (blue on lime, lime on blue);
+   it slides away while you read downwards and comes back as soon as you scroll up. */
+.bar{position:fixed;z-index:80;top:0;left:0;right:0;height:var(--hdr);display:flex;align-items:center;gap:clamp(16px,2.4vw,40px);padding:0 var(--m);color:var(--klein);font-size:var(--fs-small);font-weight:500;pointer-events:none;
+  transition:color var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter)}
+.bar>*,.bar-r>*{pointer-events:auto}
+.bar[data-tone="paper"]{color:var(--paper)}
+.bar::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--chaux);opacity:0;transition:opacity var(--dur-1),background var(--dur-3) var(--ease-enter)}
+.bar[data-tone="paper"]::before{background:var(--klein)}
+.bar.solid::before{opacity:1}
+.bar.away{translate:0 -100%}
+.bar :focus-visible{outline-color:currentColor;outline-offset:4px}
+.bar-mark{font-size:1.125rem;font-weight:550;letter-spacing:-.02em;text-decoration:none}
+.bar-now{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.62;padding-left:clamp(16px,2.4vw,40px);border-left:1px solid currentColor;line-height:1;transition:opacity var(--dur-3)}
+.bar-r{margin-left:auto;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px)}
+.bar-time{display:flex;align-items:center;gap:9px;font-weight:400;font-variant-numeric:tabular-nums}
+.bar-time .dial{flex:none;width:24px;height:14px;overflow:visible}
+.bar-time .dial .arc,.bar-time .dial .hz{fill:none;stroke:currentColor;stroke-opacity:.5;stroke-width:1.1}
 .bar-time .dial circle{fill:currentColor}
-.bar button{min-width:44px;transition:background var(--dur-1),color var(--dur-3) var(--ease-enter)}
-.bar button:hover{background:color-mix(in oklab,var(--klein) 86%,var(--paper))}
-.bar[data-tone="paper"] button:hover{background:color-mix(in oklab,var(--paper) 88%,var(--klein))}
+.bar button{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:24px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
+.bar button:hover{background-size:100% 1px}
+.bar-menu{background:none!important}
+.bar-menu svg{width:22px;height:10px;overflow:visible}
+.bar-menu path{stroke:currentColor;stroke-width:1.2;transition:d var(--dur-3) var(--ease-enter)}
+.bar-menu:hover path{d:path("M0 1h22M6 9h16")}
+@media (max-width:700px){.bar-now{display:none}}
+@media (max-width:380px){.bar-time .dial{display:none}}
 
 /* Menu (popover) */
 #menu{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--klein);color:var(--paper);overflow:auto;clip-path:inset(0);
   transition:clip-path var(--dur-4) var(--ease-move),overlay var(--dur-4) allow-discrete,display var(--dur-4) allow-discrete}
-#menu:not(:popover-open){clip-path:inset(calc(100% - clamp(68px,calc(2vw + 56px),76px)) calc((100% - var(--barw)) / 2) clamp(12px,2vw,20px) calc((100% - var(--barw)) / 2))}
-@starting-style{#menu:popover-open{clip-path:inset(calc(100% - clamp(68px,calc(2vw + 56px),76px)) calc((100% - var(--barw)) / 2) clamp(12px,2vw,20px) calc((100% - var(--barw)) / 2))}}
+/* the menu comes down like a blind, from the header */
+#menu:not(:popover-open){clip-path:inset(0 0 100% 0)}
+@starting-style{#menu:popover-open{clip-path:inset(0 0 100% 0)}}
 #menu::backdrop{background:transparent}
-.menu-in{min-height:100%;padding:clamp(72px,12vh,140px) var(--m) calc(var(--m) + 76px);display:flex;flex-direction:column;justify-content:center;position:relative;isolation:isolate}
+.menu-in{min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--m) var(--m);display:flex;flex-direction:column;justify-content:center;position:relative;isolation:isolate}
 .menu-in::before{content:"";position:absolute;inset:0;z-index:-1;background-image:var(--grain);background-size:240px;opacity:.16;mix-blend-mode:overlay}
 .menu-list a{display:block;padding:12px 0;border-bottom:1px solid var(--paper-line);text-decoration:none;transition:background var(--dur-3) var(--ease-enter),color var(--dur-3) var(--ease-enter)}
 .menu-list .mn{font-size:var(--fs-display);font-weight:350;letter-spacing:-.035em;line-height:1.08}
 .menu-list a:hover,.menu-list a:focus-visible{background:var(--paper);color:var(--klein)}
-.menu-close{position:fixed;z-index:2;left:50%;bottom:clamp(12px,2vw,20px);transform:translateX(-50%);width:var(--barw);height:56px;background:var(--paper);color:var(--klein);font-size:var(--fs-small);font-weight:600}
-.menu-close:hover{background:color-mix(in oklab,var(--paper) 88%,var(--klein))}
-.menu-close:focus-visible{outline-color:var(--klein);outline-offset:-5px}
+.menu-close{position:fixed;z-index:2;top:0;right:var(--m);height:var(--hdr);display:inline-flex;align-items:center;gap:10px;color:var(--paper);font-size:var(--fs-small);font-weight:500}
+.menu-close svg{width:16px;height:16px;overflow:visible}
+.menu-close path{stroke:currentColor;stroke-width:1.2;transition:rotate var(--dur-3) var(--ease-enter);transform-origin:50% 50%;transform-box:fill-box}
+.menu-close:hover path{rotate:90deg}
+.menu-close:focus-visible{outline-color:var(--paper);outline-offset:4px}
+.menu-mark{position:fixed;top:0;left:var(--m);height:var(--hdr);display:flex;align-items:center;font-size:1.125rem;font-weight:550;letter-spacing:-.02em;color:var(--paper)}
 
 /* Hero: the window */
 .hero{position:relative;height:calc(100svh + 200svh)}
@@ -173,6 +188,8 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;background:var(--klei
 .plate{position:relative;display:block;aspect-ratio:5/4;overflow:clip;background:var(--klein);color:var(--chaux)}
 .plate[data-t="wash"]{background:var(--wash);color:var(--klein)}
 .plate svg{position:absolute;left:0;top:-12%;width:100%;height:124%;display:block;overflow:visible}
+.plate img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.proj-more{margin-top:clamp(56px,10vh,120px);display:flex;justify-content:center}
 .plate::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,#0000 36%,rgb(241 243 242 / .22) 50%,#0000 64%);translate:-100% 0;transition:translate 2000ms var(--ease-enter)}
 .plate[data-t="wash"]::after{background:linear-gradient(105deg,#0000 36%,rgb(0 47 167 / .10) 50%,#0000 64%)}
 .row:hover .plate::after,.row:focus-visible .plate::after{translate:100% 0}
@@ -189,7 +206,7 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;background:var(--klei
 #proj::backdrop{background:transparent}
 .dlg-bg{position:fixed;inset:0;background:var(--klein)}
 .dlg-bg::before{content:"";position:absolute;inset:0;background-image:var(--grain);background-size:240px;opacity:.16;mix-blend-mode:overlay}
-.dlg-in{position:relative;min-height:100%;padding:clamp(72px,12vh,140px) var(--m) calc(var(--m) + 76px);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px clamp(16px,2vw,32px);align-content:start}
+.dlg-in{position:relative;min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--m) var(--m);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px clamp(16px,2vw,32px);align-content:start}
 .dlg-tag{grid-column:1/-1;font-size:var(--fs-small);color:var(--paper-soft)}
 .dlg-in h3{grid-column:1/-1;font-size:clamp(2.5rem,7vw,7rem);font-weight:350;letter-spacing:-.04em;line-height:.98;text-wrap:balance}
 .dlg-desc{grid-column:5/-1;font-size:var(--fs-lead);max-width:46ch;margin-top:clamp(12px,3vh,36px)}
@@ -197,16 +214,20 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;background:var(--klei
 .dlg-facts dt{font-size:var(--fs-small);color:var(--paper-soft)}
 .dlg-facts dd{font-size:1.125rem;margin-top:2px}
 .dlg-plate{grid-column:5/-1;max-width:660px;margin-top:clamp(8px,3vh,36px)}
-.dlg-actions{position:fixed;z-index:3;left:50%;bottom:clamp(12px,2vw,20px);transform:translateX(-50%);width:var(--barw);height:56px;display:flex;background:var(--paper);color:var(--klein);box-shadow:0 0 0 1px var(--line)}
-.dlg-actions button{flex:1;font-size:var(--fs-small);font-weight:600;min-height:44px;transition:background var(--dur-1)}
-.dlg-actions button+button{border-left:1px solid var(--line)}
-.dlg-actions button:hover{background:color-mix(in oklab,var(--paper) 88%,var(--klein))}
-.dlg-actions :focus-visible{outline-color:var(--klein);outline-offset:-5px}
+.dlg-gallery{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:clamp(12px,2vw,24px);margin-top:clamp(8px,3vh,36px)}
+.dlg-gallery:empty{display:none}
+.dlg-gallery img{display:block;width:100%;height:auto;background:var(--paper-line)}
+/* Dialog controls sit where the header was: the same thin line of text */
+.dlg-actions{position:fixed;z-index:3;top:0;right:var(--m);height:var(--hdr);display:flex;align-items:center;gap:clamp(18px,2.4vw,36px);color:var(--paper)}
+.dlg-actions button{min-height:44px;font-size:var(--fs-small);font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
+.dlg-actions button:hover{background-size:100% 1px}
+.dlg-actions :focus-visible{outline-color:var(--paper);outline-offset:4px}
 
 /* Services */
 .two{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:56px clamp(16px,2vw,32px)}
-.two>section:first-child{grid-column:1/7}
-.two>section:last-child{grid-column:8/-1}
+.two>.idx{grid-column:1/-1;margin-bottom:clamp(0px,2vh,24px)}
+.two>section:first-of-type{grid-column:1/7}
+.two>section:last-of-type{grid-column:8/-1}
 .two h2{margin-bottom:clamp(24px,4vh,48px)}
 .list li{border-top:1px solid var(--line);padding:18px 0 22px}
 .list li:last-child{border-bottom:1px solid var(--line)}
@@ -348,6 +369,15 @@ html.is-dialog{overflow:hidden}
 }
 
 
+/* Stacking: sections stop at their end and the next one slides over. --st is set by JS (0 or negative for tall sections),
+   --cv (0→1) is how much of the section is already covered: it dims and rises a little, slowly. */
+html.stack main>.sec{position:sticky;top:var(--st,0px);transform:translateY(calc(var(--cv,0) * -9vh))}
+html.stack main>.sec:not(.blue){background:var(--chaux)}
+html.stack main>.sec+.sec{box-shadow:0 -1px 0 var(--line),0 -40px 80px -40px rgb(0 18 70 / .22)}
+html.stack main>.sec.blue+.sec:not(.blue){box-shadow:0 -40px 80px -40px rgb(0 10 50 / .35)}
+html.stack main>.sec::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:#000838;opacity:calc(var(--cv,0) * .38)}
+html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,0) * .14)}
+
 /* Contact is only the invitation; the footer carries the rest */
 .contact{min-height:0;display:block;padding-bottom:clamp(72px,12vh,140px);overflow:clip}
 .contact .top{padding-bottom:0}
@@ -387,12 +417,105 @@ html.is-dialog{overflow:hidden}
 @media (max-width:900px){.fcol{grid-column:span 6}}
 @media (max-width:560px){.fcol{grid-column:1/-1}}
 
+/* ===================== Redesign: Swiss, airy, geometric =====================
+   Flat colour (no grain), more air, one label per section, and a geometric composition in every section
+   (square, circle, line, small square) that turns, grows and slides with the scroll. JS sets --p (0→1). */
+.blue::before,.win::before,.menu-in::before,.dlg-bg::before{display:none}
+:root{--fs-display:clamp(2.5rem,5.4vw,5.75rem)}
+.sec{padding:clamp(120px,22vh,280px) var(--m)}
+.sec-head{margin-bottom:clamp(72px,13vh,176px)}
+.display{font-weight:300;letter-spacing:-.045em;line-height:1}
+.lead{font-weight:400}
+
+.idx{display:flex;align-items:center;gap:14px;margin-bottom:clamp(48px,9vh,112px);font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;line-height:1}
+.idx .n{font-variant-numeric:tabular-nums;opacity:.55}
+.idx .sq{flex:none;display:block;width:9px;height:9px;background:currentColor;rotate:calc(var(--p,.5) * 180deg)}
+.idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22;transform-origin:0 50%;scale:var(--p2,1) 1}
+
+.sec{--p:.5;--p2:1}
+.sec>.wrap{position:relative;z-index:1}
+.geo{position:absolute;z-index:0;pointer-events:none;width:clamp(150px,22vw,360px);height:auto;overflow:visible;color:var(--klein)}
+.blue .geo{color:var(--paper)}
+.geo *{vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:50% 50%}
+.geo .g-sq{fill:none;stroke:currentColor;stroke-width:1;opacity:.55;rotate:calc(var(--p) * 90deg)}
+.geo .g-ci{fill:none;stroke:currentColor;stroke-width:1;opacity:.55;scale:calc(.35 + var(--p) * .9)}
+.geo .g-ln{stroke:currentColor;stroke-width:1;opacity:.35;transform-origin:0 50%;scale:var(--p) 1}
+.geo .g-dot{fill:currentColor;rotate:calc(var(--p) * -270deg);translate:calc((var(--p) - .5) * 180px) 0}
+.geo-a{right:var(--m);bottom:clamp(64px,12vh,160px)}
+.geo-b{left:var(--m);bottom:clamp(40px,8vh,96px);width:clamp(110px,11vw,180px)}
+.geo-c{right:var(--m);bottom:clamp(48px,9vh,120px);width:clamp(110px,11vw,180px)}
+.geo-d{right:var(--m);top:clamp(120px,22vh,280px)}
+.geo-e{right:var(--m);bottom:clamp(40px,8vh,100px);width:clamp(120px,13vw,220px)}
+.geo-f{right:var(--m);top:50%;translate:0 -50%}
+.geo-e .g-sq{fill:currentColor;opacity:.08}
+.geo-d .g-ci{fill:currentColor;opacity:.1}
+
+/* Approach: a larger statement, nothing else */
+.intro{padding-top:clamp(120px,22vh,280px)}
+.intro .display{max-width:20ch}
+
+/* Projects: more air, a square wipe when a plate enters */
+.projects{gap:clamp(72px,12vw,180px) clamp(24px,4vw,72px)}
+.cap{padding-top:22px}
+.r-title{font-weight:300;font-size:clamp(1.625rem,2.8vw,2.75rem)}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .projects .plate{animation:wipe linear both;animation-timeline:view();animation-range:entry 0% entry 90%}
+  }
+}
+@keyframes wipe{from{clip-path:inset(16% 16% 16% 16%)}to{clip-path:inset(0 0 0 0)}}
+
+/* Services */
+.list li{padding:26px 0 30px}
+.list h3{font-size:clamp(1.375rem,2vw,1.75rem);font-weight:350}
+
+/* Studio */
+.statement{font-weight:300}
+.entry{margin-top:clamp(96px,16vh,200px)}
+.team-t{margin-top:clamp(96px,16vh,200px);text-transform:uppercase;letter-spacing:.09em;font-size:.75rem}
+
+/* Light: four figures */
+.figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:48px clamp(16px,2.4vw,40px)}
+.figs>div{border-top:1px solid var(--line);padding-top:18px}
+.figs dt{font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--soft)}
+.figs dd{font-size:clamp(2.75rem,5.6vw,6rem);font-weight:250;letter-spacing:-.05em;line-height:1;margin:clamp(28px,6vh,72px) 0 14px;font-variant-numeric:tabular-nums}
+.figs .fs{font-size:var(--fs-small);color:var(--soft);max-width:24ch;min-height:2.9em}
+.sol{margin-top:clamp(56px,10vh,128px);font-size:var(--fs-lead);max-width:44ch}
+
+/* Contact */
+.contact{padding-top:clamp(120px,22vh,280px)}
+.mail{font-weight:250;border-bottom-width:1px}
+
+/* Footer */
+.fh{text-transform:uppercase;letter-spacing:.09em;font-size:.75rem;font-weight:500;color:var(--paper-soft)}
+
+/* Section squares, right edge: the current one fills and turns into a diamond */
+.dots{position:fixed;z-index:79;right:max(6px,calc(var(--m) * .45));top:50%;translate:0 -50%;display:grid;gap:4px;color:var(--klein);transition:color var(--dur-3) var(--ease-enter),opacity var(--dur-3)}
+.dots[data-tone="paper"]{color:var(--paper)}
+.dots a{display:grid;place-items:center;width:24px;height:24px}
+.dots a::before{content:"";width:7px;height:7px;border:1px solid currentColor;transition:background var(--dur-3) var(--ease-enter),rotate var(--dur-4) var(--ease-enter),scale var(--dur-4) var(--ease-enter)}
+.dots a:hover::before{background:currentColor}
+.dots a[aria-current="true"]::before{background:currentColor;rotate:45deg;scale:1.25}
+.dots :focus-visible{outline-offset:0}
+html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
+
+@media (max-width:1000px){
+  .figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .geo-b,.geo-c{display:none}
+}
+@media (max-width:820px){
+  .dots{display:none}
+  .geo{width:clamp(110px,34vw,180px);opacity:.7}
+  .geo-a,.geo-d,.geo-f{display:none}
+}
+@media (max-width:480px){.figs{grid-template-columns:1fr}}
+
 /* Responsive */
 @media (max-width:1000px){
   .sec-head h2,.sec-head p{grid-column:1/-1}
   .sec-head p{justify-self:start;text-align:left}
   .intro .display,.intro .lead-link{grid-column:1/-1}
-  .two>section:first-child,.two>section:last-child,.today>.tl,.today>.tr,.today>.yl2,.today>.yr2{grid-column:1/-1}
+  .two>section:first-of-type,.two>section:last-of-type,.today>.tl,.today>.tr,.today>.yl2,.today>.yr2{grid-column:1/-1}
   .dlg-desc,.dlg-plate{grid-column:1/-1}
   .statement{grid-column:1/-1!important}
   .entry-w,.entry-d{grid-column:1/-1}
@@ -402,7 +525,7 @@ html.is-dialog{overflow:hidden}
 }
 @media (max-width:820px){
   .stage{--wl:12vw;--wr:12vw;--wt:36svh;--wb:27svh}
-  .hero-copy{width:calc(100vw - 2 * var(--m));top:clamp(72px,12svh,120px)}
+  .hero-copy{width:calc(100vw - 2 * var(--m));top:clamp(104px,15svh,150px)}
   .hero-copy h1{font-size:clamp(1.875rem,8.6vw,2.6rem)}
   .hint{display:none}
   .sunui{bottom:clamp(80px,calc(2vw + 76px),96px)}
@@ -423,12 +546,15 @@ html.is-dialog{overflow:hidden}
 <a class="skip" href="#main" data-i="skip">Aller au contenu</a>
 <div id="tip" role="status"></div>
 
-<nav class="bar" id="bar" data-tone="klein" aria-label="Navigation principale" data-ia="nav">
-  <span class="bar-now" id="barNow" data-i="sec.top">Accueil</span>
-  <span class="bar-time" id="barTime" aria-hidden="true"><svg class="dial" viewBox="0 0 28 16" aria-hidden="true"><path class="arc" d="M2 14A12 12 0 0 1 26 14"/><line class="hz" x1="0" y1="14.6" x2="28" y2="14.6"/><circle id="dialSun" cx="2" cy="14" r="2.5"/></svg><span id="barT">12:00</span></span>
-  <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
-  <button type="button" id="menuBtn" popovertarget="menu" popovertargetaction="toggle" data-i="menu">Menu</button>
-</nav>
+<header class="bar" id="bar" data-tone="klein">
+  <a class="bar-mark" href="#top" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
+  <span class="bar-now" id="barNow" data-i="sec.top" aria-hidden="true">Accueil</span>
+  <nav class="bar-r" aria-label="Navigation principale" data-ia="nav">
+    <span class="bar-time" id="barTime" aria-hidden="true"><svg class="dial" viewBox="0 0 28 16" aria-hidden="true"><path class="arc" d="M2 14A12 12 0 0 1 26 14"/><line class="hz" x1="0" y1="14.6" x2="28" y2="14.6"/><circle id="dialSun" cx="2" cy="14" r="2.5"/></svg><span id="barT">12:00</span></span>
+    <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
+    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span data-i="menu">Menu</span><svg viewBox="0 0 22 10" aria-hidden="true"><path d="M0 1h22M0 9h22"/></svg></button>
+  </nav>
+</header>
 
 <nav id="menu" popover aria-label="Menu" data-ia="menu" data-lenis-prevent>
   <div class="menu-in">
@@ -436,13 +562,25 @@ html.is-dialog{overflow:hidden}
       <li><a href="#top"><span class="mn" data-i="sec.top">Accueil</span></a></li>
       <li><a href="#approche"><span class="mn" data-i="sec.intro">Approche</span></a></li>
       <li><a href="#projets"><span class="mn" data-i="sec.projects">Projets</span></a></li>
+      <li><a href="/projets"><span class="mn" data-i="sec.all">Tous les projets</span></a></li>
       <li><a href="#services"><span class="mn" data-i="sec.services">Services</span></a></li>
       <li><a href="#studio"><span class="mn" data-i="sec.studio">Studio</span></a></li>
       <li><a href="#lumiere"><span class="mn" data-i="sec.light">Lumière</span></a></li>
       <li><a href="#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
   </div>
-  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide" data-i="close">Fermer</button>
+  <span class="menu-mark" aria-hidden="true">moyo</span>
+  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span data-i="close">Fermer</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
+</nav>
+
+<nav class="dots" id="dots" aria-label="Sections" data-ia="dotsAria">
+  <a href="#top" data-k="top"><span class="sr" data-i="sec.top">Accueil</span></a>
+  <a href="#approche" data-k="intro"><span class="sr" data-i="sec.intro">Approche</span></a>
+  <a href="#projets" data-k="projects"><span class="sr" data-i="sec.projects">Projets</span></a>
+  <a href="#services" data-k="services"><span class="sr" data-i="sec.services">Services</span></a>
+  <a href="#studio" data-k="studio"><span class="sr" data-i="sec.studio">Studio</span></a>
+  <a href="#lumiere" data-k="light"><span class="sr" data-i="sec.light">Lumière</span></a>
+  <a href="#contact" data-k="contact"><span class="sr" data-i="sec.contact">Contact</span></a>
 </nav>
 
 <main id="main">
@@ -450,7 +588,6 @@ html.is-dialog{overflow:hidden}
 <!-- Accueil -->
 <section class="hero" id="top" data-sec="top" data-tone="paper" aria-labelledby="h1">
   <div class="stage" id="stage">
-    <a class="wordmark" href="#top" aria-label="Moyo">moyo</a>
     <div class="hero-copy">
       <h1 class="display" id="h1" data-i="h1"><span class="ln" style="--i:0">Un studio de design</span> <span class="ln" style="--i:1">qui dessine</span> <span class="ln" style="--i:2">avec la lumière.</span></h1>
       <p class="lead" data-i="h1p">Sites, identités et visualisations de données. Studio indépendant de design et de développement.</p>
@@ -464,13 +601,15 @@ html.is-dialog{overflow:hidden}
       <input type="range" id="sun" min="0" max="1440" step="1" value="720" aria-describedby="sunInfo">
       <p id="sunInfo"></p>
     </div>
-    <p class="hint" data-i="hint">Faites défiler pour ouvrir la fenêtre.</p>
+    <p class="hint" data-i="hint">Défiler</p>
   </div>
 </section>
 
 <!-- Approche -->
 <section class="sec blue intro" id="approche" data-sec="intro" data-tone="blue" aria-labelledby="introT">
+  <svg class="geo geo-a" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">01</span><span data-i="sec.intro">Approche</span></p>
     <div class="cols">
       <h2 class="display words" id="introT" data-i="introT">Nous mesurons la lumière avant de la dessiner. Chaque projet commence par des relevés, puis une idée simple, construite avec soin.</h2>
       <div class="lead-link"><a class="link" href="#projets" data-i="introL">Voir les projets</a></div>
@@ -480,24 +619,24 @@ html.is-dialog{overflow:hidden}
 
 <!-- Projets -->
 <section class="sec" id="projets" data-sec="projects" data-tone="paper" aria-labelledby="projT">
+  <svg class="geo geo-b" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">02</span><span data-i="sec.projects">Projets</span></p>
     <div class="sec-head">
       <h2 class="display shut" id="projT" data-i="projT">Projets choisis.</h2>
-      <p class="small muted" data-i="projN">Projets d’exemple, à remplacer par les vôtres.</p>
+      <p class="small muted" data-i="projN">Une sélection. Tous les projets sont rangés par catégorie.</p>
     </div>
-    <ol class="projects" id="projects">
-      <li><button class="row" type="button" data-p="0"><span class="plate row-bg" aria-hidden="true"><svg class="b" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="none" stroke="currentColor" stroke-width="1" opacity=".3"><circle cx="250" cy="200" r="100"/><circle cx="250" cy="200" r="160"/><circle cx="250" cy="200" r="230"/></g></svg><svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g stroke="currentColor" stroke-width="5" stroke-linecap="round"><line x1="250.0" y1="158.0" x2="250.0" y2="113.7"/><line x1="271.0" y1="163.6" x2="295.7" y2="120.8"/><line x1="286.4" y1="179.0" x2="349.2" y2="142.7"/><line x1="292.0" y1="200.0" x2="369.7" y2="200.0"/><line x1="286.4" y1="221.0" x2="371.5" y2="270.1"/><line x1="271.0" y1="236.4" x2="330.4" y2="339.3"/><line x1="250.0" y1="242.0" x2="250.0" y2="384.0"/><line x1="229.0" y1="236.4" x2="167.0" y2="343.8"/><line x1="213.6" y1="221.0" x2="139.6" y2="263.7"/><line x1="208.0" y1="200.0" x2="150.9" y2="200.0"/><line x1="213.6" y1="179.0" x2="179.7" y2="159.4"/><line x1="229.0" y1="163.6" x2="212.0" y2="134.2"/></g><circle cx="250" cy="200" r="22" fill="currentColor"/></svg></span><span class="cap"><span class="r-year">2026</span><span class="r-title">Soleil 2 725</span><span class="r-place">Nice</span><span class="r-type">Installation de données</span></span></button></li>
-      <li><button class="row" type="button" data-p="1"><span class="plate row-bg" aria-hidden="true"><svg class="b" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g stroke="currentColor" fill="none"><path d="M-40 226H540" stroke-width="1" opacity=".5"/><path d="M-40 240H540" stroke-width="1" opacity="0.17"/><path d="M-40 254H540" stroke-width="1" opacity="0.14"/><path d="M-40 268H540" stroke-width="1" opacity="0.11"/><path d="M-40 282H540" stroke-width="1" opacity="0.08"/><path d="M-40 296H540" stroke-width="1" opacity="0.05"/></g></svg><svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><rect x="44" y="44" width="26" height="12" rx="6"/><rect x="44" y="78" width="89" height="12" rx="6"/><rect x="44" y="112" width="170" height="12" rx="6"/><rect x="44" y="146" width="259" height="12" rx="6"/><rect x="44" y="180" width="411" height="12" rx="6"/></g><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M44 300H451"/><path d="M44.0 300v14" /><path d="M81.0 300v8" /><path d="M118.0 300v8" /><path d="M155.0 300v8" /><path d="M192.0 300v8" /><path d="M229.0 300v14" /><path d="M266.0 300v8" /><path d="M303.0 300v8" /><path d="M340.0 300v8" /><path d="M377.0 300v8" /><path d="M414.0 300v14" /><path d="M451.0 300v8" /></g></svg></span><span class="cap"><span class="r-year">2026</span><span class="r-title">Port Hercule à l’échelle</span><span class="r-place">Monaco</span><span class="r-type">Site interactif</span></span></button></li>
-      <li><button class="row" type="button" data-p="2"><span class="plate row-bg" data-t="wash" aria-hidden="true"><svg class="b" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><rect x="120" y="36" width="260" height="330" fill="none" stroke="currentColor" stroke-width="1" opacity=".22"/></svg><svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><rect x="204" y="56" width="92" height="290" fill="currentColor"/><path d="M204 214H296" stroke="var(--wash)" stroke-width="2"/><circle cx="250" cy="170" r="14" fill="var(--wash)"/><rect x="106" y="56" width="92" height="290" fill="currentColor"/><rect x="302" y="56" width="92" height="290" fill="currentColor"/><g stroke="var(--wash)" stroke-width="2.4"><path d="M106 76h92"/><path d="M106 89h92"/><path d="M106 102h92"/><path d="M106 115h92"/><path d="M106 128h92"/><path d="M106 141h92"/><path d="M106 154h92"/><path d="M106 167h92"/><path d="M106 180h92"/><path d="M106 193h92"/><path d="M106 206h92"/><path d="M106 219h92"/><path d="M106 232h92"/><path d="M106 245h92"/><path d="M106 258h92"/><path d="M106 271h92"/><path d="M106 284h92"/><path d="M106 297h92"/><path d="M106 310h92"/><path d="M106 323h92"/><path d="M302 76h92"/><path d="M302 89h92"/><path d="M302 102h92"/><path d="M302 115h92"/><path d="M302 128h92"/><path d="M302 141h92"/><path d="M302 154h92"/><path d="M302 167h92"/><path d="M302 180h92"/><path d="M302 193h92"/><path d="M302 206h92"/><path d="M302 219h92"/><path d="M302 232h92"/><path d="M302 245h92"/><path d="M302 258h92"/><path d="M302 271h92"/><path d="M302 284h92"/><path d="M302 297h92"/><path d="M302 310h92"/><path d="M302 323h92"/></g></svg></span><span class="cap"><span class="r-year">2025</span><span class="r-title">Villa Chaux</span><span class="r-place">Cap Ferrat</span><span class="r-type">Identité et site</span></span></button></li>
-      <li><button class="row" type="button" data-p="3"><span class="plate row-bg" aria-hidden="true"><svg class="b" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor" opacity=".3"><rect x="10" y="24" width="10" height="10"/><rect x="30" y="24" width="10" height="10"/><rect x="50" y="24" width="10" height="10"/><rect x="70" y="24" width="10" height="10"/><rect x="90" y="24" width="10" height="10"/><rect x="110" y="24" width="10" height="10"/><rect x="130" y="24" width="10" height="10"/><rect x="150" y="24" width="10" height="10"/><rect x="170" y="24" width="10" height="10"/><rect x="190" y="24" width="10" height="10"/><rect x="210" y="24" width="10" height="10"/><rect x="230" y="24" width="10" height="10"/><rect x="250" y="24" width="10" height="10"/><rect x="270" y="24" width="10" height="10"/><rect x="290" y="24" width="10" height="10"/><rect x="310" y="24" width="10" height="10"/><rect x="330" y="24" width="10" height="10"/><rect x="350" y="24" width="10" height="10"/><rect x="370" y="24" width="10" height="10"/><rect x="390" y="24" width="10" height="10"/><rect x="410" y="24" width="10" height="10"/><rect x="430" y="24" width="10" height="10"/><rect x="450" y="24" width="10" height="10"/><rect x="470" y="24" width="10" height="10"/><rect x="490" y="24" width="10" height="10"/><rect x="10" y="366" width="10" height="10"/><rect x="30" y="366" width="10" height="10"/><rect x="50" y="366" width="10" height="10"/><rect x="70" y="366" width="10" height="10"/><rect x="90" y="366" width="10" height="10"/><rect x="110" y="366" width="10" height="10"/><rect x="130" y="366" width="10" height="10"/><rect x="150" y="366" width="10" height="10"/><rect x="170" y="366" width="10" height="10"/><rect x="190" y="366" width="10" height="10"/><rect x="210" y="366" width="10" height="10"/><rect x="230" y="366" width="10" height="10"/><rect x="250" y="366" width="10" height="10"/><rect x="270" y="366" width="10" height="10"/><rect x="290" y="366" width="10" height="10"/><rect x="310" y="366" width="10" height="10"/><rect x="330" y="366" width="10" height="10"/><rect x="350" y="366" width="10" height="10"/><rect x="370" y="366" width="10" height="10"/><rect x="390" y="366" width="10" height="10"/><rect x="410" y="366" width="10" height="10"/><rect x="430" y="366" width="10" height="10"/><rect x="450" y="366" width="10" height="10"/><rect x="470" y="366" width="10" height="10"/><rect x="490" y="366" width="10" height="10"/></g></svg><svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><rect x="46" y="122" width="58" height="44" fill-opacity="0.07"/><rect x="116" y="122" width="58" height="44" fill-opacity="0.10"/><rect x="186" y="122" width="58" height="44" fill-opacity="0.14"/><rect x="256" y="122" width="58" height="44" fill-opacity="0.19"/><rect x="326" y="122" width="58" height="44" fill-opacity="0.23"/><rect x="396" y="122" width="58" height="44" fill-opacity="0.28"/><rect x="46" y="178" width="58" height="44" fill-opacity="0.34"/><rect x="116" y="178" width="58" height="44" fill-opacity="0.39"/><rect x="186" y="178" width="58" height="44" fill-opacity="0.45"/><rect x="256" y="178" width="58" height="44" fill-opacity="0.50"/><rect x="326" y="178" width="58" height="44" fill-opacity="0.56"/><rect x="396" y="178" width="58" height="44" fill-opacity="0.62"/><rect x="46" y="234" width="58" height="44" fill-opacity="0.68"/><rect x="116" y="234" width="58" height="44" fill-opacity="0.74"/><rect x="186" y="234" width="58" height="44" fill-opacity="0.81"/><rect x="256" y="234" width="58" height="44" fill-opacity="0.87"/><rect x="326" y="234" width="58" height="44" fill-opacity="0.93"/><rect x="396" y="234" width="58" height="44" fill-opacity="1.00"/></g></svg></span><span class="cap"><span class="r-year">2025</span><span class="r-title">La quinzaine claire</span><span class="r-place">Cannes</span><span class="r-type">Identité animée</span></span></button></li>
-      <li><button class="row" type="button" data-p="4"><span class="plate row-bg" aria-hidden="true"><svg class="b" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g stroke="currentColor" fill="none" opacity=".28"><path d="M-40 338H540" stroke-width="1"/><path d="M-40 352H540" stroke-width="1"/></g></svg><svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><path d="M-20.0 -90H16.7V268A18.4 18.4 0 0 1 -20.0 268Z" fill-opacity="0.12"/><path d="M16.7 -90H72.9V268A28.1 28.1 0 0 1 16.7 268Z" fill-opacity="0.20"/><path d="M72.9 -90H98.8V268A13.0 13.0 0 0 1 72.9 268Z" fill-opacity="0.28"/><path d="M98.8 -90H163.6V268A32.4 32.4 0 0 1 98.8 268Z" fill-opacity="0.36"/><path d="M163.6 -90H204.6V268A20.5 20.5 0 0 1 163.6 268Z" fill-opacity="0.44"/><path d="M204.6 -90H254.3V268A24.8 24.8 0 0 1 204.6 268Z" fill-opacity="0.52"/><path d="M254.3 -90H284.6V268A15.1 15.1 0 0 1 254.3 268Z" fill-opacity="0.60"/><path d="M284.6 -90H345.0V268A30.2 30.2 0 0 1 284.6 268Z" fill-opacity="0.68"/><path d="M345.0 -90H379.6V268A17.3 17.3 0 0 1 345.0 268Z" fill-opacity="0.76"/><path d="M379.6 -90H433.6V268A27.0 27.0 0 0 1 379.6 268Z" fill-opacity="0.84"/><path d="M433.6 -90H461.7V268A14.0 14.0 0 0 1 433.6 268Z" fill-opacity="0.92"/><path d="M461.7 -90H520.0V268A29.2 29.2 0 0 1 461.7 268Z" fill-opacity="1.00"/></g></svg></span><span class="cap"><span class="r-year">2024</span><span class="r-title">Chromatique</span><span class="r-place">Nice</span><span class="r-type">Atlas</span></span></button></li>
-    </ol>
+    <ol class="projects" id="projects">__ROWS__</ol>
+    <div class="proj-more"><a class="link" href="/projets" data-i="allL">Tous les projets, par catégorie</a></div>
+    <script type="application/json" id="moyo-data">__DATA__</script>
   </div>
 </section>
 
 <!-- Services et méthode -->
 <section class="sec" id="services" data-sec="services" data-tone="paper" aria-label="Services et méthode" data-ia="svcAria">
+  <svg class="geo geo-c" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap two">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">03</span><span data-i="sec.services">Services</span></p>
     <section aria-labelledby="svcT">
       <h2 class="display shut" id="svcT" data-i="svcT">Ce que nous faisons.</h2>
       <ul class="list">
@@ -521,7 +660,9 @@ html.is-dialog{overflow:hidden}
 
 <!-- Studio -->
 <section class="sec blue studio" id="studio" data-sec="studio" data-tone="blue" aria-labelledby="stuT">
+  <svg class="geo geo-d" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">04</span><span data-i="sec.studio">Studio</span></p>
     <h2 class="display par shut" id="stuT" style="--a:44px" data-i="stuT">Le studio.</h2>
     <p class="statement words" data-i="stuP">Moyo est un studio de design et de développement. Nous concevons des sites et des identités pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
     <div class="entry">
@@ -535,11 +676,7 @@ html.is-dialog{overflow:hidden}
         <p class="entry-s" data-i="enS">Nous en avons fait une règle : chaque projet doit avoir un cœur, une idée qui bat de la première page au dernier pixel.</p>
       </div>
     </div>
-    <ul class="beliefs">
-      <li><h3 data-i="b1t">Une idée par projet.</h3><p data-i="b1p">Nous choisissons une seule idée forte, puis nous la tenons du premier écran à la dernière ligne de code.</p></li>
-      <li><h3 data-i="b2t">Du temps pour la lumière.</h3><p data-i="b2p">Des mouvements lents, des pauses, de l’air. Un site se lit, il ne se subit pas.</p></li>
-      <li><h3 data-i="b3t">Accessible dès le départ.</h3><p data-i="b3p">Clavier, contraste, mouvement réduit, sans JavaScript : des états dessinés, pas des correctifs.</p></li>
-    </ul>
+    
     <h3 class="team-t" data-i="teamT">L’équipe.</h3>
     <ul class="names" aria-label="Équipe" data-ia="teamAria">
       <li><span class="nm par shut" style="--a:40px">Zahia Bougouffa</span></li>
@@ -551,43 +688,28 @@ html.is-dialog{overflow:hidden}
 
 <!-- Lumière -->
 <section class="sec" id="lumiere" data-sec="light" data-tone="paper" aria-labelledby="lumT">
+  <svg class="geo geo-e" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">05</span><span data-i="sec.light">Lumière</span></p>
     <div class="sec-head">
       <h2 class="display par shut" id="lumT" style="--a:36px" data-i="lumT">La lumière de Nice, en direct.</h2>
       <p class="small muted" data-i="lumN">Ce site calcule la position réelle du soleil. Voici les valeurs d’aujourd’hui.</p>
     </div>
-    <div class="today">
-      <div class="tl par" style="--a:26px">
-        <h3 data-i="todayT">Aujourd’hui à Nice</h3>
-        <dl>
-          <dt data-i="rise">Lever</dt><dd><span id="dRise">--:--</span><small class="dsub" id="dRiseS"></small></dd>
-          <dt data-i="lMid">Midi solaire</dt><dd><span id="dNoon">--:--</span></dd>
-          <dt data-i="set">Coucher</dt><dd><span id="dSet">--:--</span><small class="dsub" id="dSetS"></small></dd>
-          <dt data-i="len">Durée du jour</dt><dd><span id="dLen">--</span><small class="dsub" id="dLenS"></small></dd>
-          <dt data-i="elmax">Soleil au plus haut</dt><dd><span id="dEl">--</span></dd>
-          <dt data-i="lGold">Heure dorée du soir</dt><dd><span id="dGold">--</span></dd>
-          <dt data-i="lShadow">Ombre à midi (1,70 m)</dt><dd><span id="dShadow">--</span></dd>
-        </dl>
-        <p class="small muted" style="margin-top:14px;max-width:34ch" data-i="todayN">Calculé dans votre navigateur pour 43,70° N, 7,26° E, heure de Paris.</p>
-      </div>
-      <div class="tr">
-        <h3 data-i="chartT">Heures de soleil par mois à Nice</h3>
-        <div id="sunchart"></div>
-        <details class="tbl"><summary data-i="tbl">Voir les données en tableau</summary><div class="sc" tabindex="0" role="region" aria-label="Heures de soleil par mois" data-ia="tblAria"><table id="sunTbl"></table></div></details>
-        <p class="small muted src"><span data-i="srcT">2 725 h de soleil par an en moyenne, 1991 à 2020. Source : </span><a href="https://www.climatsetvoyages.com/climat/france/nice">Climats et Voyages</a>.</p>
-      </div>
-      <div class="yl2">
-        <h3 data-i="yearT">La durée du jour sur l’année</h3>
-        <p class="small" id="yearNote"></p>
-      </div>
-      <div class="yr2"><div id="yearchart"></div></div>
-    </div>
+    <dl class="figs">
+      <div><dt data-i="rise">Lever</dt><dd id="dRise">--:--</dd><p class="fs" id="dRiseS"></p></div>
+      <div><dt data-i="set">Coucher</dt><dd id="dSet">--:--</dd><p class="fs" id="dSetS"></p></div>
+      <div><dt data-i="len">Durée du jour</dt><dd id="dLen">--</dd><p class="fs" id="dLenS"></p></div>
+      <div><dt data-i="elmax">Soleil au plus haut</dt><dd id="dEl">--</dd><p class="fs"><span data-i="lMid">Midi solaire</span> <span id="dNoon">--:--</span></p></div>
+    </dl>
+    <p class="sol" id="yearNote"></p>
   </div>
 </section>
 
 <!-- Contact -->
 <section class="sec blue contact" id="contact" data-sec="contact" data-tone="blue" aria-labelledby="ctT">
+  <svg class="geo geo-f" viewBox="0 0 240 240" aria-hidden="true"><rect class="g-sq" x="40" y="40" width="160" height="160"/><circle class="g-ci" cx="120" cy="120" r="56"/><line class="g-ln" x1="0" y1="120" x2="240" y2="120"/><rect class="g-dot" x="112" y="112" width="16" height="16"/></svg>
   <div class="wrap top" style="width:100%">
+    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">06</span><span data-i="sec.contact">Contact</span></p>
     <h2 class="display shut" id="ctT" data-i="ctT">Parlons lumière.</h2>
     <a class="mail" id="mail" href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><br>
     <button class="link copy" id="copy" type="button" data-i="copy">Copier l’adresse</button>
@@ -609,6 +731,7 @@ html.is-dialog{overflow:hidden}
       <ul>
         <li><a href="#approche" data-i="sec.intro">Approche</a></li>
         <li><a href="#projets" data-i="sec.projects">Projets</a></li>
+        <li><a href="/projets" data-i="sec.all">Tous les projets</a></li>
         <li><a href="#services" data-i="sec.services">Services</a></li>
         <li><a href="#studio" data-i="sec.studio">Studio</a></li>
         <li><a href="#lumiere" data-i="sec.light">Lumière</a></li>
@@ -618,22 +741,11 @@ html.is-dialog{overflow:hidden}
     <div class="fcol fcol--live">
       <h2 class="fh" data-i="fLive">La lumière, maintenant</h2>
       <p class="foot-sun" id="fSunNow"></p>
-      <dl class="fdl">
-        <dt data-i="rise">Lever</dt><dd id="fRise">--:--</dd>
-        <dt data-i="lMid">Midi solaire</dt><dd id="fNoon">--:--</dd>
-        <dt data-i="set">Coucher</dt><dd id="fSet">--:--</dd>
-        <dt data-i="len">Durée du jour</dt><dd id="fLen">--</dd>
-      </dl>
       <p class="small muted" id="fTrend"></p>
     </div>
     <div class="fcol">
-      <h2 class="fh" data-i="fAbout">À propos du site</h2>
-      <ul class="fabout small">
-        <li data-i="fA1">Une seule page de moins de 200 Ko, sans cookie ni traceur.</li>
-        <li data-i="fA2">Lisible au clavier, sans JavaScript et avec animations réduites.</li>
-        <li data-i="fA3">Typographie Hanken Grotesk, défilement Lenis.</li>
-        <li data-i="fA4">Position du soleil : calcul simplifié, fait dans votre navigateur.</li>
-      </ul>
+      <h2 class="fh" data-i="sec.contact">Contact</h2>
+      <ul><li><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a></li></ul>
     </div>
   </div>
   <div class="wrap foot-base small">
@@ -647,7 +759,7 @@ html.is-dialog{overflow:hidden}
 <dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent>
   <span class="dlg-bg" id="dlgBg"></span>
   <div class="dlg-in">
-    <p class="dlg-tag" id="pTag" data-i="sample">Projet d’exemple</p>
+    <p class="dlg-tag" id="pTag"></p>
     <h3 id="pTitle"></h3>
     <p class="dlg-desc" id="pDesc"></p>
     <dl class="dlg-facts">
@@ -656,6 +768,7 @@ html.is-dialog{overflow:hidden}
       <div><dt data-i="fPlace">Lieu</dt><dd id="pPlace"></dd></div>
     </dl>
     <span class="plate dlg-plate" id="pPlate" aria-hidden="true"></span>
+    <div class="dlg-gallery" id="pGallery"></div>
   </div>
   <div class="dlg-actions">
     <button type="button" id="pPrev" data-i="prev">Précédent</button>
@@ -673,20 +786,21 @@ const root=document.documentElement;
 const reduceMQ=matchMedia('(prefers-reduced-motion: reduce)');
 let reduce=reduceMQ.matches; reduceMQ.addEventListener?.('change',e=>{reduce=e.matches});
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const setT=(id,v)=>{const e=document.getElementById(id); if(e&&e.textContent!==v) e.textContent=v};
 const pad=n=>String(n).padStart(2,'0');
 let lang='fr';
 try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else if(!/^fr/i.test(navigator.language||'fr')) lang='en';}catch(e){}
 
 /* ---------- Dictionary (French stays in the HTML) ---------- */
 const EN={
- 'skip':'Skip to content','nav':'Main navigation','menu':'Menu','close':'Close',
+ 'skip':'Skip to content','nav':'Main navigation','homeAria':'moyo, home','dotsAria':'Sections','menu':'Menu','close':'Close',
  'sec.top':'Home','sec.intro':'Approach','sec.projects':'Projects','sec.services':'Services','sec.studio':'Studio','sec.light':'Light','sec.contact':'Contact',
  'h1':'<span class="ln" style="--i:0">A design studio</span> <span class="ln" style="--i:1">that draws</span> <span class="ln" style="--i:2">with light.</span>',
  'h1p':'Websites, identities and data visualisations. An independent design and development studio.',
- 'sunLabel':'Time in Nice','hint':'Scroll to open the window.',
+ 'sunLabel':'Time in Nice','hint':'Scroll',
  'introT':'We measure light before we draw it. Every project starts with readings, then one simple idea, built with care.',
  'introL':'See the projects',
- 'projT':'Selected projects.','projN':'Sample projects, to be replaced with yours.',
+ 'projT':'Selected projects.','projN':'A selection. Every project is sorted by category.','allL':'All projects, by category','sec.all':'All projects',
  'svcAria':'Services and method','svcT':'What we do.',
  's1t':'Art direction','s1p':'One idea, a type system, a palette. Everything is decided before the first pixel.',
  's2t':'Immersive websites','s2p':'Narrative scroll, WebGL only when it serves the subject, readable without a mouse or animation.',
@@ -711,21 +825,13 @@ const EN={
  'srcT':'2,725 hours of sun a year on average, 1991 to 2020. Source: ',
  'footAria':'Site footer','fStudio':'Studio','fStudioP':'An independent design and development studio: websites, identities and data visualisations.','fNav':'Site map','fLive':'The light, right now','fAbout':'About this site','fA1':'A single page under 200 KB, with no cookies and no trackers.','fA2':'Readable by keyboard, without JavaScript, and with animations reduced.','fA3':'Typeface Hanken Grotesk, smooth scroll by Lenis.','fA4':'Sun position: a simplified calculation, made in your browser.','lMid':'Solar noon','lGold':'Golden hour, evening','lShadow':'Shadow at noon (1.70 m)','yearT':'Day length through the year',
  'ctT':'Let\u2019s talk about light.','copy':'Copy the address','top':'Back to top',
- 'sample':'Sample project','fRole':'Role','fYear':'Year','fPlace':'Place','prev':'Previous','next':'Next'
+ 'fRole':'Role','fYear':'Year','fPlace':'Place','prev':'Previous','next':'Next'
 };
-const PROJ=[
- {fr:{title:'Soleil 2 725',role:'Direction artistique, développement',place:'Nice',desc:'Une année d’ensoleillement niçois, mois par mois, projetée sur un mur : un rayon par mois, sa longueur égale aux heures de soleil. Le visiteur déplace l’heure, le mur réagit.'},
-  en:{title:'Soleil 2 725',role:'Art direction, development',place:'Nice',desc:'A year of Nice sunshine, month by month, projected on a wall: one ray per month, its length equal to the hours of sun. The visitor moves the hour and the wall responds.'},year:'2026'},
- {fr:{title:'Port Hercule à l’échelle',role:'Conception, développement',place:'Monaco',desc:'Chaque coque tracée à sa longueur réelle, du tender au bateau de 111 mètres, comparée à un terrain de football. Un site qui rend une dimension lisible d’un coup d’œil.'},
-  en:{title:'Port Hercule to scale',role:'Design, development',place:'Monaco',desc:'Every hull drawn at its true length, from the tender to the 111-metre yacht, compared with a football pitch. A site that makes a dimension readable at a glance.'},year:'2026'},
- {fr:{title:'Villa Chaux',role:'Identité, design, développement',place:'Cap Ferrat',desc:'Identité d’une maison d’hôtes imaginaire, entièrement bâtie sur le blanc de chaux et un seul bleu. Un site de réservation en trois écrans, lisible au soleil sur un téléphone.'},
-  en:{title:'Villa Chaux',role:'Identity, design, development',place:'Cap Ferrat',desc:'Identity for an imaginary guesthouse, built entirely on lime-wash white and one blue. A three-screen booking site, readable in sunlight on a phone.'},year:'2025'},
- {fr:{title:'La quinzaine claire',role:'Identité, motion',place:'Cannes',desc:'Identité d’un festival de cinéma indépendant : une pellicule de dix-huit images, chacune aux couleurs d’une heure du jour. Générique, affiche et billetterie.'},
-  en:{title:'The clear fortnight',role:'Identity, motion',place:'Cannes',desc:'Identity for an independent film festival: a strip of eighteen frames, each in the colours of one hour of the day. Titles, poster and ticketing.'},year:'2025'},
- {fr:{title:'Chromatique',role:'Direction artistique, données',place:'Nice',desc:'Les couleurs des façades de la vieille ville, relevées rue par rue et rangées par teinte. Un atlas consultable, avec ses relevés en tableau.'},
-  en:{title:'Chromatique',role:'Art direction, data',place:'Nice',desc:'The colours of the old town’s façades, recorded street by street and sorted by hue. A browsable atlas, with its readings in a table.'},year:'2024'}
-];
-const ROWTYPE={fr:['Installation de données','Site interactif','Identité et site','Identité animée','Atlas'],en:['Data installation','Interactive site','Identity and website','Animated identity','Atlas']};
+/* ---------- Projects: data embedded by the build, replaced by the server with the admin's current list ---------- */
+__RENDER__
+let DATA={categories:[],projects:[]};
+try{DATA=JSON.parse($('#moyo-data').textContent)}catch(e){}
+const PROJ=featuredOf(DATA);
 const M3={fr:['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'],en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']};
 const MN={fr:['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'],en:['January','February','March','April','May','June','July','August','September','October','November','December']};
 const COMP={fr:['vers le nord','vers le nord-nord-est','vers le nord-est','vers l\u2019est-nord-est','vers l\u2019est','vers l\u2019est-sud-est','vers le sud-est','vers le sud-sud-est','vers le sud','vers le sud-sud-ouest','vers le sud-ouest','vers l\u2019ouest-sud-ouest','vers l\u2019ouest','vers l\u2019ouest-nord-ouest','vers le nord-ouest','vers le nord-nord-ouest'],
@@ -841,6 +947,8 @@ function frame(){
   applySun(sunCur);
   if(sunCur!==w) more=true;
   updateBar();
+  coverStack();
+  if(pxEls.length&&parallax()) more=true;
   if(more) raf=requestAnimationFrame(frame);
 }
 function kick(){ if(!raf) raf=requestAnimationFrame(frame) }
@@ -853,19 +961,93 @@ window.addEventListener('pointermove',e=>{
   touched=true; kick();
 },{passive:true});
 
-/* ---------- Bar: tone from what is under it, section label, away over the footer ---------- */
+/* ---------- Header: tone from what is under it, section label, hides while reading down ---------- */
+let lastY=scrollY, upAt=scrollY;
 function updateBar(){
-  const mid=innerHeight*.5, under=innerHeight-48;
+  const mid=innerHeight*.5, under=Math.min(40,innerHeight*.05);
   let found=secs[0], foundUnder=secs[0];
+  // later sections are painted over earlier ones (they stack), so the last match is the one you see
   for(const s of secs){const r=s.getBoundingClientRect(); if(r.top<=mid&&r.bottom>mid) found=s; if(r.top<=under&&r.bottom>under) foundUnder=s;}
   const key=found.dataset.sec;
   let tone=foundUnder.dataset.tone;
-  if(foundUnder.dataset.sec==='top'){const r=win.getBoundingClientRect(),cx=innerWidth/2; tone=(cx>=r.left&&cx<=r.right&&under>=r.top&&under<=r.bottom)?'blue':'paper'}
+  if(foundUnder.dataset.sec==='top'){const r=win.getBoundingClientRect(); tone=(under>=r.top&&under<=r.bottom&&innerWidth*.5>=r.left&&innerWidth*.5<=r.right)||openCur>.92?'blue':'paper'}
   bar.dataset.tone=tone==='blue'?'paper':'klein';
-  const away=mono.getBoundingClientRect().top<innerHeight-24;
-  bar.classList.toggle('away',away); bar.inert=away||menu.matches(':popover-open');
-  if(key!==curSec){curSec=key;barNow.dataset.i='sec.'+key;barNow.innerHTML=lang==='en'?EN['sec.'+key]:DICT_FR['sec.'+key]}
+  const y=scrollY, dy=y-lastY; lastY=y;
+  if(dy<-2) upAt=y;
+  const away=!reduce&&y>innerHeight*.6&&dy>0&&y-upAt>80&&!menu.matches(':popover-open')&&!bar.contains(document.activeElement);
+  if(dy!==0||y<innerHeight*.6) bar.classList.toggle('away',away);
+  bar.classList.toggle('solid',y>innerHeight*2.2);
+  if(key!==curSec){curSec=key;barNow.dataset.i='sec.'+key;barNow.innerHTML=lang==='en'?EN['sec.'+key]:DICT_FR['sec.'+key];
+    dots.forEach(a=>a.setAttribute('aria-current',String(a.dataset.k===key)));}
+  let dTone=found.dataset.tone;
+  if(key==='top') dTone=openCur>.6?'blue':'paper';
+  dotsNav.dataset.tone=dTone==='blue'?'paper':'klein';
+  dotsNav.classList.toggle('off',mono.getBoundingClientRect().top<innerHeight*.85);
 }
+const dotsNav=$('#dots'), dots=$$('#dots a');
+bar.addEventListener('focusin',()=>bar.classList.remove('away'));
+
+/* ---------- Stacking: each section stops once its end is reached, the next one slides over it ---------- */
+const stackOn=!reduce&&CSS.supports('position','sticky');
+const stack=$$('main > .sec');
+function layoutStack(){
+  if(!stackOn) return;
+  // a section taller than the screen sticks only when its bottom reaches the bottom of the screen
+  for(const s of stack) s.style.setProperty('--st',Math.min(0,innerHeight-s.offsetHeight)+'px');
+}
+/* Natural position of each section, for the scroll progress that drives the geometric shapes (--p) and labels (--p2) */
+let nat=[];
+function measureNat(){ nat=stack.map(s=>({top:naturalTop(s),h:s.offsetHeight})); }
+const setV=(el,k,v)=>{ if(el.style.getPropertyValue(k)!==v) el.style.setProperty(k,v) };
+function coverStack(){
+  if(reduce) return;
+  const y=scrollY, H=innerHeight;
+  for(let i=0;i<stack.length;i++){
+    const s=stack[i], n=nat[i];
+    if(n){
+      setV(s,'--p',clamp((y+H-n.top)/(H+n.h)).toFixed(4));
+      setV(s,'--p2',clamp((y+H*.9-n.top)/(H*.7)).toFixed(3));
+    }
+    if(!stackOn) continue;
+    const nx=stack[i+1]; let c=0;
+    if(nx){const t=nx.getBoundingClientRect().top; c=clamp((H-t)/H)}
+    setV(s,'--cv',c.toFixed(3));
+  }
+}
+if(stackOn){ root.classList.add('stack'); layoutStack(); }
+if(!reduce){
+  let t=0; const relayout=()=>{ clearTimeout(t); t=setTimeout(()=>{ layoutStack(); measureNat(); kick(); },60) };
+  new ResizeObserver(relayout).observe(document.body); stack.forEach(s=>new ResizeObserver(relayout).observe(s));
+  measureNat();
+}
+/* Where a section really starts (without the sticky offset), for anchors */
+function naturalTop(el){
+  if(!stackOn) return el.getBoundingClientRect().top+scrollY;
+  root.classList.remove('stack'); const y=el.getBoundingClientRect().top+scrollY; root.classList.add('stack'); return y;
+}
+
+/* ---------- Parallax: slow layers with inertia. Each [data-px] drifts by (distance to the screen centre × speed). ---------- */
+const PX=[
+  ['.sec-head h2',.10],['.intro .display',.08],['.intro .lead-link',.16],['.statement',.07],['.entry-w',-.10],['.entry-d',.06],
+  ['.beliefs',.05],['.names',.04],['.list',.035],['.today .tr',.06],['.projects li:nth-child(even)',.09],['.projects li:nth-child(odd)',.03],
+  ['.proj-more',.06],['.contact h2',.10],['.mail',.05],['.foot-grid',.04]
+];
+const pxEls=[];
+if(!reduce) PX.forEach(([sel,sp])=>$$(sel).forEach(el=>{ if(!el.closest('.par')&&!el.classList.contains('par')) pxEls.push({el,sp,cur:0}) }));
+function parallax(){
+  let more=false; const h=innerHeight;
+  for(const p of pxEls){
+    const r=p.el.getBoundingClientRect(), top=r.top-p.cur;
+    if(top>h*1.6||top+r.height<-h*.6){ continue; }
+    const target=-(top+r.height/2-h/2)*p.sp;
+    const d=target-p.cur;
+    p.cur=Math.abs(d)<.15?target:p.cur+d*.075;
+    p.el.style.translate='0 '+p.cur.toFixed(1)+'px';
+    if(p.cur!==target) more=true;
+  }
+  return more;
+}
+function refreshProjectsPx(){ for(let i=pxEls.length-1;i>=0;i--) if(!pxEls[i].el.isConnected) pxEls.splice(i,1); }
 function onScroll(){kick()}
 addEventListener('scroll',kick,{passive:true}); addEventListener('resize',kick);
 
@@ -903,7 +1085,7 @@ function applyLang(l){
     el.setAttribute('aria-label',l==='en'&&EN[k]?EN[k]:el.dataset.frAria);
   });
   const b=$('#langBtn'); b.textContent=l==='en'?'FR':'EN'; b.lang=l==='en'?'fr':'en'; b.setAttribute('aria-label',l==='en'?'Passer en français':'Switch to English');
-  $$('.row').forEach((r,i)=>{ $('.r-title',r).textContent=PROJ[i][l].title; $('.r-type',r).textContent=ROWTYPE[l][i]; $('.r-place',r).textContent=PROJ[i][l].place });
+  $$('.row').forEach((r,i)=>{ if(!PROJ[i]) return; const t=txt(PROJ[i],l); $('.r-title',r).textContent=t.title; $('.r-type',r).textContent=t.type; $('.r-place',r).textContent=t.place });
   document.title='Moyo Studio';
   document.querySelector('meta[name=description]').content=l==='en'?'Moyo, a design and development studio. Websites, identities and data visualisations, drawn with light.':'Moyo, studio de design et de développement. Sites, identités et visualisations de données, dessinés avec la lumière.';
   applySun(sunCur); fillToday(); renderChart(); if(proj.open) fillProject(pIdx);
@@ -965,35 +1147,29 @@ function fillFoot(){
   if(now<DI.riseMs) sNow=(en?'The sun rises in ':'Le soleil se lève dans ')+durMs(DI.riseMs-now)+'.';
   else if(now>DI.setMs) sNow=en?'The sun set '+durMs(now-DI.setMs)+' ago.':'Le soleil est couché depuis '+durMs(now-DI.setMs)+'.';
   else{const sa=sunAt(now), c=COMP[lang][Math.round(sa.az/(Math.PI/8))%16]; sNow=en?`The sun is ${Math.round(sa.el/R)}° above the horizon, ${c}.`:`Le soleil est à ${Math.round(sa.el/R)}° au-dessus de l’horizon, ${c}.`}
-  $('#fSunNow').textContent=sNow;
-  $('#fRise').textContent=f.format(new Date(DI.riseMs));
-  $('#fNoon').textContent=f.format(new Date(DI.noonMs));
-  $('#fSet').textContent=f.format(new Date(DI.setMs));
-  $('#fLen').textContent=hmLen(DI.len);
-  $('#fTrend').textContent=trendText();
+  setT('fSunNow',sNow);
+  setT('fTrend',trendText());
   const dt=new Intl.DateTimeFormat(en?'en-GB':'fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Paris'}).format(new Date(localMidnightMs+12*3600000));
-  $('#fDate').textContent=en?'Sun calculated on '+dt:'Soleil calculé le '+dt;
+  setT('fDate',en?'Sun calculated on '+dt:'Soleil calculé le '+dt);
 }
 function fillToday(){
-  const f=fmtParis(lang), L=COMP[lang], nf=new Intl.NumberFormat(lang==='en'?'en-GB':'fr-FR',{maximumFractionDigits:1});
-  $('#dRise').textContent=f.format(new Date(DI.riseMs));
-  $('#dRiseS').textContent=L[compIdx(DI.riseMs)]+', '+azDeg(DI.riseMs)+'°';
-  $('#dNoon').textContent=f.format(new Date(DI.noonMs));
-  $('#dSet').textContent=f.format(new Date(DI.setMs));
-  $('#dSetS').textContent=L[compIdx(DI.setMs)]+', '+azDeg(DI.setMs)+'°';
-  $('#dLen').textContent=hmLen(DI.len);
-  $('#dLenS').textContent=trendText();
-  $('#dEl').textContent=Math.round(DI.elMax)+'°';
-  $('#dGold').textContent=f.format(new Date(GOLD))+' – '+f.format(new Date(DI.setMs));
-  $('#dShadow').textContent=nf.format(SHADOW)+' m';
-  $('#yearNote').textContent=solsticeText();
+  const f=fmtParis(lang), L=COMP[lang];
+  setT('dRise',f.format(new Date(DI.riseMs)));
+  setT('dRiseS',L[compIdx(DI.riseMs)]+', '+azDeg(DI.riseMs)+'°');
+  setT('dNoon',f.format(new Date(DI.noonMs)));
+  setT('dSet',f.format(new Date(DI.setMs)));
+  setT('dSetS',L[compIdx(DI.setMs)]+', '+azDeg(DI.setMs)+'°');
+  setT('dLen',hmLen(DI.len));
+  setT('dLenS',trendText());
+  setT('dEl',Math.round(DI.elMax)+'°');
+  setT('yearNote',solsticeText());
   renderYear(); fillFoot();
 }
 const tip=$('#tip');
 function showTip(t,x,y){tip.textContent=t;tip.classList.add('on');const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.transform=`translate(${Math.min(innerWidth-w-8,Math.max(8,x+12))}px,${Math.max(8,y-h-12)}px)`}
 function hideTip(){tip.classList.remove('on')}
 function renderChart(){
-  const host=$('#sunchart'); const w=Math.max(260,host.clientWidth||520), h=200, pl=30, pb=26, pt=12;
+  const host=$('#sunchart'); if(!host) return; const w=Math.max(260,host.clientWidth||520), h=200, pl=30, pb=26, pt=12;
   const max=360, bw=Math.min(28,(w-pl)/12*.56), step=(w-pl)/12;
   const cm=P0.month-1;
   let s=`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${lang==='en'?'Hours of sun per month in Nice, from 140 in December to 350 in July':'Heures de soleil par mois à Nice, de 140 en décembre à 350 en juillet'}">`;
@@ -1013,16 +1189,19 @@ function renderChart(){
   const th=lang==='en'?['Month','Hours of sun']:['Mois','Heures de soleil'];
   $('#sunTbl').innerHTML=`<thead><tr><th>${th[0]}</th><th>${th[1]}</th></tr></thead><tbody>${SUN_HOURS.map((v,i)=>`<tr><td>${MN[lang][i]}</td><td>${v}</td></tr>`).join('')}</tbody>`;
 }
-new ResizeObserver(()=>renderChart()).observe($('#sunchart'));
-new ResizeObserver(()=>renderYear()).observe($('#yearchart'));
+if($('#sunchart')) new ResizeObserver(()=>renderChart()).observe($('#sunchart'));
+if($('#yearchart')) new ResizeObserver(()=>renderYear()).observe($('#yearchart'));
 
 /* ---------- Projects: the row opens into the blue ---------- */
 const proj=$('#proj');
 let pIdx=0, pRow=null;
 function fillProject(i){
-  pIdx=i; const p=PROJ[i], t=p[lang];
+  pIdx=i; const p=PROJ[i], t=txt(p,lang);
+  $('#pTag').textContent=[catLabel(DATA,p.category,lang),t.type].filter(Boolean).join(' · ');
   $('#pTitle').textContent=t.title; $('#pDesc').textContent=t.desc;
-  { const src=$$('.row')[i].querySelector('.plate'), dst=$('#pPlate'); dst.innerHTML=src.innerHTML; if(src.dataset.t) dst.dataset.t=src.dataset.t; else delete dst.dataset.t; } $('#pRole').textContent=t.role; $('#pYear').textContent=p.year; $('#pPlace').textContent=t.place;
+  { const dst=$('#pPlate'); dst.innerHTML=plateInner(p); if(plateAttrs(p)) dst.dataset.t='wash'; else delete dst.dataset.t; }
+  $('#pGallery').innerHTML=(p.images||[]).map(id=>`<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
+  $('#pRole').textContent=t.role; $('#pYear').textContent=p.year; $('#pPlace').textContent=t.place;
 }
 function openProject(i,btn){
   pRow=btn;
@@ -1058,14 +1237,14 @@ $('#copy').addEventListener('click',async()=>{
 /* ---------- Soft scroll: Lenis (MIT), desktop wheel only. Touch stays native. Absent with reduced motion. ---------- */
 function initLenis(){
   if(reduce||typeof Lenis==='undefined') return;
-  lenis=new Lenis({lerp:.065,wheelMultiplier:.85,smoothWheel:true,autoRaf:true});
+  lenis=new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});
   lenis.on('scroll',kick);
   $$('a[href^="#"]:not(.skip)').forEach(a=>a.addEventListener('click',e=>{
     const id=a.getAttribute('href').slice(1), el=id?document.getElementById(id):null;
     if(!el) return;
     e.preventDefault();
     const go=()=>{
-      const y=id==='top'?0:Math.round(el.getBoundingClientRect().top+scrollY);
+      const y=id==='top'?0:Math.round(naturalTop(el));
       lenis.scrollTo(y,{duration:clamp(1.4+Math.abs(y-scrollY)/2600,1.8,3.6),easing:t=>1-Math.pow(1-t,4),onComplete:()=>{
         el.setAttribute('tabindex','-1'); el.focus({preventScroll:true});
         try{history.replaceState(null,'','#'+id)}catch(_){}

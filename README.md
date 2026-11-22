@@ -35,24 +35,77 @@ Captures prises en bureau 1440 px le 22 novembre 2026 ; les heures du soleil cha
 | Lumière | Lever, midi solaire, coucher, direction du soleil, heure dorée, ombre à midi, écart avec la veille, heures de soleil par mois, durée du jour sur l'année, prochain solstice |
 | Contact et pied de page | E-mail, plan du site, lumière du moment, infos sur le site |
 
-Les projets sont des exemples à remplacer (voir `PROJ` dans `src/index.src.html`).
+Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exemples à remplacer.
+
+## En ligne (Cloudflare Pages)
+
+Site : https://moyo-77s.pages.dev
+
+| Adresse | Contenu |
+| --- | --- |
+| `/` | La page d'accueil. La section Projets montre les projets marqués « accueil » (★) |
+| `/projets` | Tous les projets, filtrés par catégorie (`/projets?cat=identite`) |
+| `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie |
+
+Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les pages sont rendues côté serveur avec les données à jour (`functions/_middleware.js`), donc elles restent complètes sans JavaScript et lisibles par les moteurs de recherche. Tant que rien n'a été publié depuis l'admin, c'est `data/projects.json` qui sert.
+
+### Structure
+
+```
+src/index.src.html     page d'accueil (gabarit)
+src/projets.src.html   page « Tous les projets »
+src/admin.html         mode admin
+shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
+data/projects.json     projets de départ (les 5 exemples)
+functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /img/<id>
+build.mjs              construit dist/
+wrangler.toml          configuration Cloudflare (projet « moyo », KV « MOYO »)
+```
+
+### Mot de passe admin
+
+Le mot de passe est un secret Cloudflare, jamais dans le code :
+
+```bash
+npx wrangler pages secret put ADMIN_PASSWORD --project-name moyo
+npm run deploy
+```
+
+Le changer déconnecte toutes les sessions. Après 10 essais ratés, une adresse IP est bloquée 15 minutes.
+
+### Déployer
+
+```bash
+npm install
+npm run deploy      # node build.mjs puis wrangler pages deploy
+```
+
+### Développer en local
+
+Créez `.dev.vars` avec `ADMIN_PASSWORD=un-mot-de-passe-de-test`, puis :
+
+```bash
+npm run dev         # http://localhost:8788
+```
+
+Sous Windows, si le dossier du projet a un chemin très long (plus de 260 caractères avec `node_modules`), `wrangler pages dev` échoue avec `spawn ... workerd.exe ENOENT` ou `SQLITE_CANTOPEN`. Le plus simple est de placer le projet dans un dossier court (par exemple `C:\dev\moyo`).
 
 ## Technique
 
-- **Une page autonome** : `index.html` (environ 150 Ko) contient le CSS, le JavaScript, la police et Lenis. Pas de cookie, pas de traceur, aucune requête externe.
+- **Page d'accueil autonome** : `dist/index.html` (environ 160 Ko) contient le CSS, le JavaScript, la police et Lenis. Pas de traceur, aucune requête vers un autre domaine. Le seul cookie est celui de la session admin.
 - **CSS 2026** : `@property`, `animation-timeline: view()`, View Transitions entre document et `<dialog>`, API Popover pour le menu, `linear()` pour les ressorts, `@starting-style`, `text-wrap`, masques CSS.
 - **Soleil** : formules d'éphéméride simplifiées (type NOAA), latitude 43,7102, longitude 7,2620, heure de Paris.
 - **Accessibilité** : contenu visible sans JavaScript, état « animations réduites » conçu à part, contraste d'au moins 4,5:1, cibles tactiles d'au moins 24 px, navigation au clavier, FR/EN.
 
 ## Construire
 
-`src/index.src.html` est le gabarit. Il contient deux marqueurs, `__FONT__` et `__LENIS__`, que `build.py` remplace par la police en base64 et par `vendor/lenis.min.js`.
+`build.mjs` (Node) écrit `dist/`. Dans `src/index.src.html`, il remplace `__FONT__` et `__LENIS__` (police en base64, `vendor/lenis.min.js`), `__RENDER__` (`shared/render.js`), `__ROWS__` et `__DATA__` (projets de `data/projects.json`).
 
 ```bash
-python3 build.py        # écrit index.html
+npm run build
 ```
 
-Ouvrez ensuite `index.html` dans un navigateur, ou publiez le dépôt avec GitHub Pages (branche `main`, dossier racine).
+Le site a besoin des Functions Cloudflare pour l'admin et les données à jour. GitHub Pages ne sert plus que la version statique de départ.
 
 ## Tester
 
@@ -84,7 +137,7 @@ Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clie
 
 ## Reste à faire
 
-- Remplacer les projets d'exemple par de vrais projets (titres, années, textes, images).
+- Remplacer les projets d'exemple par de vrais projets, depuis `/admin`.
 - Valider la phrase qui relie le mot « moyo » (cœur, vie, courage) au studio : elle est de ma plume.
 - Mesurer la fluidité sur un vrai GPU : l'environnement de test n'en a pas.
 - Ajouter d'autres moyens de contact si besoin (réseaux, téléphone).
