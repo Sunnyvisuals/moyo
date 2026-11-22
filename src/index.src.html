@@ -650,6 +650,18 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
 .menu-close path{stroke-width:1.1}
 .menu-close{min-width:44px;justify-content:center}
 
+/* Footer "moyo": blur-text reveal. JS sets --p (0→1) as the word comes into view; each letter (--i) follows a little later,
+   from blurred, faint and slightly enlarged to sharp. The lime→blue gradient is spread over the four letters. */
+.monument.blurtext{--p:1;--g1:var(--paper);--g2:color-mix(in oklab,var(--klein) 52%,var(--paper));--g3:color-mix(in oklab,var(--klein) 82%,var(--paper));--dot:rgb(0 47 167 / .28);
+  padding-bottom:.196em;margin-bottom:0;background:none!important}
+.monument.blurtext .bl{display:inline-block;padding-bottom:.2em;margin-bottom:-.2em;
+  --q:clamp(0,calc((var(--p) - var(--i) * .14) / .5),1);
+  background-image:radial-gradient(circle at 50% 50%,var(--dot) .7px,#0000 1.1px),linear-gradient(90deg,var(--g1) 0%,var(--g1) 30%,var(--g2) 62%,var(--g3) 100%);
+  background-size:4px 4px,400% 100%;background-position:0 0,calc(var(--i) / 3 * 100%) 0;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:blur(calc((1 - var(--q)) * 28px));opacity:calc(.1 + var(--q) * .9);
+  transform:translateY(calc((1 - var(--q)) * 10%)) scale(calc(1.08 - var(--q) * .08));transform-origin:50% 80%;will-change:filter,transform}
+
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -1105,7 +1117,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span>
     <a href="#top" data-i="top">Retour en haut</a>
   </div>
-  <div class="mono-wrap" aria-hidden="true"><div class="monument grad">moyo</div></div>
+  <div class="mono-wrap" aria-hidden="true"><div class="monument blurtext"><span class="bl" style="--i:0">m</span><span class="bl" style="--i:1">o</span><span class="bl" style="--i:2">y</span><span class="bl" style="--i:3">o</span></div></div>
 </footer>
 
 <dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent>
@@ -1311,6 +1323,7 @@ function frame(){
   if(sunCur!==w) more=true;
   updateBar();
   coverStack();
+  if(!reduce&&mono){ const r=mono.getBoundingClientRect(); setV(mono,'--p',clamp((innerHeight-r.top)/(innerHeight*.52)).toFixed(3)); }
   // a band sits at the foot of a section that then stops: it is complete once it is fully on screen
   if(!reduce) for(const t of grads){ const r=t.getBoundingClientRect(); setV(t,'--g',clamp((innerHeight-r.top)/(innerHeight*.75+r.height*.5)).toFixed(3)); }
   if(!reduce) for(const b of bands){ const t=b.getBoundingClientRect().top; setV(b,'--bp',clamp((innerHeight-t)/Math.max(1,b.offsetHeight)).toFixed(3)); }
