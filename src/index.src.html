@@ -86,9 +86,20 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   transition:color var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter)}
 .bar>*,.bar-r>*{pointer-events:auto}
 .bar[data-tone="paper"]{color:var(--paper)}
-.bar::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--chaux);opacity:0;transition:opacity var(--dur-1),background var(--dur-3) var(--ease-enter)}
-.bar[data-tone="paper"]::before{background:var(--klein)}
-.bar.solid::before{opacity:1}
+/* Liquid glass: a floating pill, a 5% white veil, a frosted blur, a fine rim and inner shadows for the thickness of the glass.
+   Over blue: white text. Over lime sections the veil is denser and the text blue, so it stays readable.
+   Once you scroll, the pill tightens a little (0.98) and the blur deepens (16 → 24px). */
+.bar{top:20px;left:20px;right:20px;width:auto;height:58px;padding:0 clamp(18px,2vw,28px);border-radius:50px;pointer-events:auto;
+  background:rgb(255 255 255 / .38);border:1px solid rgb(0 47 167 / .1);
+  -webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);
+  box-shadow:inset 0 1px 1px rgb(255 255 255 / .7),inset 0 -1px 1px rgb(0 47 167 / .05),0 4px 30px rgb(0 0 0 / .1);
+  transform-origin:50% 0;
+  transition:color var(--dur-3) var(--ease-enter),translate var(--dur-3) var(--ease-enter),scale var(--dur-3) var(--ease-enter),background var(--dur-3) var(--ease-enter),border-color var(--dur-3) var(--ease-enter),box-shadow var(--dur-3) var(--ease-enter),-webkit-backdrop-filter var(--dur-3),backdrop-filter var(--dur-3)}
+.bar[data-tone="paper"]{color:#fff;background:rgb(255 255 255 / .05);border-color:rgb(255 255 255 / .1);
+  box-shadow:inset 0 1px 1px rgb(255 255 255 / .2),0 4px 30px rgb(0 0 0 / .1);text-shadow:0 2px 4px rgb(0 0 0 / .1)}
+.bar.scrolled{scale:.98;-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5)}
+.bar.away{translate:0 calc(-100% - 24px)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bar{background:rgb(241 243 242 / .94)}.bar[data-tone="paper"]{background:rgb(0 47 167 / .94)}}
 .bar.away{translate:0 -100%}
 .bar :focus-visible{outline-color:currentColor;outline-offset:4px}
 .bar-mark{font-size:1.125rem;font-weight:550;letter-spacing:-.02em;text-decoration:none}
@@ -97,7 +108,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .bar button{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:24px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
 .bar button:hover{background-size:100% 1px}
 .bar-menu{background:none!important}
-.bar-menu svg{width:22px;height:10px;overflow:visible}
+.bar-menu{min-width:44px;justify-content:center}
+.bar-menu svg{width:24px;height:10px;overflow:visible}
 .bar-menu path{stroke:currentColor;stroke-width:1.2;transition:d var(--dur-3) var(--ease-enter)}
 .bar-menu:hover path{d:path("M0 1h22M6 9h16")}
 @media (max-width:700px){.bar-now{display:none}}
@@ -494,7 +506,13 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .grad .w,.grad .c,.grad .ln{-webkit-text-fill-color:transparent}
 /* the gradient only paints inside the box: give descenders (the "y" of moyo) room below, without moving the layout */
 .grad{padding-bottom:.14em;margin-bottom:-.14em}
-.monument.grad{padding-bottom:.3em;margin-bottom:calc(.192em - .3em)}
+/* the page ends exactly at the foot of the "y": the line box is .72em, the descender of "y" reaches .912em */
+.monument.grad{padding-bottom:.196em;margin-bottom:0}
+.foot.sec{padding-bottom:0}
+.foot .mono-wrap{margin-bottom:0}
+/* the hero window is flat: no cast shadow, no shadow under the slats */
+.win{box-shadow:none}
+.lat-shadow{display:none}
 .entry-w.grad{padding-bottom:.42em;margin-bottom:-.12em}
 @media (forced-colors:active){.grad{background:none;-webkit-text-fill-color:currentColor}}
 
@@ -640,7 +658,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
   <a class="bar-mark" href="#top" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
   <nav class="bar-r" aria-label="Navigation principale" data-ia="nav">
     <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
-    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span data-i="menu">Menu</span><svg viewBox="0 0 22 10" aria-hidden="true"><path d="M0 1h22M0 9h22"/></svg></button>
+    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span class="sr" data-i="menu">Menu</span><svg viewBox="0 0 22 10" aria-hidden="true"><path d="M0 1h22M0 9h22"/></svg></button>
   </nav>
 </header>
 
@@ -740,10 +758,13 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
     <section class="par" style="--a:30px" aria-labelledby="mthT">
       <h2 class="display shut" id="mthT" data-i="mthT">Comment nous travaillons.</h2>
       <ol class="list steps">
+        <li><div><h3 data-i="m0t">Écouter</h3><p data-i="m0p">Un premier échange pour comprendre le lieu, le public, les contraintes et le calendrier.</p></div></li>
         <li><div><h3 data-i="m1t">Relever</h3><p data-i="m1p">Nous visitons, mesurons et collectons les chiffres réels.</p></div></li>
         <li><div><h3 data-i="m2t">Choisir</h3><p data-i="m2p">Nous retenons une seule idée, et ce qu’elle exclut.</p></div></li>
         <li><div><h3 data-i="m3t">Dessiner</h3><p data-i="m3p">Grille, typographie et mouvement, sur des écrans de 390 et 1440 pixels.</p></div></li>
         <li><div><h3 data-i="m4t">Construire</h3><p data-i="m4p">Du code sans dépendance inutile, testé au clavier, sans animation, sans JavaScript.</p></div></li>
+        <li><div><h3 data-i="m5t">Lancer</h3><p data-i="m5p">Mise en ligne, tournage ou impression, avec une prise en main pour votre équipe.</p></div></li>
+        <li><div><h3 data-i="m6t">Accompagner</h3><p data-i="m6p">Nous restons là après le lancement : mesures, ajustements, nouveaux contenus.</p></div></li>
       </ol>
     </section>
   </div>
@@ -946,6 +967,9 @@ const EN={
  's3t':'Data visualisation','s3p':'Charts you can explore, with their sources and a table version.',
  's4t':'Moving identities','s4p':'Logos, grids and animation for brands that live on screen.',
  'mthT':'How we work.',
+ 'm0t':'Listen','m0p':'A first conversation to understand the place, the audience, the constraints and the timeline.',
+ 'm5t':'Launch','m5p':'Going live, shooting or printing, with a hand-over for your team.',
+ 'm6t':'Support','m6p':'We stay on after launch: measuring, adjusting, new content.',
  'm1t':'Survey','m1p':'We visit, measure and collect the real figures.',
  'm2t':'Choose','m2p':'We keep one idea, and what it rules out.',
  'm3t':'Draw','m3p':'Grid, type and motion, on 390 and 1440 pixel screens.',
@@ -1118,7 +1142,7 @@ function updateBar(){
   if(dy<-2) upAt=y;
   const away=!reduce&&y>innerHeight*.6&&dy>0&&y-upAt>80&&!menu.matches(':popover-open')&&!bar.contains(document.activeElement);
   if(dy!==0||y<innerHeight*.6) bar.classList.toggle('away',away);
-  bar.classList.toggle('solid',y>innerHeight*2.2);
+  bar.classList.toggle('scrolled',y>20);
   if(key!==curSec){curSec=key;
     dots.forEach(a=>a.setAttribute('aria-current',String(a.dataset.k===key)));}
   let dTone=found.dataset.tone;
