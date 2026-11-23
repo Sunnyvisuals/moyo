@@ -2,6 +2,14 @@
    It reads the colour really under it (background or photo): light on dark, blue on light. The system caret in text fields.
    Mouse and trackpad only (pointer: fine). Inside the menu and dialogs (top layer) the system cursor comes back. */
 (() => {
+  /* focus ring for keyboard users only: never after a click (menu closing gives the focus back to its button) */
+  const kb = document.documentElement, fs = document.createElement('style');
+  fs.textContent = 'html:not(.kbd) :focus-visible{outline:none!important}*{-webkit-tap-highlight-color:transparent}';
+  document.head.appendChild(fs);
+  addEventListener('keydown', e => { if (/^(Tab|Arrow|Enter| )/.test(e.key) && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName) || e.key === 'Tab') kb.classList.add('kbd'); }, true);
+  addEventListener('pointerdown', () => kb.classList.remove('kbd'), true);
+})();
+(() => {
   if (!matchMedia('(pointer: fine)').matches) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const css = `

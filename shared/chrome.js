@@ -27,7 +27,17 @@ const BURGER_CSS = `/* Menu button: two clean lines. Opening the menu, the close
   #menu:popover-open #menuClose .bx i:nth-of-type(2){animation:x2 .55s cubic-bezier(.65,0,.35,1) both}
   #menuBtn.unx .bx i:nth-of-type(1){animation:b1 .55s cubic-bezier(.65,0,.35,1) both}
   #menuBtn.unx .bx i:nth-of-type(2){animation:b2 .55s cubic-bezier(.65,0,.35,1) both}
-}`;
+}
+/* menu preview: caption and number slide behind the image (which bulges over them), only their lower edge is cut */
+@media (min-width:821px){
+  .menu-pv .pv-frame{z-index:2}
+  .menu-pv .pv-cap{position:relative;z-index:1}
+  .menu-pv .pv-cw{height:66px;overflow:visible;clip-path:inset(-120px -8px 0)}
+  .menu-pv .pv-ci{height:66px}
+  .menu-pv .pv-nw{overflow:visible;clip-path:inset(-120px -4px -8px)}
+  .menu-pv .pv-ns>span{height:66px}
+}
+`;
 
 const CHROME_CSS = `
 /* Header bar (minimal): logo, EN, burger. Fixed, blue text on the light pages. */
