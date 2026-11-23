@@ -1050,6 +1050,8 @@ html.is-dialog .dots a,.dots.off a{translate:22px 0;opacity:0;transition-duratio
 __GLASS_CSS__
 __LANG_CSS__
 .entry-link{margin-top:28px}
+/* The time-of-day slider of the first screen is gone (the window still follows the real sun and the pointer) */
+.sunui{display:none!important}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
 @media (prefers-reduced-motion:no-preference){
   html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
