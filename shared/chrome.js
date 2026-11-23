@@ -130,6 +130,10 @@ html.menu-lock{overflow:hidden}
 /* Language button (every page): on hover the label rolls up and the same label takes its place. No underline.
    The label is drawn twice from the button's lang attribute; the real text stays for assistive tech. */
 const LANG_CSS = `
+/* footer: the name of the agency, and the credit with the names of the team (links to their pages) */
+.fnames li.bn{font-size:clamp(1.5rem,2vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1.1}
+.fby a{display:inline-flex;align-items:center;gap:.4em}.fby a::after{content:"↗";font-size:.8em;opacity:.6;transition:translate .5s cubic-bezier(.25,1,.5,1),opacity .3s}.fby a:hover::after{translate:2px -2px;opacity:1}
+
 #bar #langBtn{position:relative;display:inline-grid;place-items:center;min-width:44px;background:none!important;-webkit-text-fill-color:transparent;letter-spacing:.02em}
 #bar #langBtn::before,#bar #langBtn::after{content:attr(lang);content:attr(lang)/"";position:absolute;inset:auto;text-transform:uppercase;line-height:1.3;-webkit-text-fill-color:currentColor;pointer-events:none;
   transition:translate .5s cubic-bezier(.65,0,.15,1),clip-path .5s cubic-bezier(.65,0,.15,1)}
@@ -239,7 +243,7 @@ const footerInner = ({ home = false } = {}) => {
   return `  <div class="${w}foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Agence</h2>
-      <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
+      <ul class="fnames"><li class="bn">moyo</li></ul>
       <p class="small muted" data-i="fStudioP">Agence créative indépendante, basée en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
@@ -255,10 +259,9 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
         <li><a href="${h}contact" data-i="${home ? 'sec.contact' : 'contact'}">Contact</a></li>
       </ul>
     </nav>
-    <div class="fcol fcol--live">
-      <h2 class="fh" data-i="fLive">La lumière, maintenant</h2>
-      <p class="foot-sun" id="fSunNow"></p>
-      <p class="small muted" id="fTrend"></p>
+    <div class="fcol fcol--by">
+      <h2 class="fh" data-i="fBy">Réalisé par</h2>
+      <ul class="fnames fby"><li><a href="/equipe/zahia-bougouffa" data-who="zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah" data-who="yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
     </div>
     <div class="fcol">
       <h2 class="fh" data-i="${home ? 'sec.contact' : 'contact'}">Contact</h2>

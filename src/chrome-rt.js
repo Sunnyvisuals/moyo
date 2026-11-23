@@ -92,14 +92,14 @@ function arcCard(dt){
     for (let i = 0; i < k; i++) { A.cvx += (K * (tx - A.cx) - D * A.cvx) * h; A.cvy += (K * (ty - A.cy) - D * A.cvy) * h; A.cx += A.cvx * h; A.cy += A.cvy * h; } }
   const followBusy = Math.abs(tx - A.cx) > .05 || Math.abs(ty - A.cy) > .05 || Math.abs(A.cvx) > .05 || Math.abs(A.cvy) > .05;
   if (!followBusy) { A.cx = tx; A.cy = ty; A.cvx = A.cvy = 0; }
-  const ry = clamp(A.cvx * .02, -6, 6), rx = clamp(-A.cvy * .02, -6, 6) + clamp(-clamp(A.stv, -12, 12) * .2, -2.5, 2.5);
+  const ry = clamp(A.cvx * .02, -6, 6), rx = clamp(-A.cvy * .02, -6, 6) + clamp(clamp(A.stv, -12, 12) * .2, -2.5, 2.5);
   pvPanel.style.transform = (A.cx || A.cy || rx || ry) ? 'translate3d(' + A.cx.toFixed(2) + 'px,' + A.cy.toFixed(2) + 'px,0) perspective(1000px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)' : '';
   const y = Math.floor(A.stp + 1e-6); let fr = A.stp - y; if (fr < 4e-4) fr = 0;
   const ia = arcMod(y, arcN), ib = arcMod(y + 1, arcN);
   const W = pvFrame.clientWidth, H = pvFrame.clientHeight, off = H * .12, N = 18;
-  const sy = (q, x) => (((q - .5) * st + .5 - v * .042 * Math.sin(x * Math.PI)) * H + off);
+  const sy = (q, x) => (((q - .5) * st + .5 + v * .042 * Math.sin(x * Math.PI)) * H + off);
   const sn = Math.sin(fr * Math.PI), t = performance.now() / 1e3;
-  const yb = x => 1 - fr - sn * (.09 * Math.sin(x * Math.PI) + .035 * Math.sin(x * 7 + fr * 9 + t * 1.9)) * (.35 + amt) * A.sdir;
+  const yb = x => 1 - fr - sn * (.09 * Math.sin(x * Math.PI) + .035 * Math.sin(x * 7 + fr * 9 + t * 1.9)) * (.35 + amt) * -A.sdir;
   const top = [], mid = [], bot = [];
   for (let j = 0; j <= N; j++) { const x = j / N, px = (x * W).toFixed(1);
     top.push(px + 'px ' + sy(0, x).toFixed(1) + 'px'); bot.push(px + 'px ' + sy(1, x).toFixed(1) + 'px');
