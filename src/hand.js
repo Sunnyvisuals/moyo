@@ -4,17 +4,11 @@
    "Bad handwriting" (fixed seed, same result on every visit). Decorative only (aria-hidden, behind the content).
    Phrases: edit LINES, size: edit --hs. Fonts: SIL OFL 1.1, self-hosted in /fonts/hand. */
 (() => {
-  // host selector: [wished left %, wished top %, tilt (deg), French, English]
-  const LINES = {
-    '.win': [[6, 10, -7, 'agence créative', 'creative agency'], [34, 76, 5, 'dessiner la lumière', 'drawing light']],
-    '#approche': [[58, 11, 5, 'une idée avant tout', 'an idea above all'], [3, 60, -6, 'direction artistique', 'art direction'], [50, 73, -8, 'mesurer, puis créer', 'measure, then create']],
-    '#services': [[34, 2.5, -7, 'une idée, une seule', 'one idea, only one'], [2, 92, 4, 'du croquis à l’écran', 'from sketch to screen']],
-    '#equipe': [[50, 8, -7, 'une agence, quatre mains', 'one agency, four hands'], [56, 66, 8, 'on se comprend', 'we understand each other']],
-    '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern'], [58, 88, 5, 'et le vôtre', 'and yours']],
-    '.who-page': [[66, 46, 7, 'imaginer ensemble', 'imagine together']],
-    '#studio': [[74, 34, 8, 'deux regards', 'two pairs of eyes'], [4, 47, -9, 'des images qui restent', 'images that stay'], [40, 88, 4, 'sites, films, campagnes', 'websites, films, campaigns']],
-    '#contact': [[46, 4, -6, 'parlons de votre marque', 'let’s talk about your brand'], [3, 72, 6, 'tout commence ici', 'it all starts here'], [33, 92, -4, 'et si on créait ensemble', 'what if we made it together']],
-    '#foot': [[46, 43, -6, 'créer, filmer, raconter', 'create, film, tell'], [68, 57, 8, 'à bientôt chez moyo', 'see you soon at moyo']]
+  // host selector: [wished left %, wished top %, tilt (deg), French, English]; one phrase per page
+  const LINES = { // one phrase per page
+    '#approche': [[56, 30, -7, 'une idée avant tout', 'an idea above all']],
+    '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern']],
+    '.who-page': [[66, 46, 7, 'imaginer ensemble', 'imagine together']]
   };
   const FONTS = ['Caveat', 'Indie Flower', 'Nothing You Could Do', 'Reenie Beanie', 'Shadows Into Light'];
   const AVOID = { l: [2] }; // Nothing You Could Do draws an unreadable l
@@ -27,6 +21,7 @@
 .scr p[hidden]{display:none}
 html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
 .scr i.on{opacity:1}
+.scr p{transition:opacity .9s ease}.scr p.gone{opacity:0}
 .scr{--hs:72px}
 @media (max-width:820px){.scr{--hs:48px}}
 @media (prefers-reduced-motion:reduce){.scr i{opacity:1;transition:none}}
@@ -65,11 +60,11 @@ html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
     document.querySelectorAll('.scr').forEach(d => {
       const host = d.parentElement, H = host.getBoundingClientRect(), obs = obstacles(host, H), m = innerWidth < 821 ? 18 : 36, k0 = H.width / (host.offsetWidth || 1);
       const base = innerWidth < 821 ? 48 : 72;
-      const cap = innerWidth < 821 ? 1 : 2; let shown = 0;
+      const cap = 1; let shown = 0;
       for (const q of d.children) {
         q.hidden = false; let done = false;
         if (shown >= cap) { q.hidden = true; continue; }
-        for (const size of [base, base * .84, base * .7, base * .58, 30]) {
+        for (const size of [base, base * .84, base * .7, base * .58, 30, 24]) {
           q.style.fontSize = size + 'px';
           const a = +q.dataset.r * Math.PI / 180, w0 = q.offsetWidth, h0 = q.offsetHeight, w = w0 * Math.cos(a) + h0 * Math.abs(Math.sin(a)), h = w0 * Math.abs(Math.sin(a)) + h0 * Math.cos(a);
           const X = H.width / k0 - m - w, Y = H.height - m - h; if (X < m || Y < m) continue;
@@ -120,18 +115,18 @@ html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   /* ---------- writing driven by the scroll ----------
-     t goes 0 → 1 as the phrase climbs from the foot of the screen to its middle, and back to 0 as it leaves at the top.
-     The letters switch on from the first to the last as t rises, and off from the last to the first as it falls. */
+     Entering: the letters switch on one after the other as the phrase climbs from the foot of the screen to about three quarters of its height.
+     Leaving: once it has crossed the upper part of the screen, the whole phrase simply fades out (and comes back on the way up). */
   let raf = 0;
   const frame = () => {
     raf = 0;
     const H = innerHeight;
     document.querySelectorAll('.scr p:not([hidden])').forEach(q => {
       const r = q.getBoundingClientRect(), L = q.children, n = L.length;
-      let t = 0;
-      if (r.bottom > 0 && r.top < H) { const c = (r.top + r.bottom) / 2; t = c > H * .5 ? 1 - (c - H * .5) / (H * .38) : 1 - (H * .5 - c) / (H * .45); }
-      t = Math.max(0, Math.min(1, t * 1.25 - .05));
-      for (let k = 0; k < n; k++) { const on = t > (k + .5) / (n + 1) * .95 + .02 && t > 0; if (L[k].classList.contains('on') !== on) L[k].classList.toggle('on', on); }
+      const c = (r.top + r.bottom) / 2, vis = r.bottom > 0 && r.top < H;
+      const t = vis ? Math.max(0, Math.min(1, (H * .98 - c) / (H * .27))) : 0; // written in full once it has climbed to about 70% of the screen
+      for (let k = 0; k < n; k++) { const on = t > 0 && t > (k + .5) / (n + 1) * .95 + .02; if (L[k].classList.contains('on') !== on) L[k].classList.toggle('on', on); }
+      q.classList.toggle('gone', !vis || (scrollY > 60 && c < H * .3));
     });
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
