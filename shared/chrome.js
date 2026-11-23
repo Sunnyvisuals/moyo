@@ -3,6 +3,32 @@
    - functions/equipe/[id].js inlines them too.
    The behaviour lives in dist/chrome.js (built from src/chrome-rt.js). Keep `export` on the last line only. */
 
+/* Menu button, the same on every page (home included). */
+const BURGER_CSS = `/* Menu button: two clean lines. Opening the menu, the close button folds them into a centred cross;
+   closing, the header button unfolds the cross back into two lines. Minimal, precise motion. */
+#menuBtn{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px}
+#menuBtn .bx,#menuClose .bx{display:flex;flex-direction:column;justify-content:center;gap:5px;width:22px;height:15px}
+#menuBtn .bx i,#menuClose .bx i{display:block;width:22px;height:2px;background:currentColor;translate:none!important;transform-origin:50% 50%;
+  transition:transform .5s cubic-bezier(.76,0,.24,1)}
+/* hover (closed): the two lines ease together — a quiet, precise nudge */
+#menuBtn:hover .bx i:nth-of-type(1){transform:translateY(1px)}
+#menuBtn:hover .bx i:nth-of-type(2){transform:translateY(-1px)}
+/* open state (close button): a centred cross */
+#menuClose .bx i:nth-of-type(1){transform:translateY(3.5px) rotate(45deg)}
+#menuClose .bx i:nth-of-type(2){transform:translateY(-3.5px) rotate(-45deg)}
+#menuClose:hover .bx i:nth-of-type(1){transform:translateY(3.5px) rotate(135deg)}
+#menuClose:hover .bx i:nth-of-type(2){transform:translateY(-3.5px) rotate(-135deg)}
+@keyframes x1{0%{transform:none}50%{transform:translateY(3.5px)}100%{transform:translateY(3.5px) rotate(45deg)}}
+@keyframes x2{0%{transform:none}50%{transform:translateY(-3.5px)}100%{transform:translateY(-3.5px) rotate(-45deg)}}
+@keyframes b1{0%{transform:translateY(3.5px) rotate(45deg)}50%{transform:translateY(3.5px)}100%{transform:none}}
+@keyframes b2{0%{transform:translateY(-3.5px) rotate(-45deg)}50%{transform:translateY(-3.5px)}100%{transform:none}}
+@media (prefers-reduced-motion:no-preference){
+  #menu:popover-open #menuClose .bx i:nth-of-type(1){animation:x1 .55s cubic-bezier(.65,0,.35,1) both}
+  #menu:popover-open #menuClose .bx i:nth-of-type(2){animation:x2 .55s cubic-bezier(.65,0,.35,1) both}
+  #menuBtn.unx .bx i:nth-of-type(1){animation:b1 .55s cubic-bezier(.65,0,.35,1) both}
+  #menuBtn.unx .bx i:nth-of-type(2){animation:b2 .55s cubic-bezier(.65,0,.35,1) both}
+}`;
+
 const CHROME_CSS = `
 /* Header bar (minimal): logo, EN, burger. Fixed, blue text on the light pages. */
 .bar{position:fixed;z-index:90;top:0;left:0;right:0;height:var(--hdr);display:flex;align-items:center;padding:0 var(--m);color:var(--klein);gap:clamp(16px,2.4vw,40px);pointer-events:auto}
@@ -87,30 +113,7 @@ const CHROME_CSS = `
 @media (min-width:821px) and (prefers-reduced-motion:reduce){#menu:popover-open .pv-frame,#menu:popover-open .pv-cap{animation:none}}
 @media (max-width:820px){.menu-pv,.menu-list .arc-clone{display:none}}
 
-/* Burger: three lines folding into a cross */
-#menuBtn{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px}
-#menuBtn .bx,#menuClose .bx{display:flex;flex-direction:column;justify-content:center;gap:5px;width:24px;height:24px;transition:rotate .5s cubic-bezier(.25,1,.5,1)}
-#menuBtn .bx i,#menuClose .bx i{display:block;width:24px;height:1.5px;background:currentColor;transform-origin:50% 50%}
-#menuBtn .bx i:nth-of-type(2){transition:scale .45s cubic-bezier(.25,1,.5,1);transform-origin:100% 50%}
-#menuBtn:hover .bx i:nth-of-type(2){scale:.6 1}
-#menuClose .bx i:nth-of-type(1){transform:translateY(6.5px) rotate(45deg)}
-#menuClose .bx i:nth-of-type(2){opacity:0}
-#menuClose .bx i:nth-of-type(3){transform:translateY(-6.5px) rotate(-45deg)}
-#menuClose:hover .bx{rotate:90deg}
-@keyframes bxA{0%{transform:none}45%{transform:translateY(6.5px)}100%{transform:translateY(6.5px) rotate(45deg)}}
-@keyframes bxB{0%,40%{opacity:1}41%,100%{opacity:0}}
-@keyframes bxC{0%{transform:none}45%{transform:translateY(-6.5px)}100%{transform:translateY(-6.5px) rotate(-45deg)}}
-@keyframes xbA{0%{transform:translateY(6.5px) rotate(45deg)}55%{transform:translateY(6.5px)}100%{transform:none}}
-@keyframes xbB{0%,59%{opacity:0}60%,100%{opacity:1}}
-@keyframes xbC{0%{transform:translateY(-6.5px) rotate(-45deg)}55%{transform:translateY(-6.5px)}100%{transform:none}}
-@media (prefers-reduced-motion:no-preference){
-  #menu:popover-open #menuClose .bx i:nth-of-type(1){animation:bxA .6s cubic-bezier(.65,0,.35,1) both}
-  #menu:popover-open #menuClose .bx i:nth-of-type(2){animation:bxB .6s linear both}
-  #menu:popover-open #menuClose .bx i:nth-of-type(3){animation:bxC .6s cubic-bezier(.65,0,.35,1) both}
-  #menuBtn.unx .bx i:nth-of-type(1){animation:xbA .6s cubic-bezier(.65,0,.35,1) both}
-  #menuBtn.unx .bx i:nth-of-type(2){animation:xbB .6s linear both}
-  #menuBtn.unx .bx i:nth-of-type(3){animation:xbC .6s cubic-bezier(.65,0,.35,1) both}
-}
+${BURGER_CSS}
 html.menu-lock{overflow:hidden}
 `;
 
@@ -134,7 +137,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
   <a class="bar-mark" href="/" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
   <nav class="bar-r" aria-label="Navigation principale" data-ia="nav">
     <button type="button" id="langBtn" aria-label="Switch to English" lang="en">EN</button>
-    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span class="sr" data-i="menu">Menu</span><span class="bx" aria-hidden="true"><i></i><i></i><i></i></span></button>
+    <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle"><span class="sr" data-i="menu">Menu</span><span class="bx" aria-hidden="true"><i></i><i></i></span></button>
   </nav>
 </header>
 <nav id="menu" popover aria-label="Menu" data-ia="menu" data-start="${start}">
@@ -160,7 +163,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
     </div>
   </div>
   <span class="menu-mark" aria-hidden="true">moyo</span>
-  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i><i></i></span></button>
+  <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i></span></button>
 </nav>`;
 
 /* Footer (columns, live sun, sign-up, blur "moyo"), with a gentle parallax reveal. */
@@ -266,4 +269,4 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
 ${footerInner()}
 </footer>`;
 
-export { CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
