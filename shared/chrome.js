@@ -317,4 +317,4 @@ const footerHTML = team => `<footer class="foot" id="foot" aria-label="Pied de p
 ${footerInner({ team })}
 </footer>`;
 
-export { creditLinks, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { creditLinks, GLASS_CSS, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
