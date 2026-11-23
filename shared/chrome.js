@@ -146,7 +146,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
 
 /* Footer (columns, live sun, sign-up, blur "moyo"), with a gentle parallax reveal. */
 const FOOTER_CSS = `
-.foot{position:relative;background:var(--klein);color:var(--paper);padding:clamp(64px,10vh,120px) var(--m) clamp(40px,7vh,72px);overflow:clip}
+.foot{position:relative;z-index:2;background:var(--klein);color:var(--paper);padding:clamp(72px,11vh,132px) var(--m) clamp(40px,7vh,72px);overflow:clip;margin-top:calc(clamp(48px,8vh,96px) * -1);box-shadow:0 -40px 90px -50px rgb(0 6 40 / .55)}
 .foot ::selection{background:var(--paper);color:var(--klein)}
 .foot :focus-visible{outline-color:var(--paper)}
 .foot .small{font-size:var(--fs-small)}
