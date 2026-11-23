@@ -9,7 +9,7 @@
     '.win': [[6, 10, -7, 'agence créative', 'creative agency'], [34, 76, 5, 'dessiner la lumière', 'drawing light']],
     '#approche': [[56, 30, -7, 'une idée avant tout', 'an idea above all'], [3, 60, -6, 'direction artistique', 'art direction'], [50, 73, -8, 'mesurer, puis créer', 'measure, then create']],
     '#services': [[34, 2.5, -7, 'une idée, une seule', 'one idea, only one'], [2, 92, 4, 'du croquis à l’écran', 'from sketch to screen']],
-    '#studio': [[74, 34, 8, 'deux regards', 'two pairs of eyes'], [4, 47, -9, 'des images qui restent', 'images that stay'], [40, 88, 4, 'sites, films, campagnes', 'websites, films, campaigns']],
+    '#studio': [[74, 34, 8, 'deux regards', 'two pairs of eyes'], [40, 88, 4, 'sites, films, campagnes', 'websites, films, campaigns']],
     '#equipe': [[50, 8, -7, 'une agence, quatre mains', 'one agency, four hands'], [56, 66, 8, 'on se comprend', 'we understand each other']],
     '#contact': [[46, 4, -6, 'parlons de votre marque', 'let’s talk about your brand'], [3, 72, 6, 'tout commence ici', 'it all starts here'], [33, 92, -4, 'et si on créait ensemble', 'what if we made it together']],
     '#foot': [[46, 43, -6, 'créer, filmer, raconter', 'create, film, tell'], [68, 57, 8, 'à bientôt chez moyo', 'see you soon at moyo']],
