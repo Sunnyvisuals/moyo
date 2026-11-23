@@ -621,15 +621,6 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   html.js-lines .reveal-lines.in .lead-link{opacity:1;translate:0 0}
 }
 
-/* Footer reveal (port Framer "line reveal"): chaque ligne arrive en flou + rotation + décalage, échelonnée.
-   Le grand "moyo" garde son propre effet (JBBlurTextEffect) : il n'est pas concerné ici. */
-@media (prefers-reduced-motion:no-preference){
-  html.js-foot .foot .foot-rise{opacity:0;filter:blur(12px);translate:0 26px;rotate:-4deg;transform-origin:0 65%;will-change:opacity,filter,transform;
-    transition:opacity .7s ease,filter .9s cubic-bezier(.16,1,.3,1),translate 1s cubic-bezier(.16,1,.3,1),rotate 1s cubic-bezier(.16,1,.3,1);
-    transition-delay:calc(var(--i,0) * 65ms)}
-  html.js-foot .foot.in .foot-rise{opacity:1;filter:blur(0);translate:0 0;rotate:0}
-}
-
 /* Team section (on lime): lines and labels in blue */
 .team .names{border-top:1px solid var(--line);margin-top:clamp(8px,2vh,24px)}
 .team .names li{border-bottom:1px solid var(--line)}
@@ -1630,20 +1621,6 @@ function splitLines(el){
   const check=()=>hosts.forEach(h=>{ if(!h.classList.contains('in')&&h.getBoundingClientRect().top<innerHeight*.8) h.classList.add('in'); });
   addEventListener('scroll',check,{passive:true}); check();
   let rt=0; addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>$$('.lines').forEach(splitLines),150); });
-})();
-
-/* ---------- Footer reveal: blur + rotate + offset, ligne par ligne (pas le grand "moyo") ---------- */
-(()=>{
-  const foot=$('.foot'); if(!foot) return;
-  const items=[...foot.querySelectorAll('.fh,.fcol li,.fcol .small,.foot-sun,.fh2,.foot-sub .sub-row,.foot-base>*')];
-  const seen=new Set(); let i=0;
-  items.forEach(el=>{ if(seen.has(el)||el.closest('.monument')) return; seen.add(el); el.classList.add('foot-rise'); el.style.setProperty('--i',i++); });
-  root.classList.add('js-foot');
-  if(reduce||!('IntersectionObserver' in window)){ foot.classList.add('in'); return; }
-  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ foot.classList.add('in'); io.disconnect(); } }),{threshold:.1});
-  io.observe(foot);
-  const check=()=>{ if(!foot.classList.contains('in')&&foot.getBoundingClientRect().top<innerHeight*.85){ foot.classList.add('in'); io.disconnect(); } };
-  addEventListener('scroll',check,{passive:true}); check();
 })();
 
 /* ---------- Menu letter roll ---------- */
