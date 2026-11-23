@@ -105,7 +105,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .bar-mark{font-size:1.125rem;font-weight:550;letter-spacing:-.02em;text-decoration:none}
 .bar-now{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.62;padding-left:clamp(16px,2.4vw,40px);border-left:1px solid currentColor;line-height:1;transition:opacity var(--dur-3)}
 .bar-r{margin-left:auto;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px)}
-.bar button{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:24px;font-weight:500;border-radius:7px;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
+.bar button{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:24px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
 .bar button:hover{background-size:100% 1px}
 .bar-menu{background:none!important}
 .bar-menu{min-width:44px;justify-content:center}
@@ -890,7 +890,7 @@ html::-webkit-scrollbar,#menu::-webkit-scrollbar,#proj::-webkit-scrollbar{displa
 .chips legend{float:left;width:100%}
 .chips label{position:relative}
 .chips input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.chips span{display:inline-flex;align-items:center;min-height:42px;padding:0 18px;border:1px solid color-mix(in oklab,var(--paper) 24%,transparent);border-radius:9px;font-size:var(--fs-small);font-weight:500;transition:background var(--dur-1),color var(--dur-1),border-color var(--dur-1)}
+.chips span{display:inline-flex;align-items:center;min-height:42px;padding:0 18px;border:1px solid color-mix(in oklab,var(--paper) 24%,transparent);font-size:var(--fs-small);font-weight:500;transition:background var(--dur-1),color var(--dur-1),border-color var(--dur-1)}
 .chips label:hover span{border-color:color-mix(in oklab,var(--paper) 60%,transparent);background:rgb(255 255 255 / .06)}
 .chips input:checked+span{background:var(--paper);color:var(--klein);border-color:var(--paper)}
 .chips input:focus-visible+span{outline:2px solid var(--paper);outline-offset:3px}
