@@ -103,6 +103,7 @@ document.querySelectorAll('.flang button').forEach(b=>b.addEventListener('click'
 if(!reduce&&typeof Lenis!=='undefined')new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});})();</script>
 <script src="/chrome.js" defer></script>
 <script src="/footer.js" defer></script>
+<script src="/glass.js" defer></script>
 <script src="/cursor.js" defer></script>
 </body>
 </html>`;

@@ -53,6 +53,7 @@ out('dist/cursor.js', read('src/cursor.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
 out('dist/footer.js', read('src/footer-rt.js'));
 out('dist/lenis.js', lenis);
+out('dist/glass.js', read('src/glass-rt.js'));
 fs.mkdirSync(r('dist/proj'), { recursive: true });
 for (const n of fs.readdirSync(r('assets/proj'))) fs.copyFileSync(r('assets/proj/' + n), r('dist/proj/' + n));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });

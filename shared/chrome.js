@@ -223,19 +223,30 @@ const FOOTER_CSS = `
 /* Glass top of the footer (every page): the panel slides over the page, its top is frosted glass with a bright rim,
    then it turns into the solid Klein blue before the text starts. To remove the effect, empty this string. */
 const GLASS_CSS = `
-footer#foot{--gp:clamp(190px,32vh,320px);--gh:calc(var(--gp) + 40px);--gr:40px;
+footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(64px - var(--fr,.75) * 32px);
   border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(0 47 167) calc(var(--gh) - 1px));
-  box-shadow:0 -4px 6px rgb(0 6 40 / .05),0 -19px 20px rgb(0 6 40 / .1),0 -60px 60px -8px rgb(0 6 40 / .2)!important}
-/* the frost: blurs what is behind */
-footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;background:none;opacity:1;mix-blend-mode:normal;
-  -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25)}
-/* the light: a 3px rim and a diagonal sheen, drowned by the blue tint as it thickens downwards */
-footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;
-  background:linear-gradient(to bottom,rgb(0 47 167 / .06) 0,rgb(0 47 167 / .16) calc(var(--gp) * .22),rgb(0 47 167 / .38) calc(var(--gp) * .45),rgb(0 47 167 / .68) calc(var(--gp) * .68),rgb(0 47 167 / .9) calc(var(--gp) * .88),rgb(0 47 167) var(--gh)),linear-gradient(rgb(255 255 255 / .22),#0000 30px),linear-gradient(150deg,rgb(255 255 255 / .2) 0%,rgb(255 255 255 / .03) 34%,rgb(255 255 255 / .16) 52%,rgb(255 255 255 / .02) 72%,rgb(255 255 255 / .1) 100%);
-  box-shadow:inset 0 3px 0 -.5px rgb(255 255 255 / .92),inset 0 6px 3px -3px rgb(0 10 60 / .2)}
+  box-shadow:0 -2px 8px rgb(0 6 40 / .08),0 -24px 48px -12px rgb(0 6 40 / .22)!important}
+/* the glass: clear, it bends what is behind (glass.js sets --liquid where the browser can), then turns blue downwards */
+footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
+  background:linear-gradient(to bottom,rgb(0 47 167 / 0) 0,rgb(0 47 167 / .05) calc(var(--gp) * .34),rgb(0 47 167 / .26) calc(var(--gp) * .54),rgb(0 47 167 / .68) calc(var(--gp) * .75),rgb(0 47 167 / .95) calc(var(--gp) * .9),rgb(0 47 167) calc(var(--gp) * .98)),
+    radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .16),#0000),
+    linear-gradient(rgb(255 255 255 / .13),rgb(255 255 255 / .05) 90px);
+  /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
+  box-shadow:inset 0 calc(3px + var(--fv,0) * 5px) calc(2px + var(--fv,0) * 3px) calc(-1px - var(--fv,0) * 2px) rgb(255 255 255 / .5),
+    inset 0 calc(12px + var(--fv,0) * 16px) calc(16px + var(--fv,0) * 10px) calc(-11px - var(--fv,0) * 6px) rgb(0 14 70 / calc(.3 + var(--fv,0) * .25));
+  -webkit-backdrop-filter:blur(8px) saturate(1.2);backdrop-filter:var(--liquid,blur(8px)) saturate(1.2) brightness(1.05)}
+/* the edge: a fine ring, brightest where the light hits it (--lx) */
+footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:calc(1px + var(--fv,0) * 1.5px);box-shadow:none;
+  background:radial-gradient(520px 90px at var(--lx,50%) 0,#fff 20%,#0000),
+    radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
+    radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),
+    linear-gradient(to bottom,rgb(255 255 255 / .55) 0,rgb(255 255 255 / .4) 24px,rgb(255 255 255 / .14) 34%,#0000 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){footer#foot{background:var(--klein)}}
-@media (max-width:820px){footer#foot{--gp:clamp(150px,24vh,210px);--gr:28px}}
+@media (max-width:820px){footer#foot{--gp:clamp(170px,27vh,250px);--gr:calc(40px - var(--fr,.75) * 16px)}}
+/* home: the last section must not lift, the glass would show the page background under it */
+html.stack main>.contact{transform:none}
 /* pages other than the home: what comes before stays put while the footer slides over it (--st is set in footer.js) */
 .under{position:sticky;top:var(--st,0px);z-index:1;background:var(--chaux)}
 @media (prefers-reduced-motion:reduce){.under{position:relative;top:0}}
