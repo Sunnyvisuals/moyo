@@ -1,6 +1,7 @@
-/* Buttons and links-as-buttons appear and leave cleanly with the scroll.
-   Arriving: the box is drawn from left to right (a clip wipe) while the label fades in a beat later.
-   Leaving (scrolled past, or below again): it keeps its direction and wipes out, so the movement never reverses.
+/* Buttons and links-as-buttons appear and leave with the scroll, with the same gesture both ways.
+   Arriving: the box is drawn from left to right (a clip wipe), the label follows a beat later.
+   Leaving: it keeps its direction and wipes out the same way, a little faster, so the movement never reverses.
+   It leaves when it scrolls off screen, and also when the next section slides over it (the sections stack on the home).
    Works from the elements' own classes: nothing to add in the markup. Skipped with reduced motion. */
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
@@ -8,26 +9,46 @@
   const els = [...document.querySelectorAll(SEL)].filter(e => !e.closest('dialog,#menu'));
   if (!els.length) return;
   const st = document.createElement('style');
-  st.textContent = `.rv{transition-property:var(--rvp);transition-duration:var(--rvd);transition-timing-function:var(--rvf);transition-delay:var(--rvl)}
+  // arriving (data-rv=in): .45s, decelerating. Leaving (pre / post): .3s, accelerating
+  st.textContent = `.rv{transition-property:var(--rvp);transition-duration:var(--rvdo);transition-timing-function:var(--rvfo);transition-delay:var(--rvl)}
+.rv[data-rv=in]{transition-duration:var(--rvd);transition-timing-function:var(--rvf)}
 .rv[data-rv=pre]{clip-path:inset(-10px 100% -10px -10px);opacity:0}
 .rv[data-rv=in]{clip-path:inset(-10px);opacity:1}
 .rv[data-rv=post]{clip-path:inset(-10px -10px -10px 100%);opacity:0}
-.rv[data-rv] span,.rv[data-rv]>svg{transition:opacity .5s ease .22s}.rv[data-rv=pre] span,.rv[data-rv=post] span,.rv[data-rv=pre]>svg,.rv[data-rv=post]>svg{opacity:0;transition-delay:0s}`;
+.rv[data-rv] span,.rv[data-rv]>svg{transition:opacity .3s ease .12s}.rv[data-rv=pre] span,.rv[data-rv=post] span,.rv[data-rv=pre]>svg,.rv[data-rv=post]>svg{opacity:0;transition-duration:.15s;transition-delay:0s}`;
   document.head.appendChild(st);
-  const EASE = 'cubic-bezier(.76,0,.24,1)';
+  const IN = 'cubic-bezier(.22,1,.36,1)', OUT = 'cubic-bezier(.64,0,.78,0)';
   els.forEach(e => {
     // keep the element's own transitions (hover colour, gap...) and add ours
     const c = getComputedStyle(e), has = c.transitionProperty !== 'all' && c.transitionDuration !== '0s';
     const props = has ? c.transitionProperty.split(', ') : [], durs = has ? c.transitionDuration.split(', ') : [], fns = has ? c.transitionTimingFunction.split(/,(?![^(]*\))/).map(x => x.trim()) : [], dels = has ? c.transitionDelay.split(', ') : [];
     e.style.setProperty('--rvp', [...props, 'clip-path', 'opacity'].join(','));
-    e.style.setProperty('--rvd', [...durs, '.85s', '.55s'].join(','));
-    e.style.setProperty('--rvf', [...fns, EASE, 'ease'].join(','));
+    e.style.setProperty('--rvd', [...durs, '.45s', '.3s'].join(','));
+    e.style.setProperty('--rvdo', [...durs, '.3s', '.2s'].join(','));
+    e.style.setProperty('--rvf', [...fns, IN, 'ease-out'].join(','));
+    e.style.setProperty('--rvfo', [...fns, OUT, 'ease-in'].join(','));
     e.style.setProperty('--rvl', [...dels, '0s', '0s'].join(','));
     e.classList.add('rv'); e.dataset.rv = 'pre';
   });
+
+  /* on screen = intersecting, and not covered by another section */
+  const inView = new Set();
+  const covered = e => {
+    const r = e.getBoundingClientRect(), x = Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), y = Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2));
+    const t = document.elementFromPoint(x, y);
+    if (!t || e.contains(t) || t.contains(e)) return false;
+    const mine = e.closest('.sec,footer,main'), other = t.closest('.sec,footer,main');
+    return !!other && other !== mine && !other.contains(e) && !t.closest('.bar,.scr');
+  };
+  const set = (e, v) => { if (e.dataset.rv !== v) e.dataset.rv = v; };
   const io = new IntersectionObserver(es => es.forEach(en => {
-    const r = en.boundingClientRect;
-    en.target.dataset.rv = en.isIntersecting ? 'in' : (r.top < 0 ? 'post' : 'pre');
+    const e = en.target, r = en.boundingClientRect;
+    if (en.isIntersecting) { inView.add(e); set(e, covered(e) ? 'post' : 'in'); }
+    else { inView.delete(e); set(e, r.top < 0 ? 'post' : 'pre'); }
   }), { threshold: [0, .6], rootMargin: '0px 0px -8% 0px' });
   els.forEach(e => io.observe(e));
+  let raf = 0;
+  const check = () => { raf = 0; inView.forEach(e => set(e, covered(e) ? 'post' : 'in')); };
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(check); }, { passive: true });
+  addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(check); });
 })();
