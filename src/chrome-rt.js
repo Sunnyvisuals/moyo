@@ -16,8 +16,8 @@ let lang = getLang();
 
 /* The chrome owns its own labels so it works on any page, whatever that page's own language system. */
 const I18N = {
-  fr: { 'sec.top': 'Accueil', 'sec.projects': 'Projets', 'sec.all': 'Tous les projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'L’équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
-  en: { 'sec.top': 'Home', 'sec.projects': 'Projects', 'sec.all': 'All projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'The team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
+  fr: { 'sec.top': 'Accueil', 'sec.projects': 'Projets choisis', 'sec.all': 'Tous les projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'L’équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
+  en: { 'sec.top': 'Home', 'sec.projects': 'Featured Projects', 'sec.all': 'All projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'The team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
 };
 const ARIA = { fr: { homeAria: 'moyo, accueil', nav: 'Navigation principale', menu: 'Menu' }, en: { homeAria: 'moyo, home', nav: 'Main navigation', menu: 'Menu' } };
 const bar = document.getElementById('bar');

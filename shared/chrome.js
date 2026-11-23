@@ -141,7 +141,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
   <div class="menu-in">
     <ol class="menu-list arc">
       <li><a href="/"><span class="mn" data-i="sec.top">Accueil</span></a></li>
-      <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets</span></a></li>
+      <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets choisis</span></a></li>
       <li><a href="/projets"><span class="mn" data-i="sec.all">Tous les projets</span></a></li>
       <li><a href="/#services"><span class="mn" data-i="sec.services">Services</span></a></li>
       <li><a href="/#studio"><span class="mn" data-i="sec.studio">Agence</span></a></li>
@@ -223,19 +223,19 @@ const FOOTER_CSS = `
 /* Glass top of the footer (every page): the panel slides over the page, its top is frosted glass with a bright rim,
    then it turns into the solid Klein blue before the text starts. To remove the effect, empty this string. */
 const GLASS_CSS = `
-footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(64px - var(--fr,.75) * 32px);
+footer#foot{--gp:clamp(240px,44vh,640px);--gh:calc(var(--gp) + 40px);--gr:calc(64px - var(--fr,.75) * 32px);
   border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(0 47 167) calc(var(--gh) - 1px));
   box-shadow:0 -2px 8px rgb(0 6 40 / .08),0 -24px 48px -12px rgb(0 6 40 / .22)!important}
 /* the glass: deep frost, only soft masses of colour come through, then it turns blue downwards */
 footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
-  background:linear-gradient(to bottom in oklab,rgb(0 47 167 / 0.200) calc(var(--gp) * 0.000),rgb(0 47 167 / 0.234) calc(var(--gp) * 0.054),rgb(0 47 167 / 0.270) calc(var(--gp) * 0.109),rgb(0 47 167 / 0.312) calc(var(--gp) * 0.163),rgb(0 47 167 / 0.359) calc(var(--gp) * 0.218),rgb(0 47 167 / 0.412) calc(var(--gp) * 0.272),rgb(0 47 167 / 0.472) calc(var(--gp) * 0.327),rgb(0 47 167 / 0.535) calc(var(--gp) * 0.381),rgb(0 47 167 / 0.602) calc(var(--gp) * 0.436),rgb(0 47 167 / 0.669) calc(var(--gp) * 0.490),rgb(0 47 167 / 0.735) calc(var(--gp) * 0.544),rgb(0 47 167 / 0.796) calc(var(--gp) * 0.599),rgb(0 47 167 / 0.852) calc(var(--gp) * 0.653),rgb(0 47 167 / 0.900) calc(var(--gp) * 0.708),rgb(0 47 167 / 0.938) calc(var(--gp) * 0.762),rgb(0 47 167 / 0.967) calc(var(--gp) * 0.817),rgb(0 47 167 / 0.986) calc(var(--gp) * 0.871),rgb(0 47 167 / 0.997) calc(var(--gp) * 0.926),rgb(0 47 167 / 1.000) calc(var(--gp) * 0.980)),
+  background:linear-gradient(to bottom in oklab,rgb(0 47 167 / 0.030) calc(var(--gp) * 0.000),rgb(0 47 167 / 0.030) calc(var(--gp) * 0.049),rgb(0 47 167 / 0.030) calc(var(--gp) * 0.098),rgb(0 47 167 / 0.031) calc(var(--gp) * 0.147),rgb(0 47 167 / 0.037) calc(var(--gp) * 0.196),rgb(0 47 167 / 0.054) calc(var(--gp) * 0.245),rgb(0 47 167 / 0.085) calc(var(--gp) * 0.294),rgb(0 47 167 / 0.131) calc(var(--gp) * 0.343),rgb(0 47 167 / 0.191) calc(var(--gp) * 0.392),rgb(0 47 167 / 0.264) calc(var(--gp) * 0.441),rgb(0 47 167 / 0.347) calc(var(--gp) * 0.490),rgb(0 47 167 / 0.436) calc(var(--gp) * 0.539),rgb(0 47 167 / 0.528) calc(var(--gp) * 0.588),rgb(0 47 167 / 0.617) calc(var(--gp) * 0.637),rgb(0 47 167 / 0.702) calc(var(--gp) * 0.686),rgb(0 47 167 / 0.778) calc(var(--gp) * 0.735),rgb(0 47 167 / 0.843) calc(var(--gp) * 0.784),rgb(0 47 167 / 0.897) calc(var(--gp) * 0.833),rgb(0 47 167 / 0.939) calc(var(--gp) * 0.882),rgb(0 47 167 / 0.972) calc(var(--gp) * 0.931),rgb(0 47 167 / 1.000) calc(var(--gp) * 0.980)),
     radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
     linear-gradient(rgb(255 255 255 / .1),#0000 110px);
   /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
   box-shadow:inset 0 calc(3px + var(--fv,0) * 5px) calc(2px + var(--fv,0) * 3px) calc(-1px - var(--fv,0) * 2px) rgb(255 255 255 / .5),
     inset 0 calc(12px + var(--fv,0) * 16px) calc(16px + var(--fv,0) * 10px) calc(-11px - var(--fv,0) * 6px) rgb(0 14 70 / calc(.3 + var(--fv,0) * .25));
-  -webkit-backdrop-filter:blur(44px) contrast(.8) saturate(1.25);backdrop-filter:blur(44px) contrast(.8) saturate(1.25)}
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5)}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
 footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:calc(1px + var(--fv,0) * 1.5px);box-shadow:none;
   background:radial-gradient(520px 90px at var(--lx,50%) 0,#fff 20%,#0000),
@@ -266,7 +266,7 @@ const footerInner = ({ home = false } = {}) => {
       <ul>
 ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
 `}        <li><a href="${h}approche" data-i="${home ? 'sec.intro' : 'sIntro'}">Approche</a></li>
-        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets</a></li>
+        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets choisis</a></li>
         <li><a href="/projets" data-i="${home ? 'sec.all' : 'allL'}">Tous les projets</a></li>
         <li><a href="${h}services" data-i="${home ? 'sec.services' : 'sSvc'}">Services</a></li>
         <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Agence</a></li>
