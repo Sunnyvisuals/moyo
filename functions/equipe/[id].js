@@ -2,7 +2,7 @@
    French and English are both in the page; a small script shows the language chosen on the site (stored as "hb-lang"). */
 import { getData } from '../_lib/store.js';
 import { escHTML as e, imgURL } from '../../shared/render.js';
-import { CHROME_CSS, chromeHead, FOOTER_CSS, footerHTML } from '../../shared/chrome.js';
+import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
 
 const para = t => String(t || '').split(/\n{2,}/).map(p => `<p>${e(p).replace(/\n/g, '<br>')}</p>`).join('');
 
@@ -66,9 +66,7 @@ h1{grid-column:1/-1;font-size:clamp(3rem,9vw,9rem);font-weight:300;letter-spacin
 span[data-l],div[data-l]{display:none}html[lang=fr] :is(span,div)[data-l=fr],html[lang=en] :is(span,div)[data-l=en]{display:revert}
 @media (max-width:560px){.cta-bar{grid-template-columns:1fr 64px}.cta-bar a{min-height:84px}.cta-bar a:nth-child(2){grid-row:2;grid-column:1}.cta-bar a:nth-child(3){grid-row:1/3;grid-column:2;padding:0}}
 
-${CHROME_CSS}${FOOTER_CSS}
-/* the footer follows the blue tiles directly: it must not cover them */
-.foot{margin-top:0;box-shadow:none;border-top:1px solid var(--paper-line);animation:none}
+${CHROME_CSS}${FOOTER_CSS}${GLASS_CSS}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
 @media (prefers-reduced-motion:no-preference){
   html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
@@ -82,7 +80,7 @@ try{if(localStorage.getItem('hb-lang')==='en')document.documentElement.lang='en'
 </head>
 <body>
 ${chromeHead(5)}
-<main id="main">
+<div class="under"><main id="main">
   <p class="idx" aria-hidden="true"><i></i><span data-l="fr">L’équipe</span><span data-l="en">The team</span></p>
   <h1>${e(m.name)}</h1>
   <p class="role"><span data-l="fr">${e(fr.role)}</span><span data-l="en">${e(en.role)}</span></p>
@@ -95,6 +93,7 @@ ${chromeHead(5)}
   <a href="/#contact"><span class="n">02</span><span class="t"><span data-l="fr">Écrire au studio</span><span data-l="en">Write to the studio</span></span></a>
   <a href="/" aria-label="Accueil"><i></i><i></i><i></i><i></i></a>
 </nav>
+</div>
 ${footerHTML()}
 <script src="/lenis.js"></script>
 <script>(()=>{const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,root=document.documentElement;

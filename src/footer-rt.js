@@ -128,6 +128,9 @@ if(subForm) subForm.addEventListener('submit',async e=>{
   finally{ btn.disabled=false; }
 });
 
+/* the content before the footer stays put (bottom aligned) while the footer slides over it */
+const under=$('.under');
+if(under&&!reduce){ const fit=()=>under.style.setProperty('--st',Math.min(0,innerHeight-under.offsetHeight)+'px'); new ResizeObserver(fit).observe(under); addEventListener('resize',fit); fit(); }
 label();
 new MutationObserver(()=>{ const l=getLang(); if(l===lang) return; lang=l; label(); fillFoot(); }).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 })();

@@ -205,6 +205,27 @@ const FOOTER_CSS = `
 }}
 `;
 
+/* Glass top of the footer (every page): the panel slides over the page, its top is frosted glass with a bright rim,
+   then it turns into the solid Klein blue before the text starts. To remove the effect, empty this string. */
+const GLASS_CSS = `
+footer#foot{--gp:clamp(190px,32vh,320px);--gh:calc(var(--gp) + 40px);--gr:40px;
+  border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(0 47 167) calc(var(--gh) - 1px));
+  box-shadow:0 -4px 6px rgb(0 6 40 / .05),0 -19px 20px rgb(0 6 40 / .1),0 -60px 60px -8px rgb(0 6 40 / .2)!important}
+/* the frost: blurs what is behind */
+footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;background:none;opacity:1;mix-blend-mode:normal;
+  -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25)}
+/* the light: a 3px rim and a diagonal sheen, drowned by the blue tint as it thickens downwards */
+footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;
+  background:linear-gradient(to bottom,rgb(0 47 167 / .06) 0,rgb(0 47 167 / .16) calc(var(--gp) * .22),rgb(0 47 167 / .38) calc(var(--gp) * .45),rgb(0 47 167 / .68) calc(var(--gp) * .68),rgb(0 47 167 / .9) calc(var(--gp) * .88),rgb(0 47 167) var(--gh)),linear-gradient(rgb(255 255 255 / .22),#0000 30px),linear-gradient(150deg,rgb(255 255 255 / .2) 0%,rgb(255 255 255 / .03) 34%,rgb(255 255 255 / .16) 52%,rgb(255 255 255 / .02) 72%,rgb(255 255 255 / .1) 100%);
+  box-shadow:inset 0 3px 0 -.5px rgb(255 255 255 / .92),inset 0 6px 3px -3px rgb(0 10 60 / .2)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){footer#foot{background:var(--klein)}}
+@media (max-width:820px){footer#foot{--gp:clamp(150px,24vh,210px);--gr:28px}}
+/* pages other than the home: what comes before stays put while the footer slides over it (--st is set in footer.js) */
+.under{position:sticky;top:var(--st,0px);z-index:1;background:var(--chaux)}
+@media (prefers-reduced-motion:reduce){.under{position:relative;top:0}}
+`;
+
 /* Single source of the footer content. The home keeps its own <footer> shell (sticky stack), in-page anchors and `sec.*` labels. */
 const footerInner = ({ home = false } = {}) => {
   const w = home ? 'wrap ' : '', h = home ? '#' : '/#';
@@ -251,4 +272,4 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
 ${footerInner()}
 </footer>`;
 
-export { CHROME_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerInner, footerHTML };
