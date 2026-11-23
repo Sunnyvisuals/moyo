@@ -103,6 +103,10 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bar{background:rgb(241 243 242 / .94)}.bar[data-tone="paper"]{background:rgb(0 47 167 / .94)}}
 html.bar-pre .bar{visibility:hidden;transition:none!important}
 .bar.away{translate:0 -100%}
+.bar::before{content:"";position:absolute;inset:0 0 -26px;z-index:-1;pointer-events:none;background:linear-gradient(var(--chaux) 52%,#0000);opacity:0;transition:opacity .5s ease}
+.bar.scrolled::before{opacity:1}
+.bar[data-tone="paper"]::before{background:linear-gradient(var(--klein) 52%,#0000)}
+.bar[data-sec="contact"]::before{background:linear-gradient(color-mix(in oklab,var(--klein) 50%,#000614) 52%,#0000)}
 .bar :focus-visible{outline-color:currentColor;outline-offset:4px}
 .bar-mark{font-size:1.125rem;font-weight:550;letter-spacing:-.02em;text-decoration:none}
 .bar-now{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.62;padding-left:clamp(16px,2.4vw,40px);border-left:1px solid currentColor;line-height:1;transition:opacity var(--dur-3)}
@@ -1331,6 +1335,7 @@ __FOOTER_INNER__
 <script src="/count.js" defer></script>
 <script src="/glass.js" defer></script>
 <script src="/hand.js" defer></script>
+<script src="/stage.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/roll.js" defer></script>
 <script src="/leave.js" defer></script>

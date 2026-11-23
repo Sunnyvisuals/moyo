@@ -44,7 +44,6 @@ h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;l
 .bio{margin-top:clamp(20px,3vh,36px);font-size:clamp(1.125rem,1.4vw,1.375rem);line-height:1.6;max-width:44ch}
 .bio p+p{margin-top:1em}
 @media (prefers-reduced-motion:no-preference){
-  .photo,h1,.bio,.ttl{animation:in 1.2s var(--ease) both}.ttl{animation-delay:.05s}h1{animation-delay:.1s}.bio{animation-delay:.18s}
   html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition{background:color-mix(in oklab,var(--klein) 38%,#000614)}
@@ -89,6 +88,7 @@ if(!reduce&&typeof Lenis!=='undefined')new Lenis({lerp:.055,wheelMultiplier:.8,s
 <script src="/footer.js" defer></script>
 <script src="/glass.js" defer></script>
 <script src="/hand.js" defer></script>
+<script src="/stage.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>

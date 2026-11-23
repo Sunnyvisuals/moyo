@@ -134,9 +134,11 @@ html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
     document.querySelectorAll('.scr p:not([hidden])').forEach(q => {
       const r = q.getBoundingClientRect(), L = q.children, n = L.length;
       const c = (r.top + r.bottom) / 2, vis = r.bottom > 0 && r.top < H;
-      const t = vis ? Math.max(0, Math.min(1, (H * .98 - c) / (H * .27))) : 0; // written in full once it has climbed to about 70% of the screen
+      const hb = q.closest('.scr').parentElement.getBoundingClientRect(), shown = Math.max(0, Math.min(hb.bottom, H) - Math.max(hb.top, 0)) / Math.max(1, Math.min(H, hb.height));
+      // written in full once it has climbed to about 70% of the screen, or as soon as its section fills the screen
+      const t = vis ? Math.max(0, Math.min(1, Math.max((H * .98 - c) / (H * .27), (shown - .55) / .3))) : 0;
       for (let k = 0; k < n; k++) { const on = t > 0 && t > (k + .5) / (n + 1) * .95 + .02; if (L[k].classList.contains('on') !== on) L[k].classList.toggle('on', on); }
-      q.classList.toggle('gone', !vis || (scrollY > 60 && c < H * .3));
+      q.classList.toggle('gone', !vis || (scrollY > 60 && c < H * .3 && shown < .85));
     });
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };

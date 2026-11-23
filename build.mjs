@@ -54,6 +54,7 @@ out('dist/cursor.js', read('src/cursor.js'));
 out('dist/hand.js', read('src/hand.js'));
 out('dist/leave.js', read('src/leave.js'));
 out('dist/reveal.js', read('src/reveal.js'));
+out('dist/stage.js', read('src/stage.js'));
 out('dist/roll.js', read('src/roll.js'));
 out('dist/count.js', read('src/count.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
