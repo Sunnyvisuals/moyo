@@ -237,6 +237,37 @@ const FOOTER_CSS = `
 }}
 `;
 
+/* Glass top of the footer (every page): the panel slides over the page, its top is frosted glass with a bright rim,
+   then it turns into the solid Klein blue before the text starts. To remove the effect, empty this string. */
+const GLASS_CSS = `
+footer#foot{--gp:clamp(240px,44vh,640px);--gh:calc(var(--gp) + 40px);--gr:calc(64px - var(--fr,.75) * 32px);
+  border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(0 47 167) calc(var(--gh) - 1px));
+  box-shadow:0 -2px 8px rgb(0 6 40 / .08),0 -24px 48px -12px rgb(0 6 40 / .22)!important}
+/* the glass: clear, it bends what is behind it (glass.js sets --liquid where the browser can), then turns blue downwards */
+footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
+  background:linear-gradient(to bottom in oklab,rgb(0 47 167 / 0.012) calc(var(--gp) * 0.000),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.049),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.098),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.147),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.196),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.245),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.294),rgb(0 47 167 / 0.016) calc(var(--gp) * 0.343),rgb(0 47 167 / 0.037) calc(var(--gp) * 0.392),rgb(0 47 167 / 0.086) calc(var(--gp) * 0.441),rgb(0 47 167 / 0.166) calc(var(--gp) * 0.490),rgb(0 47 167 / 0.272) calc(var(--gp) * 0.539),rgb(0 47 167 / 0.398) calc(var(--gp) * 0.588),rgb(0 47 167 / 0.533) calc(var(--gp) * 0.637),rgb(0 47 167 / 0.666) calc(var(--gp) * 0.686),rgb(0 47 167 / 0.785) calc(var(--gp) * 0.735),rgb(0 47 167 / 0.882) calc(var(--gp) * 0.784),rgb(0 47 167 / 0.949) calc(var(--gp) * 0.833),rgb(0 47 167 / 0.987) calc(var(--gp) * 0.882),rgb(0 47 167 / 0.999) calc(var(--gp) * 0.931),rgb(0 47 167 / 1.000) calc(var(--gp) * 0.980)),
+    radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
+    linear-gradient(rgb(255 255 255 / .09),#0000 130px);
+  /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
+  box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),inset 0 calc(6px + var(--fv,0) * 8px) calc(10px + var(--fv,0) * 6px) calc(-8px - var(--fv,0) * 3px) rgb(0 14 70 / calc(.16 + var(--fv,0) * .14));
+  -webkit-backdrop-filter:blur(4px) saturate(1.3);backdrop-filter:var(--liquid,blur(4px)) saturate(1.35) brightness(1.04)}
+/* the edge: a fine ring, brightest where the light hits it (--lx) */
+footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
+  background:radial-gradient(calc(380px + var(--fv,0) * 260px) 70px at var(--lx,50%) 0,#fff 10%,#0000),
+    radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
+    radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),
+    linear-gradient(to bottom,rgb(255 255 255 / .55) 0,rgb(255 255 255 / .4) 24px,rgb(255 255 255 / .14) 34%,#0000 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){footer#foot{background:var(--klein)}}
+@media (max-width:820px){footer#foot{--gp:clamp(170px,27vh,250px);--gr:calc(40px - var(--fr,.75) * 16px)}}
+/* home: the last section must not lift, the glass would show the page background under it */
+html.stack main>.contact{transform:none}
+/* pages other than the home: what comes before stays put while the footer slides over it (--st is set in footer.js) */
+.under{position:sticky;top:var(--st,0px);z-index:1;background:var(--chaux)}
+@media (prefers-reduced-motion:reduce){.under{position:relative;top:0}}
+`;
+
 /* Single source of the footer content. The home keeps its own <footer> shell (sticky stack), in-page anchors and `sec.*` labels. */
 const SEED_TEAM = [{ id: 'zahia-bougouffa', name: 'Zahia Bougouffa' }, { id: 'yacine-bouabdallah', name: 'Yacine Bouabdallah' }];
 const escH = v => String(v).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -286,4 +317,4 @@ const footerHTML = team => `<footer class="foot" id="foot" aria-label="Pied de p
 ${footerInner({ team })}
 </footer>`;
 
-export { creditLinks, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { creditLinks, GLASS_CSS, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
