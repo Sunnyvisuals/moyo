@@ -108,7 +108,7 @@ export async function onRequestPost({ request, env }) {
           from,
           to: [to],
           reply_to: msg.email,
-          subject: `Nouveau message — ${msg.name}`,
+          subject: `Nouveau message de ${msg.name}`,
           text: lines,
           html
         })
