@@ -10,7 +10,7 @@
   const root = document.documentElement;
   const MODES = { '#approche': 'seq', '#services': 'scrub', '#studio': 'seq', '#equipe': 'scrub', '#contact': 'seq', '#foot': 'seq', '.projects-main': 'seq', '.who-main': 'seq' };
   const TARGETS = '.idx,.lead,.ct-lead,.ct-alt,.small,p,dl,.list li,.steps li,.fld,.chips,.f-foot,.figs>div,.beliefs li,.fcol,.foot-sub,.foot-base,.head>*,.filters,.projects>li,.photo,.ttl,h1,.bio p,.entry-d>*';
-  const SKIP = '.scr,#menu,dialog,.bar,.blocks,.acc,.loader,.stage,.sunui,.win,.display,.lines,.shut,.grad,.words,.par,.hint,.scroll-cue,.dots,.skip,#tip,.sr,.hp,.mono-wrap,.proj-more,.studio-cta';
+  const SKIP = '.scr,#menu,dialog,.bar,.blocks,.acc,.loader,.stage,.sunui,.win,.display,.lines,.shut,.grad,.words,.par,.hint,.scroll-cue,.dots,.skip,#tip,.sr,.hp,.mono-wrap,.proj-more,.studio-cta,.head h1,.who h1';
   const st = document.createElement('style');
   st.textContent = `.stg{opacity:0;translate:0 var(--sy,20px)}
 .stg.in{opacity:1;translate:0 0;transition:opacity .9s ease var(--sd,0ms),translate 1s cubic-bezier(.22,1,.36,1) var(--sd,0ms)}

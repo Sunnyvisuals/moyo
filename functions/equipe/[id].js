@@ -99,6 +99,7 @@ if(!reduce&&typeof Lenis!=='undefined')new Lenis({lerp:.055,wheelMultiplier:.8,s
 <script src="/hand.js" defer></script>
 <script src="/stage.js" defer></script>
 <script src="/fw.js" defer></script>
+<script src="/wr.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>
