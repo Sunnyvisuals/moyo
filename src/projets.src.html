@@ -186,6 +186,7 @@ __FOOTER__
   </div>
 </dialog>
 
+<script>__LENIS__</script>
 <script>
 (() => {
 'use strict';
@@ -381,6 +382,8 @@ if(subForm) subForm.addEventListener('submit',async e=>{
   finally{ btn.disabled=false; }
 });
 
+/* Smooth scroll, comme sur l'accueil */
+if(!reduce && typeof Lenis!=='undefined') new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});
 applyLang(lang);
 })();
 </script>

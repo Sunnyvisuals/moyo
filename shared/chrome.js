@@ -193,6 +193,11 @@ const FOOTER_CSS = `
 @media (prefers-reduced-motion:reduce){.foot-grid,.foot-subwrap,.foot-base,.foot .mono-wrap{transform:none}}
 @media (max-width:900px){.fcol{grid-column:span 6}}
 @media (max-width:560px){.fcol{grid-column:1/-1}}
+/* The blue panel rises over the content as it scrolls in (parallax "comes over"). */
+@media (prefers-reduced-motion:no-preference){@supports (animation-timeline:view()){
+  .foot{animation:footOver linear both;animation-timeline:view();animation-range:entry 0% cover 14%}
+  @keyframes footOver{from{translate:0 100px}to{translate:0 0}}
+}}
 `;
 
 const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">

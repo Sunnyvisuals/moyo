@@ -38,6 +38,7 @@ const sizes = {
     __RENDER__: renderSrc,
     __ROWS__: rowsHTML(seed.projects, 'fr'),
     __DATA__: dataJSON(seed),
+    __LENIS__: lenis,
     __CHROME_CSS__: CHROME_CSS + FOOTER_CSS,
     __CHROME_HEAD__: chromeHead(2),
     __FOOTER__: footerHTML()
