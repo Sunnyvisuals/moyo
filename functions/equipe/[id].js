@@ -54,7 +54,7 @@ h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;l
 @media (max-width:820px){main{min-height:0;align-items:start}.photo,.who{grid-column:1/-1}.photo{max-height:none}}
 span[data-l],div[data-l]{display:none}html[lang=fr] :is(span,div)[data-l=fr],html[lang=en] :is(span,div)[data-l=en]{display:revert}
 
-${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}
+${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}${GLASS_CSS}
 .foot{margin-top:0;animation:none}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
 @media (prefers-reduced-motion:no-preference){
@@ -85,6 +85,7 @@ document.querySelectorAll('.flang button').forEach(b=>b.addEventListener('click'
 if(!reduce&&typeof Lenis!=='undefined')new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});})();</script>
 <script src="/chrome.js" defer></script>
 <script src="/footer.js" defer></script>
+<script src="/glass.js" defer></script>
 <script src="/hand.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/leave.js" defer></script>

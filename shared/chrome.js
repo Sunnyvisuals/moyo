@@ -246,12 +246,11 @@ footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;i
     radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
     linear-gradient(rgb(255 255 255 / .09),#0000 130px);
   /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
-  box-shadow:inset 0 calc(3px + var(--fv,0) * 5px) calc(2px + var(--fv,0) * 3px) calc(-1px - var(--fv,0) * 2px) rgb(255 255 255 / .5),
-    inset 0 calc(12px + var(--fv,0) * 16px) calc(16px + var(--fv,0) * 10px) calc(-11px - var(--fv,0) * 6px) rgb(0 14 70 / calc(.3 + var(--fv,0) * .25));
+  box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),inset 0 calc(6px + var(--fv,0) * 8px) calc(10px + var(--fv,0) * 6px) calc(-8px - var(--fv,0) * 3px) rgb(0 14 70 / calc(.16 + var(--fv,0) * .14));
   -webkit-backdrop-filter:blur(4px) saturate(1.3);backdrop-filter:var(--liquid,blur(4px)) saturate(1.35) brightness(1.04)}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
-footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:calc(1.5px + var(--fv,0) * 2.5px);box-shadow:none;
-  background:radial-gradient(calc(520px + var(--fv,0) * 380px) 120px at var(--lx,50%) 0,#fff 20%,#0000),
+footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
+  background:radial-gradient(calc(380px + var(--fv,0) * 260px) 70px at var(--lx,50%) 0,#fff 10%,#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),
     linear-gradient(to bottom,rgb(255 255 255 / .55) 0,rgb(255 255 255 / .4) 24px,rgb(255 255 255 / .14) 34%,#0000 70%);
@@ -311,4 +310,4 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
 ${footerInner()}
 </footer>`;
 
-export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerInner, footerHTML };
