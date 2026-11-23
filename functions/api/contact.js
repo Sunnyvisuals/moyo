@@ -53,7 +53,7 @@ export async function onRequestPost({ request, env }) {
     const to = env.TO_EMAIL || 'contact.moyostudio@gmail.com';
     const from = env.FROM_EMAIL || 'moyo <onboarding@resend.dev>';
     const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' };
-    const budget = { lt5: '< 5 k€', '5-15': '5–15 k€', '15-40': '15–40 k€', gt40: '> 40 k€', tbd: 'À définir' };
+    const budget = { lt5: 'Moins de 5 k€', '5-15': '5 à 15 k€', '15-40': '15 à 40 k€', gt40: 'Plus de 40 k€', tbd: 'À définir' };
     const typeTxt = msg.type ? (label[msg.type] || msg.type) : '';
     const budgetTxt = msg.budget ? (budget[msg.budget] || msg.budget) : '';
     const first = msg.name.split(/\s+/)[0] || msg.name;
@@ -70,13 +70,13 @@ export async function onRequestPost({ request, env }) {
       '',
       msg.message,
       '',
-      `— Reçu le ${when} · réf. ${id}`
+      `Reçu le ${when} · réf. ${id}`
     ].filter(l => l !== null).join('\n');
 
     // Styled HTML receipt (table-based, inline styles for e-mail clients)
-    const chip = (k, v) => `<td style="padding:0 14px 0 0;vertical-align:top"><p style="margin:0 0 2px;font:500 11px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#9aa0a8">${esc(k)}</p><p style="margin:0;font:400 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#141821">${esc(v)}</p></td>`;
+    const chip = (k, v) => `<td style="padding:0 18px 0 0;vertical-align:top"><p style="margin:0 0 3px;font:600 11px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#9aa0a8">${esc(k)}</p><p style="margin:0;font:600 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0b1020">${esc(v)}</p></td>`;
     const chips = [typeTxt ? chip('Type', typeTxt) : '', budgetTxt ? chip('Budget', budgetTxt) : '', chip('Langue', msg.lang === 'en' ? 'Anglais' : 'Français')].join('');
-    const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#eef0ef;padding:28px 12px">
+    const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#eef0ef;padding:28px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,10,50,.08)">
 <tr><td style="background:#002FA7;padding:20px 28px">
   <table role="presentation" width="100%"><tr>
@@ -86,7 +86,7 @@ export async function onRequestPost({ request, env }) {
 </td></tr>
 <tr><td style="padding:26px 28px 6px">
   <p style="margin:0 0 3px;font:600 22px/1.2 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;color:#0b1020">${esc(msg.name)}</p>
-  <a href="mailto:${esc(msg.email)}" style="font:400 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#002FA7;text-decoration:none">${esc(msg.email)}</a>
+  <a href="mailto:${esc(msg.email)}" style="font:500 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#002FA7;text-decoration:none">${esc(msg.email)}</a>
 </td></tr>
 <tr><td style="padding:18px 28px 0"><table role="presentation"><tr>${chips}</tr></table></td></tr>
 <tr><td style="padding:18px 28px 0">
