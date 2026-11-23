@@ -9,7 +9,7 @@ const escHTML = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '
 /* Fallback drawing for a project with neither image nor plate: three horizontal slats, like the window. */
 const FALLBACK_PLATE = '<svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><rect x="110" y="70" width="280" height="76"/><rect x="110" y="162" width="280" height="76"/><rect x="110" y="254" width="280" height="76"/></g></svg>';
 
-const imgURL = id => '/img/' + encodeURIComponent(id);
+const imgURL = id => (id && (id[0] === '/' || id.startsWith('http'))) ? id : '/img/' + encodeURIComponent(id);
 
 function catLabel(data, id, lang) {
   const c = (data.categories || []).find(c => c.id === id);

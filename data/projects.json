@@ -1,187 +1,187 @@
 {
- "version": 1,
- "categories": [
-  {
-   "id": "identite",
-   "fr": "Identité",
-   "en": "Identity"
-  },
-  {
-   "id": "site",
-   "fr": "Sites",
-   "en": "Websites"
-  },
-  {
-   "id": "donnees",
-   "fr": "Données",
-   "en": "Data"
-  },
-  {
-   "id": "motion",
-   "fr": "Motion",
-   "en": "Motion"
-  }
- ],
- "projects": [
-  {
-   "id": "soleil-2725",
-   "year": "2026",
-   "category": "donnees",
-   "featured": true,
-   "tone": "klein",
-   "cover": null,
-   "images": [],
-   "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1\" opacity=\".3\"><circle cx=\"250\" cy=\"200\" r=\"100\"/><circle cx=\"250\" cy=\"200\" r=\"160\"/><circle cx=\"250\" cy=\"200\" r=\"230\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\"><line x1=\"250.0\" y1=\"158.0\" x2=\"250.0\" y2=\"113.7\"/><line x1=\"271.0\" y1=\"163.6\" x2=\"295.7\" y2=\"120.8\"/><line x1=\"286.4\" y1=\"179.0\" x2=\"349.2\" y2=\"142.7\"/><line x1=\"292.0\" y1=\"200.0\" x2=\"369.7\" y2=\"200.0\"/><line x1=\"286.4\" y1=\"221.0\" x2=\"371.5\" y2=\"270.1\"/><line x1=\"271.0\" y1=\"236.4\" x2=\"330.4\" y2=\"339.3\"/><line x1=\"250.0\" y1=\"242.0\" x2=\"250.0\" y2=\"384.0\"/><line x1=\"229.0\" y1=\"236.4\" x2=\"167.0\" y2=\"343.8\"/><line x1=\"213.6\" y1=\"221.0\" x2=\"139.6\" y2=\"263.7\"/><line x1=\"208.0\" y1=\"200.0\" x2=\"150.9\" y2=\"200.0\"/><line x1=\"213.6\" y1=\"179.0\" x2=\"179.7\" y2=\"159.4\"/><line x1=\"229.0\" y1=\"163.6\" x2=\"212.0\" y2=\"134.2\"/></g><circle cx=\"250\" cy=\"200\" r=\"22\" fill=\"currentColor\"/></svg>",
-   "fr": {
-    "title": "Soleil 2 725",
-    "role": "Direction artistique, développement",
-    "place": "Nice",
-    "desc": "Une année d’ensoleillement niçois, mois par mois, projetée sur un mur : un rayon par mois, sa longueur égale aux heures de soleil. Le visiteur déplace l’heure, le mur réagit.",
-    "type": "Installation de données"
-   },
-   "en": {
-    "title": "Soleil 2 725",
-    "role": "Art direction, development",
-    "place": "Nice",
-    "desc": "A year of Nice sunshine, month by month, projected on a wall: one ray per month, its length equal to the hours of sun. The visitor moves the hour and the wall responds.",
-    "type": "Data installation"
-   }
-  },
-  {
-   "id": "port-hercule",
-   "year": "2026",
-   "category": "site",
-   "featured": true,
-   "tone": "klein",
-   "cover": null,
-   "images": [],
-   "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g stroke=\"currentColor\" fill=\"none\"><path d=\"M-40 226H540\" stroke-width=\"1\" opacity=\".5\"/><path d=\"M-40 240H540\" stroke-width=\"1\" opacity=\"0.17\"/><path d=\"M-40 254H540\" stroke-width=\"1\" opacity=\"0.14\"/><path d=\"M-40 268H540\" stroke-width=\"1\" opacity=\"0.11\"/><path d=\"M-40 282H540\" stroke-width=\"1\" opacity=\"0.08\"/><path d=\"M-40 296H540\" stroke-width=\"1\" opacity=\"0.05\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\"><rect x=\"44\" y=\"44\" width=\"26\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"78\" width=\"89\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"112\" width=\"170\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"146\" width=\"259\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"180\" width=\"411\" height=\"12\" rx=\"6\"/></g><g stroke=\"currentColor\" stroke-width=\"1.5\" fill=\"none\"><path d=\"M44 300H451\"/><path d=\"M44.0 300v14\" /><path d=\"M81.0 300v8\" /><path d=\"M118.0 300v8\" /><path d=\"M155.0 300v8\" /><path d=\"M192.0 300v8\" /><path d=\"M229.0 300v14\" /><path d=\"M266.0 300v8\" /><path d=\"M303.0 300v8\" /><path d=\"M340.0 300v8\" /><path d=\"M377.0 300v8\" /><path d=\"M414.0 300v14\" /><path d=\"M451.0 300v8\" /></g></svg>",
-   "fr": {
-    "title": "Port Hercule à l’échelle",
-    "role": "Conception, développement",
-    "place": "Monaco",
-    "desc": "Chaque coque tracée à sa longueur réelle, du tender au bateau de 111 mètres, comparée à un terrain de football. Un site qui rend une dimension lisible d’un coup d’œil.",
-    "type": "Site interactif"
-   },
-   "en": {
-    "title": "Port Hercule to scale",
-    "role": "Design, development",
-    "place": "Monaco",
-    "desc": "Every hull drawn at its true length, from the tender to the 111-metre yacht, compared with a football pitch. A site that makes a dimension readable at a glance.",
-    "type": "Interactive site"
-   }
-  },
-  {
-   "id": "villa-chaux",
-   "year": "2025",
-   "category": "identite",
-   "featured": true,
-   "tone": "wash",
-   "cover": null,
-   "images": [],
-   "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><rect x=\"120\" y=\"36\" width=\"260\" height=\"330\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1\" opacity=\".22\"/></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><rect x=\"204\" y=\"56\" width=\"92\" height=\"290\" fill=\"currentColor\"/><path d=\"M204 214H296\" stroke=\"var(--wash)\" stroke-width=\"2\"/><circle cx=\"250\" cy=\"170\" r=\"14\" fill=\"var(--wash)\"/><rect x=\"106\" y=\"56\" width=\"92\" height=\"290\" fill=\"currentColor\"/><rect x=\"302\" y=\"56\" width=\"92\" height=\"290\" fill=\"currentColor\"/><g stroke=\"var(--wash)\" stroke-width=\"2.4\"><path d=\"M106 76h92\"/><path d=\"M106 89h92\"/><path d=\"M106 102h92\"/><path d=\"M106 115h92\"/><path d=\"M106 128h92\"/><path d=\"M106 141h92\"/><path d=\"M106 154h92\"/><path d=\"M106 167h92\"/><path d=\"M106 180h92\"/><path d=\"M106 193h92\"/><path d=\"M106 206h92\"/><path d=\"M106 219h92\"/><path d=\"M106 232h92\"/><path d=\"M106 245h92\"/><path d=\"M106 258h92\"/><path d=\"M106 271h92\"/><path d=\"M106 284h92\"/><path d=\"M106 297h92\"/><path d=\"M106 310h92\"/><path d=\"M106 323h92\"/><path d=\"M302 76h92\"/><path d=\"M302 89h92\"/><path d=\"M302 102h92\"/><path d=\"M302 115h92\"/><path d=\"M302 128h92\"/><path d=\"M302 141h92\"/><path d=\"M302 154h92\"/><path d=\"M302 167h92\"/><path d=\"M302 180h92\"/><path d=\"M302 193h92\"/><path d=\"M302 206h92\"/><path d=\"M302 219h92\"/><path d=\"M302 232h92\"/><path d=\"M302 245h92\"/><path d=\"M302 258h92\"/><path d=\"M302 271h92\"/><path d=\"M302 284h92\"/><path d=\"M302 297h92\"/><path d=\"M302 310h92\"/><path d=\"M302 323h92\"/></g></svg>",
-   "fr": {
-    "title": "Villa Chaux",
-    "role": "Identité, design, développement",
-    "place": "Cap Ferrat",
-    "desc": "Identité d’une maison d’hôtes imaginaire, entièrement bâtie sur le blanc de chaux et un seul bleu. Un site de réservation en trois écrans, lisible au soleil sur un téléphone.",
-    "type": "Identité et site"
-   },
-   "en": {
-    "title": "Villa Chaux",
-    "role": "Identity, design, development",
-    "place": "Cap Ferrat",
-    "desc": "Identity for an imaginary guesthouse, built entirely on lime-wash white and one blue. A three-screen booking site, readable in sunlight on a phone.",
-    "type": "Identity and website"
-   }
-  },
-  {
-   "id": "quinzaine-claire",
-   "year": "2025",
-   "category": "motion",
-   "featured": true,
-   "tone": "klein",
-   "cover": null,
-   "images": [],
-   "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\" opacity=\".3\"><rect x=\"10\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"30\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"50\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"70\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"110\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"130\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"150\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"170\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"190\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"210\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"230\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"250\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"270\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"290\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"310\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"330\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"350\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"370\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"390\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"410\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"430\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"450\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"470\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"490\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"10\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"30\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"50\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"70\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"90\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"110\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"130\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"150\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"170\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"190\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"210\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"230\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"250\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"270\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"290\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"310\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"330\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"350\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"370\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"390\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"410\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"430\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"450\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"470\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"490\" y=\"366\" width=\"10\" height=\"10\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\"><rect x=\"46\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.07\"/><rect x=\"116\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.10\"/><rect x=\"186\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.14\"/><rect x=\"256\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.19\"/><rect x=\"326\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.23\"/><rect x=\"396\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.28\"/><rect x=\"46\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.34\"/><rect x=\"116\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.39\"/><rect x=\"186\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.45\"/><rect x=\"256\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.50\"/><rect x=\"326\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.56\"/><rect x=\"396\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.62\"/><rect x=\"46\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.68\"/><rect x=\"116\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.74\"/><rect x=\"186\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.81\"/><rect x=\"256\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.87\"/><rect x=\"326\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.93\"/><rect x=\"396\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"1.00\"/></g></svg>",
-   "fr": {
-    "title": "La quinzaine claire",
-    "role": "Identité, motion",
-    "place": "Cannes",
-    "desc": "Identité d’un festival de cinéma indépendant : une pellicule de dix-huit images, chacune aux couleurs d’une heure du jour. Générique, affiche et billetterie.",
-    "type": "Identité animée"
-   },
-   "en": {
-    "title": "The clear fortnight",
-    "role": "Identity, motion",
-    "place": "Cannes",
-    "desc": "Identity for an independent film festival: a strip of eighteen frames, each in the colours of one hour of the day. Titles, poster and ticketing.",
-    "type": "Animated identity"
-   }
-  },
-  {
-   "id": "chromatique",
-   "year": "2024",
-   "category": "donnees",
-   "featured": true,
-   "tone": "klein",
-   "cover": null,
-   "images": [],
-   "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g stroke=\"currentColor\" fill=\"none\" opacity=\".28\"><path d=\"M-40 338H540\" stroke-width=\"1\"/><path d=\"M-40 352H540\" stroke-width=\"1\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\"><path d=\"M-20.0 -90H16.7V268A18.4 18.4 0 0 1 -20.0 268Z\" fill-opacity=\"0.12\"/><path d=\"M16.7 -90H72.9V268A28.1 28.1 0 0 1 16.7 268Z\" fill-opacity=\"0.20\"/><path d=\"M72.9 -90H98.8V268A13.0 13.0 0 0 1 72.9 268Z\" fill-opacity=\"0.28\"/><path d=\"M98.8 -90H163.6V268A32.4 32.4 0 0 1 98.8 268Z\" fill-opacity=\"0.36\"/><path d=\"M163.6 -90H204.6V268A20.5 20.5 0 0 1 163.6 268Z\" fill-opacity=\"0.44\"/><path d=\"M204.6 -90H254.3V268A24.8 24.8 0 0 1 204.6 268Z\" fill-opacity=\"0.52\"/><path d=\"M254.3 -90H284.6V268A15.1 15.1 0 0 1 254.3 268Z\" fill-opacity=\"0.60\"/><path d=\"M284.6 -90H345.0V268A30.2 30.2 0 0 1 284.6 268Z\" fill-opacity=\"0.68\"/><path d=\"M345.0 -90H379.6V268A17.3 17.3 0 0 1 345.0 268Z\" fill-opacity=\"0.76\"/><path d=\"M379.6 -90H433.6V268A27.0 27.0 0 0 1 379.6 268Z\" fill-opacity=\"0.84\"/><path d=\"M433.6 -90H461.7V268A14.0 14.0 0 0 1 433.6 268Z\" fill-opacity=\"0.92\"/><path d=\"M461.7 -90H520.0V268A29.2 29.2 0 0 1 461.7 268Z\" fill-opacity=\"1.00\"/></g></svg>",
-   "fr": {
-    "title": "Chromatique",
-    "role": "Direction artistique, données",
-    "place": "Nice",
-    "desc": "Les couleurs des façades de la vieille ville, relevées rue par rue et rangées par teinte. Un atlas consultable, avec ses relevés en tableau.",
-    "type": "Atlas"
-   },
-   "en": {
-    "title": "Chromatique",
-    "role": "Art direction, data",
-    "place": "Nice",
-    "desc": "The colours of the old town’s façades, recorded street by street and sorted by hue. A browsable atlas, with its readings in a table.",
-    "type": "Atlas"
-   }
-  }
- ],
- "team": [
-  {
-   "id": "zahia-bougouffa",
-   "name": "Zahia Bougouffa",
-   "photo": null,
-   "fr": {
-    "role": "Cofondation, moyo",
-    "bio": "Profil à compléter depuis l’administration du site."
-   },
-   "en": {
-    "role": "Co-founder, moyo",
-    "bio": "Profile to be completed from the site administration."
-   },
-   "links": [
+  "version": 1,
+  "categories": [
     {
-     "label": "E-mail",
-     "url": "mailto:contact.moyostudio@gmail.com"
-    }
-   ]
-  },
-  {
-   "id": "yacine-bouabdallah",
-   "name": "Yacine Bouabdallah",
-   "photo": null,
-   "fr": {
-    "role": "Cofondation, moyo",
-    "bio": "Profil à compléter depuis l’administration du site."
-   },
-   "en": {
-    "role": "Co-founder, moyo",
-    "bio": "Profile to be completed from the site administration."
-   },
-   "links": [
+      "id": "identite",
+      "fr": "Identité",
+      "en": "Identity"
+    },
     {
-     "label": "E-mail",
-     "url": "mailto:contact.moyostudio@gmail.com"
+      "id": "site",
+      "fr": "Sites",
+      "en": "Websites"
+    },
+    {
+      "id": "donnees",
+      "fr": "Données",
+      "en": "Data"
+    },
+    {
+      "id": "motion",
+      "fr": "Motion",
+      "en": "Motion"
     }
-   ]
-  }
- ]
+  ],
+  "projects": [
+    {
+      "id": "soleil-2725",
+      "year": "2026",
+      "category": "donnees",
+      "featured": true,
+      "tone": "klein",
+      "cover": "/proj/1.jpg",
+      "images": [],
+      "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1\" opacity=\".3\"><circle cx=\"250\" cy=\"200\" r=\"100\"/><circle cx=\"250\" cy=\"200\" r=\"160\"/><circle cx=\"250\" cy=\"200\" r=\"230\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\"><line x1=\"250.0\" y1=\"158.0\" x2=\"250.0\" y2=\"113.7\"/><line x1=\"271.0\" y1=\"163.6\" x2=\"295.7\" y2=\"120.8\"/><line x1=\"286.4\" y1=\"179.0\" x2=\"349.2\" y2=\"142.7\"/><line x1=\"292.0\" y1=\"200.0\" x2=\"369.7\" y2=\"200.0\"/><line x1=\"286.4\" y1=\"221.0\" x2=\"371.5\" y2=\"270.1\"/><line x1=\"271.0\" y1=\"236.4\" x2=\"330.4\" y2=\"339.3\"/><line x1=\"250.0\" y1=\"242.0\" x2=\"250.0\" y2=\"384.0\"/><line x1=\"229.0\" y1=\"236.4\" x2=\"167.0\" y2=\"343.8\"/><line x1=\"213.6\" y1=\"221.0\" x2=\"139.6\" y2=\"263.7\"/><line x1=\"208.0\" y1=\"200.0\" x2=\"150.9\" y2=\"200.0\"/><line x1=\"213.6\" y1=\"179.0\" x2=\"179.7\" y2=\"159.4\"/><line x1=\"229.0\" y1=\"163.6\" x2=\"212.0\" y2=\"134.2\"/></g><circle cx=\"250\" cy=\"200\" r=\"22\" fill=\"currentColor\"/></svg>",
+      "fr": {
+        "title": "Soleil 2 725",
+        "role": "Direction artistique, développement",
+        "place": "Nice",
+        "desc": "Une année d’ensoleillement niçois, mois par mois, projetée sur un mur : un rayon par mois, sa longueur égale aux heures de soleil. Le visiteur déplace l’heure, le mur réagit.",
+        "type": "Installation de données"
+      },
+      "en": {
+        "title": "Soleil 2 725",
+        "role": "Art direction, development",
+        "place": "Nice",
+        "desc": "A year of Nice sunshine, month by month, projected on a wall: one ray per month, its length equal to the hours of sun. The visitor moves the hour and the wall responds.",
+        "type": "Data installation"
+      }
+    },
+    {
+      "id": "port-hercule",
+      "year": "2026",
+      "category": "site",
+      "featured": true,
+      "tone": "klein",
+      "cover": "/proj/2.jpg",
+      "images": [],
+      "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g stroke=\"currentColor\" fill=\"none\"><path d=\"M-40 226H540\" stroke-width=\"1\" opacity=\".5\"/><path d=\"M-40 240H540\" stroke-width=\"1\" opacity=\"0.17\"/><path d=\"M-40 254H540\" stroke-width=\"1\" opacity=\"0.14\"/><path d=\"M-40 268H540\" stroke-width=\"1\" opacity=\"0.11\"/><path d=\"M-40 282H540\" stroke-width=\"1\" opacity=\"0.08\"/><path d=\"M-40 296H540\" stroke-width=\"1\" opacity=\"0.05\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\"><rect x=\"44\" y=\"44\" width=\"26\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"78\" width=\"89\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"112\" width=\"170\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"146\" width=\"259\" height=\"12\" rx=\"6\"/><rect x=\"44\" y=\"180\" width=\"411\" height=\"12\" rx=\"6\"/></g><g stroke=\"currentColor\" stroke-width=\"1.5\" fill=\"none\"><path d=\"M44 300H451\"/><path d=\"M44.0 300v14\" /><path d=\"M81.0 300v8\" /><path d=\"M118.0 300v8\" /><path d=\"M155.0 300v8\" /><path d=\"M192.0 300v8\" /><path d=\"M229.0 300v14\" /><path d=\"M266.0 300v8\" /><path d=\"M303.0 300v8\" /><path d=\"M340.0 300v8\" /><path d=\"M377.0 300v8\" /><path d=\"M414.0 300v14\" /><path d=\"M451.0 300v8\" /></g></svg>",
+      "fr": {
+        "title": "Port Hercule à l’échelle",
+        "role": "Conception, développement",
+        "place": "Monaco",
+        "desc": "Chaque coque tracée à sa longueur réelle, du tender au bateau de 111 mètres, comparée à un terrain de football. Un site qui rend une dimension lisible d’un coup d’œil.",
+        "type": "Site interactif"
+      },
+      "en": {
+        "title": "Port Hercule to scale",
+        "role": "Design, development",
+        "place": "Monaco",
+        "desc": "Every hull drawn at its true length, from the tender to the 111-metre yacht, compared with a football pitch. A site that makes a dimension readable at a glance.",
+        "type": "Interactive site"
+      }
+    },
+    {
+      "id": "villa-chaux",
+      "year": "2025",
+      "category": "identite",
+      "featured": true,
+      "tone": "wash",
+      "cover": "/proj/3.jpg",
+      "images": [],
+      "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><rect x=\"120\" y=\"36\" width=\"260\" height=\"330\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1\" opacity=\".22\"/></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><rect x=\"204\" y=\"56\" width=\"92\" height=\"290\" fill=\"currentColor\"/><path d=\"M204 214H296\" stroke=\"var(--wash)\" stroke-width=\"2\"/><circle cx=\"250\" cy=\"170\" r=\"14\" fill=\"var(--wash)\"/><rect x=\"106\" y=\"56\" width=\"92\" height=\"290\" fill=\"currentColor\"/><rect x=\"302\" y=\"56\" width=\"92\" height=\"290\" fill=\"currentColor\"/><g stroke=\"var(--wash)\" stroke-width=\"2.4\"><path d=\"M106 76h92\"/><path d=\"M106 89h92\"/><path d=\"M106 102h92\"/><path d=\"M106 115h92\"/><path d=\"M106 128h92\"/><path d=\"M106 141h92\"/><path d=\"M106 154h92\"/><path d=\"M106 167h92\"/><path d=\"M106 180h92\"/><path d=\"M106 193h92\"/><path d=\"M106 206h92\"/><path d=\"M106 219h92\"/><path d=\"M106 232h92\"/><path d=\"M106 245h92\"/><path d=\"M106 258h92\"/><path d=\"M106 271h92\"/><path d=\"M106 284h92\"/><path d=\"M106 297h92\"/><path d=\"M106 310h92\"/><path d=\"M106 323h92\"/><path d=\"M302 76h92\"/><path d=\"M302 89h92\"/><path d=\"M302 102h92\"/><path d=\"M302 115h92\"/><path d=\"M302 128h92\"/><path d=\"M302 141h92\"/><path d=\"M302 154h92\"/><path d=\"M302 167h92\"/><path d=\"M302 180h92\"/><path d=\"M302 193h92\"/><path d=\"M302 206h92\"/><path d=\"M302 219h92\"/><path d=\"M302 232h92\"/><path d=\"M302 245h92\"/><path d=\"M302 258h92\"/><path d=\"M302 271h92\"/><path d=\"M302 284h92\"/><path d=\"M302 297h92\"/><path d=\"M302 310h92\"/><path d=\"M302 323h92\"/></g></svg>",
+      "fr": {
+        "title": "Villa Chaux",
+        "role": "Identité, design, développement",
+        "place": "Cap Ferrat",
+        "desc": "Identité d’une maison d’hôtes imaginaire, entièrement bâtie sur le blanc de chaux et un seul bleu. Un site de réservation en trois écrans, lisible au soleil sur un téléphone.",
+        "type": "Identité et site"
+      },
+      "en": {
+        "title": "Villa Chaux",
+        "role": "Identity, design, development",
+        "place": "Cap Ferrat",
+        "desc": "Identity for an imaginary guesthouse, built entirely on lime-wash white and one blue. A three-screen booking site, readable in sunlight on a phone.",
+        "type": "Identity and website"
+      }
+    },
+    {
+      "id": "quinzaine-claire",
+      "year": "2025",
+      "category": "motion",
+      "featured": true,
+      "tone": "klein",
+      "cover": null,
+      "images": [],
+      "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\" opacity=\".3\"><rect x=\"10\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"30\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"50\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"70\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"110\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"130\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"150\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"170\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"190\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"210\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"230\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"250\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"270\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"290\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"310\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"330\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"350\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"370\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"390\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"410\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"430\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"450\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"470\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"490\" y=\"24\" width=\"10\" height=\"10\"/><rect x=\"10\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"30\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"50\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"70\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"90\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"110\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"130\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"150\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"170\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"190\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"210\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"230\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"250\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"270\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"290\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"310\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"330\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"350\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"370\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"390\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"410\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"430\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"450\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"470\" y=\"366\" width=\"10\" height=\"10\"/><rect x=\"490\" y=\"366\" width=\"10\" height=\"10\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\"><rect x=\"46\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.07\"/><rect x=\"116\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.10\"/><rect x=\"186\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.14\"/><rect x=\"256\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.19\"/><rect x=\"326\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.23\"/><rect x=\"396\" y=\"122\" width=\"58\" height=\"44\" fill-opacity=\"0.28\"/><rect x=\"46\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.34\"/><rect x=\"116\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.39\"/><rect x=\"186\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.45\"/><rect x=\"256\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.50\"/><rect x=\"326\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.56\"/><rect x=\"396\" y=\"178\" width=\"58\" height=\"44\" fill-opacity=\"0.62\"/><rect x=\"46\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.68\"/><rect x=\"116\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.74\"/><rect x=\"186\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.81\"/><rect x=\"256\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.87\"/><rect x=\"326\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"0.93\"/><rect x=\"396\" y=\"234\" width=\"58\" height=\"44\" fill-opacity=\"1.00\"/></g></svg>",
+      "fr": {
+        "title": "La quinzaine claire",
+        "role": "Identité, motion",
+        "place": "Cannes",
+        "desc": "Identité d’un festival de cinéma indépendant : une pellicule de dix-huit images, chacune aux couleurs d’une heure du jour. Générique, affiche et billetterie.",
+        "type": "Identité animée"
+      },
+      "en": {
+        "title": "The clear fortnight",
+        "role": "Identity, motion",
+        "place": "Cannes",
+        "desc": "Identity for an independent film festival: a strip of eighteen frames, each in the colours of one hour of the day. Titles, poster and ticketing.",
+        "type": "Animated identity"
+      }
+    },
+    {
+      "id": "chromatique",
+      "year": "2024",
+      "category": "donnees",
+      "featured": true,
+      "tone": "klein",
+      "cover": null,
+      "images": [],
+      "plate": "<svg class=\"b\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g stroke=\"currentColor\" fill=\"none\" opacity=\".28\"><path d=\"M-40 338H540\" stroke-width=\"1\"/><path d=\"M-40 352H540\" stroke-width=\"1\"/></g></svg><svg class=\"f\" viewBox=\"0 0 500 400\" preserveAspectRatio=\"xMidYMid meet\"><g fill=\"currentColor\"><path d=\"M-20.0 -90H16.7V268A18.4 18.4 0 0 1 -20.0 268Z\" fill-opacity=\"0.12\"/><path d=\"M16.7 -90H72.9V268A28.1 28.1 0 0 1 16.7 268Z\" fill-opacity=\"0.20\"/><path d=\"M72.9 -90H98.8V268A13.0 13.0 0 0 1 72.9 268Z\" fill-opacity=\"0.28\"/><path d=\"M98.8 -90H163.6V268A32.4 32.4 0 0 1 98.8 268Z\" fill-opacity=\"0.36\"/><path d=\"M163.6 -90H204.6V268A20.5 20.5 0 0 1 163.6 268Z\" fill-opacity=\"0.44\"/><path d=\"M204.6 -90H254.3V268A24.8 24.8 0 0 1 204.6 268Z\" fill-opacity=\"0.52\"/><path d=\"M254.3 -90H284.6V268A15.1 15.1 0 0 1 254.3 268Z\" fill-opacity=\"0.60\"/><path d=\"M284.6 -90H345.0V268A30.2 30.2 0 0 1 284.6 268Z\" fill-opacity=\"0.68\"/><path d=\"M345.0 -90H379.6V268A17.3 17.3 0 0 1 345.0 268Z\" fill-opacity=\"0.76\"/><path d=\"M379.6 -90H433.6V268A27.0 27.0 0 0 1 379.6 268Z\" fill-opacity=\"0.84\"/><path d=\"M433.6 -90H461.7V268A14.0 14.0 0 0 1 433.6 268Z\" fill-opacity=\"0.92\"/><path d=\"M461.7 -90H520.0V268A29.2 29.2 0 0 1 461.7 268Z\" fill-opacity=\"1.00\"/></g></svg>",
+      "fr": {
+        "title": "Chromatique",
+        "role": "Direction artistique, données",
+        "place": "Nice",
+        "desc": "Les couleurs des façades de la vieille ville, relevées rue par rue et rangées par teinte. Un atlas consultable, avec ses relevés en tableau.",
+        "type": "Atlas"
+      },
+      "en": {
+        "title": "Chromatique",
+        "role": "Art direction, data",
+        "place": "Nice",
+        "desc": "The colours of the old town’s façades, recorded street by street and sorted by hue. A browsable atlas, with its readings in a table.",
+        "type": "Atlas"
+      }
+    }
+  ],
+  "team": [
+    {
+      "id": "zahia-bougouffa",
+      "name": "Zahia Bougouffa",
+      "photo": null,
+      "fr": {
+        "role": "Cofondation, moyo",
+        "bio": "Profil à compléter depuis l’administration du site."
+      },
+      "en": {
+        "role": "Co-founder, moyo",
+        "bio": "Profile to be completed from the site administration."
+      },
+      "links": [
+        {
+          "label": "E-mail",
+          "url": "mailto:contact.moyostudio@gmail.com"
+        }
+      ]
+    },
+    {
+      "id": "yacine-bouabdallah",
+      "name": "Yacine Bouabdallah",
+      "photo": null,
+      "fr": {
+        "role": "Cofondation, moyo",
+        "bio": "Profil à compléter depuis l’administration du site."
+      },
+      "en": {
+        "role": "Co-founder, moyo",
+        "bio": "Profile to be completed from the site administration."
+      },
+      "links": [
+        {
+          "label": "E-mail",
+          "url": "mailto:contact.moyostudio@gmail.com"
+        }
+      ]
+    }
+  ]
 }

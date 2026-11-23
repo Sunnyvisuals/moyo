@@ -46,6 +46,8 @@ const sizes = {
 };
 out('dist/cursor.js', read('src/cursor.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
+fs.mkdirSync(r('dist/proj'), { recursive: true });
+for (const n of fs.readdirSync(r('assets/proj'))) fs.copyFileSync(r('assets/proj/' + n), r('dist/proj/' + n));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });
 fs.copyFileSync(r('fonts/hanken-grotesk-latin-wght-normal.woff2'), r('dist/fonts/hanken-grotesk.woff2'));
 
