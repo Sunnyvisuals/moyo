@@ -284,7 +284,7 @@ $('#msgsBtn').addEventListener('click',()=>{sel='__msgs';renderList();renderEdit
 function renderTeam(){
   const E=$('#editor'); data.team||=[];
   E.innerHTML=`<h2>Équipe</h2>
-  <p class="small muted">Chaque personne a sa page profil, ouverte en cliquant sur son nom dans la section Studio. Les champs anglais vides reprennent le français.</p>
+  <p class="small muted">Chaque personne a sa page profil (liée depuis son nom sur l’accueil et dans le pied de page). Le prénom et le nom forment le nom affiché. La petite phrase est écrite à la main en fond de la page. Les champs anglais vides reprennent le français.</p>
   ${data.team.map((m,i)=>`<div class="section" data-tm="${i}">
     <div class="danger-zone" style="margin-bottom:12px"><h3 style="margin:0">${esc(m.name||'Nouveau profil')}</h3>
       <span><a class="btn sm" href="/equipe/${esc(m.id)}" target="_blank" rel="noopener">Voir la page ↗</a> <button type="button" class="btn danger sm" data-act="tmDel">Retirer</button></span></div>
@@ -296,12 +296,16 @@ function renderTeam(){
       </div>
     </div>
     <div class="grid2" style="margin-top:16px">
-      <div><label class="req">Nom</label><input type="text" data-k="name" value="${esc(m.name)}"></div>
+      <div><label class="req">Prénom</label><input type="text" data-k="first" value="${esc(m.first??(m.name||'').split(' ')[0])}"></div>
+      <div><label class="req">Nom</label><input type="text" data-k="last" value="${esc(m.last??(m.name||'').split(' ').slice(1).join(' '))}"></div>
       <div><label>Identifiant (URL)</label><input type="text" data-k="id" value="${esc(m.id)}"><p class="hint">/equipe/${esc(m.id)}</p></div>
-      <div><label><span class="lang">FR</span>Rôle</label><input type="text" data-k="fr.role" value="${esc(m.fr?.role)}"></div>
-      <div><label><span class="lang">EN</span>Rôle</label><input type="text" data-k="en.role" value="${esc(m.en?.role)}"></div>
-      <div><label><span class="lang">FR</span>Présentation</label><textarea data-k="fr.bio">${esc(m.fr?.bio)}</textarea></div>
-      <div><label><span class="lang">EN</span>Présentation</label><textarea data-k="en.bio">${esc(m.en?.bio)}</textarea></div>
+      <div></div>
+      <div><label><span class="lang">FR</span>Titre</label><input type="text" data-k="fr.role" value="${esc(m.fr?.role)}" placeholder="Cofondatrice"></div>
+      <div><label><span class="lang">EN</span>Titre</label><input type="text" data-k="en.role" value="${esc(m.en?.role)}" placeholder="Co-founder"></div>
+      <div><label><span class="lang">FR</span>Description</label><textarea data-k="fr.bio" rows="8">${esc(m.fr?.bio)}</textarea><p class="hint">Une ligne vide sépare deux paragraphes.</p></div>
+      <div><label><span class="lang">EN</span>Description</label><textarea data-k="en.bio" rows="8">${esc(m.en?.bio)}</textarea></div>
+      <div><label><span class="lang">FR</span>Petite phrase (en fond de page)</label><input type="text" data-k="fr.phrase" value="${esc(m.fr?.phrase)}" maxlength="80" placeholder="imaginer ensemble"></div>
+      <div><label><span class="lang">EN</span>Petite phrase (en fond de page)</label><input type="text" data-k="en.phrase" value="${esc(m.en?.phrase)}" maxlength="80" placeholder="imagine together"></div>
     </div>
     <h3 style="margin:18px 0 8px;font-size:.95rem">Liens (Instagram, LinkedIn, site, e-mail…)</h3>
     ${(m.links||[]).map((l,j)=>`<div class="grid3" data-ln="${j}" style="grid-template-columns:1fr 2fr auto;align-items:end;margin-bottom:8px">
@@ -317,7 +321,7 @@ $('#editor').addEventListener('input',e=>{
   if(sel!=='__team') return;
   const box=e.target.closest('[data-tm]'); if(!box) return;
   const m=data.team[+box.dataset.tm], k=e.target.dataset.k; if(!k||k==='photo') return;
-  if(k==='name') m.name=e.target.value;
+  if(k==='first'||k==='last'){ m[k]=e.target.value; m.name=`${m.first||''} ${m.last||''}`.trim(); }
   else if(k==='id') m.id=slugify(e.target.value);
   else if(k==='link.label'||k==='link.url'){ const j=+e.target.closest('[data-ln]').dataset.ln; m.links[j][k.split('.')[1]]=e.target.value; }
   else { const [lg,f]=k.split('.'); (m[lg]||={})[f]=e.target.value; }
@@ -334,7 +338,7 @@ $('#editor').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return;
   const box=b.closest('[data-tm]'), m=box&&data.team[+box.dataset.tm];
   switch(b.dataset.act){
-    case 'tmAdd': data.team.push({id:uniqueTeamId('profil'),name:'',photo:null,fr:{role:'',bio:''},en:{role:'',bio:''},links:[]}); break;
+    case 'tmAdd': data.team.push({id:uniqueTeamId('profil'),name:'',first:'',last:'',photo:null,fr:{role:'',bio:'',phrase:''},en:{role:'',bio:'',phrase:''},links:[]}); break;
     case 'tmDel': if(!confirm(`Retirer « ${m.name||m.id} » de l’équipe ? Sa page disparaîtra à la prochaine publication.`)) return; dropIfUnsaved(m.photo); data.team.splice(+box.dataset.tm,1); break;
     case 'tmPhotoRm': { const old=m.photo; m.photo=null; dropIfUnsaved(old); break; }
     case 'lnAdd': (m.links||=[]).push({label:'',url:''}); break;

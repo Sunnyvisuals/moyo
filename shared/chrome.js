@@ -238,7 +238,11 @@ const FOOTER_CSS = `
 `;
 
 /* Single source of the footer content. The home keeps its own <footer> shell (sticky stack), in-page anchors and `sec.*` labels. */
-const footerInner = ({ home = false } = {}) => {
+const SEED_TEAM = [{ id: 'zahia-bougouffa', name: 'Zahia Bougouffa' }, { id: 'yacine-bouabdallah', name: 'Yacine Bouabdallah' }];
+const escH = v => String(v).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+/* the credit in the footer: one link per person, from the team data (also rewritten by the middleware when the admin has saved) */
+const creditLinks = team => (team && team.length ? team : SEED_TEAM).map(m => `<li><a href="/equipe/${escH(m.id)}" data-who="${escH(m.id)}">${escH(m.name)}</a></li>`).join('');
+const footerInner = ({ home = false, team } = {}) => {
   const w = home ? 'wrap ' : '', h = home ? '#' : '/#';
   return `  <div class="${w}foot-grid">
     <div class="fcol">
@@ -261,7 +265,7 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
     </nav>
     <div class="fcol fcol--by">
       <h2 class="fh" data-i="fBy">Réalisé par</h2>
-      <ul class="fnames fby"><li><a href="/equipe/zahia-bougouffa" data-who="zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah" data-who="yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
+      <ul class="fnames fby">${creditLinks(team)}</ul>
     </div>
     <div class="fcol">
       <h2 class="fh" data-i="${home ? 'sec.contact' : 'contact'}">Contact</h2>
@@ -278,8 +282,8 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
   <div class="mono-wrap" aria-hidden="true"><div class="monument blurtext"><span class="bl" style="--i:0">m</span><span class="bl" style="--i:1">o</span><span class="bl" style="--i:2">y</span><span class="bl" style="--i:3">o</span></div></div>`;
 };
 
-const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
-${footerInner()}
+const footerHTML = team => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
+${footerInner({ team })}
 </footer>`;
 
-export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { creditLinks, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };

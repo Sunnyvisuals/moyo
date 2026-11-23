@@ -170,38 +170,46 @@
       "name": "Zahia Bougouffa",
       "photo": null,
       "fr": {
-        "role": "Cofondation, moyo",
-        "bio": "Cofondation de moyo, agence créative basée en Provence-Alpes-Côte d’Azur."
+        "role": "Cofondatrice",
+        "bio": "Cofondatrice de moyo, agence créative basée en Provence-Alpes-Côte d’Azur.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "phrase": "imaginer ensemble"
       },
       "en": {
-        "role": "Co-founder, moyo",
-        "bio": "Co-founder of moyo, a creative agency based on the French Riviera."
+        "role": "Co-founder",
+        "bio": "Co-founder of moyo, a creative agency based on the French Riviera.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "phrase": "imagine together"
       },
       "links": [
         {
           "label": "E-mail",
           "url": "mailto:contact.moyostudio@gmail.com"
         }
-      ]
+      ],
+      "first": "Zahia",
+      "last": "Bougouffa"
     },
     {
       "id": "yacine-bouabdallah",
       "name": "Yacine Bouabdallah",
       "photo": null,
       "fr": {
-        "role": "Cofondation, moyo",
-        "bio": "Cofondation de moyo, agence créative basée en Provence-Alpes-Côte d’Azur."
+        "role": "Cofondateur",
+        "bio": "Cofondateur de moyo, agence créative basée en Provence-Alpes-Côte d’Azur.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "phrase": "la main avant l’outil"
       },
       "en": {
-        "role": "Co-founder, moyo",
-        "bio": "Co-founder of moyo, a creative agency based on the French Riviera."
+        "role": "Co-founder",
+        "bio": "Co-founder of moyo, a creative agency based on the French Riviera.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "phrase": "the hand before the tool"
       },
       "links": [
         {
           "label": "E-mail",
           "url": "mailto:contact.moyostudio@gmail.com"
         }
-      ]
+      ],
+      "first": "Yacine",
+      "last": "Bouabdallah"
     }
   ]
 }

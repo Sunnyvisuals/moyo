@@ -16,6 +16,9 @@
     '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern'], [58, 88, 5, 'et le vôtre', 'and yours']],
     '.who-page': [[66, 46, 7, 'imaginer ensemble', 'imagine together'], [40, 14, -8, 'la main avant l’outil', 'the hand before the tool']]
   };
+  // the team pages carry their own phrase (set in the admin)
+  const pm = document.getElementById('main');
+  if (pm && pm.dataset.phraseFr) LINES['.who-page'] = [[58, 7, -3, pm.dataset.phraseFr, pm.dataset.phraseEn || pm.dataset.phraseFr]];
   const FONTS = ['Caveat', 'Indie Flower', 'Nothing You Could Do', 'Reenie Beanie', 'Shadows Into Light'];
   const AVOID = { l: [2] }; // Nothing You Could Do draws an unreadable l
   const st = document.createElement('style');
@@ -51,6 +54,7 @@ html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
       if (parseFloat(c.borderBottomWidth)) add({ left: r.left, right: r.right, top: r.bottom - 1, bottom: r.bottom, width: r.width, height: 1 }, 8); });
     // blocks that drift with the scroll on wide screens: keep a vertical margin around their whole box
     if (innerWidth > 1000) host.querySelectorAll('.intro .cols,.statement,.entry-d,.names,.contact h2,.sec-head').forEach(e => { const r = e.getBoundingClientRect(); add({ left: r.left, right: r.right, top: r.top - 90, bottom: r.bottom + 90, width: r.width, height: r.height + 180 }, 0); });
+    if (host.matches('.projects-page,.who-page')) out.push([0, 0, H.width, 96]); // the header is fixed above the top of these pages
     if (host.matches('.win')) for (const f of [1 / 3, 2 / 3]) out.push([0, H.height * f - 14, H.width, H.height * f + 14]);
     if (host.matches('.sec') && innerWidth > 1180) out.push([H.width - 64, 0, H.width, H.height]); // section marks
     return out;

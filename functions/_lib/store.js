@@ -92,17 +92,18 @@ export function validate(input) {
   const team = [];
   for (const m of Array.isArray(input.team) ? input.team.slice(0, 12) : []) {
     const id = str(m?.id, 60);
-    const name = str(m?.name, 80);
+    const first = str(m?.first, 60), last = str(m?.last, 60);
+    const name = first || last ? `${first} ${last}`.trim() : str(m?.name, 80);
     if (!SLUG.test(id) || !name) { errors.push(`Équipe : profil « ${name || id} » incomplet (nom et identifiant).`); continue; }
     if (team.some(x => x.id === id)) { errors.push(`Équipe : identifiant en double ${id}.`); continue; }
     const links = (Array.isArray(m.links) ? m.links : []).slice(0, 6)
       .map(l => ({ label: str(l?.label, 40), url: str(l?.url, 300) }))
       .filter(l => l.label && /^(https?:\/\/|mailto:)/i.test(l.url));
     team.push({
-      id, name,
+      id, name, first, last,
       photo: typeof m.photo === 'string' && IMAGE_ID.test(m.photo) ? m.photo : null,
-      fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000) },
-      en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000) },
+      fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000), phrase: str(m.fr?.phrase, 80) },
+      en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000), phrase: str(m.en?.phrase, 80) },
       links
     });
   }
