@@ -1,5 +1,5 @@
-/* Minimal cursor: a small Klein-blue square that follows the pointer with a little inertia.
-   It reads the colour really under it (background or photo): light on dark, blue on light, an outlined square over anything clickable, the system caret in text fields.
+/* Minimal cursor: two thin slats, like the blind and the mark before each section title. They open over anything clickable, close on press.
+   It reads the colour really under it (background or photo): light on dark, blue on light. The system caret in text fields.
    Mouse and trackpad only (pointer: fine). Inside the menu and dialogs (top layer) the system cursor comes back. */
 (() => {
   if (!matchMedia('(pointer: fine)').matches) return;
@@ -11,12 +11,11 @@ html.cur-off,html.cur-off *{cursor:auto}
 html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-off button *,html.cur-off label *{cursor:pointer}
 .cur{position:fixed;left:0;top:0;z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .3s}
 .cur.on{opacity:1}
-.cur::before{content:"";position:absolute;left:-4px;top:-4px;width:8px;height:8px;background:#002FA7;border:1px solid transparent;box-sizing:border-box;
-  transition:left .45s cubic-bezier(.25,1,.5,1),top .45s cubic-bezier(.25,1,.5,1),width .45s cubic-bezier(.25,1,.5,1),height .45s cubic-bezier(.25,1,.5,1),background .18s,border-color .18s,scale .2s}
-.cur.inv::before{background:#F1F3F2}
-.cur.hot::before{left:-18px;top:-18px;width:36px;height:36px;background:transparent;border-color:#002FA7}
-.cur.inv.hot::before{border-color:#F1F3F2}
-.cur.down::before{scale:.8}`;
+.cur::before{content:"";position:absolute;left:0;top:0;width:14px;height:6px;translate:-50% -50%;box-sizing:border-box;border:0 solid #002FA7;border-width:1.5px 0;
+  transition:width .4s cubic-bezier(.25,1,.5,1),height .4s cubic-bezier(.25,1,.5,1),border-color .18s}
+.cur.inv::before{border-color:#F1F3F2}
+.cur.hot::before{width:26px;height:26px}
+.cur.down::before{height:3px}`;
   /* luminance (0 dark, 1 light) of what is painted under the pointer */
   const px = document.createElement('canvas'); px.width = px.height = 1;
   const g = px.getContext('2d', { willReadFrequently: true });
