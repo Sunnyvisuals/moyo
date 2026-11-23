@@ -2,6 +2,10 @@
 name = "moyo"
 compatibility_date = "2026-10-01"
 
+# Construit dist/ avant chaque déploiement (y compris les builds GitHub de Cloudflare).
+[build]
+command = "node build.mjs"
+
 [assets]
 directory = "./dist"
 
