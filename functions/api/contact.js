@@ -7,6 +7,7 @@ const BUDGETS = ['lt5', '5-15', '15-40', 'gt40', 'tbd'];
 const MAX_PER_HOUR = 5;
 const EMAIL = /^[^\s@<>()[\]\\,;:"]{1,64}@[^\s@<>()[\]\\,;:"]{1,190}\.[a-z]{2,24}$/i;
 const str = (v, max) => (typeof v === 'string' ? v.trim().replace(/\s+\n/g, '\n').slice(0, max) : '');
+const esc = (v) => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 export async function onRequestPost({ request, env }) {
   const isForm = !(request.headers.get('Content-Type') || '').includes('application/json');
@@ -53,17 +54,52 @@ export async function onRequestPost({ request, env }) {
     const from = env.FROM_EMAIL || 'moyo <onboarding@resend.dev>';
     const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' };
     const budget = { lt5: '< 5 k€', '5-15': '5–15 k€', '15-40': '15–40 k€', gt40: '> 40 k€', tbd: 'À définir' };
+    const typeTxt = msg.type ? (label[msg.type] || msg.type) : '';
+    const budgetTxt = msg.budget ? (budget[msg.budget] || msg.budget) : '';
+    const first = msg.name.split(/\s+/)[0] || msg.name;
+    let when = at;
+    try { when = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(at)); } catch (_) {}
+
+    // Plain-text fallback (clients without HTML)
     const lines = [
       `Nom : ${msg.name}`,
       `E-mail : ${msg.email}`,
-      msg.type ? `Type : ${label[msg.type] || msg.type}` : null,
-      msg.budget ? `Budget : ${budget[msg.budget] || msg.budget}` : null,
+      typeTxt ? `Type : ${typeTxt}` : null,
+      budgetTxt ? `Budget : ${budgetTxt}` : null,
       `Langue : ${msg.lang}`,
       '',
       msg.message,
       '',
-      `— Reçu le ${at} · réf. ${id}`
+      `— Reçu le ${when} · réf. ${id}`
     ].filter(l => l !== null).join('\n');
+
+    // Styled HTML receipt (table-based, inline styles for e-mail clients)
+    const chip = (k, v) => `<td style="padding:0 14px 0 0;vertical-align:top"><p style="margin:0 0 2px;font:500 11px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#9aa0a8">${esc(k)}</p><p style="margin:0;font:400 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#141821">${esc(v)}</p></td>`;
+    const chips = [typeTxt ? chip('Type', typeTxt) : '', budgetTxt ? chip('Budget', budgetTxt) : '', chip('Langue', msg.lang === 'en' ? 'Anglais' : 'Français')].join('');
+    const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#eef0ef;padding:28px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,10,50,.08)">
+<tr><td style="background:#002FA7;padding:20px 28px">
+  <table role="presentation" width="100%"><tr>
+    <td style="font:600 19px/1 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.02em;color:#fff">moyo</td>
+    <td align="right" style="font:500 12px/1 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:.04em;color:rgba(255,255,255,.72)">NOUVEAU MESSAGE</td>
+  </tr></table>
+</td></tr>
+<tr><td style="padding:26px 28px 6px">
+  <p style="margin:0 0 3px;font:600 22px/1.2 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:-.01em;color:#0b1020">${esc(msg.name)}</p>
+  <a href="mailto:${esc(msg.email)}" style="font:400 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#002FA7;text-decoration:none">${esc(msg.email)}</a>
+</td></tr>
+<tr><td style="padding:18px 28px 0"><table role="presentation"><tr>${chips}</tr></table></td></tr>
+<tr><td style="padding:18px 28px 0">
+  <div style="background:#f5f6f8;border-left:3px solid #002FA7;border-radius:0 10px 10px 0;padding:16px 18px;font:400 15px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1a1f2b;white-space:pre-wrap">${esc(msg.message)}</div>
+</td></tr>
+<tr><td style="padding:22px 28px 26px">
+  <a href="mailto:${esc(msg.email)}" style="display:inline-block;background:#002FA7;color:#fff;text-decoration:none;font:600 14px/1 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:12px 24px;border-radius:999px">Répondre à ${esc(first)}</a>
+</td></tr>
+<tr><td style="padding:14px 28px;border-top:1px solid #eef0ef;background:#fafbfb">
+  <p style="margin:0;font:400 12px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#9aa0a8">Reçu le ${esc(when)} &middot; réf. ${esc(id)}</p>
+</td></tr>
+</table></body></html>`;
+
     try {
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -73,7 +109,8 @@ export async function onRequestPost({ request, env }) {
           to: [to],
           reply_to: msg.email,
           subject: `Nouveau message — ${msg.name}`,
-          text: lines
+          text: lines,
+          html
         })
       });
     } catch (_) { /* KV copy already stored; don't fail the form if e-mail is down */ }
