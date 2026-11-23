@@ -51,6 +51,7 @@ const sizes = {
   'robots.txt': out('dist/robots.txt', 'User-agent: *\nDisallow: /admin\nDisallow: /api/\n')
 };
 out('dist/cursor.js', read('src/cursor.js'));
+out('dist/hand.js', read('src/hand.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
 out('dist/footer.js', read('src/footer-rt.js'));
 out('dist/lenis.js', lenis);
@@ -59,6 +60,7 @@ fs.mkdirSync(r('dist/proj'), { recursive: true });
 for (const n of fs.readdirSync(r('assets/proj'))) fs.copyFileSync(r('assets/proj/' + n), r('dist/proj/' + n));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });
 fs.copyFileSync(r('fonts/hanken-grotesk-latin-wght-normal.woff2'), r('dist/fonts/hanken-grotesk.woff2'));
+fs.cpSync(r('fonts/hand'), r('dist/fonts/hand'), { recursive: true });
 
 for (const [k, v] of Object.entries(sizes)) console.log(`dist/${k}`.padEnd(24), (v / 1024).toFixed(1), 'Ko');
 const left = fs.readFileSync(r('dist/index.html'), 'utf8').match(/__[A-Z_]+__/g);
