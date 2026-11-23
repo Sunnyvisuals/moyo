@@ -44,10 +44,7 @@ const CHROME_CSS = `
 .bar{position:fixed;z-index:90;top:0;left:0;right:0;height:var(--hdr);display:flex;align-items:center;padding:0 var(--m);color:var(--klein);gap:clamp(16px,2.4vw,40px);pointer-events:auto}
 .bar,.bar *{transition-property:color,translate,opacity,background-size;transition-duration:.9s;transition-timing-function:cubic-bezier(.25,1,.5,1)}
 .bar.away{translate:0 -100%}
-.bar::before{content:"";position:absolute;inset:0 0 -26px;z-index:-1;pointer-events:none;background:linear-gradient(var(--chaux) 52%,#0000);opacity:0;transition:opacity .5s ease}
-.bar.scrolled::before{opacity:1}
 .bar[data-tone="paper"]{color:var(--paper)}
-.bar[data-tone="paper"]::before{background:linear-gradient(var(--klein) 52%,#0000)}
 .bar-mark{display:flex;align-items:center;text-decoration:none;color:inherit;font-size:clamp(1.625rem,2.1vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1}
 .bar-r{margin-left:auto;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px)}
 .bar button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;font-weight:500;background:none}
