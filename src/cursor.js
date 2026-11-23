@@ -1,4 +1,4 @@
-/* Minimal cursor: two thin slats, like the blind and the mark before each section title. They open over anything clickable, close on press.
+/* Minimal cursor: a small solid disc (it scales with very wide screens). Over anything clickable it opens into a thin translucent ring.
    It reads the colour really under it (background or photo): light on dark, blue on light. The system caret in text fields.
    Mouse and trackpad only (pointer: fine). Inside the menu and dialogs (top layer) the system cursor comes back. */
 (() => {
@@ -11,11 +11,12 @@ html.cur-off,html.cur-off *{cursor:auto}
 html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-off button *,html.cur-off label *{cursor:pointer}
 .cur{position:fixed;left:0;top:0;z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .3s}
 .cur.on{opacity:1}
-.cur::before{content:"";position:absolute;left:0;top:0;width:14px;height:6px;translate:-50% -50%;box-sizing:border-box;border:0 solid #002FA7;border-width:1.5px 0;
-  transition:width .4s cubic-bezier(.25,1,.5,1),height .4s cubic-bezier(.25,1,.5,1),border-color .18s}
-.cur.inv::before{border-color:#F1F3F2}
-.cur.hot::before{width:26px;height:26px}
-.cur.down::before{height:3px}`;
+.cur{--c:#002FA7}
+.cur.inv{--c:#F1F3F2}
+.cur::before{content:"";position:absolute;left:0;top:0;width:clamp(13px,.8vw,24px);aspect-ratio:1;translate:-50% -50%;box-sizing:border-box;border-radius:50%;background:var(--c);border:1.5px solid var(--c);
+  transition:width .45s cubic-bezier(.2,.9,.2,1),background .25s,border-color .18s,scale .25s}
+.cur.hot::before{width:clamp(44px,2.8vw,84px);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.cur.down::before{scale:.78}`;
   /* luminance (0 dark, 1 light) of what is painted under the pointer */
   const px = document.createElement('canvas'); px.width = px.height = 1;
   const g = px.getContext('2d', { willReadFrequently: true });

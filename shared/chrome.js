@@ -141,7 +141,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
   <div class="menu-in">
     <ol class="menu-list arc">
       <li><a href="/"><span class="mn" data-i="sec.top">Accueil</span></a></li>
-      <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets</span></a></li>
+      <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets choisis</span></a></li>
       <li><a href="/projets"><span class="mn" data-i="sec.all">Tous les projets</span></a></li>
       <li><a href="/#services"><span class="mn" data-i="sec.services">Services</span></a></li>
       <li><a href="/#studio"><span class="mn" data-i="sec.studio">Agence</span></a></li>
@@ -234,7 +234,7 @@ const footerInner = ({ home = false } = {}) => {
       <ul>
 ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
 `}        <li><a href="${h}approche" data-i="${home ? 'sec.intro' : 'sIntro'}">Approche</a></li>
-        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets</a></li>
+        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets choisis</a></li>
         <li><a href="/projets" data-i="${home ? 'sec.all' : 'allL'}">Tous les projets</a></li>
         <li><a href="${h}services" data-i="${home ? 'sec.services' : 'sSvc'}">Services</a></li>
         <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Agence</a></li>
