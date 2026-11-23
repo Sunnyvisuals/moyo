@@ -474,6 +474,11 @@ html.stack main>.sec:not(.blue)::after{background:#001660;opacity:calc(var(--cv,
 .blocks .k4{--to:var(--c4);--from:var(--c2)}
 .blocks .k5{--to:var(--c5);--from:var(--c3)}
 @media (max-width:820px){.blocks{grid-auto-rows:clamp(44px,8vh,88px)}}
+/* The band of colour blocks opens its section (top, full width) and is a little larger */
+.sec.has-band{display:flex;flex-direction:column;padding-top:0;padding-bottom:clamp(120px,22vh,280px)}
+.sec.has-band>.blocks{order:-1;flex:none;margin:0 calc(var(--m) * -1) clamp(72px,12vh,160px);grid-auto-rows:clamp(96px,16vh,200px)}
+.sec.has-band>.wrap{width:100%}
+@media (max-width:820px){.sec.has-band>.blocks{grid-auto-rows:clamp(60px,10vh,112px);margin-bottom:clamp(56px,9vh,104px)}}
 
 /* Buttons: a thin outline; on hover a solid fill rises from the bottom like a blind, the arrow slides. No stripes. */
 .link{gap:18px;min-height:52px;padding:0 24px;font-weight:500;letter-spacing:.01em;transition:color var(--dur-1) var(--ease-enter) 60ms}
@@ -1313,6 +1318,7 @@ __FOOTER_INNER__
   </div>
 </dialog>
 
+<script src="/count.js" defer></script>
 <script src="/hand.js" defer></script>
 <script src="/cursor.js" defer></script>
 <script>__LENIS__</script>
