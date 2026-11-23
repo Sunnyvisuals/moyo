@@ -1,20 +1,14 @@
-# Cloudflare Workers + static assets: site statique servi depuis dist/
+# Cloudflare Pages: static files from dist/ + Functions from functions/
 name = "moyo"
+pages_build_output_dir = "dist"
 compatibility_date = "2026-10-01"
 
-# Construit dist/ avant chaque déploiement (y compris les builds GitHub de Cloudflare).
-[build]
-command = "node build.mjs"
-
-[assets]
-directory = "./dist"
-
-# Projects and images KV (conservé pour un futur backend).
+# Projects and images.
 #   npx wrangler kv namespace create MOYO
 [[kv_namespaces]]
 binding = "MOYO"
-id = "b607180688c748049ddacd96798e1d55"
+id = "de946356b5934cbfa13b6e0ac49d3052"
 
 # Secrets (never in this file):
-#   npx wrangler secret put ADMIN_PASSWORD
+#   npx wrangler pages secret put ADMIN_PASSWORD
 # For local dev, put ADMIN_PASSWORD=... in .dev.vars (ignored by git).
