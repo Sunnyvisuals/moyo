@@ -2,7 +2,7 @@
    French and English are both in the page; a small script shows the language chosen on the site (stored as "hb-lang"). */
 import { getData } from '../_lib/store.js';
 import { escHTML as e, imgURL } from '../../shared/render.js';
-import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
+import { CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
 
 const para = t => String(t || '').split(/\n{2,}/).map(p => `<p>${e(p).replace(/\n/g, '<br>')}</p>`).join('');
 
@@ -66,7 +66,7 @@ h1{grid-column:1/-1;font-size:clamp(3rem,9vw,9rem);font-weight:300;letter-spacin
 span[data-l],div[data-l]{display:none}html[lang=fr] :is(span,div)[data-l=fr],html[lang=en] :is(span,div)[data-l=en]{display:revert}
 @media (max-width:560px){.cta-bar{grid-template-columns:1fr 64px}.cta-bar a{min-height:84px}.cta-bar a:nth-child(2){grid-row:2;grid-column:1}.cta-bar a:nth-child(3){grid-row:1/3;grid-column:2;padding:0}}
 
-${CHROME_CSS}${FOOTER_CSS}${GLASS_CSS}
+${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}${GLASS_CSS}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
 @media (prefers-reduced-motion:no-preference){
   html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
