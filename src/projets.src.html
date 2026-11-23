@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F1F3F2">
 <title>Projets · Moyo Studio</title>
-<meta name="description" content="Tous les projets de moyo, studio de design basé en Provence-Alpes-Côte d’Azur, rangés par catégorie : identités, sites, données, motion.">
+<meta name="description" content="Tous les projets de moyo, agence créative basée en Provence-Alpes-Côte d’Azur, rangés par catégorie : identités, sites, données, motion.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <script>/* page transitions can be cut short by a fast click: that is not an error */
@@ -201,8 +201,8 @@ const ALL=DATA.projects||[];
 const EN={idxL:'Project index',skip:'Skip to content',home:'Home',contact:'Contact',title:'All projects.',empty:'No project in this category yet.',back:'Back to home',
   fRole:'Role',fYear:'Year',fPlace:'Place',prev:'Previous',next:'Next',close:'Close',all:'All',
   homeAria:'moyo, home',nav:'Navigation',filtersAria:'Filter by category',
-  'sec.top':'Home','sec.projects':'Projects','sec.all':'All projects','sec.services':'Services','sec.studio':'Studio','sec.team':'The team','sec.contact':'Contact',menu:'Menu',close:'Close',fStudio:'Studio',allL:'All projects',sTeam:'The team',fLive:'The light, right now',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',fStudioP:'An independent design and development studio, based on the French Riviera: websites, identities, audiovisual and communication.',fNav:'Site map',
-  sIntro:'Approach',sProj:'Projects',sSvc:'Services',sStu:'Studio',fWrite:'Write to the studio',top:'Back to top',footAria:'Site footer',langAria:'Language'};
+  'sec.top':'Home','sec.projects':'Projects','sec.all':'All projects','sec.services':'Services','sec.studio':'Agency','sec.team':'The team','sec.contact':'Contact',menu:'Menu',close:'Close',fStudio:'Agency',allL:'All projects',sTeam:'The team',fLive:'The light, right now',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',fStudioP:'An independent creative agency, based on the French Riviera: websites, identities, audiovisual and communication.',fNav:'Site map',
+  sIntro:'Approach',sProj:'Projects',sSvc:'Services',sStu:'Agency',fWrite:'Write to the agency',top:'Back to top',footAria:'Site footer',langAria:'Language'};
 const FR={all:'Tous'};
 let lang='fr';
 try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else if(!/^fr/i.test(navigator.language||'fr')) lang='en';}catch(e){}
@@ -213,7 +213,7 @@ if(cat!=='all' && !DATA.categories.some(c=>c.id===cat)) cat='all';
 const visible=()=>ALL.map((p,i)=>i).filter(i=>cat==='all'||ALL[i].category===cat);
 
 function renderFilters(){
-  const used=DATA.categories.filter(c=>ALL.some(p=>p.category===c.id));
+  const used=DATA.categories; // every category, even without a project yet
   const btn=(id,label,n)=>`<button type="button" data-cat="${escHTML(id)}" aria-pressed="${id===cat}">${escHTML(label)}<span class="n">${n}</span></button>`;
   $('#filters').innerHTML=btn('all',lang==='en'?EN.all:FR.all,ALL.length)+used.map(c=>btn(c.id,catLabel(DATA,c.id,lang),ALL.filter(p=>p.category===c.id).length)).join('');
 }

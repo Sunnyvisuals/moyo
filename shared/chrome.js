@@ -144,7 +144,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
       <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets</span></a></li>
       <li><a href="/projets"><span class="mn" data-i="sec.all">Tous les projets</span></a></li>
       <li><a href="/#services"><span class="mn" data-i="sec.services">Services</span></a></li>
-      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Studio</span></a></li>
+      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Agence</span></a></li>
       <li><a href="/#equipe"><span class="mn" data-i="sec.team">L’équipe</span></a></li>
       <li><a href="/#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
@@ -227,15 +227,15 @@ footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(6
   border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(0 47 167) calc(var(--gh) - 1px));
   box-shadow:0 -2px 8px rgb(0 6 40 / .08),0 -24px 48px -12px rgb(0 6 40 / .22)!important}
-/* the glass: clear, it bends what is behind (glass.js sets --liquid where the browser can), then turns blue downwards */
+/* the glass: deep frost, only soft masses of colour come through, then it turns blue downwards */
 footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
-  background:linear-gradient(to bottom,rgb(0 47 167 / 0) 0,rgb(0 47 167 / .05) calc(var(--gp) * .34),rgb(0 47 167 / .26) calc(var(--gp) * .54),rgb(0 47 167 / .68) calc(var(--gp) * .75),rgb(0 47 167 / .95) calc(var(--gp) * .9),rgb(0 47 167) calc(var(--gp) * .98)),
-    radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .16),#0000),
-    linear-gradient(rgb(255 255 255 / .13),rgb(255 255 255 / .05) 90px);
+  background:linear-gradient(to bottom in oklab,rgb(0 47 167 / 0.200) calc(var(--gp) * 0.000),rgb(0 47 167 / 0.234) calc(var(--gp) * 0.054),rgb(0 47 167 / 0.270) calc(var(--gp) * 0.109),rgb(0 47 167 / 0.312) calc(var(--gp) * 0.163),rgb(0 47 167 / 0.359) calc(var(--gp) * 0.218),rgb(0 47 167 / 0.412) calc(var(--gp) * 0.272),rgb(0 47 167 / 0.472) calc(var(--gp) * 0.327),rgb(0 47 167 / 0.535) calc(var(--gp) * 0.381),rgb(0 47 167 / 0.602) calc(var(--gp) * 0.436),rgb(0 47 167 / 0.669) calc(var(--gp) * 0.490),rgb(0 47 167 / 0.735) calc(var(--gp) * 0.544),rgb(0 47 167 / 0.796) calc(var(--gp) * 0.599),rgb(0 47 167 / 0.852) calc(var(--gp) * 0.653),rgb(0 47 167 / 0.900) calc(var(--gp) * 0.708),rgb(0 47 167 / 0.938) calc(var(--gp) * 0.762),rgb(0 47 167 / 0.967) calc(var(--gp) * 0.817),rgb(0 47 167 / 0.986) calc(var(--gp) * 0.871),rgb(0 47 167 / 0.997) calc(var(--gp) * 0.926),rgb(0 47 167 / 1.000) calc(var(--gp) * 0.980)),
+    radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
+    linear-gradient(rgb(255 255 255 / .1),#0000 110px);
   /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
   box-shadow:inset 0 calc(3px + var(--fv,0) * 5px) calc(2px + var(--fv,0) * 3px) calc(-1px - var(--fv,0) * 2px) rgb(255 255 255 / .5),
     inset 0 calc(12px + var(--fv,0) * 16px) calc(16px + var(--fv,0) * 10px) calc(-11px - var(--fv,0) * 6px) rgb(0 14 70 / calc(.3 + var(--fv,0) * .25));
-  -webkit-backdrop-filter:blur(8px) saturate(1.2);backdrop-filter:var(--liquid,blur(8px)) saturate(1.2) brightness(1.05)}
+  -webkit-backdrop-filter:blur(44px) contrast(.8) saturate(1.25);backdrop-filter:blur(44px) contrast(.8) saturate(1.25)}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
 footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:calc(1px + var(--fv,0) * 1.5px);box-shadow:none;
   background:radial-gradient(520px 90px at var(--lx,50%) 0,#fff 20%,#0000),
@@ -257,9 +257,9 @@ const footerInner = ({ home = false } = {}) => {
   const w = home ? 'wrap ' : '', h = home ? '#' : '/#';
   return `  <div class="${w}foot-grid">
     <div class="fcol">
-      <h2 class="fh" data-i="fStudio">Studio</h2>
+      <h2 class="fh" data-i="fStudio">Agence</h2>
       <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
-      <p class="small muted" data-i="fStudioP">Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
+      <p class="small muted" data-i="fStudioP">Agence créative indépendante, basée en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
       <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
@@ -269,7 +269,7 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
         <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets</a></li>
         <li><a href="/projets" data-i="${home ? 'sec.all' : 'allL'}">Tous les projets</a></li>
         <li><a href="${h}services" data-i="${home ? 'sec.services' : 'sSvc'}">Services</a></li>
-        <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Studio</a></li>
+        <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Agence</a></li>
         <li><a href="${h}equipe" data-i="${home ? 'sec.team' : 'sTeam'}">L’équipe</a></li>
         <li><a href="${h}contact" data-i="${home ? 'sec.contact' : 'contact'}">Contact</a></li>
       </ul>

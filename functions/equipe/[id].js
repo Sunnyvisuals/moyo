@@ -11,7 +11,7 @@ export async function onRequestGet({ params, env, request }) {
   const team = data.team || [];
   const i = team.findIndex(m => m.id === params.id);
   if (i < 0) return Response.redirect(new URL('/#studio', request.url).toString(), 302);
-  const m = team[i], next = team[(i + 1) % team.length];
+  const m = team[i];
   const fr = m.fr || {}, en = { role: m.en?.role || fr.role, bio: m.en?.bio || fr.bio };
 
   const html = `<!DOCTYPE html>
@@ -21,7 +21,7 @@ export async function onRequestGet({ params, env, request }) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>${e(m.name)} · Moyo Studio</title>
-<meta name="description" content="${e(m.name)}, ${e(fr.role)}. Moyo, studio de design basé en Provence-Alpes-Côte d’Azur.">
+<meta name="description" content="${e(m.name)}, ${e(fr.role)}. Moyo, agence créative basée en Provence-Alpes-Côte d’Azur.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -35,26 +35,15 @@ body{margin:0;color:var(--klein);font-family:"Hanken Grotesk",system-ui,sans-ser
 h1,h2,p,ul{margin:0}ul{padding:0;list-style:none}a{color:inherit}
 :focus-visible{outline:2px solid currentColor;outline-offset:3px}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;padding:calc(var(--hdr) + clamp(32px,7vh,88px)) var(--m) clamp(72px,12vh,140px);max-width:calc(1500px + 2 * var(--m));margin:0 auto}
-.idx{grid-column:1/-1;display:flex;align-items:center;gap:14px;font-size:.8125rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;margin-bottom:clamp(24px,5vh,56px)}
-.idx i{width:18px;height:7px;border-block:1px solid currentColor}.idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22}
-h1{grid-column:1/-1;font-size:clamp(3rem,9vw,9rem);font-weight:300;letter-spacing:-.05em;line-height:.95;text-wrap:balance}
-.role{grid-column:1/7;font-size:clamp(1.125rem,1.6vw,1.5rem);margin-top:clamp(16px,3vh,32px);color:var(--soft)}
-.photo{grid-column:1/6;grid-row:span 2;margin-top:clamp(48px,8vh,96px);aspect-ratio:4/5;background:var(--klein);position:relative;overflow:hidden}
+main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:40px clamp(16px,2vw,32px);align-items:end;min-height:100svh;padding:calc(var(--hdr) + clamp(16px,3vh,40px)) var(--m) clamp(48px,8vh,96px);max-width:calc(1500px + 2 * var(--m));margin:0 auto}
+.photo{grid-column:1/6;aspect-ratio:4/5;max-height:calc(100svh - var(--hdr) - clamp(64px,11vh,136px));background:#b0b4ba;position:relative;overflow:hidden}
 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.photo.empty{background:linear-gradient(var(--klein),var(--klein)) 0 0/100% 31% no-repeat,linear-gradient(var(--klein),var(--klein)) 0 50%/100% 31% no-repeat,linear-gradient(var(--klein),var(--klein)) 0 100%/100% 31% no-repeat;background-color:transparent}
-.bio{grid-column:7/-1;margin-top:clamp(48px,8vh,96px);font-size:clamp(1.0625rem,1.35vw,1.25rem);line-height:1.6;max-width:52ch;display:grid;gap:1em}
-.links{grid-column:7/-1;align-self:start;display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
-.links a{display:inline-flex;align-items:center;gap:12px;min-height:48px;padding:0 20px;border:1px solid currentColor;text-decoration:none;font-size:.9375rem;font-weight:500;transition:background .45s var(--ease),color .45s var(--ease)}
-.links a:hover{background:var(--klein);color:var(--paper)}
-.cta-bar{display:grid;grid-template-columns:1fr 1fr clamp(72px,7vw,104px);min-height:clamp(84px,11vh,112px)}
-.cta-bar a{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 clamp(20px,2.4vw,40px);color:var(--paper);text-decoration:none;transition:background .45s var(--ease)}
-.cta-bar .n{font-size:.8125rem;font-weight:600;opacity:.75}.cta-bar .t{font-size:clamp(1rem,1.4vw,1.375rem);font-weight:600;text-transform:uppercase}
-.cta-bar a:nth-child(1){background:color-mix(in oklab,var(--klein) 58%,#000614)}.cta-bar a:nth-child(2){background:var(--klein)}
-.cta-bar a:nth-child(3){background:var(--wash);color:var(--klein);display:grid;grid-template-columns:repeat(2,8px);gap:6px;place-content:center}
-.cta-bar a:nth-child(3) i{width:8px;height:8px;background:currentColor}
+.who{grid-column:7/-1}
+h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;line-height:1.02;text-wrap:balance}
+.bio{margin-top:clamp(20px,3vh,36px);font-size:clamp(1.125rem,1.4vw,1.375rem);line-height:1.6;max-width:44ch}
+.bio p+p{margin-top:1em}
 @media (prefers-reduced-motion:no-preference){
-  h1,.role,.photo,.bio,.links{animation:in 1.2s var(--ease) both}.role{animation-delay:.1s}.photo{animation-delay:.18s}.bio{animation-delay:.26s}.links{animation-delay:.32s}
+  .photo,h1,.bio{animation:in 1.2s var(--ease) both}h1{animation-delay:.1s}.bio{animation-delay:.18s}
   html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition{background:color-mix(in oklab,var(--klein) 38%,#000614)}
@@ -62,9 +51,8 @@ h1{grid-column:1/-1;font-size:clamp(3rem,9vw,9rem);font-weight:300;letter-spacin
 @keyframes in{from{opacity:0;translate:0 28px}}
 @keyframes pgOut{to{scale:.86;border-radius:28px;filter:brightness(.5)}}
 @keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
-@media (max-width:820px){.role,.photo,.bio,.links{grid-column:1/-1}.photo{grid-row:auto}}
+@media (max-width:820px){main{min-height:0;align-items:start}.photo,.who{grid-column:1/-1}.photo{max-height:none}}
 span[data-l],div[data-l]{display:none}html[lang=fr] :is(span,div)[data-l=fr],html[lang=en] :is(span,div)[data-l=en]{display:revert}
-@media (max-width:560px){.cta-bar{grid-template-columns:1fr 64px}.cta-bar a{min-height:84px}.cta-bar a:nth-child(2){grid-row:2;grid-column:1}.cta-bar a:nth-child(3){grid-row:1/3;grid-column:2;padding:0}}
 
 ${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}${GLASS_CSS}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
@@ -81,18 +69,12 @@ try{if(localStorage.getItem('hb-lang')==='en')document.documentElement.lang='en'
 <body>
 ${chromeHead(5)}
 <div class="under"><main id="main">
-  <p class="idx" aria-hidden="true"><i></i><span data-l="fr">L’équipe</span><span data-l="en">The team</span></p>
-  <h1>${e(m.name)}</h1>
-  <p class="role"><span data-l="fr">${e(fr.role)}</span><span data-l="en">${e(en.role)}</span></p>
-  <div class="photo${m.photo ? '' : ' empty'}" aria-hidden="${m.photo ? 'false' : 'true'}">${m.photo ? `<img src="${imgURL(m.photo)}" alt="${e(m.name)}">` : ''}</div>
-  <div class="bio"><div data-l="fr">${para(fr.bio)}</div><div data-l="en">${para(en.bio)}</div></div>
-  ${m.links?.length ? `<ul class="links">${m.links.map(l => `<li><a href="${e(l.url)}"${/^https?:/i.test(l.url) ? ' target="_blank" rel="noopener"' : ''}>${e(l.label)} →</a></li>`).join('')}</ul>` : ''}
+  <div class="photo"${m.photo ? '' : ' aria-hidden="true"'}>${m.photo ? `<img src="${imgURL(m.photo)}" alt="${e(m.name)}">` : ''}</div>
+  <div class="who">
+    <h1>${e(m.name)}</h1>
+    <div class="bio"><div data-l="fr">${para(fr.bio)}</div><div data-l="en">${para(en.bio)}</div></div>
+  </div>
 </main>
-<nav class="cta-bar" aria-label="Suite">
-  ${next && next.id !== m.id ? `<a href="/equipe/${e(next.id)}"><span class="n">01</span><span class="t">${e(next.name)}</span></a>` : `<a href="/#studio"><span class="n">01</span><span class="t"><span data-l="fr">Le studio</span><span data-l="en">The studio</span></span></a>`}
-  <a href="/#contact"><span class="n">02</span><span class="t"><span data-l="fr">Écrire au studio</span><span data-l="en">Write to the studio</span></span></a>
-  <a href="/" aria-label="Accueil"><i></i><i></i><i></i><i></i></a>
-</nav>
 </div>
 ${footerHTML()}
 <script src="/lenis.js"></script>
