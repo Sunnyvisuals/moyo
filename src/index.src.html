@@ -795,6 +795,9 @@ html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .
 .nm-link:hover .nm-go,.nm-link:focus-visible .nm-go{opacity:1;gap:20px}
 .nm-link:hover .nm{font-style:normal;letter-spacing:-.05em}
 .nm{transition:letter-spacing var(--dur-3) var(--ease-enter)}
+/* a thin chevron at the right of each name says it is a link; it slides a little on hover */
+.nm-link::after{content:"";flex:none;align-self:center;width:clamp(14px,1.5vw,22px);height:clamp(14px,1.5vw,22px);border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;rotate:45deg;margin-right:clamp(6px,1.2vw,18px);transition:translate .55s var(--ease-enter),opacity .4s;opacity:.85}
+.nm-link:hover::after,.nm-link:focus-visible::after{translate:8px 0;opacity:1}
 .fnames a{min-height:0!important;font-size:inherit}
 @media (max-width:640px){.nm-go{display:none}}
 
