@@ -22,6 +22,15 @@ export async function onRequestGet({ params, env, request }) {
 <meta name="color-scheme" content="light">
 <title>${e(m.name)} · Moyo Studio</title>
 <meta name="description" content="${e(m.name)}, ${e(fr.role)}. Moyo, agence créative basée en Provence-Alpes-Côte d’Azur.">
+<meta property="og:title" content="${e(m.name)} · Moyo Studio">
+<meta property="og:description" content="${e(m.name)}, ${e(fr.role)}. Moyo, agence créative basée en Provence-Alpes-Côte d’Azur.">
+<meta property="og:type" content="profile">
+<meta property="og:image" content="https://moyo-d0n.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="moyo">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://moyo-d0n.pages.dev/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -89,6 +98,7 @@ if(!reduce&&typeof Lenis!=='undefined')new Lenis({lerp:.055,wheelMultiplier:.8,s
 <script src="/glass.js" defer></script>
 <script src="/hand.js" defer></script>
 <script src="/stage.js" defer></script>
+<script src="/fw.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>

@@ -51,10 +51,12 @@ const sizes = {
   'robots.txt': out('dist/robots.txt', 'User-agent: *\nDisallow: /admin\nDisallow: /api/\n')
 };
 out('dist/cursor.js', read('src/cursor.js'));
+fs.copyFileSync(r('assets/og.png'), r('dist/og.png')); // image shown when the site is shared
 out('dist/hand.js', read('src/hand.js'));
 out('dist/leave.js', read('src/leave.js'));
 out('dist/reveal.js', read('src/reveal.js'));
 out('dist/stage.js', read('src/stage.js'));
+out('dist/fw.js', read('src/fw.js'));
 out('dist/roll.js', read('src/roll.js'));
 out('dist/count.js', read('src/count.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
