@@ -792,6 +792,11 @@ html.loading .hero-copy h1 .ln,html.loading .sunui{animation-play-state:paused}
   .acc-glow{display:none}
 }
 
+/* Projects: go straight to the full-screen accordion — no heading band above it */
+#projets{padding-top:0}
+#projets>.wrap>.acc{margin-top:0}
+.acc{height:100svh}
+#projets .proj-more{margin-top:clamp(40px,7vh,96px)}
 /* Sections slide over each other with flat edges: no shadow, no line */
 html.stack main>.sec+.sec,html.stack main>.sec.blue+.sec:not(.blue),html.stack .foot{box-shadow:none}
 
@@ -1088,11 +1093,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 <!-- Projets -->
 <section class="sec" id="projets" data-sec="projects" data-tone="paper" aria-labelledby="projT">
   <div class="wrap">
-    <p class="idx" aria-hidden="true"><i class="sq"></i><span class="n">02</span><span data-i="sec.projects">Projets</span></p>
-    <div class="sec-head">
-      <h2 class="display shut" id="projT" data-i="projT">Projets choisis.</h2>
-      <p class="small muted" data-i="projN">Une sélection. Tous les projets sont rangés par catégorie.</p>
-    </div>
+    <h2 class="sr" id="projT" data-i="projT">Projets choisis.</h2>
     <div class="acc" id="projects" role="list">__ROWS__</div>
     <div class="proj-more"><a class="link" href="/projets" data-i="allL">Tous les projets, par catégorie</a></div>
     <script type="application/json" id="moyo-data">__DATA__</script>

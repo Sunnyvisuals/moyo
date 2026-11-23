@@ -144,4 +144,95 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
   <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i><i></i></span></button>
 </nav>`;
 
-export { CHROME_CSS, chromeHead };
+/* Footer (columns, live sun, sign-up, blur "moyo"), with a gentle parallax reveal. */
+const FOOTER_CSS = `
+.foot{position:relative;background:var(--klein);color:var(--paper);padding:clamp(64px,10vh,120px) var(--m) clamp(40px,7vh,72px);overflow:clip}
+.foot ::selection{background:var(--paper);color:var(--klein)}
+.foot :focus-visible{outline-color:var(--paper)}
+.foot .small{font-size:var(--fs-small)}
+.foot .muted{color:var(--paper-soft)}
+.foot-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px clamp(16px,2vw,32px);max-width:1500px;margin:0 auto}
+.fcol{grid-column:span 3;min-width:0}
+.fh{font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;margin-bottom:16px;color:var(--paper-soft)}
+.fcol ul{display:grid;gap:2px;list-style:none;margin:0;padding:0}
+.fnames li{font-size:1.25rem;font-weight:300;letter-spacing:-.02em;line-height:1.3}
+.fnames+p{margin-top:16px;max-width:30ch}
+.fcol a{display:inline-flex;align-items:center;min-height:32px;text-decoration:none;color:var(--paper);background:linear-gradient(currentColor,currentColor) 0 calc(100% - 6px)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
+.fcol a:hover{background-size:100% 1px}
+.foot-sun{font-size:1.25rem;font-weight:300;letter-spacing:-.02em;line-height:1.3;margin-bottom:16px;max-width:24ch;text-wrap:balance}
+.fcol--live .small{margin-top:14px;max-width:30ch}
+.foot-base{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px;margin:clamp(56px,9vh,104px) auto 0;max-width:1500px;padding-top:20px;border-top:1px solid var(--paper-line);font-size:var(--fs-small)}
+.foot-base a{display:inline-flex;align-items:center;min-height:32px;color:var(--paper);text-decoration:none}
+.flang{display:inline-flex;gap:14px}
+.flang button{min-height:32px;color:var(--paper-soft);background:linear-gradient(currentColor,currentColor) 0 calc(100% - 6px)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter),color var(--dur-1)}
+.flang button:hover{color:var(--paper)}
+.flang button[aria-pressed="true"]{color:var(--paper);background-size:100% 1px}
+.foot-subwrap{max-width:1500px;margin:clamp(44px,7vh,96px) auto 0}
+.foot-sub{max-width:520px}
+.fh2{font-size:var(--fs-lead);font-weight:400;line-height:1.15;margin:0 0 20px;color:var(--paper)}
+.sub-row{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.sub-row input[type=email]{flex:1 1 220px;min-width:0;font:inherit;font-size:clamp(1.125rem,1.4vw,1.375rem);font-weight:300;color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;padding:6px 0 12px;outline:none;transition:border-color var(--dur-1)}
+.sub-row input[type=email]::placeholder{color:color-mix(in oklab,var(--paper) 45%,transparent)}
+.sub-row input[type=email]:focus-visible{border-color:var(--paper)}
+.sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:var(--paper);color:var(--klein);font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
+.sub-btn::after{content:"→"}
+.sub-btn:hover{gap:26px;background:color-mix(in oklab,var(--paper) 90%,var(--klein))}
+.sub-btn:focus-visible{outline:2px solid var(--paper);outline-offset:4px}
+.sub-btn:disabled{opacity:.6;cursor:progress;gap:16px}
+.sub-msg{margin-top:16px;min-height:1.3em;opacity:.85}
+.sub-msg.err{color:color-mix(in oklab,var(--paper) 80%,#ffb3b3)}
+@media (max-width:560px){.sub-btn{flex:1 1 100%;justify-content:space-between}}
+.mono-wrap{container-type:inline-size;margin:clamp(40px,7vh,88px) calc(var(--m) * -1) 0;padding:0 var(--m)}
+.monument{font-size:calc(100cqw / 2.165);font-weight:300;letter-spacing:-.055em;line-height:.72;white-space:nowrap;margin-left:-.077em;user-select:none;padding-bottom:.3em;margin-bottom:-.06em}
+.monument.blurtext{background:none!important;-webkit-text-fill-color:currentColor;color:var(--paper)}
+.monument.blurtext .bl{display:inline-block;filter:blur(var(--b,0px));padding-bottom:.28em;margin-bottom:-.28em;
+  background-image:radial-gradient(circle at 50% 50%,rgb(0 47 167 / .28) .7px,#0000 1.1px),linear-gradient(var(--paper),var(--paper));background-size:4px 4px,100% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.foot-grid,.foot-subwrap,.foot-base{transform:translateY(calc((1 - var(--fp,1)) * 40px))}
+.foot .mono-wrap{transform:translateY(calc((1 - var(--fp,1)) * 90px))}
+@media (prefers-reduced-motion:reduce){.foot-grid,.foot-subwrap,.foot-base,.foot .mono-wrap{transform:none}}
+@media (max-width:900px){.fcol{grid-column:span 6}}
+@media (max-width:560px){.fcol{grid-column:1/-1}}
+`;
+
+const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
+  <div class="foot-grid">
+    <div class="fcol">
+      <h2 class="fh" data-i="fStudio">Studio</h2>
+      <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
+      <p class="small muted" data-i="fStudioP">Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
+    </div>
+    <nav class="fcol" aria-labelledby="fNavT">
+      <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
+      <ul>
+        <li><a href="/" data-i="home">Accueil</a></li>
+        <li><a href="/#approche" data-i="sIntro">Approche</a></li>
+        <li><a href="/#projets" data-i="sProj">Projets</a></li>
+        <li><a href="/projets" data-i="allL">Tous les projets</a></li>
+        <li><a href="/#services" data-i="sSvc">Services</a></li>
+        <li><a href="/#studio" data-i="sStu">Studio</a></li>
+        <li><a href="/#equipe" data-i="sTeam">L’équipe</a></li>
+        <li><a href="/#contact" data-i="contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="fcol fcol--live">
+      <h2 class="fh" data-i="fLive">La lumière, maintenant</h2>
+      <p class="foot-sun" id="fSunNow"></p>
+      <p class="small muted" id="fTrend"></p>
+    </div>
+    <div class="fcol">
+      <h2 class="fh" data-i="contact">Contact</h2>
+      <ul><li><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a></li></ul>
+    </div>
+  </div>
+  <div class="foot-subwrap"><form class="foot-sub" id="subForm" novalidate><h2 class="fh2" data-i="subH">Inscrivez-vous pour un peu de joie.</h2><div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" data-i="subBtn">S’inscrire</button></div><p class="sub-msg small" id="subMsg" role="status" aria-live="polite"></p></form></div>
+  <div class="foot-base small">
+    <span>© 2026 moyo</span>
+    <span class="muted" id="fDate"></span>
+    <span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span>
+    <a href="#main" data-i="top">Retour en haut</a>
+  </div>
+  <div class="mono-wrap" aria-hidden="true"><div class="monument blurtext"><span class="bl" style="--i:0">m</span><span class="bl" style="--i:1">o</span><span class="bl" style="--i:2">y</span><span class="bl" style="--i:3">o</span></div></div>
+</footer>`;
+
+export { CHROME_CSS, chromeHead, FOOTER_CSS, footerHTML };
