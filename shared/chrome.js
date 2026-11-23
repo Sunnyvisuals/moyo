@@ -311,4 +311,4 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
 ${footerInner()}
 </footer>`;
 
-export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerInner, footerHTML };
+export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };

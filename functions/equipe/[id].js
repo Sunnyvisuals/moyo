@@ -54,7 +54,8 @@ h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;l
 @media (max-width:820px){main{min-height:0;align-items:start}.photo,.who{grid-column:1/-1}.photo{max-height:none}}
 span[data-l],div[data-l]{display:none}html[lang=fr] :is(span,div)[data-l=fr],html[lang=en] :is(span,div)[data-l=en]{display:revert}
 
-${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}${GLASS_CSS}
+${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}
+.foot{margin-top:0;animation:none}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
 @media (prefers-reduced-motion:no-preference){
   html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
@@ -68,14 +69,13 @@ try{if(localStorage.getItem('hb-lang')==='en')document.documentElement.lang='en'
 </head>
 <body>
 ${chromeHead(5)}
-<div class="under"><main id="main">
+<main id="main">
   <div class="photo"${m.photo ? '' : ' aria-hidden="true"'}>${m.photo ? `<img src="${imgURL(m.photo)}" alt="${e(m.name)}">` : ''}</div>
   <div class="who">
     <h1>${e(m.name)}</h1>
     <div class="bio"><div data-l="fr">${para(fr.bio)}</div><div data-l="en">${para(en.bio)}</div></div>
   </div>
 </main>
-</div>
 ${footerHTML()}
 <script src="/lenis.js"></script>
 <script>(()=>{const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,root=document.documentElement;
@@ -85,8 +85,9 @@ document.querySelectorAll('.flang button').forEach(b=>b.addEventListener('click'
 if(!reduce&&typeof Lenis!=='undefined')new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});})();</script>
 <script src="/chrome.js" defer></script>
 <script src="/footer.js" defer></script>
-<script src="/glass.js" defer></script>
 <script src="/hand.js" defer></script>
+<script src="/reveal.js" defer></script>
+<script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>
 </body>
 </html>`;

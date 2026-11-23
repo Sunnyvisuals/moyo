@@ -15,7 +15,7 @@ const out = (p, s) => { fs.mkdirSync(path.dirname(r(p)), { recursive: true }); f
 const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k).join(v), s);
 
 const { rowsHTML, cardsHTML, featuredOf, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
-const { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerInner, footerHTML } = await import(pathToFileURL(r('shared/chrome.js')).href);
+const { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
 const renderSrc = read('shared/render.js').replace(/^export \{[^}]*\};?\s*$/m, '');
 if (/^\s*export\b/m.test(renderSrc)) throw new Error('shared/render.js: keep `export` on the last line only');
@@ -31,7 +31,6 @@ const sizes = {
     __FONT__: font.toString('base64'),
     __LENIS__: lenis,
     __RENDER__: renderSrc,
-    __GLASS_CSS__: GLASS_CSS,
     __BURGER_CSS__: BURGER_CSS,
     __LANG_CSS__: LANG_CSS,
     __FOOTER_INNER__: footerInner({ home: true }),
@@ -52,6 +51,8 @@ const sizes = {
 };
 out('dist/cursor.js', read('src/cursor.js'));
 out('dist/hand.js', read('src/hand.js'));
+out('dist/leave.js', read('src/leave.js'));
+out('dist/reveal.js', read('src/reveal.js'));
 out('dist/count.js', read('src/count.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
 out('dist/footer.js', read('src/footer-rt.js'));
