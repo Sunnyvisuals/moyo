@@ -1,4 +1,4 @@
-/* Minimal cursor: a small solid disc (it scales with very wide screens). Over anything clickable it opens into a thin translucent ring.
+/* Minimal cursor: a small solid disc (it scales with very wide screens). Over anything clickable it opens into a thin empty ring.
    It reads the colour really under it (background or photo): light on dark, blue on light. The system caret in text fields.
    Mouse and trackpad only (pointer: fine). Inside the menu and dialogs (top layer) the system cursor comes back. */
 (() => {
@@ -15,7 +15,7 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
 .cur.inv{--c:#F1F3F2}
 .cur::before{content:"";position:absolute;left:0;top:0;width:clamp(13px,.8vw,24px);aspect-ratio:1;translate:-50% -50%;box-sizing:border-box;border-radius:50%;background:var(--c);border:1.5px solid var(--c);
   transition:width .45s cubic-bezier(.2,.9,.2,1),background .25s,border-color .18s,scale .25s}
-.cur.hot::before{width:clamp(44px,2.8vw,84px);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.cur.hot::before{width:clamp(44px,2.8vw,84px);background:transparent}
 .cur.down::before{scale:.78}`;
   /* luminance (0 dark, 1 light) of what is painted under the pointer */
   const px = document.createElement('canvas'); px.width = px.height = 1;
