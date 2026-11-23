@@ -466,7 +466,7 @@ if(subForm) subForm.addEventListener('submit',async e=>{
   try{
     const r=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:mail.value.trim(),website:subForm.website.value,lang})});
     const d=await r.json().catch(()=>({}));
-    if(r.ok){ subForm.reset(); show(d.already?(en?'You are already on the list.':'Vous êtes déjà inscrit·e.'):(en?'Thank you — see you soon.':'Merci — à très vite.')); }
+    if(r.ok){ subForm.reset(); show(d.already?(en?'You are already on the list.':'Vous êtes déjà inscrit·e.'):(en?'Thank you, see you soon.':'Merci, à très vite.')); }
     else show(d.message||(en?'Sign-up failed.':'L’inscription a échoué.'),true);
   }catch(_){ show(en?'Sign-up failed. Check your connection.':'L’inscription a échoué. Vérifiez votre connexion.',true); }
   finally{ btn.disabled=false; }
