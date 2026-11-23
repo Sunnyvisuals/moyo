@@ -114,6 +114,21 @@ const CHROME_CSS = `
 html.menu-lock{overflow:hidden}
 `;
 
+/* Language button (every page): on hover the label rolls up and the same label takes its place. No underline.
+   The label is drawn twice from the button's lang attribute; the real text stays for assistive tech. */
+const LANG_CSS = `
+#bar #langBtn{position:relative;display:inline-grid;place-items:center;min-width:44px;background:none!important;-webkit-text-fill-color:transparent;letter-spacing:.02em}
+#bar #langBtn::before,#bar #langBtn::after{content:attr(lang);content:attr(lang)/"";position:absolute;inset:auto;text-transform:uppercase;line-height:1.3;-webkit-text-fill-color:currentColor;pointer-events:none;
+  transition:translate .5s cubic-bezier(.65,0,.15,1),clip-path .5s cubic-bezier(.65,0,.15,1)}
+#bar #langBtn::before{clip-path:inset(0)}
+#bar #langBtn::after{translate:0 100%;clip-path:inset(0 0 100%)}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  #bar #langBtn:hover::before{translate:0 -100%;clip-path:inset(100% 0 0)}
+  #bar #langBtn:hover::after{translate:0 0;clip-path:inset(0)}
+}
+@media (forced-colors:active){#bar #langBtn{-webkit-text-fill-color:currentColor}#bar #langBtn::before,#bar #langBtn::after{content:none}}
+`;
+
 /* Header + menu markup. `start` = the arc card the menu opens on (page's own section). */
 const chromeHead = (start = 0) => `<header class="bar" id="bar">
   <a class="bar-mark" href="/" aria-label="moyo, accueil" data-ia="homeAria">moyo</a>
@@ -251,4 +266,4 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
 ${footerInner()}
 </footer>`;
 
-export { CHROME_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+export { CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
