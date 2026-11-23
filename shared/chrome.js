@@ -189,7 +189,7 @@ const FOOTER_CSS = `
 .mono-wrap{container-type:inline-size;margin:clamp(40px,7vh,88px) calc(var(--m) * -1) 0;padding:0 var(--m)}
 .monument{font-size:calc(100cqw / 2.165);font-weight:300;letter-spacing:-.055em;line-height:.72;white-space:nowrap;margin-left:-.077em;user-select:none;height:.915em}
 .monument.blurtext{background:none!important;-webkit-text-fill-color:currentColor;color:var(--paper)}
-.monument.blurtext .bl{display:inline-block;filter:blur(var(--b,0px));padding-bottom:.28em;margin-bottom:-.28em;
+.monument.blurtext .bl{display:inline-block;filter:blur(var(--b,0px));padding:0 .1em .28em;margin:0 -.1em -.28em;
   background-image:radial-gradient(circle at 50% 50%,rgb(0 47 167 / .28) .7px,#0000 1.1px),linear-gradient(var(--paper),var(--paper));background-size:4px 4px,100% 100%;
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .foot-grid,.foot-subwrap,.foot-base{transform:translateY(calc((1 - var(--fp,1)) * 40px))}
