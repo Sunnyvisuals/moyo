@@ -15,14 +15,14 @@ for(const t of ['pagereveal','pageswap']) addEventListener(t,e=>{const v=e.viewT
 @font-face{font-family:"Hanken Grotesk";src:url(/fonts/hanken-grotesk.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 :root{
   --chaux:#F1F3F2;--klein:#002FA7;--paper:#F1F3F2;
-  --soft:color-mix(in oklab,var(--klein) 74%,var(--chaux));
+  --soft:color-mix(in oklab,var(--klein) 88%,var(--chaux));
   --line:color-mix(in oklab,var(--klein) 24%,var(--chaux));
   --wash:color-mix(in oklab,var(--klein) 7%,var(--chaux));
-  --paper-soft:color-mix(in oklab,var(--paper) 82%,var(--klein));
+  --paper-soft:color-mix(in oklab,var(--paper) 90%,var(--klein));
   --paper-line:color-mix(in oklab,var(--paper) 34%,var(--klein));
   --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --m:clamp(20px,3.2vw,56px);
-  --fs-small:.875rem;--fs-lead:clamp(1.0625rem,1.35vw,1.25rem);--fs-display:clamp(2.125rem,3.9vw,3.75rem);
+  --fs-small:.9375rem;--fs-lead:clamp(1.125rem,1.4vw,1.375rem);--fs-display:clamp(2.125rem,3.9vw,3.75rem);
   --dur-1:450ms;--dur-3:950ms;--dur-4:1500ms;
   --barw:min(380px,calc(100vw - 24px));
   --hdr:clamp(64px,8vh,84px);
@@ -43,7 +43,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 ::selection{background:var(--klein);color:var(--paper)}
 .skip{position:fixed;left:12px;top:-80px;z-index:200;background:var(--klein);color:var(--paper);padding:12px 16px;text-decoration:none;font-weight:600}
 .skip:focus{top:12px}
-.small{font-size:var(--fs-small);line-height:1.45}
+.small{font-size:var(--fs-small);line-height:1.55}
 .muted{color:var(--soft)}
 
 .top{display:flex;justify-content:space-between;align-items:center;padding:var(--m) var(--m) 0}
@@ -52,15 +52,15 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .top nav a,.top nav button{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-size:var(--fs-small);font-weight:500;text-decoration:none}
 .top nav a:hover,.top nav button:hover{background:var(--wash)}
 
-main{padding:clamp(56px,10vh,120px) var(--m) clamp(88px,14vh,160px);max-width:calc(1500px + 2 * var(--m));margin:0 auto;position:relative;z-index:1;background:var(--chaux)}
+main{padding:max(calc(var(--hdr) + 24px),clamp(56px,10vh,120px)) var(--m) clamp(88px,14vh,160px);max-width:calc(1500px + 2 * var(--m));margin:0 auto;position:relative;z-index:1;background:var(--chaux)}
 .head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px clamp(16px,2vw,32px);align-items:end;margin-bottom:clamp(32px,5vh,64px)}
 .head h1{grid-column:1/9;font-size:clamp(2.5rem,5.4vw,5.75rem);font-weight:300;letter-spacing:-.035em;line-height:1.03;text-wrap:balance}
 .head p{grid-column:9/-1;justify-self:end;text-align:right;max-width:30ch}
 
 /* Filters: square, outlined like the site's links; the active one is filled blue */
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:clamp(40px,7vh,88px);border-top:1px solid var(--line);padding-top:20px}
-.filters button{display:inline-flex;align-items:baseline;gap:8px;min-height:44px;padding:10px 18px;border:1px solid color-mix(in oklab,var(--klein) 28%,transparent);font-size:var(--fs-small);font-weight:550;transition:background var(--dur-1),color var(--dur-1),border-color var(--dur-1)}
-.filters button .n{font-weight:400;opacity:.7}
+.filters button{display:inline-flex;align-items:baseline;gap:8px;min-height:44px;padding:11px 18px;border:1px solid color-mix(in oklab,var(--klein) 45%,transparent);font-size:var(--fs-small);font-weight:550;transition:background var(--dur-1),color var(--dur-1),border-color var(--dur-1)}
+.filters button .n{font-weight:500;opacity:.85}
 .filters button:hover{background:var(--wash);border-color:color-mix(in oklab,var(--klein) 55%,transparent)}
 .filters button[aria-pressed="true"]{background:var(--klein);color:var(--paper)}
 html:not(.js) .filters{display:none}
@@ -91,7 +91,7 @@ html:not(.js) .filters{display:none}
 .dlg-in{min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--m) var(--m);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px clamp(16px,2vw,32px);align-content:start}
 .dlg-tag{grid-column:1/-1;font-size:var(--fs-small);color:var(--paper-soft)}
 .dlg-in h2{grid-column:1/-1;font-size:clamp(2.5rem,7vw,7rem);font-weight:350;letter-spacing:-.04em;line-height:.98;text-wrap:balance}
-.dlg-desc{grid-column:5/-1;font-size:var(--fs-lead);max-width:46ch;margin-top:clamp(12px,3vh,36px);white-space:pre-line}
+.dlg-desc{grid-column:5/-1;font-size:var(--fs-lead);max-width:52ch;line-height:1.6;margin-top:clamp(12px,3vh,36px);white-space:pre-line}
 .dlg-facts{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:clamp(20px,6vh,72px);border-top:1px solid var(--paper-line);padding-top:16px}
 .dlg-facts dt{font-size:var(--fs-small);color:var(--paper-soft)}
 .dlg-facts dd{font-size:1.125rem;margin-top:2px}
@@ -103,7 +103,7 @@ html:not(.js) .filters{display:none}
 .dlg-actions button{min-height:44px;font-size:var(--fs-small);font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
 .dlg-actions button:hover{background-size:100% 1px}
 .dlg-actions :focus-visible{outline-color:var(--paper);outline-offset:4px}
-.idx{display:flex;align-items:center;gap:14px;margin-bottom:clamp(40px,8vh,96px);font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;line-height:1}
+.idx{display:flex;align-items:center;gap:14px;margin-bottom:clamp(40px,8vh,96px);font-size:.8125rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;line-height:1}
 .idx .sq{width:18px;height:7px;border-block:1px solid currentColor;display:block}
 .idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22}
 html.is-dialog{overflow:hidden}
@@ -242,7 +242,6 @@ function applyLang(l){
   $$('[data-i]').forEach(el=>{ if(!('fr' in el.dataset)) el.dataset.fr=el.textContent; el.textContent=l==='en'&&EN[el.dataset.i]?EN[el.dataset.i]:el.dataset.fr; });
   $$('[data-ia]').forEach(el=>{ if(!('frA' in el.dataset)) el.dataset.frA=el.getAttribute('aria-label'); el.setAttribute('aria-label',l==='en'&&EN[el.dataset.ia]?EN[el.dataset.ia]:el.dataset.frA); });
   $$('[data-ph]').forEach(el=>{ if(!('frP' in el.dataset)) el.dataset.frP=el.getAttribute('placeholder')||''; el.setAttribute('placeholder',l==='en'&&EN[el.dataset.ph]?EN[el.dataset.ph]:el.dataset.frP); });
-  if(typeof fillFoot==='function') fillFoot();
   $$('#projects > li').forEach((li,i)=>{ const t=txt(ALL[i],l); $('.r-title',li).textContent=t.title; $('.r-type',li).textContent=t.type; $('.r-place',li).textContent=t.place; });
   $$('.flang button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.l===l)));
   const b=$('#langBtn'); b.hidden=false; b.textContent=l==='en'?'FR':'EN'; b.lang=l==='en'?'fr':'en'; b.setAttribute('aria-label',l==='en'?'Passer en français':'Switch to English');
@@ -286,108 +285,13 @@ $('#pNext').addEventListener('click',()=>step(1));
 $('#pPrev').addEventListener('click',()=>step(-1));
 dlg.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') step(1); else if(e.key==='ArrowLeft') step(-1); });
 
-/* ---------- Footer: live sun, blur "moyo", sign-up, parallax ---------- */
-const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
-const pad=n=>String(n).padStart(2,'0');
-const setT=(id,v)=>{const e=document.getElementById(id); if(e&&e.textContent!==v) e.textContent=v};
-const setV=(el,k,v)=>{ if(el&&el.style.getPropertyValue(k)!==v) el.style.setProperty(k,v) };
-const COMP={fr:['vers le nord','vers le nord-nord-est','vers le nord-est','vers l’est-nord-est','vers l’est','vers l’est-sud-est','vers le sud-est','vers le sud-sud-est','vers le sud','vers le sud-sud-ouest','vers le sud-ouest','vers l’ouest-sud-ouest','vers l’ouest','vers l’ouest-nord-ouest','vers le nord-ouest','vers le nord-nord-ouest'],
-  en:['towards the north','towards the north-northeast','towards the northeast','towards the east-northeast','towards the east','towards the east-southeast','towards the southeast','towards the south-southeast','towards the south','towards the south-southwest','towards the southwest','towards the west-southwest','towards the west','towards the west-northwest','towards the northwest','towards the north-northwest']};
-const LAT=43.7102, LON=7.2620, R=Math.PI/180;
-const fmtParts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
-function parisNow(){const p={};fmtParts.formatToParts(new Date()).forEach(x=>{p[x.type]=+x.value});return p}
-const P0=parisNow();
-const dayUTC=Date.UTC(P0.year,P0.month-1,P0.day);
-const noonUTC=new Date(Date.UTC(P0.year,P0.month-1,P0.day,12));
-const offMin=((+new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',hour:'2-digit',hourCycle:'h23'}).format(noonUTC))-12)*60;
-const localMidnightMs=dayUTC-offMin*60000;
-const doy=Math.round((dayUTC-Date.UTC(P0.year,0,0))/864e5);
-function sunAt(ms){
-  const d=new Date(ms);
-  const n=Math.round((Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())-Date.UTC(d.getUTCFullYear(),0,0))/864e5);
-  const g=2*Math.PI/365*(n-1+(d.getUTCHours()-12)/24);
-  const decl=.006918-.399912*Math.cos(g)+.070257*Math.sin(g)-.006758*Math.cos(2*g)+.000907*Math.sin(2*g)-.002697*Math.cos(3*g)+.00148*Math.sin(3*g);
-  const eot=229.18*(.000075+.001868*Math.cos(g)-.032077*Math.sin(g)-.014615*Math.cos(2*g)-.040849*Math.sin(2*g));
-  const utcMin=d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60;
-  const tst=((utcMin+eot+4*LON)%1440+1440)%1440;
-  const ha=(tst/4-180)*R;
-  const el=Math.asin(Math.sin(LAT*R)*Math.sin(decl)+Math.cos(LAT*R)*Math.cos(decl)*Math.cos(ha));
-  let az=Math.atan2(Math.sin(ha),Math.cos(ha)*Math.sin(LAT*R)-Math.tan(decl)*Math.cos(LAT*R))+Math.PI;
-  return {el,az:((az%(2*Math.PI))+2*Math.PI)%(2*Math.PI)};
-}
-function dayInfo(){
-  const g=2*Math.PI/365*(doy-1);
-  const decl=.006918-.399912*Math.cos(g)+.070257*Math.sin(g)-.006758*Math.cos(2*g)+.000907*Math.sin(2*g)-.002697*Math.cos(3*g)+.00148*Math.sin(3*g);
-  const eot=229.18*(.000075+.001868*Math.cos(g)-.032077*Math.sin(g)-.014615*Math.cos(2*g)-.040849*Math.sin(2*g));
-  const cosH=(Math.cos(90.833*R)-Math.sin(LAT*R)*Math.sin(decl))/(Math.cos(LAT*R)*Math.cos(decl));
-  const H=Math.acos(clamp(cosH,-1,1))/R;
-  const noonMin=720-4*LON-eot;
-  return {riseMs:dayUTC+(noonMin-4*H)*60000,setMs:dayUTC+(noonMin+4*H)*60000,noonMs:dayUTC+noonMin*60000};
-}
-const DI=dayInfo();
-const declN=n=>{const g=2*Math.PI/365*(n-1);return .006918-.399912*Math.cos(g)+.070257*Math.sin(g)-.006758*Math.cos(2*g)+.000907*Math.sin(2*g)-.002697*Math.cos(3*g)+.00148*Math.sin(3*g)};
-const lenN=n=>{const d=declN(n),c=(Math.cos(90.833*R)-Math.sin(LAT*R)*Math.sin(d))/(Math.cos(LAT*R)*Math.cos(d));return 8*Math.acos(clamp(c,-1,1))/R/60};
-const fmtDur=sec=>{const m=Math.floor(sec/60),r=Math.round(sec%60);return m?m+' min '+pad(r)+' s':r+' s'};
-const durMs=ms=>{const m=Math.max(1,Math.round(ms/60000));return m>=60?Math.floor(m/60)+' h '+pad(m%60):m+' min'};
-function trendText(){
-  const en=lang==='en', d=(lenN(doy)-lenN(doy-1))*3600;
-  if(Math.abs(d)<1) return en?'As long as yesterday.':'Autant qu’hier.';
-  return d<0?(en?fmtDur(-d)+' shorter than yesterday.':fmtDur(-d)+' de moins qu’hier.'):(en?fmtDur(d)+' longer than yesterday.':fmtDur(d)+' de plus qu’hier.');
-}
-function fillFoot(){
-  const en=lang==='en', now=Date.now(); let sNow;
-  if(now<DI.riseMs) sNow=(en?'The sun rises in ':'Le soleil se lève dans ')+durMs(DI.riseMs-now)+'.';
-  else if(now>DI.setMs) sNow=en?'The sun set '+durMs(now-DI.setMs)+' ago.':'Le soleil est couché depuis '+durMs(now-DI.setMs)+'.';
-  else{const sa=sunAt(now), c=COMP[lang][Math.round(sa.az/(Math.PI/8))%16]; sNow=en?`The sun is ${Math.round(sa.el/R)}° above the horizon, ${c}.`:`Le soleil est à ${Math.round(sa.el/R)}° au-dessus de l’horizon, ${c}.`}
-  setT('fSunNow',sNow); setT('fTrend',trendText());
-  const dt=new Intl.DateTimeFormat(en?'en-GB':'fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Paris'}).format(new Date(localMidnightMs+12*3600000));
-  setT('fDate',en?'Sun calculated on '+dt:'Soleil calculé le '+dt);
-}
-/* blur-text "moyo" */
-const mono=$('.monument.blurtext'), btLetters=mono?[...mono.querySelectorAll('.bl')]:[];
-function blurText(){
-  if(reduce||!btLetters.length) return;
-  const r=mono.getBoundingClientRect();
-  const p=clamp((innerHeight-r.top)/(innerHeight*.52));
-  const intensity=parseFloat(getComputedStyle(mono).fontSize)*.07*(1-p), n=btLetters.length;
-  btLetters.forEach((el,i)=>{ const t=n===1?0:i/(n-1), dist=1-t, blur=dist>.75?0:intensity*(1-dist/.75); setV(el,'--b',blur.toFixed(1)+'px'); });
-}
-/* footer parallax reveal */
-const foot=$('#foot');
-function footPar(){
-  if(reduce||!foot) return;
-  const r=foot.getBoundingClientRect();
-  setV(foot,'--fp',clamp((innerHeight-r.top)/(innerHeight*.6)).toFixed(3));
-}
-let footRaf=0;
-function footFrame(){ footRaf=0; blurText(); footPar(); }
-addEventListener('scroll',()=>{ if(!footRaf) footRaf=requestAnimationFrame(footFrame); },{passive:true});
-addEventListener('resize',()=>{ if(!footRaf) footRaf=requestAnimationFrame(footFrame); });
-fillFoot(); footFrame(); setInterval(fillFoot,30000);
-/* newsletter sign-up */
-const subForm=$('#subForm');
-if(subForm) subForm.addEventListener('submit',async e=>{
-  e.preventDefault();
-  const en=lang==='en', mail=$('#subMail'), btn=subForm.querySelector('.sub-btn'), msg=$('#subMsg');
-  const show=(t,bad)=>{ msg.textContent=t; msg.classList.toggle('err',!!bad); };
-  const EMAIL=/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
-  if(!EMAIL.test(mail.value.trim())){ show(en?'Please enter a valid email.':'Indiquez une adresse valide.',true); mail.focus(); return; }
-  btn.disabled=true; show(en?'Signing up…':'Inscription…');
-  try{
-    const r=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:mail.value.trim(),website:subForm.website.value,lang})});
-    const d=await r.json().catch(()=>({}));
-    if(r.ok){ subForm.reset(); show(d.already?(en?'You are already on the list.':'Vous êtes déjà inscrit·e.'):(en?'Thank you, see you soon.':'Merci, à très vite.')); }
-    else show(d.message||(en?'Sign-up failed.':'L’inscription a échoué.'),true);
-  }catch(_){ show(en?'Sign-up failed. Check your connection.':'L’inscription a échoué. Vérifiez votre connexion.',true); }
-  finally{ btn.disabled=false; }
-});
-
 /* Smooth scroll, comme sur l'accueil */
 if(!reduce && typeof Lenis!=='undefined') new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});
 applyLang(lang);
 })();
 </script>
 <script src="/chrome.js" defer></script>
+<script src="/footer.js" defer></script>
 <script src="/cursor.js" defer></script>
 </body>
 </html>

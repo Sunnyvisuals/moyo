@@ -257,7 +257,7 @@ function field(id,label,val,{req,area,hint,lang}={}){
 
 /* ---------- contact messages ---------- */
 const TYPE_FR={identite:'Identité',site:'Site',donnees:'Données',motion:'Motion',audiovisuel:'Audiovisuel',communication:'Communication',autre:'Autre'};
-const BUDGET_FR={lt5:'< 5 k€','5-15':'5 – 15 k€','15-40':'15 – 40 k€',gt40:'40 k€ +',tbd:'Budget à définir'};
+const BUDGET_FR={lt5:'Moins de 5 000 €','5-15':'5 000 à 15 000 €','15-40':'15 000 à 40 000 €',gt40:'Plus de 40 000 €',tbd:'Budget à définir'};
 let msgs=null;
 async function loadMsgs(){
   try{ const r=await api('/api/messages'); msgs=r.messages; $('#msgCount').textContent=r.total?`(${r.total})`:''; }

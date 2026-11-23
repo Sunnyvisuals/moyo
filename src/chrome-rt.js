@@ -250,4 +250,17 @@ new MutationObserver(() => {
   arcChars(); A.shown = -1; pvCS.dataset.k = '';
   if (menu.matches(':popover-open')) arcKick();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
+/* header: hides while reading down, returns on the way up, white over the blue footer */
+if (bar) {
+  let last = scrollY, upAt = scrollY, q = 0;
+  const ft = document.getElementById('foot');
+  const upd = () => { q = 0; const y = scrollY, dy = y - last; last = y; if (dy < -2) upAt = y;
+    if (dy) bar.classList.toggle('away', !reduce && y > 80 && dy > 0 && y - upAt > 80 && !bar.contains(document.activeElement));
+    bar.classList.toggle('scrolled', y > 20);
+    bar.dataset.tone = ft && ft.getBoundingClientRect().top <= bar.offsetHeight / 2 ? 'paper' : 'klein'; };
+  addEventListener('scroll', () => { if (!q) q = requestAnimationFrame(upd); }, { passive: true });
+  bar.addEventListener('focusin', () => bar.classList.remove('away'));
+  upd();
+}
 })();

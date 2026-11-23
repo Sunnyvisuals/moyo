@@ -8,6 +8,10 @@ const CHROME_CSS = `
 .bar{position:fixed;z-index:90;top:0;left:0;right:0;height:var(--hdr);display:flex;align-items:center;padding:0 var(--m);color:var(--klein);gap:clamp(16px,2.4vw,40px);pointer-events:auto}
 .bar,.bar *{transition-property:color,translate,opacity,background-size;transition-duration:.9s;transition-timing-function:cubic-bezier(.25,1,.5,1)}
 .bar.away{translate:0 -100%}
+.bar::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--chaux);opacity:0;transition:opacity .4s,background .4s}
+.bar.scrolled::before{opacity:1}
+.bar[data-tone="paper"]{color:var(--paper)}
+.bar[data-tone="paper"]::before{background:var(--klein)}
 .bar-mark{display:flex;align-items:center;text-decoration:none;color:inherit;font-size:clamp(1.625rem,2.1vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1}
 .bar-r{margin-left:auto;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px)}
 .bar button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;font-weight:500;background:none}
@@ -146,14 +150,14 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
 
 /* Footer (columns, live sun, sign-up, blur "moyo"), with a gentle parallax reveal. */
 const FOOTER_CSS = `
-.foot{position:relative;z-index:2;background:var(--klein);color:var(--paper);padding:clamp(72px,11vh,132px) var(--m) clamp(40px,7vh,72px);overflow:clip;margin-top:calc(clamp(48px,8vh,96px) * -1);box-shadow:0 -40px 90px -50px rgb(0 6 40 / .55)}
+.foot{position:relative;z-index:2;background:var(--klein);color:var(--paper);padding:clamp(64px,10vh,120px) var(--m) 0;overflow:clip;margin-top:calc(clamp(48px,8vh,96px) * -1);box-shadow:0 -40px 90px -50px rgb(0 6 40 / .55)}
 .foot ::selection{background:var(--paper);color:var(--klein)}
 .foot :focus-visible{outline-color:var(--paper)}
 .foot .small{font-size:var(--fs-small)}
 .foot .muted{color:var(--paper-soft)}
 .foot-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:48px clamp(16px,2vw,32px);max-width:1500px;margin:0 auto}
 .fcol{grid-column:span 3;min-width:0}
-.fh{font-size:.75rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;margin-bottom:16px;color:var(--paper-soft)}
+.fh{font-size:.875rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;color:var(--paper-soft)}
 .fcol ul{display:grid;gap:2px;list-style:none;margin:0;padding:0}
 .fnames li{font-size:1.25rem;font-weight:300;letter-spacing:-.02em;line-height:1.3}
 .fnames+p{margin-top:16px;max-width:30ch}
@@ -172,7 +176,7 @@ const FOOTER_CSS = `
 .fh2{font-size:var(--fs-lead);font-weight:400;line-height:1.15;margin:0 0 20px;color:var(--paper)}
 .sub-row{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .sub-row input[type=email]{flex:1 1 220px;min-width:0;font:inherit;font-size:clamp(1.125rem,1.4vw,1.375rem);font-weight:300;color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;padding:6px 0 12px;outline:none;transition:border-color var(--dur-1)}
-.sub-row input[type=email]::placeholder{color:color-mix(in oklab,var(--paper) 45%,transparent)}
+.sub-row input[type=email]::placeholder{color:color-mix(in oklab,var(--paper) 78%,var(--klein))}
 .sub-row input[type=email]:focus-visible{border-color:var(--paper)}
 .sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:var(--paper);color:var(--klein);font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
 .sub-btn::after{content:"→"}
@@ -183,7 +187,7 @@ const FOOTER_CSS = `
 .sub-msg.err{color:color-mix(in oklab,var(--paper) 80%,#ffb3b3)}
 @media (max-width:560px){.sub-btn{flex:1 1 100%;justify-content:space-between}}
 .mono-wrap{container-type:inline-size;margin:clamp(40px,7vh,88px) calc(var(--m) * -1) 0;padding:0 var(--m)}
-.monument{font-size:calc(100cqw / 2.165);font-weight:300;letter-spacing:-.055em;line-height:.72;white-space:nowrap;margin-left:-.077em;user-select:none;padding-bottom:.3em;margin-bottom:-.06em}
+.monument{font-size:calc(100cqw / 2.165);font-weight:300;letter-spacing:-.055em;line-height:.72;white-space:nowrap;margin-left:-.077em;user-select:none;height:.915em}
 .monument.blurtext{background:none!important;-webkit-text-fill-color:currentColor;color:var(--paper)}
 .monument.blurtext .bl{display:inline-block;filter:blur(var(--b,0px));padding-bottom:.28em;margin-bottom:-.28em;
   background-image:radial-gradient(circle at 50% 50%,rgb(0 47 167 / .28) .7px,#0000 1.1px),linear-gradient(var(--paper),var(--paper));background-size:4px 4px,100% 100%;
@@ -193,6 +197,7 @@ const FOOTER_CSS = `
 @media (prefers-reduced-motion:reduce){.foot-grid,.foot-subwrap,.foot-base,.foot .mono-wrap{transform:none}}
 @media (max-width:900px){.fcol{grid-column:span 6}}
 @media (max-width:560px){.fcol{grid-column:1/-1}}
+@media (max-width:820px){.bar-mark,.fcol a,.foot-base a,.flang button{min-height:44px}.fcol ul{gap:0}}
 /* The blue panel rises over the content as it scrolls in (parallax "comes over"). */
 @media (prefers-reduced-motion:no-preference){@supports (animation-timeline:view()){
   .foot{animation:footOver linear both;animation-timeline:view();animation-range:entry 0% cover 14%}
@@ -200,8 +205,10 @@ const FOOTER_CSS = `
 }}
 `;
 
-const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
-  <div class="foot-grid">
+/* Single source of the footer content. The home keeps its own <footer> shell (sticky stack), in-page anchors and `sec.*` labels. */
+const footerInner = ({ home = false } = {}) => {
+  const w = home ? 'wrap ' : '', h = home ? '#' : '/#';
+  return `  <div class="${w}foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Studio</h2>
       <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
@@ -210,14 +217,14 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
     <nav class="fcol" aria-labelledby="fNavT">
       <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
       <ul>
-        <li><a href="/" data-i="home">Accueil</a></li>
-        <li><a href="/#approche" data-i="sIntro">Approche</a></li>
-        <li><a href="/#projets" data-i="sProj">Projets</a></li>
-        <li><a href="/projets" data-i="allL">Tous les projets</a></li>
-        <li><a href="/#services" data-i="sSvc">Services</a></li>
-        <li><a href="/#studio" data-i="sStu">Studio</a></li>
-        <li><a href="/#equipe" data-i="sTeam">L’équipe</a></li>
-        <li><a href="/#contact" data-i="contact">Contact</a></li>
+${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
+`}        <li><a href="${h}approche" data-i="${home ? 'sec.intro' : 'sIntro'}">Approche</a></li>
+        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets</a></li>
+        <li><a href="/projets" data-i="${home ? 'sec.all' : 'allL'}">Tous les projets</a></li>
+        <li><a href="${h}services" data-i="${home ? 'sec.services' : 'sSvc'}">Services</a></li>
+        <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Studio</a></li>
+        <li><a href="${h}equipe" data-i="${home ? 'sec.team' : 'sTeam'}">L’équipe</a></li>
+        <li><a href="${h}contact" data-i="${home ? 'sec.contact' : 'contact'}">Contact</a></li>
       </ul>
     </nav>
     <div class="fcol fcol--live">
@@ -226,18 +233,22 @@ const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de pag
       <p class="small muted" id="fTrend"></p>
     </div>
     <div class="fcol">
-      <h2 class="fh" data-i="contact">Contact</h2>
+      <h2 class="fh" data-i="${home ? 'sec.contact' : 'contact'}">Contact</h2>
       <ul><li><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a></li></ul>
     </div>
   </div>
-  <div class="foot-subwrap"><form class="foot-sub" id="subForm" novalidate><h2 class="fh2" data-i="subH">Inscrivez-vous pour un peu de joie.</h2><div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" data-i="subBtn">S’inscrire</button></div><p class="sub-msg small" id="subMsg" role="status" aria-live="polite"></p></form></div>
-  <div class="foot-base small">
+  <div class="${w}foot-subwrap"><form class="foot-sub" id="subForm" novalidate><h2 class="fh2" data-i="subH">Inscrivez-vous pour un peu de joie.</h2><div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" data-i="subBtn">S’inscrire</button></div><p class="sub-msg small" id="subMsg" role="status" aria-live="polite"></p></form></div>
+  <div class="${w}foot-base small">
     <span>© 2026 moyo</span>
     <span class="muted" id="fDate"></span>
     <span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span>
-    <a href="#main" data-i="top">Retour en haut</a>
+    <a href="${home ? '#top' : '#main'}" data-i="top">Retour en haut</a>
   </div>
-  <div class="mono-wrap" aria-hidden="true"><div class="monument blurtext"><span class="bl" style="--i:0">m</span><span class="bl" style="--i:1">o</span><span class="bl" style="--i:2">y</span><span class="bl" style="--i:3">o</span></div></div>
+  <div class="mono-wrap" aria-hidden="true"><div class="monument blurtext"><span class="bl" style="--i:0">m</span><span class="bl" style="--i:1">o</span><span class="bl" style="--i:2">y</span><span class="bl" style="--i:3">o</span></div></div>`;
+};
+
+const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
+${footerInner()}
 </footer>`;
 
-export { CHROME_CSS, chromeHead, FOOTER_CSS, footerHTML };
+export { CHROME_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };

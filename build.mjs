@@ -15,7 +15,7 @@ const out = (p, s) => { fs.mkdirSync(path.dirname(r(p)), { recursive: true }); f
 const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k).join(v), s);
 
 const { rowsHTML, cardsHTML, featuredOf, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
-const { CHROME_CSS, chromeHead, FOOTER_CSS, footerHTML } = await import(pathToFileURL(r('shared/chrome.js')).href);
+const { CHROME_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
 const renderSrc = read('shared/render.js').replace(/^export \{[^}]*\};?\s*$/m, '');
 if (/^\s*export\b/m.test(renderSrc)) throw new Error('shared/render.js: keep `export` on the last line only');
@@ -31,6 +31,7 @@ const sizes = {
     __FONT__: font.toString('base64'),
     __LENIS__: lenis,
     __RENDER__: renderSrc,
+    __FOOTER_INNER__: footerInner({ home: true }),
     __ROWS__: cardsHTML(featuredOf(seed), 'fr'),
     __DATA__: dataJSON(seed)
   })),
@@ -48,11 +49,13 @@ const sizes = {
 };
 out('dist/cursor.js', read('src/cursor.js'));
 out('dist/chrome.js', read('src/chrome-rt.js'));
+out('dist/footer.js', read('src/footer-rt.js'));
+out('dist/lenis.js', lenis);
 fs.mkdirSync(r('dist/proj'), { recursive: true });
 for (const n of fs.readdirSync(r('assets/proj'))) fs.copyFileSync(r('assets/proj/' + n), r('dist/proj/' + n));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });
 fs.copyFileSync(r('fonts/hanken-grotesk-latin-wght-normal.woff2'), r('dist/fonts/hanken-grotesk.woff2'));
 
 for (const [k, v] of Object.entries(sizes)) console.log(`dist/${k}`.padEnd(24), (v / 1024).toFixed(1), 'Ko');
-const left = fs.readFileSync(r('dist/index.html'), 'utf8').match(/__[A-Z]+__/g);
+const left = fs.readFileSync(r('dist/index.html'), 'utf8').match(/__[A-Z_]+__/g);
 if (left) throw new Error('markers left in index.html: ' + left.join(', '));
