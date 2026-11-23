@@ -1740,11 +1740,11 @@ function arcCard(dt){
   if(pvB.dataset.i!==String(ib)){ pvB.dataset.i=ib; pvB.style.setProperty('--img',img(ib)); }
   const key=ia+'|'+ib+'|'+lang;
   if(pvCS.dataset.k!==key){ pvCS.dataset.k=key;
-    [ia,ib].forEach((it,j)=>{ const ps=pvCI[j].children; ps[0].textContent=ARC_DESC[lang][it]||'';
+    [ib,ia].forEach((it,j)=>{ const ps=pvCI[j].children; ps[0].textContent=ARC_DESC[lang][it]||'';
       ps[1].textContent=arcReal[it].querySelector('.sr')?.textContent||arcReal[it].textContent.trim(); pvNI[j].textContent=pad(it+1); });
     setT('pvTot','/'+pad(arcN)); }
-  pvCS.style.transform='translate3d(0,'+(-fr*pvCI[0].offsetHeight).toFixed(2)+'px,0)';
-  pvNS.style.transform='translate3d(0,'+(-fr*pvNI[0].offsetHeight).toFixed(2)+'px,0)';
+  pvCS.style.transform='translate3d(0,'+((fr-1)*pvCI[0].offsetHeight).toFixed(2)+'px,0)';
+  pvNS.style.transform='translate3d(0,'+((fr-1)*pvNI[0].offsetHeight).toFixed(2)+'px,0)';
   return A.stp!==c||A.stv!==0||followBusy;
 }
 const arcWrap=x=>x-arcM*Math.round(x/arcM);                 // signed distance between rows, around the loop
