@@ -278,7 +278,7 @@ $('#projects').addEventListener('click',e=>{
   const b=e.target.closest('.row'); if(!b) return;
   opener=b; fill(+b.dataset.p); dlg.showModal(); document.documentElement.classList.add('is-dialog'); $('#pClose').focus();
 });
-function close(){ dlg.close(); }
+function close(){ if(window.hbOut&&!dlg.dataset.leaving){ dlg.dataset.leaving='1'; window.hbOut(dlg,()=>{ dlg.dataset.leaving=''; dlg.close(); }); } else dlg.close(); }
 dlg.addEventListener('close',()=>{ document.documentElement.classList.remove('is-dialog'); opener?.focus(); });
 $('#pClose').addEventListener('click',close);
 $('#pNext').addEventListener('click',()=>step(1));
@@ -293,6 +293,8 @@ applyLang(lang);
 <script src="/chrome.js" defer></script>
 <script src="/footer.js" defer></script>
 <script src="/hand.js" defer></script>
+<script src="/reveal.js" defer></script>
+<script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>
 </body>
 </html>
