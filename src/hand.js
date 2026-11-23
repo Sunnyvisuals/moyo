@@ -1,14 +1,14 @@
-/* Hidden handwriting: phrases scribbled in the background of each section, in a solid tone of the section's own colours, to be found.
+/* Handwriting in the background of the sections: each phrase writes itself letter by letter as it enters the screen,
+   in the full ink of its section, and erases itself as it leaves (driven by the scroll, both ways).
    Each letter takes one of five handwritings, all at the same size, with the same draw as the Framer component
-   "Bad handwriting" (fixed seed, same result on every visit),
-   and lights up when the pointer passes near it. On touch screens the letters light up as they cross the middle of the screen.
-   Decorative only (aria-hidden, behind the content). Phrases: edit LINES, size: edit --hs. Fonts: SIL OFL 1.1, self-hosted in /fonts/hand. */
+   "Bad handwriting" (fixed seed, same result on every visit). Decorative only (aria-hidden, behind the content).
+   Phrases: edit LINES, size: edit --hs. Fonts: SIL OFL 1.1, self-hosted in /fonts/hand. */
 (() => {
   // host selector: [wished left %, wished top %, tilt (deg), French, English]
   const LINES = {
     '.win': [[6, 10, -7, 'agence créative', 'creative agency'], [34, 76, 5, 'dessiner la lumière', 'drawing light']],
     '#approche': [[58, 11, 5, 'une idée avant tout', 'an idea above all'], [3, 60, -6, 'direction artistique', 'art direction'], [50, 73, -8, 'mesurer, puis créer', 'measure, then create']],
-    '#services': [[34, 2.5, -7, 'une idée, une seule', 'one idea, only one'], [30, 50, -5, 'à chaque support', 'on every medium'], [2, 92, 4, 'du croquis à l’écran', 'from sketch to screen']],
+    '#services': [[34, 2.5, -7, 'une idée, une seule', 'one idea, only one'], [2, 92, 4, 'du croquis à l’écran', 'from sketch to screen']],
     '#equipe': [[50, 8, -7, 'une agence, quatre mains', 'one agency, four hands'], [56, 66, 8, 'on se comprend', 'we understand each other']],
     '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern'], [58, 88, 5, 'et le vôtre', 'and yours']],
     '.who-page': [[46, 16, -8, 'moyo, agence créative', 'moyo, creative agency'], [66, 46, 7, 'imaginer ensemble', 'imagine together']],
@@ -25,10 +25,11 @@
 .contact>.scr{--bg:color-mix(in oklab,#002FA7 50%,#000614)}
 .scr p{position:absolute;margin:0;max-width:none;white-space:nowrap;line-height:1.2;font-weight:400;letter-spacing:0;transform-origin:50% 50%;rotate:var(--r);font-size:var(--hs)}
 .scr p[hidden]{display:none}
-.scr i{font-style:normal;color:color-mix(in oklab,var(--ink) calc((var(--o0) + var(--o,0) * .6) * 100%),var(--bg));transition:color .7s cubic-bezier(.25,1,.5,1)}
-.scr{--o0:.34;--hs:72px}
+html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
+.scr i.on{opacity:1}
+.scr{--hs:72px}
 @media (max-width:820px){.scr{--hs:48px}}
-@media (prefers-reduced-motion:reduce){.scr{--o0:.3}}
+@media (prefers-reduced-motion:reduce){.scr i{opacity:1;transition:none}}
 ` + FONTS.map((f, n) => `.scr .h${n}{font-family:"${f}",cursive}`).join('');
   document.head.appendChild(st);
 
@@ -64,8 +65,10 @@
     document.querySelectorAll('.scr').forEach(d => {
       const host = d.parentElement, H = host.getBoundingClientRect(), obs = obstacles(host, H), m = innerWidth < 821 ? 18 : 36, k0 = H.width / (host.offsetWidth || 1);
       const base = innerWidth < 821 ? 48 : 72;
+      const cap = innerWidth < 821 ? 1 : 2; let shown = 0;
       for (const q of d.children) {
         q.hidden = false; let done = false;
+        if (shown >= cap) { q.hidden = true; continue; }
         for (const size of [base, base * .84, base * .7, base * .58, 30]) {
           q.style.fontSize = size + 'px';
           const a = +q.dataset.r * Math.PI / 180, w0 = q.offsetWidth, h0 = q.offsetHeight, w = w0 * Math.cos(a) + h0 * Math.abs(Math.sin(a)), h = w0 * Math.abs(Math.sin(a)) + h0 * Math.cos(a);
@@ -80,13 +83,12 @@
           q.style.left = ((best[0] + (w - w0) / 2) / H.width * 100).toFixed(2) + '%'; q.style.top = ((best[1] + (h - h0) / 2) / H.height * 100).toFixed(2) + '%';
           obs.push([best[0] - 60, best[1] - 60, best[0] + w + 60, best[1] + h + 60]); done = true; break;
         }
-        q.hidden = !done;
+        q.hidden = !done; if (done) shown++;
       }
     });
   }
   const rnd = s => { const x = Math.sin(s) * 1e4; return x - Math.floor(x); };
   const esc = c => c.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  let letters = [];
   function scribble(text, seed) {
     const used = {}; let out = '';
     for (const ch of text) {
@@ -108,7 +110,6 @@
       d.innerHTML = lines.map(([x, y, r, fr, e]) => `<p hidden data-x="${x}" data-y="${y}" data-r="${r}" style="--r:${r}deg">${scribble(en ? e : fr, 12)}</p>`).join('');
       host.appendChild(d);
     });
-    letters = [...document.querySelectorAll('.scr i[class]')];
     place();
   }
   build();
@@ -118,23 +119,23 @@
   new MutationObserver(() => { build(); again(900); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  /* ---------- light ---------- */
-  const fine = matchMedia('(pointer: fine)').matches;
-  let mx = -9999, my = -9999, raf = 0;
+  /* ---------- writing driven by the scroll ----------
+     t goes 0 → 1 as the phrase climbs from the foot of the screen to its middle, and back to 0 as it leaves at the top.
+     The letters switch on from the first to the last as t rises, and off from the last to the first as it falls. */
+  let raf = 0;
   const frame = () => {
     raf = 0;
-    const H = innerHeight, R = Math.max(220, innerWidth * .15);
-    const pos = letters.map(l => { const r = l.parentNode.getBoundingClientRect(); if (r.bottom < -80 || r.top > H + 80) return null; const b = l.getBoundingClientRect(); return [(b.left + b.right) / 2, (b.top + b.bottom) / 2]; });
-    letters.forEach((l, i) => {
-      const p = pos[i]; if (!p) return;
-      const k = fine ? 1 - Math.hypot(p[0] - mx, p[1] - my) / R : 1 - Math.abs(p[1] - H / 2) / (H * .3);
-      const v = Math.max(0, k).toFixed(2);
-      if (l.dataset.v !== v) { l.dataset.v = v; l.style.setProperty('--o', v); }
+    const H = innerHeight;
+    document.querySelectorAll('.scr p:not([hidden])').forEach(q => {
+      const r = q.getBoundingClientRect(), L = q.children, n = L.length;
+      let t = 0;
+      if (r.bottom > 0 && r.top < H) { const c = (r.top + r.bottom) / 2; t = c > H * .5 ? 1 - (c - H * .5) / (H * .38) : 1 - (H * .5 - c) / (H * .45); }
+      t = Math.max(0, Math.min(1, t * 1.25 - .05));
+      for (let k = 0; k < n; k++) { const on = t > (k + .5) / (n + 1) * .95 + .02 && t > 0; if (L[k].classList.contains('on') !== on) L[k].classList.toggle('on', on); }
     });
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
-  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; kick(); }, { passive: true });
-  document.documentElement.addEventListener('mouseleave', () => { mx = my = -9999; kick(); });
-  addEventListener('scroll', kick, { passive: true });
-  kick();
+  addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick);
+  new MutationObserver(kick).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  kick(); setTimeout(kick, 2200);
 })();
