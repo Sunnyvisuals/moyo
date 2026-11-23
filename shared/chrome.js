@@ -130,6 +130,10 @@ html.menu-lock{overflow:hidden}
 /* Language button (every page): on hover the label rolls up and the same label takes its place. No underline.
    The label is drawn twice from the button's lang attribute; the real text stays for assistive tech. */
 const LANG_CSS = `
+/* footer: the name of the agency, and the credit with the names of the team (links to their pages) */
+.fnames li.bn{font-size:clamp(1.5rem,2vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1.1}
+.fby a{display:inline-flex;align-items:center;gap:.4em}.fby a::after{content:"↗";font-size:.8em;opacity:.6;transition:translate .5s cubic-bezier(.25,1,.5,1),opacity .3s}.fby a:hover::after{translate:2px -2px;opacity:1}
+
 #bar #langBtn{position:relative;display:inline-grid;place-items:center;min-width:44px;background:none!important;-webkit-text-fill-color:transparent;letter-spacing:.02em}
 #bar #langBtn::before,#bar #langBtn::after{content:attr(lang);content:attr(lang)/"";position:absolute;inset:auto;text-transform:uppercase;line-height:1.3;-webkit-text-fill-color:currentColor;pointer-events:none;
   transition:translate .5s cubic-bezier(.65,0,.15,1),clip-path .5s cubic-bezier(.65,0,.15,1)}
@@ -265,12 +269,16 @@ html.stack main>.contact{transform:none}
 `;
 
 /* Single source of the footer content. The home keeps its own <footer> shell (sticky stack), in-page anchors and `sec.*` labels. */
-const footerInner = ({ home = false } = {}) => {
+const SEED_TEAM = [{ id: 'zahia-bougouffa', name: 'Zahia Bougouffa' }, { id: 'yacine-bouabdallah', name: 'Yacine Bouabdallah' }];
+const escH = v => String(v).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+/* the credit in the footer: one link per person, from the team data (also rewritten by the middleware when the admin has saved) */
+const creditLinks = team => (team && team.length ? team : SEED_TEAM).map(m => `<li><a href="/equipe/${escH(m.id)}" data-who="${escH(m.id)}">${escH(m.name)}</a></li>`).join('');
+const footerInner = ({ home = false, team } = {}) => {
   const w = home ? 'wrap ' : '', h = home ? '#' : '/#';
   return `  <div class="${w}foot-grid">
     <div class="fcol">
       <h2 class="fh" data-i="fStudio">Agence</h2>
-      <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
+      <ul class="fnames"><li class="bn">moyo</li></ul>
       <p class="small muted" data-i="fStudioP">Agence créative indépendante, basée en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
@@ -286,10 +294,9 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
         <li><a href="${h}contact" data-i="${home ? 'sec.contact' : 'contact'}">Contact</a></li>
       </ul>
     </nav>
-    <div class="fcol fcol--live">
-      <h2 class="fh" data-i="fLive">La lumière, maintenant</h2>
-      <p class="foot-sun" id="fSunNow"></p>
-      <p class="small muted" id="fTrend"></p>
+    <div class="fcol fcol--by">
+      <h2 class="fh" data-i="fBy">Réalisé par</h2>
+      <ul class="fnames fby">${creditLinks(team)}</ul>
     </div>
     <div class="fcol">
       <h2 class="fh" data-i="${home ? 'sec.contact' : 'contact'}">Contact</h2>
@@ -306,8 +313,8 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
   <div class="mono-wrap" aria-hidden="true"><div class="monument blurtext"><span class="bl" style="--i:0">m</span><span class="bl" style="--i:1">o</span><span class="bl" style="--i:2">y</span><span class="bl" style="--i:3">o</span></div></div>`;
 };
 
-const footerHTML = () => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
-${footerInner()}
+const footerHTML = team => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">
+${footerInner({ team })}
 </footer>`;
 
-export { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerInner, footerHTML };
+export { creditLinks, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };

@@ -35,15 +35,16 @@ body{margin:0;color:var(--klein);font-family:"Hanken Grotesk",system-ui,sans-ser
 h1,h2,p,ul{margin:0}ul{padding:0;list-style:none}a{color:inherit}
 :focus-visible{outline:2px solid currentColor;outline-offset:3px}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:40px clamp(16px,2vw,32px);align-items:end;min-height:100svh;padding:calc(var(--hdr) + clamp(16px,3vh,40px)) var(--m) clamp(48px,8vh,96px);max-width:calc(1500px + 2 * var(--m));margin:0 auto}
+main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:40px clamp(16px,2vw,32px);align-items:start;min-height:100svh;padding:calc(var(--hdr) + clamp(16px,3vh,40px)) var(--m) clamp(48px,8vh,96px);max-width:calc(1500px + 2 * var(--m));margin:0 auto}
 .photo{grid-column:1/6;aspect-ratio:4/5;max-height:calc(100svh - var(--hdr) - clamp(64px,11vh,136px));background:#b0b4ba;position:relative;overflow:hidden}
 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.who{grid-column:7/-1}
+.who{grid-column:7/-1;padding-top:clamp(96px,26vh,300px)}
+.ttl{font-size:.8125rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:clamp(10px,1.6vh,18px)}
 h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;line-height:1.02;text-wrap:balance}
 .bio{margin-top:clamp(20px,3vh,36px);font-size:clamp(1.125rem,1.4vw,1.375rem);line-height:1.6;max-width:44ch}
 .bio p+p{margin-top:1em}
 @media (prefers-reduced-motion:no-preference){
-  .photo,h1,.bio{animation:in 1.2s var(--ease) both}h1{animation-delay:.1s}.bio{animation-delay:.18s}
+  .photo,h1,.bio,.ttl{animation:in 1.2s var(--ease) both}.ttl{animation-delay:.05s}h1{animation-delay:.1s}.bio{animation-delay:.18s}
   html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition{background:color-mix(in oklab,var(--klein) 38%,#000614)}
@@ -51,7 +52,7 @@ h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;l
 @keyframes in{from{opacity:0;translate:0 28px}}
 @keyframes pgOut{to{scale:.86;border-radius:28px;filter:brightness(.5)}}
 @keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
-@media (max-width:820px){main{min-height:0;align-items:start}.photo,.who{grid-column:1/-1}.photo{max-height:none}}
+@media (max-width:820px){main{min-height:0;align-items:start}.photo,.who{grid-column:1/-1}.photo{max-height:none}.who{padding-top:0}main{padding-top:calc(var(--hdr) + clamp(88px,13vh,120px))}}
 span[data-l],div[data-l]{display:none}html[lang=fr] :is(span,div)[data-l=fr],html[lang=en] :is(span,div)[data-l=en]{display:revert}
 
 ${CHROME_CSS}${LANG_CSS}${FOOTER_CSS}${GLASS_CSS}
@@ -69,14 +70,15 @@ try{if(localStorage.getItem('hb-lang')==='en')document.documentElement.lang='en'
 </head>
 <body>
 ${chromeHead(5)}
-<main id="main">
+<main id="main" data-phrase-fr="${e(fr.phrase || '')}" data-phrase-en="${e(m.en?.phrase || fr.phrase || '')}">
   <div class="photo"${m.photo ? '' : ' aria-hidden="true"'}>${m.photo ? `<img src="${imgURL(m.photo)}" alt="${e(m.name)}">` : ''}</div>
   <div class="who">
+    ${fr.role ? `<p class="ttl"><span data-l="fr">${e(fr.role)}</span><span data-l="en">${e(en.role)}</span></p>` : ''}
     <h1>${e(m.name)}</h1>
     <div class="bio"><div data-l="fr">${para(fr.bio)}</div><div data-l="en">${para(en.bio)}</div></div>
   </div>
 </main>
-${footerHTML()}
+${footerHTML(team)}
 <script src="/lenis.js"></script>
 <script>(()=>{const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,root=document.documentElement;
 const set=l=>{if(l===root.lang)return;const run=()=>{root.lang=l};if(document.startViewTransition&&!reduce){try{document.startViewTransition({update:run,types:['lang']}).finished.catch(()=>{})}catch(e){run()}}else run();try{localStorage.setItem('hb-lang',l)}catch(e){}};
