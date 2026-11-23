@@ -240,18 +240,18 @@ footer#foot{--gp:clamp(240px,44vh,640px);--gh:calc(var(--gp) + 40px);--gr:calc(6
   border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(0 47 167) calc(var(--gh) - 1px));
   box-shadow:0 -2px 8px rgb(0 6 40 / .08),0 -24px 48px -12px rgb(0 6 40 / .22)!important}
-/* the glass: deep frost, only soft masses of colour come through, then it turns blue downwards */
+/* the glass: clear, it bends what is behind it (glass.js sets --liquid where the browser can), then turns blue downwards */
 footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
-  background:linear-gradient(to bottom in oklab,rgb(0 47 167 / 0.030) calc(var(--gp) * 0.000),rgb(0 47 167 / 0.030) calc(var(--gp) * 0.049),rgb(0 47 167 / 0.030) calc(var(--gp) * 0.098),rgb(0 47 167 / 0.031) calc(var(--gp) * 0.147),rgb(0 47 167 / 0.037) calc(var(--gp) * 0.196),rgb(0 47 167 / 0.054) calc(var(--gp) * 0.245),rgb(0 47 167 / 0.085) calc(var(--gp) * 0.294),rgb(0 47 167 / 0.131) calc(var(--gp) * 0.343),rgb(0 47 167 / 0.191) calc(var(--gp) * 0.392),rgb(0 47 167 / 0.264) calc(var(--gp) * 0.441),rgb(0 47 167 / 0.347) calc(var(--gp) * 0.490),rgb(0 47 167 / 0.436) calc(var(--gp) * 0.539),rgb(0 47 167 / 0.528) calc(var(--gp) * 0.588),rgb(0 47 167 / 0.617) calc(var(--gp) * 0.637),rgb(0 47 167 / 0.702) calc(var(--gp) * 0.686),rgb(0 47 167 / 0.778) calc(var(--gp) * 0.735),rgb(0 47 167 / 0.843) calc(var(--gp) * 0.784),rgb(0 47 167 / 0.897) calc(var(--gp) * 0.833),rgb(0 47 167 / 0.939) calc(var(--gp) * 0.882),rgb(0 47 167 / 0.972) calc(var(--gp) * 0.931),rgb(0 47 167 / 1.000) calc(var(--gp) * 0.980)),
+  background:linear-gradient(to bottom in oklab,rgb(0 47 167 / 0.012) calc(var(--gp) * 0.000),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.049),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.098),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.147),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.196),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.245),rgb(0 47 167 / 0.012) calc(var(--gp) * 0.294),rgb(0 47 167 / 0.016) calc(var(--gp) * 0.343),rgb(0 47 167 / 0.037) calc(var(--gp) * 0.392),rgb(0 47 167 / 0.086) calc(var(--gp) * 0.441),rgb(0 47 167 / 0.166) calc(var(--gp) * 0.490),rgb(0 47 167 / 0.272) calc(var(--gp) * 0.539),rgb(0 47 167 / 0.398) calc(var(--gp) * 0.588),rgb(0 47 167 / 0.533) calc(var(--gp) * 0.637),rgb(0 47 167 / 0.666) calc(var(--gp) * 0.686),rgb(0 47 167 / 0.785) calc(var(--gp) * 0.735),rgb(0 47 167 / 0.882) calc(var(--gp) * 0.784),rgb(0 47 167 / 0.949) calc(var(--gp) * 0.833),rgb(0 47 167 / 0.987) calc(var(--gp) * 0.882),rgb(0 47 167 / 0.999) calc(var(--gp) * 0.931),rgb(0 47 167 / 1.000) calc(var(--gp) * 0.980)),
     radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
-    linear-gradient(rgb(255 255 255 / .1),#0000 110px);
+    linear-gradient(rgb(255 255 255 / .09),#0000 130px);
   /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
   box-shadow:inset 0 calc(3px + var(--fv,0) * 5px) calc(2px + var(--fv,0) * 3px) calc(-1px - var(--fv,0) * 2px) rgb(255 255 255 / .5),
     inset 0 calc(12px + var(--fv,0) * 16px) calc(16px + var(--fv,0) * 10px) calc(-11px - var(--fv,0) * 6px) rgb(0 14 70 / calc(.3 + var(--fv,0) * .25));
-  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5)}
+  -webkit-backdrop-filter:blur(4px) saturate(1.3);backdrop-filter:var(--liquid,blur(4px)) saturate(1.35) brightness(1.04)}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
-footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:calc(1px + var(--fv,0) * 1.5px);box-shadow:none;
-  background:radial-gradient(520px 90px at var(--lx,50%) 0,#fff 20%,#0000),
+footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:calc(1.5px + var(--fv,0) * 2.5px);box-shadow:none;
+  background:radial-gradient(calc(520px + var(--fv,0) * 380px) 120px at var(--lx,50%) 0,#fff 20%,#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),
     linear-gradient(to bottom,rgb(255 255 255 / .55) 0,rgb(255 255 255 / .4) 24px,rgb(255 255 255 / .14) 34%,#0000 70%);
