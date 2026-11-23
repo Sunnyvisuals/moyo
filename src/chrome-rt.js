@@ -16,8 +16,8 @@ let lang = getLang();
 
 /* The chrome owns its own labels so it works on any page, whatever that page's own language system. */
 const I18N = {
-  fr: { 'sec.top': 'Accueil', 'sec.projects': 'Projets', 'sec.all': 'Tous les projets', 'sec.services': 'Services', 'sec.studio': 'Studio', 'sec.team': 'L’équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
-  en: { 'sec.top': 'Home', 'sec.projects': 'Projects', 'sec.all': 'All projects', 'sec.services': 'Services', 'sec.studio': 'Studio', 'sec.team': 'The team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
+  fr: { 'sec.top': 'Accueil', 'sec.projects': 'Projets', 'sec.all': 'Tous les projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'L’équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
+  en: { 'sec.top': 'Home', 'sec.projects': 'Projects', 'sec.all': 'All projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'The team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
 };
 const ARIA = { fr: { homeAria: 'moyo, accueil', nav: 'Navigation principale', menu: 'Menu' }, en: { homeAria: 'moyo, home', nav: 'Main navigation', menu: 'Menu' } };
 const bar = document.getElementById('bar');
@@ -47,8 +47,8 @@ arcReal.forEach(li => arcList.insertBefore(arcClone(li), arcReal[0]));
 arcReal.forEach(li => arcList.appendChild(arcClone(li)));
 const arcItems = $$('.menu-list.arc li');
 const ARC_DESC = {
-  fr: ['La fenêtre qui s’ouvre et le soleil de Nice.', 'Une sélection de nos travaux récents.', 'Tous les projets, rangés par catégorie.', 'Direction artistique, sites, données, audiovisuel, communication.', 'Le studio, sa méthode, ses principes.', 'Zahia et Yacine : les profils.', 'Parlons de votre projet.'],
-  en: ['The opening window and the sun of Nice.', 'A selection of recent work.', 'Every project, sorted by category.', 'Art direction, websites, data, audiovisual, communication.', 'The studio, its method, its principles.', 'Zahia and Yacine: the profiles.', 'Let’s talk about your project.']
+  fr: ['La fenêtre qui s’ouvre et le soleil de Nice.', 'Une sélection de nos travaux récents.', 'Tous les projets, rangés par catégorie.', 'Direction artistique, sites, données, audiovisuel, communication.', 'L’agence, sa méthode, ses principes.', 'Zahia et Yacine : les profils.', 'Parlons de votre projet.'],
+  en: ['The opening window and the sun of Nice.', 'A selection of recent work.', 'Every project, sorted by category.', 'Art direction, websites, data, audiovisual, communication.', 'The agency, its method, its principles.', 'Zahia and Yacine: the profiles.', 'Let’s talk about your project.']
 };
 const ARC = { curve: 60, spacing: 1.08, edgeFade: 16, wRest: 280, wFocus: 720, spread: 1, omega: (3 + 50 * .09) * 1.5, waveDur: .7, wheelTau: 80 };
 const A = { pos: 0, target: 0, av: 0, pv: 0, lastPos: 0, lean: 0, lensC: 0, lensV: 0, lensAmp: 1, hoverK: null, focusK: null, moving: false,

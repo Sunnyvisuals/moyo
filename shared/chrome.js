@@ -144,7 +144,7 @@ const chromeHead = (start = 0) => `<header class="bar" id="bar">
       <li><a href="/#projets"><span class="mn" data-i="sec.projects">Projets</span></a></li>
       <li><a href="/projets"><span class="mn" data-i="sec.all">Tous les projets</span></a></li>
       <li><a href="/#services"><span class="mn" data-i="sec.services">Services</span></a></li>
-      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Studio</span></a></li>
+      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Agence</span></a></li>
       <li><a href="/#equipe"><span class="mn" data-i="sec.team">L’équipe</span></a></li>
       <li><a href="/#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
@@ -225,9 +225,9 @@ const footerInner = ({ home = false } = {}) => {
   const w = home ? 'wrap ' : '', h = home ? '#' : '/#';
   return `  <div class="${w}foot-grid">
     <div class="fcol">
-      <h2 class="fh" data-i="fStudio">Studio</h2>
+      <h2 class="fh" data-i="fStudio">Agence</h2>
       <ul class="fnames"><li><a href="/equipe/zahia-bougouffa">Zahia Bougouffa</a></li><li><a href="/equipe/yacine-bouabdallah">Yacine Bouabdallah</a></li></ul>
-      <p class="small muted" data-i="fStudioP">Studio indépendant de design et de développement, basé en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
+      <p class="small muted" data-i="fStudioP">Agence créative indépendante, basée en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.</p>
     </div>
     <nav class="fcol" aria-labelledby="fNavT">
       <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
@@ -237,7 +237,7 @@ ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
         <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets</a></li>
         <li><a href="/projets" data-i="${home ? 'sec.all' : 'allL'}">Tous les projets</a></li>
         <li><a href="${h}services" data-i="${home ? 'sec.services' : 'sSvc'}">Services</a></li>
-        <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Studio</a></li>
+        <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Agence</a></li>
         <li><a href="${h}equipe" data-i="${home ? 'sec.team' : 'sTeam'}">L’équipe</a></li>
         <li><a href="${h}contact" data-i="${home ? 'sec.contact' : 'contact'}">Contact</a></li>
       </ul>

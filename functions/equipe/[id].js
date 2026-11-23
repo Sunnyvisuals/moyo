@@ -21,7 +21,7 @@ export async function onRequestGet({ params, env, request }) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>${e(m.name)} · Moyo Studio</title>
-<meta name="description" content="${e(m.name)}, ${e(fr.role)}. Moyo, studio de design basé en Provence-Alpes-Côte d’Azur.">
+<meta name="description" content="${e(m.name)}, ${e(fr.role)}. Moyo, agence créative basée en Provence-Alpes-Côte d’Azur.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -91,8 +91,8 @@ ${chromeHead(5)}
   ${m.links?.length ? `<ul class="links">${m.links.map(l => `<li><a href="${e(l.url)}"${/^https?:/i.test(l.url) ? ' target="_blank" rel="noopener"' : ''}>${e(l.label)} →</a></li>`).join('')}</ul>` : ''}
 </main>
 <nav class="cta-bar" aria-label="Suite">
-  ${next && next.id !== m.id ? `<a href="/equipe/${e(next.id)}"><span class="n">01</span><span class="t">${e(next.name)}</span></a>` : `<a href="/#studio"><span class="n">01</span><span class="t"><span data-l="fr">Le studio</span><span data-l="en">The studio</span></span></a>`}
-  <a href="/#contact"><span class="n">02</span><span class="t"><span data-l="fr">Écrire au studio</span><span data-l="en">Write to the studio</span></span></a>
+  ${next && next.id !== m.id ? `<a href="/equipe/${e(next.id)}"><span class="n">01</span><span class="t">${e(next.name)}</span></a>` : `<a href="/#studio"><span class="n">01</span><span class="t"><span data-l="fr">L’agence</span><span data-l="en">The agency</span></span></a>`}
+  <a href="/#contact"><span class="n">02</span><span class="t"><span data-l="fr">Écrire à l’agence</span><span data-l="en">Write to the agency</span></span></a>
   <a href="/" aria-label="Accueil"><i></i><i></i><i></i><i></i></a>
 </nav>
 ${footerHTML()}
