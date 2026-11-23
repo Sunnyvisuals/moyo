@@ -42,6 +42,8 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
       if (ac) { const r = ac.getBoundingClientRect(), f = (my - r.top) / r.height; dim = 1 - (f < .5 ? .05 + f * .3 : .2 + (f - .5) * 1.3); } // its dark veil
       if (im && im.naturalWidth) { try { const l = imgLum(im, mx, my); if (l !== null) return l * dim; } catch (_) {} }
       if (el.classList.contains('acard-grad')) continue;
+      // outlined buttons fill up through ::before on hover: read that layer
+      if (el.matches('.link:hover,.menu-list a:hover')) { const f = colorOf(getComputedStyle(el, '::before').backgroundColor); if (f[1] > .5) return f[0]; }
       const c = colorOf(getComputedStyle(el).backgroundColor);
       if (c[1] > .5) return c[0] * dim;
     }
@@ -59,7 +61,7 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
   };
   // two thresholds, so the colour does not flicker over mid greys
   let queued = 0;
-  const tone = () => { if (x < 0) return; const l = under(x, y); c.classList.toggle('inv', l < (c.classList.contains('inv') ? .5 : .4)); };
+  const tone = () => { if (x < 0) return; const t = document.elementFromPoint(x, y); c.classList.toggle('hot', !!(t && t.closest('a,button,label,summary,.row,[role=button]'))); const l = under(x, y); c.classList.toggle('inv', l < (c.classList.contains('inv') ? .5 : .4)); };
   const start = () => {
     addEventListener('scroll', () => { if (!queued) queued = requestAnimationFrame(() => { queued = 0; tone(); }); }, { passive: true, capture: true });
     document.body.appendChild(c); root.classList.add('has-cur');
@@ -71,10 +73,11 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
       root.classList.toggle('cur-off', !!top);
       const text = t && t.closest('input:not([type=radio]):not([type=checkbox]):not([type=submit]):not([type=button]):not([type=reset]):not([type=range]):not([type=file]):not([type=color]):not([type=image]),textarea,select,[contenteditable]');
       c.classList.toggle('on', !top && !text);
-      c.classList.toggle('hot', !!(t && t.closest('a,button,label,summary,.row,[role=button]')));
       tone();
       if (!raf) raf = requestAnimationFrame(loop);
     }, { passive: true });
+    // a button can change colour under a still pointer (hover fade, selected choice): look again
+    setInterval(() => { if (!document.hidden && c.classList.contains('on')) tone(); }, 120);
     addEventListener('pointerdown', () => c.classList.add('down'), { passive: true });
     addEventListener('pointerup', () => c.classList.remove('down'), { passive: true });
     root.addEventListener('mouseleave', () => c.classList.remove('on'));
