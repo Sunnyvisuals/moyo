@@ -6,7 +6,7 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const css = `
 html.has-cur,html.has-cur *{cursor:none}
-html.has-cur input,html.has-cur textarea,html.has-cur select{cursor:text}
+html.has-cur input:not([type=radio]):not([type=checkbox]):not([type=submit]):not([type=button]):not([type=reset]):not([type=range]):not([type=file]):not([type=color]):not([type=image]),html.has-cur textarea,html.has-cur select{cursor:text}
 html.cur-off,html.cur-off *{cursor:auto}
 html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-off button *,html.cur-off label *{cursor:pointer}
 .cur{position:fixed;left:0;top:0;z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .3s}
@@ -35,7 +35,7 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
       const t = e.target instanceof Element ? e.target : null;
       const top = t && t.closest('dialog,[popover]');
       root.classList.toggle('cur-off', !!top);
-      const text = t && t.closest('input,textarea,select,[contenteditable]');
+      const text = t && t.closest('input:not([type=radio]):not([type=checkbox]):not([type=submit]):not([type=button]):not([type=reset]):not([type=range]):not([type=file]):not([type=color]):not([type=image]),textarea,select,[contenteditable]');
       c.classList.toggle('on', !top && !text);
       c.classList.toggle('hot', !!(t && t.closest('a,button,label,summary,.row,[role=button]')));
       c.classList.toggle('inv', !!(t && t.closest('.blue,.foot,.bar[data-tone="paper"],.cta,.send,.plate:not([data-t="wash"]),.win')));
