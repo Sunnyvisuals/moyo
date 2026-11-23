@@ -1060,9 +1060,7 @@ html.is-dialog .dots,.dots.off{opacity:0;pointer-events:none}
 }
 
 __LANG_CSS__
-.entry-ja{font-size:clamp(1.25rem,1.7vw,1.625rem);font-weight:300;line-height:1.5;letter-spacing:.04em;margin-bottom:14px}
 .entry-link{margin-top:28px}
-[lang=ja]{font-family:var(--sans),"Hiragino Sans","Yu Gothic UI","Yu Gothic","Noto Sans JP",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
 /* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
 @media (prefers-reduced-motion:no-preference){
   html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
@@ -1234,12 +1232,11 @@ __LANG_CSS__
     <div class="entry">
       <p class="entry-w par grad" style="--a:64px" aria-hidden="true"><span class="c">m</span><span class="c">o</span><span class="c">y</span><span class="c">o</span></p>
       <div class="entry-d">
-        <p class="entry-t" data-i="enT">Moyo, nom. Du japonais <span lang="ja">模様</span>, moyō.</p>
+        <p class="entry-t" data-i="enT">Moyo, nom. Du japonais moyō.</p>
         <dl>
-          <dt><span lang="ja">模様</span> moyō</dt><dd data-i="enD1">le motif, le dessin.</dd>
-          <dt><span lang="ja">空模様</span> soramoyō</dt><dd data-i="enD2">l’allure du ciel.</dd>
+          <dt lang="ja-Latn">moyō</dt><dd data-i="enD1">le motif, le dessin.</dd>
+          <dt lang="ja-Latn">soramoyō</dt><dd data-i="enD2">l’allure du ciel.</dd>
         </dl>
-        <p class="entry-ja" lang="ja">一つの模様から、すべてが始まる。</p>
         <p class="entry-s" data-i="enS">Nous en avons fait une règle : chaque projet part d’un motif, une idée simple qui relie tout, de la première page au dernier pixel.</p>
         <a class="link entry-link" href="https://jisho.org/word/%E6%A8%A1%E6%A7%98" target="_blank" rel="noopener" data-i="enLink">Voir la signification</a>
       </div>
@@ -1390,7 +1387,7 @@ const EN={
  'b1t':'One idea per project.','b1p':'We choose a single strong idea, then hold it from the first screen to the last line of code.',
  'b2t':'Time for light.','b2p':'Slow movement, pauses, air. A site is meant to be read, not endured.',
  'b3t':'Accessible from the start.','b3p':'Keyboard, contrast, reduced motion, no JavaScript: designed states, not afterthought fixes.',
- 'enT':'Moyo, noun. From the Japanese <span lang="ja">模様</span>, moyō.','enD1':'pattern, design.','enD2':'the look of the sky.','enLink':'See the meaning','enS':'We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.',
+ 'enT':'Moyo, noun. From the Japanese moyō.','enD1':'pattern, design.','enD2':'the look of the sky.','enLink':'See the meaning','enS':'We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.',
  'teamT':'The team.','teamAria':'Team','stuL':'Write to the agency',
  'lumT':'The light of Nice, live.','lumN':'This site calculates the real position of the sun. These are today\u2019s values.',
  'todayT':'Today in Nice','rise':'Sunrise','set':'Sunset','len':'Day length','elmax':'Sun at its highest',

@@ -213,7 +213,7 @@ if(cat!=='all' && !DATA.categories.some(c=>c.id===cat)) cat='all';
 const visible=()=>ALL.map((p,i)=>i).filter(i=>cat==='all'||ALL[i].category===cat);
 
 function renderFilters(){
-  const used=DATA.categories.filter(c=>ALL.some(p=>p.category===c.id));
+  const used=DATA.categories; // every category, even without a project yet
   const btn=(id,label,n)=>`<button type="button" data-cat="${escHTML(id)}" aria-pressed="${id===cat}">${escHTML(label)}<span class="n">${n}</span></button>`;
   $('#filters').innerHTML=btn('all',lang==='en'?EN.all:FR.all,ALL.length)+used.map(c=>btn(c.id,catLabel(DATA,c.id,lang),ALL.filter(p=>p.category===c.id).length)).join('');
 }
