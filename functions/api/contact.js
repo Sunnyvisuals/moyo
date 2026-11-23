@@ -43,6 +43,41 @@ export async function onRequestPost({ request, env }) {
 
   const hex = [...crypto.getRandomValues(new Uint8Array(4))].map(b => b.toString(16).padStart(2, '0')).join('');
   const id = String(Date.now()).padStart(15, '0') + '-' + hex;
-  await env.MOYO.put('msg:' + id, JSON.stringify({ id, at: new Date().toISOString(), ...msg }));
+  const at = new Date().toISOString();
+  await env.MOYO.put('msg:' + id, JSON.stringify({ id, at, ...msg }));
+
+  // Send an e-mail notification to the studio (best-effort; the message is already saved in KV).
+  // Set RESEND_API_KEY as a Pages secret to enable delivery. Optional: TO_EMAIL, FROM_EMAIL.
+  if (env.RESEND_API_KEY) {
+    const to = env.TO_EMAIL || 'contact.moyostudio@gmail.com';
+    const from = env.FROM_EMAIL || 'moyo <onboarding@resend.dev>';
+    const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' };
+    const budget = { lt5: '< 5 k€', '5-15': '5–15 k€', '15-40': '15–40 k€', gt40: '> 40 k€', tbd: 'À définir' };
+    const lines = [
+      `Nom : ${msg.name}`,
+      `E-mail : ${msg.email}`,
+      msg.type ? `Type : ${label[msg.type] || msg.type}` : null,
+      msg.budget ? `Budget : ${budget[msg.budget] || msg.budget}` : null,
+      `Langue : ${msg.lang}`,
+      '',
+      msg.message,
+      '',
+      `— Reçu le ${at} · réf. ${id}`
+    ].filter(l => l !== null).join('\n');
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from,
+          to: [to],
+          reply_to: msg.email,
+          subject: `Nouveau message — ${msg.name}`,
+          text: lines
+        })
+      });
+    } catch (_) { /* KV copy already stored; don't fail the form if e-mail is down */ }
+  }
+
   return reply(true, 201);
 }
