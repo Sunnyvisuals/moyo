@@ -1541,7 +1541,7 @@ function updateBar(){
   if(key==='top') dTone=openCur>.6?'blue':'paper';
   if(key==='projects'){const a=document.getElementById('projects'); if(a){const r=a.getBoundingClientRect(); dTone=(mid>=r.top&&mid<r.bottom)?'blue':'paper';}}
   dotsNav.dataset.tone=dTone==='blue'?'paper':'klein';
-  dotsNav.classList.toggle('off',mono.getBoundingClientRect().top<innerHeight*.85);
+  dotsNav.classList.toggle('off',$('#foot').getBoundingClientRect().top<innerHeight*.98); // the section marks stop at the footer
 }
 const dotsNav=$('#dots'), dots=$$('#dots a');
 bar.addEventListener('focusin',()=>bar.classList.remove('away'));
