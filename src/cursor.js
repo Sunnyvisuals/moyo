@@ -2,6 +2,14 @@
    It reads the colour really under it (background or photo): light on dark, blue on light. The system caret in text fields.
    Mouse and trackpad only (pointer: fine). Inside the menu and dialogs (top layer) the system cursor comes back. */
 (() => {
+  /* focus ring for keyboard users only: never after a click (menu closing gives the focus back to its button) */
+  const kb = document.documentElement, fs = document.createElement('style');
+  fs.textContent = 'html:not(.kbd) :focus-visible{outline:none!important}*{-webkit-tap-highlight-color:transparent}';
+  document.head.appendChild(fs);
+  addEventListener('keydown', e => { if (/^(Tab|Arrow|Enter| )/.test(e.key) && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName) || e.key === 'Tab') kb.classList.add('kbd'); }, true);
+  addEventListener('pointerdown', () => kb.classList.remove('kbd'), true);
+})();
+(() => {
   if (!matchMedia('(pointer: fine)').matches) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const css = `
@@ -44,7 +52,6 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
       if (el.classList.contains('acard-grad')) continue;
       // outlined buttons fill up through ::before on hover: read that layer
       if (el.matches('.link:hover,.menu-list a:hover')) { const f = colorOf(getComputedStyle(el, '::before').backgroundColor); if (f[1] > .5) return f[0]; }
-      if (el.id === 'foot' && my - el.getBoundingClientRect().top > 80) return 0; // solid blue under its glass top
       const c = colorOf(getComputedStyle(el).backgroundColor);
       if (c[1] > .5) return c[0] * dim;
     }

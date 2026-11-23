@@ -1,36 +1,89 @@
-/* Hidden handwriting: phrases scribbled in the background of each section, almost invisible, to be found.
+/* Hidden handwriting: phrases scribbled in the background of each section, in a solid tone of the section's own colours, to be found.
    Each letter takes one of five handwritings, all at the same size, with the same draw as the Framer component
    "Bad handwriting" (fixed seed, same result on every visit),
    and lights up when the pointer passes near it. On touch screens the letters light up as they cross the middle of the screen.
    Decorative only (aria-hidden, behind the content). Phrases: edit LINES, size: edit --hs. Fonts: SIL OFL 1.1, self-hosted in /fonts/hand. */
 (() => {
-  // host selector: [left %, top %, (unused), tilt (deg), French, English]
+  // host selector: [wished left %, wished top %, tilt (deg), French, English]
   const LINES = {
-    '#approche': [[-3, 66, 7.5, -7, 'la lumière d’abord', 'light comes first'], [62, 10, 2.4, 9, 'regarder encore', 'look again'], [74, 80, 3.4, -13, 'presque rien', 'almost nothing']],
-    '#services': [[34, 2.5, 4.4, -9, 'une idée, une seule', 'one idea, only one'], [38, 44, 3, 78, 'recommencer', 'start over'], [-2, 88, 8, 4, 'à la main', 'by hand'], [66, 92, 2.6, -11, 'écouter le lieu', 'listen to the place']],
-    '#studio': [[52, 5, 5.4, 8, 'l’allure du ciel', 'the look of the sky'], [-4, 46, 3.6, -80, 'moyō, le motif', 'moyō, the pattern'], [38, 84, 2.8, -6, 'ce qui se répète', 'what comes back']],
-    '#equipe': [[48, 8, 6.4, -8, 'deux regards', 'two pairs of eyes'], [58, 66, 2.8, 12, 'on se comprend', 'we understand each other'], [-3, 84, 4, -4, 'quatre mains', 'four hands']],
-    '#contact': [[42, 3, 3.6, -10, 'dites-nous tout', 'tell us everything'], [-4, 70, 8.4, 6, 'et si on essayait', 'what if we tried'], [30, 52, 2.4, 72, 'demain matin', 'tomorrow morning']],
-    '#foot': [[46, 44, 5.6, -7, 'jusqu’au dernier rayon', 'until the last ray'], [70, 58, 2.4, 10, 'à bientôt', 'see you soon']],
-    '.projects-page': [[44, 14, 4.6, -5, 'tout commence par un motif', 'it all starts with a pattern'], [-3, 48, 3.2, -82, 'midi, plein soleil', 'noon, full sun'], [60, 86, 6, 6, 'et après', 'and then']],
-    '.who-page': [[46, 14, 7, -9, 'quelqu’un, quelque part', 'someone, somewhere'], [72, 48, 2.6, 11, 'la main avant l’outil', 'the hand before the tool']]
+    '.win': [[6, 10, -7, 'agence créative', 'creative agency'], [34, 76, 5, 'dessiner la lumière', 'drawing light']],
+    '#approche': [[58, 11, 5, 'une idée avant tout', 'an idea above all'], [3, 60, -6, 'direction artistique', 'art direction'], [50, 73, -8, 'mesurer, puis créer', 'measure, then create']],
+    '#services': [[34, 2.5, -7, 'une idée, une seule', 'one idea, only one'], [30, 50, -5, 'à chaque support', 'on every medium'], [2, 92, 4, 'du croquis à l’écran', 'from sketch to screen']],
+    '#equipe': [[50, 8, -7, 'une agence, quatre mains', 'one agency, four hands'], [56, 66, 8, 'on se comprend', 'we understand each other']],
+    '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern'], [58, 88, 5, 'et le vôtre', 'and yours']],
+    '.who-page': [[46, 16, -8, 'moyo, agence créative', 'moyo, creative agency'], [66, 46, 7, 'imaginer ensemble', 'imagine together']],
+    '#studio': [[42, 6, -5, 'moyo, agence créative', 'moyo, creative agency'], [74, 34, 8, 'deux regards', 'two pairs of eyes'], [4, 47, -9, 'des images qui restent', 'images that stay'], [40, 88, 4, 'sites, films, campagnes', 'websites, films, campaigns']],
+    '#contact': [[46, 4, -6, 'parlons de votre marque', 'let’s talk about your brand'], [3, 72, 6, 'tout commence ici', 'it all starts here'], [33, 92, -4, 'et si on créait ensemble', 'what if we made it together']],
+    '#foot': [[46, 43, -6, 'créer, filmer, raconter', 'create, film, tell'], [68, 57, 8, 'à bientôt chez moyo', 'see you soon at moyo']]
   };
   const FONTS = ['Caveat', 'Indie Flower', 'Nothing You Could Do', 'Reenie Beanie', 'Shadows Into Light'];
   const AVOID = { l: [2] }; // Nothing You Could Do draws an unreadable l
   const st = document.createElement('style');
   st.textContent = FONTS.map(f => `@font-face{font-family:"${f}";src:url(/fonts/hand/${f.toLowerCase().replace(/ /g, '-')}.woff2) format("woff2");font-weight:400;font-display:swap}`).join('') +
-    `.scr{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;user-select:none;color:inherit}
-.scr p{position:absolute;margin:0;max-width:none;white-space:nowrap;line-height:1.2;font-weight:400;letter-spacing:0;transform-origin:0 50%;rotate:var(--r);font-size:var(--hs)}
-.scr i{font-style:normal;opacity:calc(var(--o0) + var(--o,0) * .5);transition:opacity .7s cubic-bezier(.25,1,.5,1)}
-.scr{--o0:.06;--hs:72px}
+    `.scr{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;user-select:none;--ink:#002FA7;--bg:#F1F3F2}
+.blue>.scr,.win>.scr,.foot>.scr{--ink:#F1F3F2;--bg:#002FA7}
+.contact>.scr{--bg:color-mix(in oklab,#002FA7 50%,#000614)}
+.scr p{position:absolute;margin:0;max-width:none;white-space:nowrap;line-height:1.2;font-weight:400;letter-spacing:0;transform-origin:50% 50%;rotate:var(--r);font-size:var(--hs)}
+.scr p[hidden]{display:none}
+.scr i{font-style:normal;color:color-mix(in oklab,var(--ink) calc((var(--o0) + var(--o,0) * .6) * 100%),var(--bg));transition:color .7s cubic-bezier(.25,1,.5,1)}
+.scr{--o0:.34;--hs:72px}
 @media (max-width:820px){.scr{--hs:48px}}
-@media (prefers-reduced-motion:reduce){.scr{--o0:.14}}
+@media (prefers-reduced-motion:reduce){.scr{--o0:.3}}
 ` + FONTS.map((f, n) => `.scr .h${n}{font-family:"${f}",cursive}`).join('');
   document.head.appendChild(st);
 
   const main = document.getElementById('main');
   if (main && document.getElementById('filters')) main.classList.add('projects-page');
   if (main && main.querySelector('.who')) main.classList.add('who-page');
+  /* Placement: a phrase goes to the free spot nearest to the wished one, never over a text, an image, a line or a control.
+     It gets smaller when there is no room, and is left out when there is none at all. */
+  const SOLID = 'img,svg,button,input,textarea,select,.link,.plate,.photo,.blocks,.acc,.filters,.idx,.mono-wrap,.sub-row,.foot-base,.ct-form,.entry-w,.cap,.projects';
+  function obstacles(host, H) {
+    const out = [], add = (r, p) => { if (r.width > 1 && r.height > 0) out.push([r.left - H.left - p, r.top - H.top - p, r.right - H.left + p, r.bottom - H.top + p]); };
+    const pad = innerWidth < 821 ? 16 : 30; // a margin around every text
+    host.querySelectorAll(SOLID).forEach(e => { if (!e.closest('.scr,.win')) add(e.getBoundingClientRect(), pad); });
+    const w = document.createTreeWalker(host, NodeFilter.SHOW_TEXT), rg = document.createRange(); let n;
+    while ((n = w.nextNode())) { if (!n.data.trim() || n.parentElement.closest('.scr,.sr,script,style,dialog')) continue; rg.selectNodeContents(n); for (const r of rg.getClientRects()) add(r, pad); }
+    host.querySelectorAll('li,.sec-head,.names,dl,.head,.foot-base').forEach(e => { if (e.closest('.scr')) return; const c = getComputedStyle(e), r = e.getBoundingClientRect();
+      if (parseFloat(c.borderTopWidth)) add({ left: r.left, right: r.right, top: r.top, bottom: r.top + 1, width: r.width, height: 1 }, 8);
+      if (parseFloat(c.borderBottomWidth)) add({ left: r.left, right: r.right, top: r.bottom - 1, bottom: r.bottom, width: r.width, height: 1 }, 8); });
+    // blocks that drift with the scroll on wide screens: keep a vertical margin around their whole box
+    if (innerWidth > 1000) host.querySelectorAll('.intro .cols,.statement,.entry-d,.names,.contact h2,.sec-head').forEach(e => { const r = e.getBoundingClientRect(); add({ left: r.left, right: r.right, top: r.top - 90, bottom: r.bottom + 90, width: r.width, height: r.height + 180 }, 0); });
+    if (host.matches('.win')) for (const f of [1 / 3, 2 / 3]) out.push([0, H.height * f - 14, H.width, H.height * f + 14]);
+    if (host.matches('.sec') && innerWidth > 1180) out.push([H.width - 64, 0, H.width, H.height]); // section marks
+    return out;
+  }
+  // measure the real layout: no parallax, reveal or scroll animation moving the texts around
+  const frz = document.createElement('style'); frz.textContent = 'html.scr-m *,html.scr-m *::before,html.scr-m *::after{translate:none!important;transform:none!important;animation:none!important;transition:none!important}html.scr-m .lm-in,html.scr-m .lm{opacity:1!important}';
+  document.head.appendChild(frz);
+  function place() {
+    document.documentElement.classList.add('scr-m');
+    try { placeAll(); } finally { document.documentElement.classList.remove('scr-m'); }
+  }
+  function placeAll() {
+    document.querySelectorAll('.scr').forEach(d => {
+      const host = d.parentElement, H = host.getBoundingClientRect(), obs = obstacles(host, H), m = innerWidth < 821 ? 18 : 36, k0 = H.width / (host.offsetWidth || 1);
+      const base = innerWidth < 821 ? 48 : 72;
+      for (const q of d.children) {
+        q.hidden = false; let done = false;
+        for (const size of [base, base * .84, base * .7, base * .58, 30]) {
+          q.style.fontSize = size + 'px';
+          const a = +q.dataset.r * Math.PI / 180, w0 = q.offsetWidth, h0 = q.offsetHeight, w = w0 * Math.cos(a) + h0 * Math.abs(Math.sin(a)), h = w0 * Math.abs(Math.sin(a)) + h0 * Math.cos(a);
+          const X = H.width / k0 - m - w, Y = H.height - m - h; if (X < m || Y < m) continue;
+          const wx = H.width * q.dataset.x / 100, wy = H.height * q.dataset.y / 100; let best = null, bd = 1e12;
+          for (let y = m; y <= Y; y += 20) for (let x = m; x <= X; x += 20) {
+            const dd = (x - wx) ** 2 + (y - wy) ** 2; if (dd >= bd) continue;
+            if (obs.some(o => x < o[2] && x + w > o[0] && y < o[3] && y + h > o[1])) continue;
+            bd = dd; best = [x, y];
+          }
+          if (!best) continue;
+          q.style.left = ((best[0] + (w - w0) / 2) / H.width * 100).toFixed(2) + '%'; q.style.top = ((best[1] + (h - h0) / 2) / H.height * 100).toFixed(2) + '%';
+          obs.push([best[0] - 60, best[1] - 60, best[0] + w + 60, best[1] + h + 60]); done = true; break;
+        }
+        q.hidden = !done;
+      }
+    });
+  }
   const rnd = s => { const x = Math.sin(s) * 1e4; return x - Math.floor(x); };
   const esc = c => c.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   let letters = [];
@@ -47,18 +100,22 @@
   function build() {
     document.querySelectorAll('.scr').forEach(e => e.remove());
     const en = document.documentElement.lang === 'en';
-    Object.entries(LINES).forEach(([sel, lines], h) => {
+    Object.entries(LINES).forEach(([sel, lines]) => {
       const host = document.querySelector(sel); if (!host) return;
       if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
       host.style.isolation = 'isolate';
       const d = document.createElement('div'); d.className = 'scr'; d.setAttribute('aria-hidden', 'true');
-      d.innerHTML = lines.map(([x, y, , r, fr, e], i) => `<p style="left:${x}%;top:${y}%;--r:${r}deg">${scribble(en ? e : fr, 12)}</p>`).join('');
+      d.innerHTML = lines.map(([x, y, r, fr, e]) => `<p hidden data-x="${x}" data-y="${y}" data-r="${r}" style="--r:${r}deg">${scribble(en ? e : fr, 12)}</p>`).join('');
       host.appendChild(d);
     });
     letters = [...document.querySelectorAll('.scr i[class]')];
+    place();
   }
   build();
-  new MutationObserver(build).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  let pt = 0; const again = ms => { clearTimeout(pt); pt = setTimeout(place, ms); };
+  document.fonts?.ready.then(() => again(60)); addEventListener('load', () => setTimeout(place, 1600)); addEventListener('resize', () => again(250));
+  Promise.all(FONTS.map(f => document.fonts.load('72px "' + f + '"'))).then(() => again(60)).catch(() => {});
+  new MutationObserver(() => { build(); again(900); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   /* ---------- light ---------- */
