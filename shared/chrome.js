@@ -192,8 +192,14 @@ const FOOTER_CSS = `
 .mono-wrap{container-type:inline-size;pointer-events:none;margin-top:clamp(0rem,1vw,1rem)}
 .monument{font-size:calc(100cqw * var(--mono-k,.4406));font-weight:700;letter-spacing:-.055em;line-height:.72;white-space:nowrap;margin-left:calc(var(--mono-l,-.0625) * 1em);height:.915em;user-select:none;-webkit-user-select:none}
 .monument .bl{display:inline-block}
-/* each o is an eye: --ecx/--ecy its centre, --epr the radius of the pupil (measured on the font, in em) */
-.eye{position:relative;transform-origin:calc(var(--ecx,.28) * 1em) calc(var(--ecy,.45) * 1em);transform:scaleY(var(--lid,1))}
+/* each o is an eye: --ecx/--ecy its centre, --epr the radius of the pupil, --erx/--ery the radii of its inside (measured on the font, in em).
+   The letter never changes shape: what opens and shuts is a lid, in the ink of the letter, inside it (--lid: 1 open, 0 shut) */
+.eye{position:relative}
+.eye .ld{--x:.034;position:absolute;left:calc(var(--ecx,.28) * 1em);top:calc(var(--ecy,.45) * 1em);width:calc((var(--erx,.14) + var(--x)) * 2em);height:calc((var(--ery,.19) + var(--x)) * 2em);translate:-50% -50%;border-radius:50%;overflow:clip;pointer-events:none}
+.eye .ld::before{content:"";position:absolute;left:-12%;right:-12%;bottom:100%;height:100%;border-radius:0 0 50% 50%/0 0 15% 15%;background:currentColor;translate:0 calc((1 - var(--lid,1)) * 101%)}
+/* shut, the eye is a thin curve */
+.eye .ld::after{content:"";position:absolute;left:50%;top:50%;width:58%;aspect-ratio:1;border:.022em solid var(--bg);border-radius:50%;translate:-50% -64%;clip-path:inset(63% -1px -1px);opacity:calc((.15 - var(--lid,1)) * 12)}
+.flood .eye .ld::after{border-color:#002FA7}
 .eye .pu,.eye .hit{position:absolute;left:calc(var(--ecx,.28) * 1em);top:calc(var(--ecy,.45) * 1em);border-radius:50%}
 .eye .pu{width:calc(var(--epr,.072) * 2em);aspect-ratio:1;margin:calc(var(--epr,.072) * -1em) 0 0 calc(var(--epr,.072) * -1em);background:var(--klein);translate:var(--gx,0px) var(--gy,0px);scale:var(--pd,1)}
 .eye .hit{width:calc(var(--ecr,.27) * 2em);aspect-ratio:1;margin:calc(var(--ecr,.27) * -1em) 0 0 calc(var(--ecr,.27) * -1em);pointer-events:auto;cursor:pointer;touch-action:none;-webkit-touch-callout:none}
@@ -303,7 +309,7 @@ const footerInner = ({ home = false, team } = {}) => {
       <button class="hold" id="hold" type="button" data-i="fHold">Maintenez un œil</button>
     </div>
   </div>
-  <div class="mono-wrap" aria-hidden="true" translate="no"><div class="monument"><span class="bl">m</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span><span class="bl">y</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span></div></div>`;
+  <div class="mono-wrap" aria-hidden="true" translate="no"><div class="monument"><span class="bl">m</span><span class="bl eye">o<i class="pu"></i><i class="ld"></i><i class="hit"></i></span><span class="bl">y</span><span class="bl eye">o<i class="pu"></i><i class="ld"></i><i class="hit"></i></span></div></div>`;
 };
 
 const footerHTML = (team, opts = {}) => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">

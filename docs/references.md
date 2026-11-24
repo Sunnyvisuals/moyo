@@ -35,7 +35,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 ## Détails à trouver
 
 - Le point du titre se prend en main et se lance : il rebondit sur les lignes de la phrase, puis rentre.
-- De 23 h à 6 h, les yeux sont mi-clos et donnent l'heure.
+- De 23 h à 6 h, les paupières sont lourdes (battements lents, sommeil plus tôt) et les yeux donnent l'heure. La lettre ne change jamais de forme : la paupière descend dedans.
 - Sur la page introuvable, « Rien à voir » : les yeux sont fermés.
 - Le mot « moyo » tapé au clavier : un monochrome, une seconde.
 - Une case sans photo est un point qui regarde le pointeur.

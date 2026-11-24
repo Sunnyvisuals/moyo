@@ -5,7 +5,8 @@
    - left alone, they look at "Quelle est votre idée ?": we follow other people's eyes without deciding to,
    - at the end of the home, the dot that showed the way leaves it, goes into the last o, and jumps into the first one: it was an eye all along,
    - they dilate in front of what interests them, wink for each founder, fall asleep when nobody moves, go round with joy on sign-up.
-   At night they are half closed and tell the time. On the lost page they are shut ("nothing to see").
+   At night their lids are heavy (slow blinks, early sleep) and they tell the time. On the lost page they are shut ("nothing to see").
+   The letter itself never changes shape: a lid, in its ink, comes down inside it.
    Hold an eye: it dilates until the whole footer is a blue monochrome (after Yves Klein). Let go: it closes. No sound.
    Nothing is stored or sent: the time spent together lives in memory only. With reduced motion the eyes stay still. */
 (() => {
@@ -57,11 +58,11 @@ function fit() {
   if (ink > 1) { set('--mono-k', (1 / ink).toFixed(5)); set('--mono-l', (-m[0]).toFixed(4)); }
   const r = ring(w, f); if (!r) return;
   FS = parseFloat(getComputedStyle(mono).fontSize);
-  const e = eyes[0].el, lid = e.style.getPropertyValue('--lid'); e.style.setProperty('--lid', '1');
+  const e = eyes[0].el;
   const probe = document.createElement('i'); probe.style.cssText = 'display:inline-block;width:0;height:0'; e.appendChild(probe);
-  const base = (probe.getBoundingClientRect().bottom - e.getBoundingClientRect().top) / FS; probe.remove(); e.style.setProperty('--lid', lid || '1');
+  const base = (probe.getBoundingClientRect().bottom - e.getBoundingClientRect().top) / FS; probe.remove();
   const pr = Math.min(r.rx, r.ry) * .58;
-  set('--ecx', r.cx.toFixed(4)); set('--ecy', (base - r.cy).toFixed(4)); set('--ecr', r.r.toFixed(4)); set('--epr', pr.toFixed(4));
+  set('--ecx', r.cx.toFixed(4)); set('--ecy', (base - r.cy).toFixed(4)); set('--ecr', r.r.toFixed(4)); set('--epr', pr.toFixed(4)); set('--erx', r.rx.toFixed(4)); set('--ery', r.ry.toFixed(4));
   RX = r.rx * FS; RY = r.ry * FS; PR = pr * FS; R = r.r * FS;
   question(w, f);
 }
@@ -99,12 +100,13 @@ function frame(t) {
   const dt = Math.min(.05, (t - (last || t)) / 1000); last = t;
   eyes.forEach(e => { const r = e.hit.getBoundingClientRect(); e.x = r.left + r.width / 2; e.y = r.top + r.height / 2; });
   const mx = (eyes[0].x + eyes[1].x) / 2, my = eyes[0].y, look = target(t, mx, my);
-  if (t - act > 16000 && !asleep && dir === 0) asleep = true;
+  const late = night();
+  if (t - act > (late ? 11000 : 16000) && !asleep && dir === 0) asleep = true;
   if (t > nextBlink) { blink = t; nextBlink = t + 2600 + Math.random() * 4200; }
-  const b = (t - blink) / 190, shut = b > 0 && b < 1 ? Math.sin(b * Math.PI) : 0, j = (t - joy) / 1700;
+  const b = (t - blink) / (late ? 520 : 210), shut = b > 0 && b < 1 ? Math.sin(b * Math.PI) : 0, j = (t - joy) / 1700;
   eyes.forEach((e, i) => {
     // lids
-    const full = blind ? (ptr && t - ptrT < 2600 && Math.hypot(ptr[0] - e.x, ptr[1] - e.y) < R * 1.3 ? .5 : .07) : night() ? .66 : 1;
+    const full = blind ? (ptr && t - ptrT < 2600 && Math.hypot(ptr[0] - e.x, ptr[1] - e.y) < R * 1.3 ? .5 : .07) : 1;
     const open = asleep ? .07 + .025 * Math.sin(t / 900) : wink === i ? .07 : Math.max(.07, full * (1 - .93 * shut));
     e.lid += (open - e.lid) * (1 - Math.exp(-(asleep ? 2.2 : 34) * dt));
     // gaze: more and more off centre as the target gets farther, inside the ellipse of the letter

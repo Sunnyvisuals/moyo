@@ -73,9 +73,9 @@ const eyes = (() => {
     if ('letterSpacing' in g) g.letterSpacing = '0px';
     d = scan('o'); let x0 = W, x1 = 0, y0 = H, y1 = 0; for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) if (on(d, x, y)) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
     if (x1 <= x0) return; const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2; let rx = 0, ry = 0; while (rx < S && !on(d, cx + rx, cy)) rx++; while (ry < S && !on(d, cx, cy + ry)) ry++;
-    const FS = parseFloat(getComputedStyle(mono).fontSize), e = els[0].el, probe = document.createElement('i'); e.style.setProperty('--lid', '1'); probe.style.cssText = 'display:inline-block;width:0;height:0'; e.appendChild(probe);
+    const FS = parseFloat(getComputedStyle(mono).fontSize), e = els[0].el, probe = document.createElement('i'); probe.style.cssText = 'display:inline-block;width:0;height:0'; e.appendChild(probe);
     const base = (probe.getBoundingClientRect().bottom - e.getBoundingClientRect().top) / FS; probe.remove();
-    const pr = Math.min(rx, ry) / S * .58, set = (k, v) => mono.style.setProperty(k, v); set('--ecx', ((cx - X0) / S).toFixed(4)); set('--ecy', (base - (Y0 - cy) / S).toFixed(4)); set('--ecr', (Math.max(x1 - x0, y1 - y0) / 2 / S).toFixed(4)); set('--epr', pr.toFixed(4));
+    const pr = Math.min(rx, ry) / S * .58, set = (k, v) => mono.style.setProperty(k, v); set('--ecx', ((cx - X0) / S).toFixed(4)); set('--ecy', (base - (Y0 - cy) / S).toFixed(4)); set('--ecr', (Math.max(x1 - x0, y1 - y0) / 2 / S).toFixed(4)); set('--epr', pr.toFixed(4)); set('--erx', (rx / S).toFixed(4)); set('--ery', (ry / S).toFixed(4));
     RX = rx / S * FS; RY = ry / S * FS; PR = pr * FS;
   }
   function frame(t) {
