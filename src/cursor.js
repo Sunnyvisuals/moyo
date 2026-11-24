@@ -1,7 +1,7 @@
 /* The cursor is the dot. It punctuates what you point at:
    - over a word that can be clicked, it leaves the pointer and goes to sit at the end of it, as its final point,
    - over a picture it opens and says what will happen,
-   - over a pill or an icon it is a thin ring, over a text field it gives way to the caret of the system,
+   - over a pill, an icon or the point of a title (which can be picked up, play.js) it is a thin ring, over a text field it gives way to the caret of the system,
    - between two things it stretches with its own speed.
    It reads the colour really under it: blue on paper, paper on blue. It lives in the top layer, so it is the same over the menu and the project sheet.
    Mouse and trackpad only. */
@@ -20,11 +20,13 @@
   const st = document.createElement('style');
   st.textContent = `html.has-cur,html.has-cur *{cursor:none!important}
 html.has-cur :is(${TEXT}){cursor:text!important}
-.cur{position:fixed;inset:auto;left:0;top:0;width:0;height:0;margin:0;padding:0;border:0;overflow:visible;background:none;pointer-events:none;opacity:0;transition:opacity .25s;z-index:2147483000;--c:#002FA7;--t:#F5F4F0}
+.cur{view-transition-name:cur;position:fixed;inset:auto;left:0;top:0;width:0;height:0;margin:0;padding:0;border:0;overflow:visible;background:none;pointer-events:none;opacity:0;transition:opacity .25s;z-index:2147483000;--c:#002FA7;--t:#F5F4F0}
 .cur.on{opacity:1}
 .cur.inv{--c:#F5F4F0;--t:#002FA7}
 .cur i{position:absolute;left:0;top:0;border-radius:50%;background:var(--c);transition:background .25s,box-shadow .25s}
 .cur.ring i{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c)}
+.cur em{position:absolute;left:0;top:0;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--c);opacity:0;transition:opacity .25s}
+.cur.away em{opacity:.75}
 .cur span{position:absolute;left:0;top:0;translate:-50% -50%;font:600 15px/1 var(--sans);letter-spacing:-.01em;color:var(--t);white-space:nowrap;opacity:0;scale:.7;transition:opacity .2s,scale .4s cubic-bezier(.16,1,.3,1)}
 .cur.say span{opacity:1;scale:1;transition-delay:.08s}`;
   document.head.appendChild(st);
@@ -41,15 +43,15 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   const under = (mx, my) => {
     for (const el of document.elementsFromPoint(mx, my)) {
       if (el.tagName === 'IMG' && el.naturalWidth) { try { const l = imgLum(el, mx, my); if (l !== null) return l; } catch (_) {} }
-      if (el.matches('.plate--none')) { const r = el.getBoundingClientRect(), R = Math.min(r.width, r.height) * .13; return Math.hypot(mx - r.left - r.width / 2, my - r.top - r.height / 2) < R ? .05 : .8; }
+      if (el.matches('.plate--none')) { const r = el.getBoundingClientRect(), R = Math.min(r.width, r.height) * .13; return Math.hypot(mx - r.left - r.width / 2 - (parseFloat(el.style.getPropertyValue('--dx')) || 0), my - r.top - r.height / 2 - (parseFloat(el.style.getPropertyValue('--dy')) || 0)) < R ? .05 : .8; }
       const c = colorOf(getComputedStyle(el).backgroundColor);
       if (c[1] > .5) return c[0];
     }
     return 1;
   };
 
-  const c = document.createElement('div'); c.className = 'cur'; c.setAttribute('aria-hidden', 'true'); c.innerHTML = '<i></i><span></span>';
-  const disc = c.firstChild, say = c.lastChild;
+  const c = document.createElement('div'); c.className = 'cur'; c.setAttribute('aria-hidden', 'true'); c.innerHTML = '<i></i><em></em><span></span>';
+  const disc = c.children[0], tip = c.children[1], say = c.children[2]; // the disc, the place of the pointer when the disc has gone to a word, the word it says
   const BASE = Math.min(22, Math.max(12, innerWidth * .0085)), clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const WORD = { see: ['Voir', 'View'], go: ['Aller', 'Go'], hold: ['Maintenir', 'Hold'] };
   const word = k => WORD[k][root.lang === 'en' ? 1 : 0];
@@ -59,6 +61,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   function pick(t) {
     if (!t || root.classList.contains('holding')) return { m: 'free' };
     if (t.closest(TEXT)) return { m: 'text' };
+    if (t.closest('h1 .dot b,.ball')) return { m: 'ring', blue: true };
     if (t.closest('.eye .hit')) return { m: 'say', w: 'hold' };
     if (t.closest('.pv-frame')) return { m: 'say', w: 'go' };
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
@@ -67,7 +70,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const row = t.closest('.row'); if (row) return { m: 'dock', el: row.querySelector('.r-title') };
     const nm = t.closest('.nm-link'); if (nm) return { m: 'dock', el: nm.querySelector('.nm') };
     const a = t.closest('a,button,[role=button]');
-    if (a && !a.disabled) return a.closest('.menu-list.arc') ? { m: 'free' } : { m: 'dock', el: a };
+    if (a && !a.disabled && (a.tagName !== 'A' || a.hasAttribute('href'))) return a.closest('.menu-list.arc') ? { m: 'free' } : { m: 'dock', el: a };
     return { m: 'free' };
   }
   /* the end of the last line of a word: where its final point would be */
@@ -108,10 +111,11 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     disc.style.width = disc.style.height = s.toFixed(2) + 'px'; disc.style.margin = `${(-s / 2).toFixed(2)}px 0 0 ${(-s / 2).toFixed(2)}px`;
     disc.style.transform = e > .01 ? `rotate(${a.toFixed(3)}rad) scale(${(1 + e).toFixed(3)},${(1 / (1 + e)).toFixed(3)})` : '';
     c.style.transform = `translate3d(${cx.toFixed(2)}px,${cy.toFixed(2)}px,0)`;
+    const gone = (mode.m === 'dock' || mode.m === 'dot') && Math.hypot(x - cx, y - cy) > 16; c.classList.toggle('away', gone); if (gone) tip.style.transform = `translate(${(x - cx).toFixed(1)}px,${(y - cy).toFixed(1)}px)`;
     if (mode.m === 'dock' || mode.m === 'dot' || Math.abs(tx - cx) + Math.abs(ty - cy) + Math.abs(ts - s) > .12 || sp > 4) raf = requestAnimationFrame(frame);
   };
   const kick = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
-  const tone = () => { if (x < 0) return; const t = document.elementFromPoint(x, y); mode = pick(t); apply(); const l = under(x, y); if (mode.m === 'say') c.classList.remove('inv'); if (mode.m !== 'say' || root.classList.contains('mono') || t.closest('#menu')) c.classList.toggle('inv', c.classList.contains('inv') ? l < .58 : l < .46); kick(); };
+  const tone = () => { if (x < 0) return; const t = document.elementFromPoint(x, y); mode = pick(t); apply(); const l = under(x, y); if (mode.m === 'say' || mode.blue) c.classList.remove('inv'); if (!mode.blue && mode.m !== 'say' || root.classList.contains('mono') || t.closest('#menu')) c.classList.toggle('inv', c.classList.contains('inv') ? l < .58 : l < .46); kick(); };
   const top = () => { try { if (c.matches(':popover-open')) c.hidePopover(); c.showPopover(); } catch (_) {} };
   const start = () => {
     c.setAttribute('popover', 'manual'); document.body.appendChild(c); top(); root.classList.add('has-cur');

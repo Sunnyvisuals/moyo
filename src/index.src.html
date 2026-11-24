@@ -90,9 +90,12 @@ __CSS__
 .fld textarea{resize:vertical;min-height:calc(4.2em + 26px)}
 .fld input:hover,.fld textarea:hover{border-color:var(--ink)}
 .fld input:focus,.fld textarea:focus{border-color:var(--klein);box-shadow:0 1px 0 var(--klein)}
+.f-err{display:block;font-size:var(--fs-small);line-height:1.35;color:#B3261E}
+.f-err:not(:empty){margin-top:10px}
 .fld [aria-invalid]{border-color:#B3261E;box-shadow:0 1px 0 #B3261E}
 .chips{display:flex;flex-wrap:wrap;gap:8px 6px}
 .chips legend{float:left;width:100%;margin-bottom:20px}
+.opt{color:var(--mute)}
 .chips label{position:relative}
 .chips input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
 .chips label span{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s}
@@ -129,7 +132,7 @@ __CHROME_HEAD__
 </section>
 
 <!-- Projects -->
-<section class="sec" id="projets" aria-labelledby="projT">
+<section class="sec over" id="projets" aria-labelledby="projT">
   <h2 class="t-xl" id="projT"><span data-i="projT">Projets</span><i class="dot">&#8288;<b></b></i></h2>
   <ol class="cases" id="projects">__ROWS__</ol>
   <script type="application/json" id="moyo-data">__DATA__</script>
@@ -138,15 +141,15 @@ __CHROME_HEAD__
 <!-- Services -->
 <section class="sec" id="services" aria-labelledby="svcT">
   <h2 class="t-xl" id="svcT"><span data-i="svcT">Services</span><i class="dot">&#8288;<b></b></i></h2>
-  <ul class="rows">
-    <li class="g line"><h3 class="t-m h1" data-i="s1t">Direction artistique</h3><p class="mute h2" data-i="s1p">Une idée, un système typographique, une palette. Tout se décide avant le premier pixel.</p></li>
-    <li class="g line"><h3 class="t-m h1" data-i="s4t">Identités en mouvement</h3><p class="mute h2" data-i="s4p">Logos, grilles et animations pour les marques qui vivent sur écran.</p></li>
-    <li class="g line"><h3 class="t-m h1" data-i="s2t">Sites immersifs</h3><p class="mute h2" data-i="s2p">Scroll narratif, WebGL quand il sert le sujet, lisibles sans souris ni animation.</p></li>
-    <li class="g line"><h3 class="t-m h1" data-i="s3t">Visualisation de données</h3><p class="mute h2" data-i="s3p">Des graphiques que l’on explore, avec leurs sources et une version en tableau.</p></li>
-    <li class="g line"><h3 class="t-m h1" data-i="s5t">Audiovisuel</h3><p class="mute h2" data-i="s5p">Films de marque, captation, montage et motion design, du storyboard à l’étalonnage.</p></li>
-    <li class="g line"><h3 class="t-m h1" data-i="s6t">Communication</h3><p class="mute h2" data-i="s6p">Stratégie, campagnes et réseaux sociaux : un message clair, tenu sur chaque support.</p></li>
-    <li class="g line"><h3 class="t-m h1" data-i="s7t">Édition &amp; print</h3><p class="mute h2" data-i="s7p">Affiches, catalogues, signalétique : la même rigueur sur le papier que sur l’écran.</p></li>
-  </ul>
+  <div class="svc"><ul class="rows">
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="identite" data-i="s1t">Direction artistique</a></h3><p class="mute h2" data-i="s1p">Une idée, un système typographique, une palette. Tout se décide avant le premier pixel.</p></li>
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="motion" data-i="s4t">Identités en mouvement</a></h3><p class="mute h2" data-i="s4p">Logos, grilles et animations pour les marques qui vivent sur écran.</p></li>
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="site" data-i="s2t">Sites immersifs</a></h3><p class="mute h2" data-i="s2p">Scroll narratif, WebGL quand il sert le sujet, lisibles sans souris ni animation.</p></li>
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="donnees" data-i="s3t">Visualisation de données</a></h3><p class="mute h2" data-i="s3p">Des graphiques que l’on explore, avec leurs sources et une version en tableau.</p></li>
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="audiovisuel" data-i="s5t">Audiovisuel</a></h3><p class="mute h2" data-i="s5p">Films de marque, captation, montage et motion design, du storyboard à l’étalonnage.</p></li>
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="communication" data-i="s6t">Communication</a></h3><p class="mute h2" data-i="s6p">Stratégie, campagnes et réseaux sociaux : un message clair, tenu sur chaque support.</p></li>
+    <li class="g line"><h3 class="t-m h1"><a class="la" data-cat="print" data-i="s7t">Édition &amp; print</a></h3><p class="mute h2" data-i="s7p">Affiches, catalogues, signalétique : la même rigueur sur le papier que sur l’écran.</p></li>
+  </ul><canvas class="svc-c" aria-hidden="true"></canvas></div>
 </section>
 
 <!-- Method: four scenes (method.js); a plain list without JavaScript -->
@@ -165,7 +168,7 @@ __CHROME_HEAD__
 </section>
 
 <!-- Agency -->
-<section class="sec" id="studio" aria-labelledby="stuT">
+<section class="sec over" id="studio" aria-labelledby="stuT">
   <h2 class="t-xl" id="stuT"><span data-i="stuT">Agence</span><i class="dot">&#8288;<b></b></i></h2>
   <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est une agence créative basée en Provence-Alpes-Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
   <div class="g defs">
@@ -201,11 +204,11 @@ __CHROME_HEAD__
     </div>
     <form class="ct-form h2" id="ctForm" action="/api/contact" method="post" novalidate>
       <div class="f-two">
-        <label class="fld"><span class="fl" data-i="fName">Nom</span><input name="name" autocomplete="name" required maxlength="120"></label>
-        <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+        <label class="fld"><span class="fl" data-i="fName">Nom</span><input name="name" autocomplete="name" required maxlength="120" aria-describedby="e-name"><small class="f-err" id="e-name"></small></label>
+        <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="e-email"><small class="f-err" id="e-email"></small></label>
       </div>
       <fieldset class="chips">
-        <legend class="fl" data-i="fType">Le projet</legend>
+        <legend class="fl"><span data-i="fType">Le projet</span> <span class="opt" data-i="fOpt">(facultatif)</span></legend>
         <label><input type="radio" name="type" value="identite"><span data-i="tId">Identité</span></label>
         <label><input type="radio" name="type" value="site"><span data-i="tSite">Site</span></label>
         <label><input type="radio" name="type" value="donnees"><span data-i="tData">Données</span></label>
@@ -215,14 +218,14 @@ __CHROME_HEAD__
         <label><input type="radio" name="type" value="autre"><span data-i="tOther">Autre</span></label>
       </fieldset>
       <fieldset class="chips">
-        <legend class="fl" data-i="fBudget">Budget</legend>
+        <legend class="fl"><span data-i="fBudget">Budget</span> <span class="opt" data-i="fOpt">(facultatif)</span></legend>
         <label><input type="radio" name="budget" value="lt5"><span data-i="b1">Moins de 5 k€</span></label>
         <label><input type="radio" name="budget" value="5-15"><span data-i="b2">5 à 15 k€</span></label>
         <label><input type="radio" name="budget" value="15-40"><span data-i="b3">15 à 40 k€</span></label>
         <label><input type="radio" name="budget" value="gt40"><span data-i="b4">Plus de 40 k€</span></label>
         <label><input type="radio" name="budget" value="tbd"><span data-i="bTbd">À définir</span></label>
       </fieldset>
-      <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" required minlength="10" maxlength="5000"></textarea></label>
+      <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="f-foot">
         <div class="f-say"><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span><p class="t-small mute" data-i="fNote">Vos informations servent uniquement à vous répondre.</p></div>
@@ -259,7 +262,7 @@ __SHEET__
 "enT":"Moyo, noun. From the Japanese moyō.","enD1":"pattern, design.","enD2":"the look of the sky.","enLink":"See the meaning",
 "enS":"We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.",
 "ctQ":"A place, an event, a brand?","ctLead":"Tell us about the project. We reply within 48 hours.","copy":"Copy the address",
-"fName":"Name","fMail":"Email","fType":"The project","tId":"Identity","tSite":"Website","tData":"Data","tMotion":"Motion","tAv":"Audiovisual","tCom":"Communication","tOther":"Other",
+"fName":"Name","fMail":"Email","fType":"The project","fOpt":"(optional)","tId":"Identity","tSite":"Website","tData":"Data","tMotion":"Motion","tAv":"Audiovisual","tCom":"Communication","tOther":"Other",
 "fBudget":"Budget","b1":"Under €5k","b2":"€5k to €15k","b3":"€15k to €40k","b4":"Over €40k","bTbd":"To be defined","fMsg":"Message","fNote":"Your details are only used to reply to you.","fSend":"Send",
 "sProjL":"Projects","nextP":"Next project","fCat":"Category","fRole":"Role","fYear":"Year","fPlace":"Place","prev":"Previous","next":"Next","close":"Close"
 }</script>

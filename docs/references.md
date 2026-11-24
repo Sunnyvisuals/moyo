@@ -4,7 +4,7 @@ Ce qui a été lu avant de dessiner, et ce que chaque lecture a donné sur le si
 
 ## L'idée
 
-Une seule idée pour tout le site : **le point Klein**. Il charge la page (il dessine la phrase), termine les titres, devient le curseur, voyage sur le chemin, joue la méthode, et finit dans le pied de page, où il devient la pupille des deux o de « moyo ».
+Une seule idée pour tout le site : **le point Klein**. Il charge la page (il dessine la phrase), termine les titres, devient le curseur, voyage sur le chemin, fait les sept métiers, joue la méthode, et finit dans le pied de page : il quitte le chemin, entre dans le dernier o, saute dans le premier. C'était un œil.
 
 ## Créativité
 
@@ -31,6 +31,14 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 - [Accordion Cards Pro](https://www.framer.com/marketplace/components/accordion-cards-pro/) : la carte regardée s'ouvre. Repris pour les projets, la légende restant sur la grille.
 - [Gradient Text Reveal](https://www.framer.com/marketplace/components/gradient-text-reveal/) : chaque lettre passe par trois couleurs avec le scroll. Repris avec une vague Klein, seulement pour les phrases qui parlent : agence, méthode, contact.
 - [Font Weight Hover](https://www.framer.com/marketplace/components/font-weight-hover/) : la graisse suit le pointeur. Repris pour les services.
+
+## Détails à trouver
+
+- Le point du titre se prend en main et se lance : il rebondit sur les lignes de la phrase, puis rentre.
+- De 23 h à 6 h, les yeux sont mi-clos et donnent l'heure.
+- Sur la page introuvable, « Rien à voir » : les yeux sont fermés.
+- Le mot « moyo » tapé au clavier : un monochrome, une seconde.
+- Une case sans photo est un point qui regarde le pointeur.
 
 ## Techniques
 

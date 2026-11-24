@@ -1,5 +1,6 @@
-/* Home: the sections pass over each other, like the footer over the page. Each one stays in place once its end is reached (CSS sticky),
-   the next one slides over it behind its glass edge, while the one underneath drifts up more slowly and fades (--cv: how much it is covered).
+/* Home: three times a sheet of paper passes over the screen before it, like the footer over the page: the projects over the first sentence,
+   the agency over the method (the footer does it by itself). The screen underneath stays in place once its end is reached (CSS sticky), drifts up
+   more slowly and fades (--cv: how much it is covered). Which sections pass over: the class .over in the page. The others simply follow.
    Off with reduced motion and without JavaScript. Also gives window.moyoTop(el): where an element really is in the page, since a sticky
    section moves its own rectangle. */
 (() => {
@@ -13,28 +14,25 @@ window.moyoTop = el => {
   for (const x of secs) { const c = getComputedStyle(x); y += parseFloat(c.marginTop) || 0; if (x === s) break; y += x.offsetHeight + (parseFloat(c.marginBottom) || 0); }
   return el === s ? y : y + el.getBoundingClientRect().top - s.getBoundingClientRect().top;
 };
-if (secs.length < 3 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+const pairs = secs.filter(s => s.matches('.over')).map(over => ({ over, under: over.previousElementSibling, cv: '' })).filter(p => p.under);
+if (!pairs.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 root.classList.add('stack');
-const under = secs.slice(0, -1);
-under.forEach(s => { const v = document.createElement('i'); v.className = 'veil'; v.setAttribute('aria-hidden', 'true'); s.appendChild(v); });
-const fit = () => { secs.forEach(s => { const h = s.offsetHeight + 'px'; if (s.style.getPropertyValue('--h') !== h) s.style.setProperty('--h', h); }); cover(); };
+pairs.forEach(p => { p.under.classList.add('pin'); const v = document.createElement('i'); v.className = 'veil'; v.setAttribute('aria-hidden', 'true'); p.under.appendChild(v); });
+const fit = () => { pairs.forEach(({ under }) => { const h = under.offsetHeight + 'px'; if (under.style.getPropertyValue('--h') !== h) under.style.setProperty('--h', h); }); cover(); };
 let raf = 0;
 function cover() {
   raf = 0;
   const H = innerHeight;
-  under.forEach((s, i) => {
-    const t = secs[i + 1].getBoundingClientRect().top, cv = Math.min(1, Math.max(0, (H - t) / H)), v = cv.toFixed(4);
-    if (s.__cv !== v) { s.__cv = v; s.style.setProperty('--cv', v); }
-  });
+  pairs.forEach(p => { const v = Math.min(1, Math.max(0, (H - p.over.getBoundingClientRect().top) / H)).toFixed(4); if (p.cv !== v) { p.cv = v; p.under.style.setProperty('--cv', v); p.over.style.setProperty('--ov', Math.min(1, v * 7).toFixed(3)); } });
 }
 const kick = () => { if (!raf) raf = requestAnimationFrame(cover); };
-const ro = new ResizeObserver(fit); secs.forEach(s => ro.observe(s));
+const ro = new ResizeObserver(fit); pairs.forEach(p => ro.observe(p.under));
 addEventListener('scroll', kick, { passive: true }); addEventListener('resize', fit);
 fit();
 
-/* keyboard: a focused element hidden under the next section is brought back into view */
+/* keyboard: a focused element hidden under a sheet is brought back into view */
 document.addEventListener('focusin', e => {
-  const s = secs.find(x => x.contains(e.target)); if (!s || !root.classList.contains('kbd')) return;
+  const s = secs.find(x => x.contains(e.target)); if (!s || !root.classList.contains('kbd') || root.classList.contains('vt-sheet')) return;
   requestAnimationFrame(() => {
     const r = e.target.getBoundingClientRect(), x = Math.min(innerWidth - 2, Math.max(1, r.left + r.width / 2)), y = r.top + Math.min(r.height / 2, 40);
     const t = y > 0 && y < innerHeight && document.elementFromPoint(x, y);

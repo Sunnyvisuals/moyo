@@ -3,7 +3,9 @@
    - they look at you (Simmel: the mutual glance is the purest reciprocity, you cannot look without being seen),
    - they look away if you stare (Goffman: civil inattention), then steal a glance,
    - left alone, they look at "On se voit ?": we follow other people's eyes without deciding to,
+   - at the end of the home, the dot that showed the way leaves it, goes into the last o, and jumps into the first one: it was an eye all along,
    - they dilate in front of what interests them, wink for each founder, fall asleep when nobody moves, go round with joy on sign-up.
+   At night they are half closed and tell the time. On the lost page they are shut ("nothing to see").
    Hold an eye: it dilates until the whole footer is a blue monochrome (after Yves Klein). Let go: it closes. No sound.
    Nothing is stored or sent: the time spent together lives in memory only. With reduced motion the eyes stay still. */
 (() => {
@@ -15,7 +17,9 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const en = () => document.documentElement.lang === 'en';
 const eyes = $$('.eye', mono).map((el, i) => ({ el, i, pu: $('.pu', el), hit: $('.hit', el), gx: 0, gy: 0, lid: 1, pd: 1, x: 0, y: 0 }));
-const cta = $('.foot-cta', foot), mail = $('#subMail', foot);
+const cta = $('.foot-cta', foot), mail = $('#subMail', foot), way = document.getElementById('path'), wayDot = way && $('.path-d', way);
+const blind = document.documentElement.classList.contains('blind'), night = () => { const h = new Date().getHours(); return h >= 23 || h < 6; };
+const io = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, GO = 1050, JUMP = 780;
 
 /* ---------- geometry, measured on the font itself ---------- */
 let RX = 0, RY = 0, PR = 0, R = 100, FS = 100; // inner radii of the eye, radius of the pupil and of the whole letter, in px
@@ -63,7 +67,7 @@ function fit() {
 }
 
 /* ---------- life ---------- */
-let seen = false, dropT = 0, ptr = null, ptrT = -1e9, act = performance.now(), asleep = false, stare = 0, wander = [0, 0], wanderT = 0, wanderN = 0, blink = -1e9, nextBlink = 3000, wink = -1, joy = -1e9, hot = false, raf = 0, last = 0;
+let seen = false, dropT = 0, from = null, ptr = null, ptrT = -1e9, act = performance.now(), asleep = false, stare = 0, wander = [0, 0], wanderT = 0, wanderN = 0, blink = -1e9, nextBlink = 3000, wink = -1, joy = -1e9, hot = false, raf = 0, last = 0;
 const alive = () => { act = performance.now(); if (asleep) { asleep = false; blink = act + 240; } };
 addEventListener('pointermove', e => { ptr = [e.clientX, e.clientY]; ptrT = performance.now(); alive(); }, { passive: true });
 addEventListener('pointerdown', e => { ptr = [e.clientX, e.clientY]; ptrT = performance.now(); alive(); }, { passive: true });
@@ -100,7 +104,8 @@ function frame(t) {
   const b = (t - blink) / 190, shut = b > 0 && b < 1 ? Math.sin(b * Math.PI) : 0, j = (t - joy) / 1700;
   eyes.forEach((e, i) => {
     // lids
-    const open = asleep ? .07 + .025 * Math.sin(t / 900) : wink === i ? .07 : 1 - .93 * shut;
+    const full = blind ? (ptr && t - ptrT < 2600 && Math.hypot(ptr[0] - e.x, ptr[1] - e.y) < R * 1.3 ? .5 : .07) : night() ? .66 : 1;
+    const open = asleep ? .07 + .025 * Math.sin(t / 900) : wink === i ? .07 : Math.max(.07, full * (1 - .93 * shut));
     e.lid += (open - e.lid) * (1 - Math.exp(-(asleep ? 2.2 : 34) * dt));
     // gaze: more and more off centre as the target gets farther, inside the ellipse of the letter
     let gx, gy; const ax = Math.max(0, RX - PR * e.pd) * .88, ay = Math.max(0, RY - PR * e.pd) * .88;
@@ -109,9 +114,12 @@ function frame(t) {
     const f = 1 - Math.exp(-(stare ? 16 : 11) * dt); e.gx += (gx - e.gx) * f; e.gy += (gy - e.gy) * f;
     const pd = (hot ? 1.28 : 1) * (dir > 0 ? 1.25 : 1) * (j > 0 && j < 1 ? 1.15 : 1); e.pd += (pd - e.pd) * (1 - Math.exp(-7 * dt));
     // arrival: the dots fall into the letters
-    const u = clamp((t - dropT - i * 150) / 1150), fall = u < 1 ? (1 - bounce(u)) * -1.5 * FS : 0;
-    e.el.style.setProperty('--lid', e.lid.toFixed(3));
-    e.pu.style.setProperty('--gx', e.gx.toFixed(2) + 'px'); e.pu.style.setProperty('--gy', (e.gy * (u >= 1 ? 1 : 0) + fall).toFixed(2) + 'px'); e.pu.style.setProperty('--pd', e.pd.toFixed(3));
+    let ox = 0, oy = 0, sc = 1, here = 1;
+    if (!from) { const u = clamp((t - dropT - i * 150) / 1150); if (u < 1) { oy = (1 - bounce(u)) * -1.5 * FS; here = 0; } }
+    else if (i) { const u = clamp((t - dropT) / GO), k = io(u); if (u < 1) { ox = (from[0] - e.x) * (1 - k); oy = (from[1] - e.y) * (1 - k) - Math.sin(k * Math.PI) * FS * .2; sc = from[2] / (2 * PR) * (1 - k) + k; here = k * k; } }
+    else { const u = clamp((t - dropT - GO - 60) / JUMP); if (u < 1) { ox = (eyes[1].x - e.x) * (1 - u); oy = -4 * u * (1 - u) * FS * .42; sc = u > 0 ? 1 : 0; here = u * u; } }
+    e.el.style.setProperty('--lid', (from && t < dropT + GO + JUMP + 60 ? 1 : e.lid).toFixed(3));
+    e.pu.style.setProperty('--gx', (e.gx * here + ox).toFixed(2) + 'px'); e.pu.style.setProperty('--gy', (e.gy * here + oy).toFixed(2) + 'px'); e.pu.style.setProperty('--pd', (e.pd * sc).toFixed(3));
   });
   raf = requestAnimationFrame(frame);
 }
@@ -119,8 +127,10 @@ const start = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame); 
 if (!reduce) {
   eyes.forEach(e => e.pu.style.setProperty('--gy', '-200vh')); // above, waiting
   new IntersectionObserver(es => es.forEach(x => {
-    if (!seen && x.intersectionRatio > .34) { seen = true; const t = performance.now(); dropT = t; act = t; asleep = false; wanderT = 0; blink = t + 1750; nextBlink = t + 4200; setTimeout(() => { blink = performance.now(); }, 2150); start(); }
-    else if (seen && x.intersectionRatio < .04) { seen = false; eyes.forEach(e => e.pu.style.setProperty('--gy', '-200vh')); }
+    if (!seen && x.intersectionRatio > .34) { seen = true; const t = performance.now(); dropT = t; act = t; asleep = false; wanderT = 0; nextBlink = t + 5200; from = null;
+      if (wayDot && way.classList.contains('end') && wayDot.offsetParent !== null) { const r = wayDot.getBoundingClientRect(); from = [r.left + r.width / 2, r.top + r.height / 2, r.width]; way.classList.add('gone'); }
+      const done = from ? GO + JUMP + 160 : 1750; blink = t + done; setTimeout(() => { blink = performance.now(); }, done + 400); start(); }
+    else if (seen && x.intersectionRatio < .04) { seen = false; if (way) way.classList.remove('gone'); eyes.forEach(e => e.pu.style.setProperty('--gy', '-200vh')); }
   }), { threshold: [0, .04, .34, .6] }).observe(mono.parentElement);
 }
 fit(); document.fonts?.ready.then(fit); new MutationObserver(() => setTimeout(fit, 80)).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] }); addEventListener('resize', () => { clearTimeout(fit.t); fit.t = setTimeout(fit, 120); });
@@ -183,6 +193,16 @@ if (hold) {
 addEventListener('blur', release); document.addEventListener('visibilitychange', () => { if (document.hidden) release(); });
 addEventListener('keydown', e => { if (e.key === 'Escape') release(); });
 
+/* ---------- a plate without picture (project without cover, profile without portrait) is a dot too: it looks at the pointer ---------- */
+if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  let q = 0;
+  addEventListener('pointermove', () => { if (!q) q = requestAnimationFrame(() => { q = 0; $$('.plate--none').forEach(p => {
+    const r = p.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > innerHeight) return;
+    const dx = ptr[0] - r.left - r.width / 2, dy = ptr[1] - r.top - r.height / 2, k = Math.min(r.width, r.height) * .2 / Math.hypot(dx, dy, 260);
+    p.style.setProperty('--dx', (dx * k).toFixed(1) + 'px'); p.style.setProperty('--dy', (dy * k).toFixed(1) + 'px');
+  }); }); }, { passive: true });
+}
+
 /* ---------- the time spent together: in memory only ---------- */
 const line = $('#together'), secs = $$('main section[id]').filter(s => s.id !== 'top' && $('h2', s)), spent = new Map();
 let total = 0;
@@ -194,6 +214,8 @@ setInterval(() => {
   if (at && foot.getBoundingClientRect().top > innerHeight * .5) spent.set(at, (spent.get(at) || 0) + 1);
   if (line && foot.getBoundingClientRect().top < innerHeight) {
     const best = [...spent].sort((a, b) => b[1] - a[1])[0], name = best && best[1] > 4 ? $('h2', best[0]).textContent.replace(/⁠/g, '').trim() : '';
+    const d = new Date(), h = d.getHours(), mm = String(d.getMinutes()).padStart(2, '0');
+    if (night() && total % 14 > 8) { line.textContent = en() ? `It is ${h % 12 || 12}:${mm} ${h < 12 ? 'am' : 'pm'}. Go to sleep.` : `Il est ${h} h ${mm}. Allez dormir.`; return; }
     line.textContent = en() ? `${fmt(total)} together${name ? ', mostly on ' + name : ''}. Nothing is recorded.` : `${fmt(total)} ensemble${name ? ', surtout sur ' + name : ''}. Rien n’est enregistré.`;
   }
 }, 1000);

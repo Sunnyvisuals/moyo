@@ -26,18 +26,20 @@ if (/^\s*export\b/m.test(renderSrc)) throw new Error('shared/render.js: keep `ex
 const SITE = 'https://moyo-d0n.pages.dev';
 const CSS = DESIGN_CSS + CHROME_CSS + FOOTER_CSS + GLASS_CSS;
 const lenis = read('vendor/lenis.min.js').replace('//# sourceMappingURL=lenis.min.js.map', '');
+/* a service that has projects leads to them */
+const services = html => html.replace(/<a class="la" data-cat="([^"]+)"/g, (m, c) => seed.projects.some(p => p.category === c) ? `${m} href="/projets?cat=${c}"` : m);
 const common = { __HEAD__: headCommon, __CSS__: CSS, __DATA__: dataJSON(seed), __SHEET__: sheetHTML, __SCRIPTS__: scripts };
 
 fs.rmSync(r('dist'), { recursive: true, force: true });
 
 const sizes = {
-  'index.html': out('dist/index.html', fill(read('src/index.src.html'), {
+  'index.html': out('dist/index.html', services(fill(read('src/index.src.html'), {
     ...common,
     __CHROME_HEAD__: chromeHead(0, { land: true }),
     __ROWS__: rowsHTML(featuredOf(seed), 'fr'),
     __TEAM__: teamRows(seed.team),
     __FOOTER__: footerHTML(seed.team, { home: true })
-  })),
+  }))),
   'projets.html': out('dist/projets.html', fill(read('src/projets.src.html'), {
     ...common,
     __CHROME_HEAD__: chromeHead(1),
@@ -51,7 +53,7 @@ const sizes = {
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
-const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink' };
+const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink', trades: 'trades', play: 'play' };
 for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, read(`src/${from}.js`));
 out('dist/lenis.js', lenis);
 fs.copyFileSync(r('assets/og.png'), r('dist/og.png')); // image shown when the site is shared

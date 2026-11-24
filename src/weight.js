@@ -10,11 +10,11 @@
   document.head.appendChild(st);
   const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   document.querySelectorAll('.line').forEach(row => {
-    const el = row.querySelector('h3'); if (!el) return;
+    const el = row.querySelector('.la'); if (!el) return;
     let text = null, letters = [], raf = 0, ptr = null, base = 600, undo = 0;
-    const split = () => { if (text !== null) return; text = el.textContent; base = parseFloat(getComputedStyle(el).fontWeight) || 600; el.setAttribute('aria-label', text);
-      el.innerHTML = `<span class="fw" aria-hidden="true">${[...text].map(c => `<span class="fw-c" style="font-variation-settings:'wght' ${base}">${esc(c)}</span>`).join('')}</span>`; letters = [...el.querySelectorAll('.fw-c')]; };
-    const join = () => { if (text === null) return; if (el.querySelector('.fw')) el.textContent = text; el.removeAttribute('aria-label'); text = null; letters = []; };
+    const split = () => { if (text !== null) return; text = el.textContent; base = parseFloat(getComputedStyle(el).fontWeight) || 600;
+      el.innerHTML = `<span class="sr">${esc(text)}</span><span class="fw" aria-hidden="true">${[...text].map(c => `<span class="fw-c" style="font-variation-settings:'wght' ${base}">${esc(c)}</span>`).join('')}</span>`; letters = [...el.querySelectorAll('.fw-c')]; };
+    const join = () => { if (text === null) return; if (el.querySelector('.fw')) el.textContent = text; text = null; letters = []; };
     const paint = () => { raf = 0; if (!ptr || !letters.length) return;
       const size = parseFloat(getComputedStyle(el).fontSize), rad = size * 4.2;
       const mid = letters.map(l => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; }); // read everything, then write everything
@@ -23,6 +23,6 @@
     row.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || text === null) return; ptr = e.clientX; if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
     row.addEventListener('pointerleave', () => { ptr = null; letters.forEach(l => { l.style.fontVariationSettings = `'wght' ${base}`; }); clearTimeout(undo); undo = setTimeout(join, 420); });
     // a language switch rewrites the name: forget our letters, never put the old text back
-    new MutationObserver(() => { if (text !== null && !el.querySelector('.fw')) { text = null; letters = []; el.removeAttribute('aria-label'); } }).observe(el, { childList: true });
+    new MutationObserver(() => { if (text !== null && !el.querySelector('.fw')) { text = null; letters = []; } }).observe(el, { childList: true });
   });
 })();

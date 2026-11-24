@@ -18,11 +18,12 @@ const I18N = {
   fr: { 'sec.top': 'Accueil', 'sec.all': 'Projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'Équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
   en: { 'sec.top': 'Home', 'sec.all': 'Projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'Team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
 };
-const ARIA = { fr: { homeAria: 'moyo, accueil', nav: 'Navigation principale', menu: 'Menu' }, en: { homeAria: 'moyo, home', nav: 'Main navigation', menu: 'Menu' } };
+const ARIA = { fr: { homeAria: 'moyo, accueil', menu: 'Menu', langAria: 'Langue' }, en: { homeAria: 'moyo, home', menu: 'Menu', langAria: 'Language' } };
 const bar = document.getElementById('bar');
 function applyChromeLang(l){
   [bar, menu].forEach(root => { if (!root) return;
     root.querySelectorAll('[data-i]').forEach(el => { const k = el.dataset.i; if (I18N[l][k] != null) el.textContent = I18N[l][k]; });
+    root.querySelectorAll('.flang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === l)));
     root.querySelectorAll('[data-ia]').forEach(el => { const k = el.dataset.ia; if (ARIA[l][k] != null) el.setAttribute('aria-label', ARIA[l][k]); });
   });
 }

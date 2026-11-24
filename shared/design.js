@@ -14,20 +14,22 @@ const DESIGN_CSS = `
   color-scheme:light;
   --bg:#F5F4F0;--tint:#E8E6DF;--ink:#121214;--mute:#65656B;--line:rgb(18 18 20 / .15);--klein:#002FA7;
   --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  /* grid: its width drives everything, so a very large screen gets a larger page, not a lost one */
+  --m:clamp(20px,3.4vw,64px);--max:clamp(1680px,80vw,2400px);
+  --edge:max(var(--m),calc((100vw - var(--max)) / 2));--w:calc(100vw - 2 * var(--edge));
+  --gut:clamp(16px,calc(var(--w) * .0193),44px);
   /* type */
-  --fs-hero:clamp(2.75rem,8.5vw,9.75rem);
-  --fs-xl:clamp(2.5rem,5.5vw,6.5rem);
-  --fs-l:clamp(1.75rem,3.5vw,4.125rem);
-  --fs-row:clamp(1.5rem,2.5vw,2.875rem);
-  --fs-m:clamp(1.3125rem,1.9vw,2.125rem);
-  --fs-lead:clamp(1.125rem,1.35vw,1.5rem);
-  --fs-body:clamp(1.0625rem,1.2vw,1.25rem);
-  --fs-small:clamp(.9375rem,1.02vw,1.0625rem);
+  --fs-hero:clamp(2.75rem,calc(var(--w) * .0912),15rem);
+  --fs-xl:clamp(2.5rem,calc(var(--w) * .059),9.5rem);
+  --fs-l:clamp(1.75rem,calc(var(--w) * .0375),6rem);
+  --fs-row:clamp(1.5rem,calc(var(--w) * .0268),4.25rem);
+  --fs-m:clamp(1.3125rem,calc(var(--w) * .0204),3.25rem);
+  --fs-lead:clamp(1.125rem,calc(var(--w) * .0145),2.25rem);
+  --fs-body:clamp(1.0625rem,calc(var(--w) * .0129),1.75rem);
+  --fs-small:clamp(.9375rem,calc(var(--w) * .0109),1.4rem);
   /* space */
-  --m:clamp(20px,3.4vw,64px);--gut:clamp(16px,1.8vw,32px);--max:1680px;
-  --edge:max(var(--m),calc((100vw - var(--max)) / 2));
-  --sec:clamp(8rem,16vw,17rem);
-  --gap:clamp(3rem,6.4vw,7rem);
+  --sec:clamp(8rem,calc(var(--w) * .172),26rem);
+  --gap:clamp(3rem,calc(var(--w) * .0687),10rem);
   --hdr:clamp(64px,8vh,84px);
   /* motion */
   --ease:cubic-bezier(.16,1,.3,1);--ease-io:cubic-bezier(.76,0,.24,1);
@@ -51,6 +53,7 @@ img{display:block;max-width:100%}
 :focus-visible{outline:2px solid var(--klein);outline-offset:6px}
 ::selection{background:var(--klein);color:var(--bg)}
 .sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+[hidden]{display:none!important}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .skip{position:fixed;left:12px;top:-80px;z-index:200;background:var(--ink);color:var(--bg);padding:12px 18px;font-weight:600}
 .skip:focus{top:12px}
@@ -85,14 +88,13 @@ html.js .sec .dot.in b{opacity:1;translate:0 0;transition:opacity .15s ease .2s,
   .c5{grid-column:1/6!important}
 }
 
-/* ---------- Home: sections pass over each other (stack.js). Each is a sheet of paper whose top edge is the glass of the footer ---------- */
-html.stack main>.hero,html.stack main>.sec{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100svh - var(--h,100svh)));translate:0 calc(var(--cv,0) * -15vh)}
-html.stack main>.hero{background:var(--bg)}
-html.stack main>.sec{min-height:calc(100vh + var(--gh) - 96px);min-height:calc(100svh + var(--gh) - 96px);--gh:calc(var(--sec) * .9);--gp:calc(var(--gh) - 36px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;scroll-margin-top:calc(96px - var(--gh));
-  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),var(--bg) calc(var(--gh) - 1px));box-shadow:0 -2px 8px rgb(18 18 20 / .05),0 -26px 52px -14px rgb(18 18 20 / .15)}
-html.stack main>.sec:not(.mth):not(.contact){padding-bottom:clamp(5rem,10vw,10rem)}
-html.stack main>.mth.live{margin-top:0;padding:var(--gh) 0 0;height:calc(460vh + var(--gh));height:calc(460svh + var(--gh));scroll-margin-top:calc(var(--gh) * -1)}
-html.stack main>.contact{position:relative;top:auto}
+/* ---------- Home: three times, and no more, a sheet of paper passes over the screen before it (stack.js): the projects over the first
+   sentence, the agency over the method, the footer over the contact. Its top edge is the glass of the footer. The other sections simply follow. */
+html.stack main>*{position:relative;background:var(--bg)}
+html.stack main>.pin{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100svh - var(--h,100svh)));translate:0 calc(var(--cv,0) * -15vh)}
+html.stack main>.over{--gh:calc(var(--sec) * .9);--gp:calc(var(--gh) - 36px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;scroll-margin-top:calc(96px - var(--gh));
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),var(--bg) calc(var(--gh) - 1px));box-shadow:0 -2px 8px rgb(18 18 20 / calc(.05 * var(--ov,0))),0 -26px 52px -14px rgb(18 18 20 / calc(.15 * var(--ov,0)))}
+html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh + var(--sec));height:calc(460svh + var(--sec))}
 .veil{position:absolute;inset:0;z-index:20;border-radius:inherit;background:var(--bg);opacity:calc(var(--cv,0) * .82);pointer-events:none}
 
 /* ---------- Links and buttons ---------- */
@@ -108,7 +110,7 @@ html.stack main>.contact{position:relative;top:auto}
 .plate{position:relative;display:block;aspect-ratio:4/5;overflow:clip;background:var(--tint)}
 .plate img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 8%;transition:scale 1.4s var(--ease)}
 /* no picture yet: the dot */
-.plate--none::after{content:"";position:absolute;left:50%;top:50%;width:26%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:var(--klein);transition:scale 1.2s var(--ease)}
+.plate--none::after{content:"";position:absolute;left:50%;top:50%;width:26%;aspect-ratio:1;translate:calc(-50% + var(--dx,0px)) calc(-50% + var(--dy,0px));border-radius:50%;background:var(--klein);transition:scale 1.2s var(--ease),translate .55s cubic-bezier(.22,1,.36,1)}
 
 /* ---------- Projects. Home: an accordion of pictures (the one you look at opens), its caption below, on the axes. /projets: a contact sheet. ---------- */
 .row{display:block;width:100%}
@@ -138,6 +140,7 @@ html.stack main>.contact{position:relative;top:auto}
   /* the picture keeps its open width: the card is a window that opens on it */
   .cases .plate img{left:50%;width:calc((100cqw - (var(--n,5) - 1) * var(--gp)) * var(--k) / (var(--n,5) + var(--k) - 1));max-width:none;translate:calc(-50% + var(--px,0px)) 0;scale:1.04;transition:scale 1.4s var(--ease),translate .9s var(--ease)}
   .cases .case.on .plate img{scale:1.01}
+  .cases.still .case,.cases.still .case *{transition:none!important}
   .cases .cap{position:absolute;left:0;right:0;bottom:0;height:calc(var(--cap) - clamp(24px,2.4vw,40px));display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto 1fr;gap:0 var(--gut);padding:0;pointer-events:none}
   .cases .cap>*{opacity:0;translate:0 20px;transition:opacity .25s ease,translate .3s ease}
   .cases .case.on .cap>*,.cases:not(:has(.on)) .case:first-child .cap>*{opacity:1;translate:0 0;transition:opacity .8s ease calc(.12s + var(--c,0) * 70ms),translate 1s var(--ease) calc(.12s + var(--c,0) * 70ms)}
@@ -153,6 +156,20 @@ html.stack main>.contact{position:relative;top:auto}
 .line{padding:clamp(1.5rem,2.5vw,2.75rem) 0;align-items:baseline;row-gap:10px}
 .line .t-m{font-size:var(--fs-row);letter-spacing:-.034em;line-height:1.15;text-box:normal}
 .line p{max-width:44ch}
+.line{position:relative}
+.la[href]::after{content:"";position:absolute;inset:0}
+.line .n{font-size:.42em;font-weight:600;letter-spacing:0;vertical-align:.95em;margin-left:.22em;color:var(--klein);line-height:0}
+/* services: the dot at work (trades.js), on the fourth axis; next to the description on small screens */
+.svc{position:relative;--sc:clamp(80px,11vw,108px)}
+.svc-c{position:absolute;right:0;top:0;width:var(--sc);aspect-ratio:1;translate:0 var(--y,0px);opacity:0;pointer-events:none;transition:translate .9s var(--ease),opacity 1s ease}
+.svc-c.on{opacity:1}
+@media (max-width:1080px){.svc .line p{padding-right:calc(var(--sc) + 20px);min-height:var(--sc);max-width:none}}
+@media (min-width:1081px){
+  .svc{--sc:calc((100% + var(--gut)) / 4 - var(--gut))}
+  .svc .rows{width:calc((100% + var(--gut)) * .75 - var(--gut))}
+  .svc .line{grid-template-columns:repeat(9,minmax(0,1fr))}
+  .svc-c{pointer-events:auto}
+}
 @media (hover:hover){
   .rows>li{transition:opacity .6s var(--ease)}
   .rows:hover>li:not(:hover){opacity:.28}
@@ -163,6 +180,9 @@ html.stack main>.contact{position:relative;top:auto}
    Other pages: the same line laid flat above the title (where you come from, where you are), and the next stop at the end. */
 .path{position:fixed;z-index:60;right:0;top:50%;width:var(--edge);height:min(46vh,440px);translate:0 -50%;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s}
 .path.on{opacity:1;visibility:visible;transition:opacity .6s ease}
+.path.end{opacity:1;visibility:visible;pointer-events:none}
+.path.end>:not(.path-d){opacity:0;visibility:hidden;transition:opacity .4s}
+.path.gone .path-d{opacity:0}
 .path-l{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgb(18 18 20 / .2)}
 .path-l::after{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:var(--klein);transform-origin:50% 0;transform:scaleY(var(--pp,0))}
 .path ol{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between}
@@ -188,6 +208,7 @@ html.stack main>.contact{position:relative;top:auto}
 .path:focus-within .path-h{opacity:0}
 @media (max-width:820px){
   .path{right:auto;left:var(--m);top:auto;bottom:14px;width:auto;height:auto;translate:none}
+  .path.end{opacity:0;visibility:hidden}
   .path::before,.path-l,.path-d,.path-h{display:none}
   .path-b{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 18px 0 16px;border-radius:999px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 8px 24px -10px rgb(18 18 20 / .25);font-size:var(--fs-small);font-weight:600}
   .path-b::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--klein)}
@@ -231,11 +252,25 @@ html.stack main>.contact{position:relative;top:auto}
 #proj::backdrop{background:rgb(18 18 20 / 0);transition:background .9s,overlay .9s allow-discrete,display .9s allow-discrete}
 #proj[open]::backdrop{background:rgb(18 18 20 / .4)}
 @starting-style{#proj[open]::backdrop{background:rgb(18 18 20 / 0)}}
+/* where the browser can: the picture of the card becomes the picture of the sheet, the paper opens from the card (site.js) */
+html.vt-sheet #proj,html.vt-sheet #proj::backdrop{transition:none!important}
+html.vt-sheet::view-transition-group(shot){animation-duration:.95s;animation-timing-function:var(--ease-io);z-index:3}
+html.vt-sheet::view-transition-old(shot),html.vt-sheet::view-transition-new(shot){width:100%;height:100%;object-fit:cover;object-position:var(--vp,50% 8%);overflow:clip;mix-blend-mode:normal;animation:none}
+html.vt-sheet.vt-in::view-transition-old(shot),html.vt-sheet:not(.vt-in)::view-transition-new(shot){display:none}
+html.vt-sheet::view-transition-old(root),html.vt-sheet::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html.vt-sheet.vt-in::view-transition-new(root){animation:sheetIn .95s var(--ease-io) both}
+html.vt-sheet:not(.vt-in)::view-transition-old(root){z-index:2;animation:sheetOut .85s var(--ease-io) both}
+::view-transition-group(cur){animation:none;z-index:9}
+::view-transition-old(cur){display:none}
+::view-transition-new(cur){animation:none}
+@keyframes sheetIn{from{clip-path:inset(var(--vt,50%) round 0)}to{clip-path:inset(0)}}
+@keyframes sheetOut{from{clip-path:inset(0)}to{clip-path:inset(var(--vt,50%))}}
 #proj .plate{aspect-ratio:auto}
 #proj .plate img{position:static;height:auto}
 #proj .plate--none{aspect-ratio:4/5}
 .dlg-actions{position:fixed;z-index:3;top:0;left:var(--edge);right:var(--edge);height:var(--hdr);justify-content:flex-end;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px);color:#fff;background:#000;mix-blend-mode:difference;pointer-events:none}
 .dlg-actions button{pointer-events:auto}
+.dlg-actions :focus-visible{outline-color:currentColor}
 .dlg-actions button{min-height:44px;font-weight:600;font-size:var(--fs-small)}
 .dlg-pos{margin-right:auto;display:inline-flex;align-items:center;font-size:var(--fs-small);font-weight:500}
 .dlg-pos>:last-child::before{content:"";display:inline-block;width:clamp(20px,3vw,52px);height:1px;margin:0 14px;vertical-align:.3em;background:currentColor;opacity:.5}
@@ -278,7 +313,7 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle">
   <div class="dlg-in sheet">
     <h2 class="t-hero sheet-t"><span id="pTitle"></span><i class="dot">&#8288;<b></b></i></h2>
     <div class="g sheet-g">
-      <span class="plate c5" id="pPlate" aria-hidden="true"></span>
+      <span class="plate c5" id="pPlate"></span>
       <div class="h2">
         <p class="t-lead" id="pDesc"></p>
         <dl class="facts">
@@ -301,7 +336,7 @@ const headCommon = `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http
 try{var l=localStorage.getItem('hb-lang');if(l!=='fr'&&l!=='en')l=/^fr/i.test(navigator.language||'fr')?'fr':'en';document.documentElement.lang=l}catch(e){}
 /* what opens the page: the loading (first visit, reload), the dot closing on the title (coming from a link of the site), or nothing */
 try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var k=+sessionStorage.getItem('moyo-in')||0,n=performance.getEntriesByType('navigation')[0],o=document.referrer&&new URL(document.referrer).origin===location.origin,d=document.documentElement;sessionStorage.removeItem('moyo-in');
-if(Date.now()-k<8000)d.classList.add('enter');else if(n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},7000)}}catch(e){}
+if(Date.now()-k<8000)d.classList.add('enter');else if(!/[?&]projet=/.test(location.search)&&n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},7000)}}catch(e){}
 for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTransition;if(v)for(const p of[v.ready,v.finished,v.updateCallbackDone])p&&p.catch(()=>{})});</script>`;
 
 /* Scripts of every page, in order. */
@@ -316,10 +351,12 @@ const scripts = `<script src="/lenis.js" defer></script>
 <script src="/glass.js" defer></script>
 <script src="/method.js" defer></script>
 <script src="/ink.js" defer></script>
+<script src="/trades.js" defer></script>
 <script src="/stage.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/roll.js" defer></script>
 <script src="/weight.js" defer></script>
+<script src="/play.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>`;
 

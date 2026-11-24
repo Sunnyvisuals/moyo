@@ -44,6 +44,7 @@ const CHROME_CSS = `
 .bar{position:fixed;z-index:90;top:0;left:0;right:0;height:var(--hdr);display:flex;align-items:center;justify-content:space-between;padding:0 var(--edge);color:#fff;background:#000;mix-blend-mode:difference;pointer-events:none;transition:translate .9s var(--ease)}
 .bar>*{pointer-events:auto}
 .bar.away{translate:0 -100%}
+html.kbd .bar:focus-within{translate:0 0}
 .bar-mark,.menu-mark{font-size:clamp(1.5rem,1.9vw,1.875rem);font-weight:700;letter-spacing:-.052em;line-height:1;margin-left:-.06em}
 .bar-mark{display:inline-flex;align-items:center;min-height:44px;color:inherit}
 .bar-mark::before{content:"moyo"}
@@ -60,12 +61,16 @@ const CHROME_CSS = `
 .menu-in{min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--edge) var(--edge);display:flex;flex-direction:column;justify-content:center;position:relative;isolation:isolate}
 .menu-mark{position:absolute;left:var(--edge);top:0;height:var(--hdr);display:flex;align-items:center;color:var(--bg)}
 .menu-close{position:absolute;z-index:2;top:0;right:var(--edge);height:var(--hdr);display:inline-flex;align-items:center;justify-content:flex-end;min-width:44px;color:var(--bg)}
+.menu-foot{position:absolute;z-index:2;left:var(--edge);right:var(--edge);bottom:clamp(14px,2.4vw,34px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0 24px;font-size:var(--fs-small);font-weight:600}
+.menu-foot a,.menu-foot button{display:inline-flex;align-items:center;min-height:44px}
+.menu-foot .flang button{color:var(--paper-soft);background:none}
+.menu-foot .flang button[aria-pressed="true"]{color:var(--bg);text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
 .menu-list a{position:relative;display:block;padding:10px 0;color:var(--bg)}
 .menu-list .mn{font-size:clamp(2.25rem,11vw,4.5rem);font-weight:700;letter-spacing:-.045em;line-height:1.08}
 .menu-list .roll{position:relative;display:inline-block;overflow:hidden;vertical-align:top;padding:0 .06em .2em 0;margin-bottom:-.2em}
 .menu-list .roll .r2{position:absolute;left:0;top:0}
 .menu-list .roll .c{display:inline-block;white-space:pre;transition:transform .7s var(--ease-io);transition-delay:calc(var(--i) * 18ms)}
-.menu-list .roll .r2 .c{transform:translateY(105%)}
+.menu-list .roll .r2 .c{transform:translateY(125%)}
 
 /* Arc carousel (desktop) */
 @media (min-width:821px){
@@ -135,6 +140,7 @@ const chromeHead = (start = 0, { land = false } = {}) => `<header class="bar${la
       </div>
     </div>
   </div>
+  <div class="menu-foot"><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span></div>
   <span class="menu-mark" aria-hidden="true">moyo</span>
   <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i></span></button>
 </nav>`;
@@ -206,7 +212,7 @@ footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(6
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(245 244 240) calc(var(--gh) - 1px));
   box-shadow:0 -2px 8px rgb(18 18 20 / .06),0 -24px 48px -12px rgb(18 18 20 / .16)!important}
 /* the glass: clear, it bends what is behind it (glass.js sets --liquid where the browser can), then turns blue downwards */
-:is(footer#foot.foot,html.stack main>.sec)::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
+:is(footer#foot.foot,html.stack main>.over)::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
   background:linear-gradient(to bottom in oklab,rgb(245 244 240 / 0.012) calc(var(--gp) * 0.000),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.049),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.098),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.147),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.196),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.245),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.294),rgb(245 244 240 / 0.016) calc(var(--gp) * 0.343),rgb(245 244 240 / 0.037) calc(var(--gp) * 0.392),rgb(245 244 240 / 0.086) calc(var(--gp) * 0.441),rgb(245 244 240 / 0.166) calc(var(--gp) * 0.490),rgb(245 244 240 / 0.272) calc(var(--gp) * 0.539),rgb(245 244 240 / 0.398) calc(var(--gp) * 0.588),rgb(245 244 240 / 0.533) calc(var(--gp) * 0.637),rgb(245 244 240 / 0.666) calc(var(--gp) * 0.686),rgb(245 244 240 / 0.785) calc(var(--gp) * 0.735),rgb(245 244 240 / 0.882) calc(var(--gp) * 0.784),rgb(245 244 240 / 0.949) calc(var(--gp) * 0.833),rgb(245 244 240 / 0.987) calc(var(--gp) * 0.882),rgb(245 244 240 / 0.999) calc(var(--gp) * 0.931),rgb(245 244 240 / 1.000) calc(var(--gp) * 0.980)),
     radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
     linear-gradient(rgb(255 255 255 / .09),#0000 130px);
@@ -214,7 +220,7 @@ footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(6
   box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),inset 0 calc(6px + var(--fv,0) * 8px) calc(10px + var(--fv,0) * 6px) calc(-8px - var(--fv,0) * 3px) rgb(18 18 20 / calc(.16 + var(--fv,0) * .14));
   -webkit-backdrop-filter:blur(4px) saturate(1.08);backdrop-filter:var(--liquid,blur(4px)) saturate(1.08) brightness(1.015)}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
-:is(footer#foot.foot,html.stack main>.sec)::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
+:is(footer#foot.foot,html.stack main>.over)::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
   background:radial-gradient(calc(380px + var(--fv,0) * 260px) 70px at var(--lx,50%) 0,#fff 10%,#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),

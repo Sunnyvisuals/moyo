@@ -1,6 +1,6 @@
 /* The way, on the home: a line in the margin, one stop per section, the dot travels on it as you read.
    Hover or keyboard: the names of the stops. Small screens: a pill with the current section, which opens the list.
-   It stays away on the first screen and over the footer. The other pages have a breadcrumb (.crumbs) and a next stop (.next). */
+   Over the footer only the dot is left: it goes into the eye of the wordmark (eyes.js). The other pages have a breadcrumb (.crumbs) and a next stop (.next). */
 (() => {
 'use strict';
 const IDS = ['top', 'projets', 'services', 'methode', 'studio', 'equipe', 'contact'];
@@ -20,17 +20,18 @@ const links = [...nav.querySelectorAll('a')], here = nav.querySelector('.path-h'
 function label() {
   const l = lang(); nav.setAttribute('aria-label', l === 'en' ? 'Where you are' : 'Où vous êtes');
   links.forEach((a, i) => { a.firstElementChild.textContent = NAME[l][i]; });
-  if (cur >= 0) { here.textContent = NAME[l][cur]; btn.textContent = NAME[l][cur]; }
+  if (cur >= 0) { here.textContent = cur ? NAME[l][cur] : ''; btn.textContent = NAME[l][cur]; }
 }
+let ready = false; (window.moyoReady || Promise.resolve()).then(() => { ready = true; read(); });
 let cur = -1, tops = [], pos = 0, goal = 0, raf = 0, h = 0, swap = 0;
 function measure() { tops = els.map(moyoTop); h = nav.clientHeight; read(); }
 function read() {
-  const H = innerHeight, y = scrollY + H * .5, n = els.length;
+  const H = innerHeight, y = scrollY + H * .5 * clamp(scrollY / (H * .5)), n = els.length; // the reading line: from the top of the screen to its middle during the first scroll
   let i = 0; while (i < n - 1 && y >= tops[i + 1]) i++;
   const end = tops[i + 1] ?? Infinity, f = i < n - 1 ? clamp((y - tops[i]) / (end - tops[i])) : 0;
   goal = (i + f) / (n - 1);
   const ft = foot.getBoundingClientRect().top;
-  nav.classList.toggle('on', scrollY > H * .55 && ft > H * .5);
+  nav.classList.toggle('on', ready && ft > H * .5 && (innerWidth > 820 || scrollY > H * .55)); nav.classList.toggle('end', ready && ft <= H * .5); // at the end of the way only the dot is left (eyes.js takes it)
   if (ft <= H * .5) nav.classList.remove('open');
   if (i !== cur) {
     cur = i;

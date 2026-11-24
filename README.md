@@ -9,11 +9,11 @@ Contact : contact.moyostudio@gmail.com
 Le système est décrit et défini dans un seul fichier, `shared/design.js`, utilisé par toutes les pages.
 
 - **Couleur** : blanc cassé `#F5F4F0`, encre `#121214`, un gris `#65656B`. Le bleu Klein `#002FA7` est la seule couleur et il a toujours un sens : l'idée, l'action, la fin de page.
-- **Le point Klein** : l'idée unique. Il charge la page, termine les titres, est le curseur, montre le chemin, joue la méthode et devient la pupille des deux o dans le pied de page. Sources et choix : `docs/references.md`.
+- **Le point Klein** : l'idée unique. Il charge la page, termine les titres (celui d'une page se prend en main et se lance), est le curseur, montre le chemin, fait les sept métiers des services, joue la méthode, regarde depuis les cases sans photo ; à la fin il quitte le chemin et devient la pupille des deux o du pied de page. Sources et choix : `docs/references.md`.
 - **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
-- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe. Les sections de l'accueil passent l'une sur l'autre, avec le bord de verre du pied de page (`src/stack.js`).
+- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe. Trois passages seulement se font l'un sur l'autre, avec le bord de verre : les projets sur la première phrase, l'agence sur la méthode, le pied de page sur le contact (classe `.over`, `src/stack.js`). L'image d'une carte devient l'image de la fiche (View Transitions).
 - **Chemin** : une ligne dans la marge (accueil), un fil d'Ariane et une étape suivante (autres pages), une page 404.
 
 ## Contenu
@@ -21,10 +21,10 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 | Section | Contenu |
 | --- | --- |
 | Ouverture | Une phrase |
-| Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche |
-| Services | Sept services, une ligne chacun |
+| Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`?projet=<id>`), le bouton Retour la ferme |
+| Services | Sept services, une ligne chacun, et le point au travail sur le quatrième axe (`src/trades.js`). Une ligne qui a des projets y mène |
 | Méthode | Une scène épinglée, quatre temps, un champ de points |
-| Agence | La phrase s'encre mot à mot avec le scroll, puis le sens de « moyo » |
+| Agence | La phrase s'encre d'une vague Klein avec le scroll, puis le sens de « moyo » |
 | Équipe | Les noms, vers `/equipe/<id>` |
 | Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome |
 
@@ -32,7 +32,7 @@ Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exempl
 
 ## En ligne (Cloudflare Pages)
 
-Site : https://moyo-77s.pages.dev
+Site : https://moyo-d0n.pages.dev
 
 | Adresse | Contenu |
 | --- | --- |
@@ -49,7 +49,7 @@ src/index.src.html     page d'accueil (gabarit)
 src/projets.src.html   page « Projets »
 src/admin.html         mode admin
 src/site.js            langue, scroll, projets, fiche, formulaire (toutes les pages)
-src/*.js               un fichier par comportement : menu, pied de page, verre, apparitions, sorties, curseur
+src/*.js               un fichier par comportement : menu, pied de page, yeux, verre, passages, métiers, méthode, encre, apparitions, point lancé, sorties, curseur
 shared/design.js       système de design : couleurs, typographie, grille, composants, fiche projet
 shared/chrome.js       en-tête, menu, pied de page
 shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
@@ -91,7 +91,7 @@ Sous Windows, si le dossier du projet a un chemin très long (plus de 260 caract
 
 ## Technique
 
-- **Léger** : accueil d'environ 70 Ko (HTML et CSS), police et scripts en fichiers partagés par toutes les pages. Pas de traceur, aucune requête vers un autre domaine.
+- **Léger** : accueil d'environ 90 Ko (HTML et CSS, 21 Ko compressés), police et scripts en fichiers partagés par toutes les pages. Pas de traceur, aucune requête vers un autre domaine.
 - **CSS 2026** : `subgrid`, `text-box`, View Transitions entre documents, API Popover pour le menu, `@starting-style`, `text-wrap`.
 - **Accessibilité** : contenu visible sans JavaScript, état « animations réduites » conçu à part, contraste d'au moins 4,5:1, cibles tactiles d'au moins 24 px, navigation au clavier, FR/EN.
 
@@ -125,19 +125,19 @@ Ces scripts ont été écrits pour l'accueil v8 : leurs sélecteurs sont à adap
 
 | Critère | Poids | Note |
 | --- | --- | --- |
-| Design | 40 % | 7,6 |
-| Usabilité | 30 % | 8,0 |
-| Créativité | 20 % | 7,3 |
-| Contenu | 10 % | 5,5 |
-| **Total pondéré** | | **environ 7,4** |
+| Design | 40 % | 9,0 |
+| Utilisabilité | 30 % | 9,1 |
+| Créativité | 20 % | 9,5 |
+| Contenu | 10 % | 6,0 |
+| **Total pondéré** | | **environ 8,8** |
 
 Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clients.
 
 ## Reste à faire
 
 - Remplacer les projets d'exemple par de vrais projets, depuis `/admin`.
-- Valider la phrase qui relie le mot « moyo » (cœur, vie, courage) au studio : elle est de ma plume.
-- Mesurer la fluidité sur un vrai GPU : l'environnement de test n'en a pas.
+- Remplacer les biographies (texte d'attente) et ajouter les portraits.
+- Essayer sur de vrais téléphones, Safari et Firefox.
 - Ajouter d'autres moyens de contact si besoin (réseaux, téléphone).
 
 ## Historique

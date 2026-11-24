@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="blind">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,6 +12,10 @@ __HEAD__
 __CSS__
 main{min-height:100vh;min-height:100svh}
 .lost{max-width:34ch;margin-bottom:var(--gap)}
+/* nothing to see: the eye is shut */
+.sheet-t .dot b{scale:1 .16;transition:scale .5s var(--ease)}
+@media (prefers-reduced-motion:no-preference){.sheet-t .dot b{animation:shut 5s var(--ease-io) 1.4s infinite both}}
+@keyframes shut{0%,82%,100%{scale:1 .16}88%,94%{scale:1 1}}
 </style>
 </head>
 <body>

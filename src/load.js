@@ -34,7 +34,7 @@ async function enter() {
   layer = document.createElement('div'); layer.className = 'kl'; document.body.appendChild(layer);
   root.classList.remove('enter');
   const R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 4;
-  await tween(1000, t => 1 - Math.pow(1 - t, 3.2), u => { layer.style.clipPath = `circle(${(r1 + (R - r1) * (1 - u)).toFixed(1)}px at ${x.toFixed(1)}px ${y.toFixed(1)}px)`; });
+  await tween(860, t => 1 - Math.pow(1 - t, 3.2), u => { layer.style.clipPath = `circle(${(r1 + (R - r1) * (1 - u)).toFixed(1)}px at ${x.toFixed(1)}px ${y.toFixed(1)}px)`; });
   end();
   if (mark) mark.animate([{ scale: 1.7 }, { scale: 1 }], { duration: 620, easing: 'cubic-bezier(.16,1,.3,1)' });
 }
@@ -67,18 +67,17 @@ async function load() {
   root.classList.remove('load');
   let full = document.readyState === 'complete'; addEventListener('load', () => { full = true; }, { once: true });
   const t0 = performance.now();
-  await new Promise(done => { let v = 0; const f = t => { const e = (t - t0) / 950, goal = full || t - t0 > 3200 ? out(Math.min(1, e)) : Math.min(.9, out(Math.min(1, e)) * .9); v = hurry ? 1 : Math.max(v, goal);
+  await new Promise(done => { let v = 0; const f = t => { const e = (t - t0) / 620, goal = full || t - t0 > 3200 ? out(Math.min(1, e)) : Math.min(.9, out(Math.min(1, e)) * .9); v = hurry ? 1 : Math.max(v, goal);
     dig.textContent = String(Math.round(v * 100)); px = after(); put(px, py); (v >= .999 || hurry) ? done() : requestAnimationFrame(f); }; requestAnimationFrame(f); });
-  await wait(hurry ? 0 : 120);
   // the number leaves, the dot goes to the first line
-  dig.animate([{ translate: '0 0' }, { translate: '0 -125%' }], { duration: hurry ? 1 : 520, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' });
+  dig.animate([{ translate: '0 0' }, { translate: '0 -125%' }], { duration: hurry ? 1 : 420, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' });
   const x0 = px, y0 = py, sx = rows[0].l, sy = rows[0].base - d;
-  await tween(560, io, u => put(x0 + (sx - x0) * u, y0 + (sy - y0) * u - Math.sin(u * Math.PI) * fs * .5));
+  await tween(400, io, u => put(x0 + (sx - x0) * u, y0 + (sy - y0) * u - Math.sin(u * Math.PI) * fs * .5));
   // it draws
   for (let i = 0; i < rows.length; i++) {
-    const o = rows[i], last = i === rows.length - 1, len = o.r - o.l, ms = 260 + len / innerWidth * 520;
+    const o = rows[i], last = i === rows.length - 1, len = o.r - o.l, ms = 170 + len / innerWidth * 330;
     await tween(ms, last ? out : io, u => { const x = o.l + len * u; ws[i] = x + (u >= 1 && !last ? fs : d * .5); cut(ws); put(x, o.base - d); });
-    if (!last) { const n = rows[i + 1], xa = o.r, ya = o.base - d, xb = n.l, yb = n.base - d; await tween(300, io, u => put(xa + (xb - xa) * u, ya + (yb - ya) * u)); }
+    if (!last) { const n = rows[i + 1], xa = o.r, ya = o.base - d, xb = n.l, yb = n.base - d; await tween(170, io, u => put(xa + (xb - xa) * u, ya + (yb - ya) * u)); }
   }
   put(m.left, m.top);
   const b = mark; end(); b.animate([{ scale: 1.9 }, { scale: 1 }], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)' });

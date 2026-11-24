@@ -7,7 +7,7 @@
   const EASE = 'cubic-bezier(.16,1,.3,1)', TOP = .03, BOTTOM = .09; // margins of the stage, in screens
   const st = document.createElement('style');
   st.textContent = `.stg{opacity:0;translate:0 26px;transition:opacity .5s ease,translate .6s ease}
-.stg.in{opacity:1;translate:0 0;transition:opacity 1.1s ease var(--sd,0ms),translate 1.3s ${EASE} var(--sd,0ms)}
+.stg.in{opacity:1;translate:none;transition:opacity 1.1s ease var(--sd,0ms),translate 1.3s ${EASE} var(--sd,0ms)}
 .stg.up{translate:0 -22px}
 .stg.clip{opacity:1;translate:none;clip-path:inset(0 0 100% 0);transition:clip-path .7s cubic-bezier(.64,0,.78,0)}
 .stg.clip.in{clip-path:inset(0);transition:clip-path 1.5s cubic-bezier(.76,0,.24,1) var(--sd,0ms)}

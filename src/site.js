@@ -1,5 +1,5 @@
 /* Page runtime, the same on every page: language, scroll and anchors, optical alignment of titles,
-   project list + filters + sheet, contact form. The header, the menu and the footer have their own files (chrome.js, footer.js). */
+   project list + filters + sheet, services, contact form. The header, the menu and the footer have their own files (chrome.js, footer.js). */
 (() => {
 'use strict';
 const root = document.documentElement;
@@ -45,29 +45,40 @@ if (filters) filters.addEventListener('click', e => {
   vt.ready.catch(() => {}); vt.finished.catch(() => {}).finally(() => lis.forEach(li => { li.style.viewTransitionName = ''; }));
 });
 
-/* ---------- Project sheet: rises over the page; previous and next stay inside the current filter ---------- */
+/* a service that has projects leads to them, and says how many */
+$$('.la[data-cat]').forEach(a => {
+  const n = (DATA.projects || []).filter(p => p.category === a.dataset.cat).length;
+  if (!n) return a.removeAttribute('href');
+  a.href = '/projets?cat=' + encodeURIComponent(a.dataset.cat);
+  const k = document.createElement('span'); k.className = 'n'; k.setAttribute('aria-hidden', 'true'); k.textContent = n; a.after(k);
+});
+
+/* ---------- Project sheet: opens from its card; previous and next stay inside the current filter. Each project has its own address (?projet=id):
+   it can be shared, and the Back button closes the sheet. ---------- */
 const dlg = $('#proj');
-let cur = 0, opener = null;
+let cur = 0, opener = null, pushed = false, openCard = null;
 function fill(i) {
   cur = i; const p = ALL[i], t = txt(p, lang);
   $('#pTitle').textContent = t.title; $('#pDesc').textContent = t.desc;
   $('#pTag').textContent = [catLabel(DATA, p.category, lang), t.type].filter(Boolean).join(', ');
   $('#pRole').textContent = t.role; $('#pPlace').textContent = t.place; $('#pYear').textContent = p.year;
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
-  const pl = $('#pPlate'); pl.innerHTML = plateInner(p); pl.classList.toggle('plate--none', !p.cover);
+  const pl = $('#pPlate'); pl.innerHTML = plateInner(p, t.title); pl.classList.toggle('plate--none', !p.cover);
+  const im = $('img', pl); if (im) { im.loading = 'eager'; im.decoding = 'sync'; }
   $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
   const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
   $('#pPos').textContent = `${at + 1}/${v.length}`; $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
+  document.title = t.title + ' · Moyo Studio';
+  [nx, ALL[v[(at - 1 + v.length) % v.length]]].forEach(q => { if (q.cover) new Image().src = imgURL(q.cover); }); // the next ones are ready
   dlg.scrollTop = 0; optical(dlg);
 }
 /* accordion (home, large screens): the card under the pointer or the focus opens. A finger opens it first, then opens the sheet. */
 const wide = matchMedia('(min-width:821px)');
-let armed = null;
 if (list && !filters) {
   const cards = $$('#projects > .case'); let on = 0, lock = 0;
   list.style.setProperty('--n', cards.length);
   const set = i => { on = i; cards.forEach((c, k) => c.classList.toggle('on', k === i)); lock = performance.now() + 220; };
-  set(0);
+  openCard = set; set(0);
   cards.forEach((c, i) => {
     const plate = $('.plate', c), img = $('img', c);
     plate.addEventListener('pointermove', e => {
@@ -80,23 +91,64 @@ if (list && !filters) {
     c.addEventListener('click', e => { if (wide.matches && i !== on && !matchMedia('(hover:hover)').matches) { e.stopPropagation(); set(i); } }, true);
   });
 }
-function step(d) { const v = visible(), k = v.indexOf(cur); fill(v[(k + d + v.length) % v.length]); }
-function closeSheet() {
-  if (!window.hbOut || dlg.dataset.leaving) return dlg.close();
-  dlg.dataset.leaving = '1';
-  window.hbOut(dlg, () => { delete dlg.dataset.leaving; dlg.close(); });
-}
-if (dlg && list) {
-  list.addEventListener('click', e => {
-    const b = e.target.closest('.row'); if (!b) return;
-    opener = b; fill(+b.dataset.p); dlg.showModal(); optical(dlg); root.classList.add('is-dialog'); lenis?.stop(); $('#pClose').focus({ preventScroll: true });
+const cardOf = i => list && $$('#projects > li')[i];
+const address = id => { const u = new URL(location.href); if (id) u.searchParams.set('projet', id); else u.searchParams.delete('projet'); return u; };
+/* the picture of the card becomes the picture of the sheet, and goes back to it. Where the browser cannot, the sheet rises. */
+function morph(open, i, update) {
+  const plate = cardOf(i) && $('.plate', cardOf(i)), mine = $('#pPlate'), r = plate && plate.getBoundingClientRect();
+  const can = document.startViewTransition && !reduce && r && r.width > 24 && r.top < innerHeight - 60 && r.bottom > 60 && (open || dlg.scrollTop < innerHeight * .6);
+  if (!can) return false;
+  root.style.setProperty('--vt', `${Math.max(0, r.top).toFixed(0)}px ${Math.max(0, innerWidth - r.right).toFixed(0)}px ${Math.max(0, innerHeight - r.bottom).toFixed(0)}px ${Math.max(0, r.left).toFixed(0)}px`);
+  root.style.setProperty('--vp', ALL[i].cover ? '50% 8%' : '50% 50%');
+  root.classList.add('vt-sheet'); root.classList.toggle('vt-in', open);
+  (open ? plate : mine).style.viewTransitionName = 'shot';
+  const vt = document.startViewTransition(async () => {
+    plate.style.viewTransitionName = mine.style.viewTransitionName = ''; update(); (open ? mine : plate).style.viewTransitionName = 'shot';
+    const im = open && $('img', mine); if (im) await Promise.race([im.decode().catch(() => {}), new Promise(done => setTimeout(done, 400))]);
   });
-  dlg.addEventListener('close', () => { root.classList.remove('is-dialog'); lenis?.start(); opener?.focus({ preventScroll: true }); });
+  vt.ready.catch(() => {});
+  vt.finished.catch(() => {}).finally(() => { plate.style.viewTransitionName = mine.style.viewTransitionName = ''; root.classList.remove('vt-sheet', 'vt-in'); });
+  return true;
+}
+function openSheet(i, push) {
+  const show = () => { fill(i); dlg.showModal(); optical(dlg); root.classList.add('is-dialog'); lenis?.stop(); $('#pClose').focus({ preventScroll: true }); };
+  if (push) { history.pushState({ projet: ALL[i].id }, '', address(ALL[i].id)); pushed = true; }
+  opener = cardOf(i) && $('.row', cardOf(i));
+  if (!push || !morph(true, i, show)) show();
+}
+let stepping = false;
+function step(d) { // the page of a project goes one way, the next one comes from the other
+  const v = visible(), n = v[(v.indexOf(cur) + d + v.length) % v.length]; if (n === cur || stepping) return;
+  const turn = () => { fill(n); history.replaceState(history.state, '', address(ALL[n].id)); };
+  if (reduce) return turn();
+  stepping = true;
+  const els = $$('.sheet-t,.sheet-g>*', dlg), out = els.map((el, i) => el.animate([{ opacity: 1, translate: '0 0' }, { opacity: 0, translate: `${d * -26}px 0` }], { duration: 210, delay: i * 22, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' }));
+  Promise.all(out.map(a => a.finished)).catch(() => {}).then(() => { turn(); stepping = false; out.forEach(a => a.cancel()); els.forEach((el, i) => el.animate([{ opacity: 0, translate: `${d * 40}px 0` }, { opacity: 1, translate: '0 0' }], { duration: 720, delay: i * 55, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' })); });
+}
+function hideSheet() { // really closes it: the address has already changed
+  if (!dlg.open || dlg.dataset.leaving) return;
+  opener = (cardOf(cur) && $('.row', cardOf(cur))) || opener;
+  if (openCard && wide.matches) { list.classList.add('still'); openCard(cur); list.offsetWidth; }
+  const end = () => { delete dlg.dataset.leaving; dlg.close(); };
+  if (!morph(false, cur, end)) { if (!window.hbOut) end(); else { dlg.dataset.leaving = '1'; window.hbOut(dlg, end); } }
+  if (list) requestAnimationFrame(() => list.classList.remove('still'));
+}
+const closeSheet = () => { if (pushed) history.back(); else { history.replaceState(null, '', address()); hideSheet(); } };
+if (dlg && list) {
+  list.addEventListener('click', e => { const b = e.target.closest('.row'); if (b) openSheet(+b.dataset.p, true); });
+  dlg.addEventListener('close', () => {
+    root.classList.remove('is-dialog'); lenis?.start(); document.title = (filters ? (lang === 'en' ? 'Projects' : 'Projets') + ' · ' : '') + 'Moyo Studio';
+    if (new URLSearchParams(location.search).has('projet')) history.replaceState(null, '', address()); // closed by the browser itself
+    opener?.focus({ preventScroll: true });
+  });
   dlg.addEventListener('cancel', e => { e.preventDefault(); closeSheet(); });
   dlg.addEventListener('keydown', e => { if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); });
   $('#pClose').addEventListener('click', closeSheet);
   $('#pNext').addEventListener('click', () => step(1)); $('#pNext2').addEventListener('click', () => step(1));
   $('#pPrev').addEventListener('click', () => step(-1));
+  const asked = () => { const id = new URLSearchParams(location.search).get('projet'); return id ? ALL.findIndex(p => p.id === id) : -1; };
+  addEventListener('popstate', () => { const i = asked(); if (i < 0) { pushed = false; hideSheet(); } else if (!dlg.open) { pushed = true; openSheet(i, false); } else if (i !== cur) fill(i); });
+  if (asked() >= 0) addEventListener('DOMContentLoaded', () => openSheet(asked(), false), { once: true }); // a shared address
 }
 
 /* ---------- Optical alignment: the ink of the first letter sits on the axis, not its invisible side bearing ----------
@@ -165,8 +217,8 @@ if (!reduce && typeof Lenis !== 'undefined') lenis = new Lenis({ lerp: .07, whee
 window.moyoScroll = y => { if (lenis) lenis.scrollTo(y, { duration: 1.6, easing: t => 1 - Math.pow(1 - t, 4), force: true }); else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); };
 function goTo(id) {
   const el = id === 'top' || id === 'main' || !id ? null : document.getElementById(id);
-  // a section is read once its glass edge has gone up: the title sits just under the header
-  const pad = el ? parseFloat(getComputedStyle(el).paddingTop) || 0 : 0, glass = el && root.classList.contains('stack') && el.matches('main>.sec') ? parseFloat(getComputedStyle(el, '::before').height) || 0 : 0;
+  // a sheet that passes over a screen is read once its glass edge has gone up: the title sits just under the header
+  const pad = el ? parseFloat(getComputedStyle(el).paddingTop) || 0 : 0, glass = el && root.classList.contains('stack') && el.matches('.over') ? parseFloat(getComputedStyle(el, '::before').height) || 0 : 0;
   const y = el ? Math.max(0, Math.round(moyoTop(el) + (el.matches('.mth.live') ? pad : glass ? glass - (innerWidth > 820 ? 96 : 64) : pad * .42))) : 0;
   const done = () => { if (el) { el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); } try { history.replaceState(null, '', el ? '#' + id : location.pathname + location.search); } catch (_) {} };
   if (lenis) lenis.scrollTo(y, { duration: clamp(1 + Math.abs(y - scrollY) / 3200, 1.2, 2.8), easing: t => 1 - Math.pow(1 - t, 4), force: true, onComplete: done });
@@ -212,16 +264,19 @@ if (form) {
   // three dots, one per required field: what is started wants to be finished
   const dots = $('.f-dots', form), need = [['name', f => f.value.trim().length > 1], ['email', f => !!f.value && f.validity.valid && /\.[a-z]{2,}$/i.test(f.value.trim())], ['message', f => f.value.trim().length >= 10]];
   const fillDots = () => { let n = 0; need.forEach(([k, ok], i) => { const y = ok(form.elements[k]); n += y; dots.children[i].classList.toggle('ok', y); }); dots.classList.toggle('full', n === 3); };
-  form.addEventListener('input', fillDots);
+  // what is wrong is said next to its field, when the field is left or the form is sent, and taken back as soon as it is right
+  const ERR = { name: ['Indiquez votre nom.', 'Please enter your name.'], email: ['Indiquez une adresse e-mail valide.', 'Please enter a valid email address.'], message: ['Votre message est un peu court.', 'Your message is a little short.'] };
+  const OK = { name: f => !!f.value.trim(), email: need[1][1], message: need[2][1] };
+  const mark = (k, bad) => { const f = form.elements[k]; if (bad) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid'); $('#e-' + k).textContent = bad ? ERR[k][lang === 'en' ? 1 : 0] : ''; };
+  form.addEventListener('input', e => { fillDots(); const k = e.target.name; if (OK[k] && e.target.hasAttribute('aria-invalid') && OK[k](e.target)) { mark(k, false); say3(''); } });
+  form.addEventListener('focusout', e => { const k = e.target.name; if (OK[k] && e.target.value.trim() && !OK[k](e.target)) mark(k, true); });
+  new MutationObserver(() => Object.keys(OK).forEach(k => { if (form.elements[k]?.hasAttribute('aria-invalid')) mark(k, true); })).observe(root, { attributes: true, attributeFilter: ['lang'] });
+  // a choice can be taken back
+  const chosen = {}; form.addEventListener('click', e => { const r = e.target; if (r.type !== 'radio') return; if (chosen[r.name] === r) { r.checked = false; chosen[r.name] = null; } else chosen[r.name] = r; });
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    const en = lang === 'en', f = form.elements;
-    [f.name, f.email, f.message].forEach(x => x.removeAttribute('aria-invalid'));
-    const bad = !f.name.value.trim() ? f.name : !f.email.value || !f.email.validity.valid ? f.email : f.message.value.trim().length < 10 ? f.message : null;
-    if (bad) {
-      bad.setAttribute('aria-invalid', 'true'); bad.focus();
-      return say3(bad === f.name ? (en ? 'Please enter your name.' : 'Indiquez votre nom.') : bad === f.email ? (en ? 'Please enter a valid email address.' : 'Indiquez une adresse e-mail valide.') : (en ? 'Your message is a little short.' : 'Votre message est un peu court.'), true);
-    }
+    const en = lang === 'en', wrong = Object.keys(OK).filter(k => { const bad = !OK[k](form.elements[k]); mark(k, bad); return bad; });
+    if (wrong.length) { form.elements[wrong[0]].focus(); return say3(en ? (wrong.length > 1 ? `${wrong.length} fields to check.` : 'One field to check.') : (wrong.length > 1 ? `${wrong.length} champs à vérifier.` : 'Un champ à vérifier.'), true); }
     const btn = $('.btn', form); btn.disabled = true; say3(en ? 'Sending…' : 'Envoi…');
     try {
       const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), lang }) });

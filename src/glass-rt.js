@@ -19,8 +19,8 @@
     const peak = snell(0), N = 256, lut = Float32Array.from({ length: N + 1 }, (_, i) => snell(i / N) / peak);
     const lens = (d, size, pull) => d < size ? lut[Math.round(d / size * N)] * pull : 0;
     let n = 0, t0 = 0;
-    /* one filter per size of glass: the footer, and the top edge of the sections (home) */
-    const sec = document.querySelector('html.stack main>.sec');
+    /* one filter per size of glass: the footer, and the top edge of the sheets that pass over a screen (home) */
+    const sec = document.querySelector('html.stack main>.over');
     const PANES = [[foot, v => foot.style.setProperty('--liquid', v)], [sec, v => document.documentElement.style.setProperty('--liquid-s', v)]].filter(p => p[0])
       .map(([el, set]) => ({ el, set, last: '', box: svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g')) }));
     const build = () => PANES.forEach(pane => {
