@@ -78,8 +78,8 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   const WORD = { see: ['Voir', 'View'], go: ['Aller', 'Go'], hold: ['Maintenir', 'Hold'] };
   const word = k => WORD[k][root.lang === 'en' ? 1 : 0];
   const asc = (() => { const m = new Map(); return (w, f) => { const k = w + f; if (!m.has(k)) { const x = document.createElement('canvas').getContext('2d'); x.font = `${w} 100px ${f}`; const q = x.measureText('M'); m.set(k, [q.fontBoundingBoxAscent / 100, q.fontBoundingBoxDescent / 100]); } return m.get(k); }; })();
-  const middle = (el, k = 1.18) => () => { const r = el.getBoundingClientRect(); return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2, s: r.width * k } : null; };
-  const place = l => () => { const p = l.querySelector('span'), a = getComputedStyle(p, '::after'), r = l.getBoundingClientRect(), w = parseFloat(a.width); return w ? { x: r.left + parseFloat(a.left) + w / 2, y: r.top + parseFloat(a.top) + w / 2, s: w * .5 } : null; }; // the empty place of a choice: a pupil in its ring
+  const middle = (el, k = 1.18) => () => { const r = el.getBoundingClientRect(); return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2, s: r.width * k, c: getComputedStyle(el).backgroundColor } : null; }; // it takes the colour of the dot it joins
+  const place = l => () => { const p = l.querySelector('span'), a = getComputedStyle(p, '::after'), r = l.getBoundingClientRect(), w = parseFloat(a.width); return w ? { x: r.left + parseFloat(a.left) + w / 2, y: r.top + parseFloat(a.top) + w / 2, s: w * .5, c: '#002FA7' } : null; }; // the empty place of a choice: a pupil in its ring
 
   function pick(t) {
     if (!t || root.classList.contains('holding')) return { m: 'free' };
@@ -140,7 +140,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const bv = Math.hypot(bvx, bvy), be = reduce ? 0 : clamp(bv / 4200, 0, .55);
     part.style.width = part.style.height = bs.toFixed(2) + 'px';
     part.style.transform = `translate(${(bx - x - bs / 2).toFixed(2)}px,${(by - y - bs / 2).toFixed(2)}px)` + (be > .01 ? ` rotate(${Math.atan2(bvy, bvx).toFixed(3)}rad) scale(${(1 + be).toFixed(3)},${(1 / (1 + be)).toFixed(3)})` : '');
-    if (to && t - seen > 120) { seen = t; part.classList.toggle('inv', under(to.x, to.y) < .5); }
+    if (to && t - seen > 120) { seen = t; part.style.background = to.c || ''; part.classList.toggle('inv', !to.c && under(to.x, to.y) < .5); }
     if (to || bs > 0 || Math.abs(ts - s) > .1 || sp > 6) raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
