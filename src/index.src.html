@@ -729,9 +729,9 @@ __BURGER_CSS__
 .sub-row input[type=email]{flex:1 1 220px;min-width:0;font:inherit;font-size:clamp(1.125rem,1.4vw,1.375rem);font-weight:300;color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;padding:6px 0 12px;outline:none;transition:border-color var(--dur-1)}
 .sub-row input[type=email]::placeholder{color:color-mix(in oklab,var(--paper) 45%,transparent)}
 .sub-row input[type=email]:focus-visible{border-color:var(--paper)}
-.sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:var(--paper);color:var(--klein);font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
+.sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:transparent;color:var(--paper);border:1px solid currentColor;font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
 .sub-btn::after{content:"→"}
-.sub-btn:hover{gap:26px;background:color-mix(in oklab,var(--paper) 90%,var(--klein))}
+.sub-btn:hover{gap:26px;background:var(--paper);color:var(--klein)}
 .sub-btn:focus-visible{outline:2px solid var(--paper);outline-offset:4px}
 .sub-btn:disabled{opacity:.6;cursor:progress;gap:16px}
 .sub-msg{margin-top:16px;min-height:1.3em;opacity:.85}
@@ -1068,6 +1068,21 @@ __LANG_CSS__
 }
 @keyframes langOut{to{opacity:0;filter:blur(8px)}}
 @keyframes langIn{from{opacity:0;filter:blur(8px)}}
+
+/* ---------- Harmonisation (after a full pass): one rhythm, one weight for lists, one button language, more air ---------- */
+.list li{padding:clamp(30px,4.2vh,46px) 0 clamp(32px,4.6vh,50px)}
+.list h3{font-weight:300;letter-spacing:-.025em;margin-bottom:10px}
+.list p{max-width:38ch;line-height:1.6}
+.steps li{gap:0 12px}
+@media (min-width:901px){
+  .two{gap:72px clamp(24px,3.4vw,64px)}
+  .two>section:first-of-type{grid-column:1/6}
+  .two>section:last-of-type{grid-column:7/-1}
+}
+.contact .send{background:transparent;color:var(--paper);border:1px solid currentColor;min-height:60px;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-3),color var(--dur-3)}
+.contact .send:hover{background:var(--paper);color:color-mix(in oklab,var(--klein) 50%,#000614)}
+.contact .chips{gap:12px}
+.contact .fld{margin-bottom:clamp(8px,1.6vh,20px)}
 </style>
 <noscript><style>#langBtn,.sunui,.hint{display:none}</style></noscript>
 </head>

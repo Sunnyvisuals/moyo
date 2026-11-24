@@ -207,9 +207,9 @@ const FOOTER_CSS = `
 .sub-row input[type=email]{flex:1 1 220px;min-width:0;font:inherit;font-size:clamp(1.125rem,1.4vw,1.375rem);font-weight:300;color:var(--paper);background:transparent;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;padding:6px 0 12px;outline:none;transition:border-color var(--dur-1)}
 .sub-row input[type=email]::placeholder{color:color-mix(in oklab,var(--paper) 78%,var(--klein))}
 .sub-row input[type=email]:focus-visible{border-color:var(--paper)}
-.sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:var(--paper);color:var(--klein);font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
+.sub-btn{flex:none;display:inline-flex;align-items:center;gap:16px;min-height:52px;padding:0 24px;background:transparent;color:var(--paper);border:1px solid currentColor;font:inherit;font-size:.9375rem;font-weight:550;cursor:pointer;transition:gap var(--dur-3) var(--ease-enter),background var(--dur-1)}
 .sub-btn::after{content:"→"}
-.sub-btn:hover{gap:26px;background:color-mix(in oklab,var(--paper) 90%,var(--klein))}
+.sub-btn:hover{gap:26px;background:var(--paper);color:var(--klein)}
 .sub-btn:focus-visible{outline:2px solid var(--paper);outline-offset:4px}
 .sub-btn:disabled{opacity:.6;cursor:progress;gap:16px}
 .sub-msg{margin-top:16px;min-height:1.3em;opacity:.85}

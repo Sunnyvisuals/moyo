@@ -12,7 +12,7 @@
     '#studio': [[74, 34, 8, 'deux regards', 'two pairs of eyes'], [40, 88, 4, 'sites, films, campagnes', 'websites, films, campaigns']],
     '#equipe': [[50, 8, -7, 'une agence, quatre mains', 'one agency, four hands'], [56, 66, 8, 'on se comprend', 'we understand each other']],
     '#contact': [[3, 72, 6, 'tout commence ici', 'it all starts here'], [33, 92, -4, 'et si on créait ensemble', 'what if we made it together']],
-    '#foot': [[46, 43, -6, 'créer, filmer, raconter', 'create, film, tell'], [68, 57, 8, 'à bientôt chez moyo', 'see you soon at moyo']],
+    '#foot': [[46, 43, -6, 'créer, filmer, raconter', 'create, film, tell']],
     '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern'], [58, 88, 5, 'et le vôtre', 'and yours']],
     '.who-page': [[66, 46, 7, 'imaginer ensemble', 'imagine together'], [40, 14, -8, 'la main avant l’outil', 'the hand before the tool']]
   };
@@ -70,7 +70,7 @@ html.js .scr i,.scr i{color:var(--ink);opacity:0;transition:opacity .3s ease}
     document.querySelectorAll('.scr').forEach(d => {
       const host = d.parentElement, H = host.getBoundingClientRect(), obs = obstacles(host, H), m = innerWidth < 821 ? 18 : 36, k0 = H.width / (host.offsetWidth || 1);
       const base = innerWidth < 821 ? 48 : 72;
-      const cap = innerWidth < 821 ? 2 : 3; let shown = 0;
+      const cap = innerWidth < 821 ? 1 : 2; let shown = 0;
       for (const q of d.children) {
         q.hidden = false; let done = false;
         if (shown >= cap) { q.hidden = true; continue; }
