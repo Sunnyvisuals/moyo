@@ -14,7 +14,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
 - **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe. Trois passages seulement se font l'un sur l'autre, avec le bord de verre : les projets sur la première phrase, le studio sur la méthode, le pied de page sur le contact (classe `.over`, `src/stack.js`). Une image naît d'un seul point, qui se divise jusqu'à la former (`src/divide.js`) ; celle d'une carte devient celle de la fiche (View Transitions). « Moins de mouvement », en bas de page, coupe tout.
-- **Chemin** : une ligne dans la marge (accueil), un fil d'Ariane et une étape suivante (autres pages), une page 404.
+- **Chemin** : une ligne et un point dans la marge, qui s'ouvre sur les noms au survol ou au clavier (accueil), un fil d'Ariane et une étape suivante (autres pages), une page 404.
 
 ## Contenu
 

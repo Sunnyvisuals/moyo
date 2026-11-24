@@ -183,48 +183,41 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 }
 
 /* ---------- The way ----------
-   Home: a line in the margin, one stop per section, the dot travels on it with the scroll (path.js). Hover or focus: the names.
-   Other pages: the same line laid flat above the title (where you come from, where you are), and the next stop at the end. */
-.path{position:fixed;z-index:60;right:0;top:50%;width:var(--edge);height:min(46vh,440px);translate:0 -50%;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s}
-.path.on{opacity:1;visibility:visible;transition:opacity .6s ease}
+   Home: one line and one dot in the margin, the dot travels with the scroll (path.js). Pointed at or focused, the line opens on the names.
+   Other pages: the same line laid flat above the title (where you come from, where you are), and the next stop at the end.
+   --p: where the dot is (0 to 1), --k: how much the line is open, --row: the height of a name. */
+@property --k{syntax:"<number>";inherits:true;initial-value:.46}
+.path{--row:clamp(38px,calc(var(--w) * .0232),54px);--pw:min(var(--edge),64px);--px:calc(var(--edge) / 2);--pd:clamp(11px,calc(var(--w) * .0074),17px);--k:.46;
+  position:fixed;z-index:60;right:calc(var(--px) - var(--pw) / 2);top:50%;width:var(--pw);height:calc(var(--row) * 7);translate:0 -50%;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s,--k .8s var(--ease)}
+.path.on{opacity:1;visibility:visible;transition:opacity .6s ease,--k .8s var(--ease)}
+.path.open{--k:1}
 .path.end{opacity:1;visibility:visible;pointer-events:none}
 .path.end>:not(.path-d){opacity:0;visibility:hidden;transition:opacity .4s}
 .path.gone .path-d{opacity:0}
-.path-l{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgb(18 18 20 / .2)}
-.path-l::after{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:var(--klein);transform-origin:50% 0;transform:scaleY(var(--pp,0))}
-.path ol{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between}
-.path li{position:relative;height:0}
-.path a{position:absolute;right:0;top:-22px;width:100%;height:44px;display:grid;place-items:center}
-.path a::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--bg);box-shadow:0 0 0 1px rgb(18 18 20 / .4);transition:background .4s,box-shadow .4s}
-.path a.past::before{background:var(--klein);box-shadow:0 0 0 1px var(--klein)}
-.path a span{position:absolute;right:calc(50% + 22px);font-size:var(--fs-small);font-weight:500;white-space:nowrap;opacity:0;translate:10px 0;transition:opacity .35s ease,translate .6s var(--ease),color .3s;pointer-events:none}
-.path a[aria-current]{color:var(--klein)}
-.path a:hover{color:var(--klein)}
-.path{--pd:clamp(13px,calc(var(--w) * .0078),19px)}
-.path-d{position:absolute;left:50%;top:0;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 var(--py,0px);pointer-events:none}
-.path-h{display:none;position:absolute;left:calc(50% + var(--pd) * .62);top:0;font-size:clamp(14px,calc(var(--w) * .0088),21px);line-height:1;font-weight:500;white-space:nowrap;writing-mode:vertical-rl;translate:0 calc(var(--py,0px) - 50%);opacity:var(--ho,1);transition:opacity .3s ease;pointer-events:none}
-.path::before{content:"";position:absolute;right:0;top:-50vh;bottom:-50vh;width:calc(var(--edge) * .5 + 230px);background:linear-gradient(to left,var(--bg) 62%,rgb(245 244 240 / 0));opacity:0;transition:opacity .4s ease;pointer-events:none}
-.path-b{display:none}
-@media (min-width:1300px){.path-h{display:block}}
-@media (hover:hover) and (min-width:821px){
-  .path:hover::before{opacity:1}
-  .path:hover a span{opacity:1;translate:0 0;transition-delay:calc(var(--i) * 25ms),calc(var(--i) * 25ms),0s}
-  .path:hover .path-h{opacity:0}
+.path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--k);pointer-events:none}
+.path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((var(--p,0) - .5) * var(--row) * 6 * var(--k));pointer-events:none}
+.path ol{position:absolute;right:50%;top:0}
+.path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);padding:0 28px 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
+.path a span{opacity:0;translate:10px 0;transition:opacity .2s ease,translate .4s ease,color .3s}
+.path a[aria-current]{color:var(--ink)}
+.path a:hover,.path a:focus-visible{color:var(--klein)}
+.path a:focus-visible{outline:0}.path a:focus-visible span{outline:2px solid var(--klein);outline-offset:6px}
+.path.open a{pointer-events:auto}
+.path.open a span{opacity:1;translate:0 0;transition:opacity .4s ease calc(var(--i) * 24ms),translate .8s var(--ease) calc(var(--i) * 24ms),color .3s}
+/* paper under the names, only while they are there */
+.path::before{content:"";position:absolute;z-index:-1;right:calc(50% - var(--px));top:-50vh;bottom:-50vh;width:calc(var(--px) + 250px);background:linear-gradient(to left,var(--bg) 58%,rgb(245 244 240 / 0));opacity:0;transition:opacity .4s ease;pointer-events:none}
+.path.open::before{opacity:1}
+/* very large screens: the line stays near the page, and the names have the margin for themselves */
+@media (min-width:2400px){
+  .path{--px:calc(var(--edge) - 72px)}
+  .path ol{right:auto;left:50%}
+  .path a{justify-content:flex-start;padding:0 48px 0 30px}
+  .path a span{translate:-10px 0}
+  .path::before{display:none}
 }
-.path:focus-within::before{opacity:1}
-.path:focus-within a span{opacity:1;translate:0 0}
-.path:focus-within .path-h{opacity:0}
 @media (max-width:820px){
-  .path{right:auto;left:var(--m);top:auto;bottom:max(14px,env(safe-area-inset-bottom));width:auto;height:auto;translate:none}
-  .path.end{opacity:0;visibility:hidden}
-  .path::before,.path-l,.path-d,.path-h{display:none}
-  .path-b{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 18px 0 16px;border-radius:999px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 8px 24px -10px rgb(18 18 20 / .25);font-size:var(--fs-small);font-weight:600}
-  .path-b::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--klein)}
-  .path ol{inset:auto auto calc(100% + 10px) 0;display:none;min-width:200px;padding:10px 0;border-radius:22px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 12px 32px -12px rgb(18 18 20 / .3)}
-  .path.open ol{display:block}
-  .path li{height:auto}
-  .path a{position:static;width:auto;height:auto;min-height:44px;display:flex;align-items:center;gap:14px;padding:0 20px}
-  .path a span,.path:focus-within a span{position:static;opacity:1;translate:none}
+  .path{--row:16px;--pd:9px;--k:1;pointer-events:none}
+  .path ol,.path::before{display:none}
 }
 .crumbs ol{display:flex;flex-wrap:wrap;align-items:center;font-size:var(--fs-small);font-weight:500}
 .crumbs li{display:inline-flex;align-items:center}

@@ -65,7 +65,8 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (t.closest('.eye .hit')) return { m: 'say', w: 'hold' };
     if (t.closest('.pv-frame')) return { m: 'say', w: 'go' };
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
-    if (t.closest('.btn,.chips label,.sub-btn,#menuBtn,.menu-close,.path a,.path-b,.path')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
+    const way = t.closest('.path'); if (way) return t.closest('a') ? { m: 'dot', el: way.querySelector('.path-d') } : { m: 'free' }; // it joins the dot of the way
+    if (t.closest('.btn,.chips label,.sub-btn,#menuBtn,.menu-close')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     if (t.closest('.foot-cta')) return { m: 'dot', el: t.closest('.foot-cta').querySelector('.qd') };
     const row = t.closest('.row'); if (row) return { m: 'dock', el: row.querySelector('.r-title') };
     const nm = t.closest('.nm-link'); if (nm) return { m: 'dock', el: nm.querySelector('.nm') };
