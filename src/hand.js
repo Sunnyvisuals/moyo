@@ -11,7 +11,7 @@
     '#services': [[34, 2.5, -7, 'une idée, une seule', 'one idea, only one'], [2, 92, 4, 'du croquis à l’écran', 'from sketch to screen']],
     '#studio': [[74, 34, 8, 'deux regards', 'two pairs of eyes'], [40, 88, 4, 'sites, films, campagnes', 'websites, films, campaigns']],
     '#equipe': [[50, 8, -7, 'une agence, quatre mains', 'one agency, four hands'], [56, 66, 8, 'on se comprend', 'we understand each other']],
-    '#contact': [[46, 4, -6, 'parlons de votre marque', 'let’s talk about your brand'], [3, 72, 6, 'tout commence ici', 'it all starts here'], [33, 92, -4, 'et si on créait ensemble', 'what if we made it together']],
+    '#contact': [[3, 72, 6, 'tout commence ici', 'it all starts here'], [33, 92, -4, 'et si on créait ensemble', 'what if we made it together']],
     '#foot': [[46, 43, -6, 'créer, filmer, raconter', 'create, film, tell'], [68, 57, 8, 'à bientôt chez moyo', 'see you soon at moyo']],
     '.projects-page': [[44, 14, -5, 'chaque projet a son motif', 'every project has its pattern'], [58, 88, 5, 'et le vôtre', 'and yours']],
     '.who-page': [[66, 46, 7, 'imaginer ensemble', 'imagine together'], [40, 14, -8, 'la main avant l’outil', 'the hand before the tool']]
