@@ -1087,6 +1087,8 @@ __LANG_CSS__
 .contact .ct-lead{font-weight:300;line-height:1.55}
 .statement,.intro .lead{font-weight:300}
 .contact .fld{margin-bottom:clamp(8px,1.6vh,20px)}
+/* the opening page is removed: the site starts on the approach */
+.hero{display:none!important}
 </style>
 <noscript><style>#langBtn,.sunui,.hint{display:none}</style></noscript>
 </head>
@@ -1203,7 +1205,6 @@ __LANG_CSS__
   <div class="wrap">
     <h2 class="sr" id="projT" data-i="projT">Projets choisis.</h2>
     <div class="acc" id="projects" role="list">__ROWS__</div>
-    <div class="proj-more"><a class="link" href="/projets" data-i="allL">Tous les projets, par catégorie</a></div>
     <script type="application/json" id="moyo-data">__DATA__</script>
   </div>
 </section>
@@ -1359,8 +1360,6 @@ __FOOTER_INNER__
 <script src="/count.js" defer></script>
 <script src="/glass.js" defer></script>
 <script src="/stage.js" defer></script>
-<script src="/fw.js" defer></script>
-<script src="/wr.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/roll.js" defer></script>
 <script src="/leave.js" defer></script>
