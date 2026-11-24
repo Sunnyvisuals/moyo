@@ -288,8 +288,7 @@ const footerInner = ({ home = false, team } = {}) => {
       <h2 class="fh" id="fNavT" data-i="fNav">Plan du site</h2>
       <ul>
 ${home ? "" : `        <li><a href="/" data-i="home">Accueil</a></li>
-`}        <li><a href="${h}approche" data-i="${home ? 'sec.intro' : 'sIntro'}">Approche</a></li>
-        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets choisis</a></li>
+`}        <li><a href="${h}projets" data-i="${home ? 'sec.projects' : 'sProj'}">Projets choisis</a></li>
         <li><a href="/projets" data-i="${home ? 'sec.all' : 'allL'}">Tous les projets</a></li>
         <li><a href="${h}services" data-i="${home ? 'sec.services' : 'sSvc'}">Services</a></li>
         <li><a href="${h}studio" data-i="${home ? 'sec.studio' : 'sStu'}">Agence</a></li>
@@ -321,3 +320,117 @@ ${footerInner({ team })}
 </footer>`;
 
 export { creditLinks, GLASS_CSS, BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, footerInner, footerHTML };
+
+/* Bold version of the whole site: heavier type, massive titles, thicker rules and buttons. One layer shared by every page.
+   (prefixed with "html body" so it wins over the page styles whatever their order) */
+export const BOLD_CSS = `
+html:root body{font-weight:500}
+html:root body .display,html:root body .menu-list .mn,html:root body .head h1,html:root body .who h1,html:root body .nm,html:root body .team-t,html:root body .entry-t{font-weight:700;letter-spacing:-.05em}
+html:root body .bar-mark,html:root body .menu-mark{font-weight:800!important}
+html:root body .lead,html:root body .statement,html:root body .ct-lead,html:root body .bio,html:root body .list p,html:root body .head p,html:root body .small,html:root body p{font-weight:500}
+html:root body .list h3,html:root body .fh2,html:root body .fnames li,html:root body .r-name{font-weight:700;letter-spacing:-.03em}
+html:root body .fh,html:root body .idx,html:root body .fl,html:root body .ttl,html:root body .r-year,html:root body .r-place,html:root body .r-type,html:root body .lbl{font-weight:700}
+html:root body .link,html:root body .send,html:root body .sub-btn,html:root body .contact .chips span,html:root body .filters button,html:root body .filters a{font-weight:700;border-width:2px}
+html:root body .list li,html:root body .names li,html:root body .nm-link,html:root body .foot-base,html:root body .sec-head,html:root body .idx::after{border-width:2px}
+html:root body .fcol a,html:root body .foot-base a{font-weight:600}
+html:root body input,html:root body textarea{font-weight:500}
+
+/* ---------- One grid for every page: 12 columns, 1500px at most, two axes (column 1 and column 7). Nothing drifts. ---------- */
+:root{--edge:max(var(--m),calc((100vw - 1500px) / 2));--gut:clamp(16px,2vw,32px)}
+html:root body .bar{padding-left:var(--edge);padding-right:var(--edge)}
+html:root #langBtn,html:root .dots,html:root #fDate{display:none!important}
+html:root body .par{animation:none!important;translate:none!important}
+/* titles: solid, still, no effect */
+html:root body .display,html:root body .nm,html:root body .entry-w,html:root body .entry-w .c,html:root body .head h1,html:root body .who h1{animation:none!important;clip-path:none!important;-webkit-mask-image:none!important;mask-image:none!important;background:none!important;-webkit-text-fill-color:currentColor!important;translate:none!important;color:var(--klein)}
+html:root body .display,html:root body .head h1,html:root body .who h1{font-size:clamp(2.5rem,5.2vw,5.5rem);line-height:1.04;margin-left:-.035em}
+html:root body .nm{margin-left:-.035em;line-height:1.2}
+html:root body .entry-w{font-weight:700}
+html:root body .stg{--sy:0px}
+html:root body .bio,html:root body .ct-lead,html:root body .statement{font-size:clamp(1.125rem,1.35vw,1.375rem);line-height:1.6;max-width:42ch;letter-spacing:-.01em}
+/* footer on the same axes */
+html:root body .foot-grid,html:root body .foot-base{column-gap:var(--gut)}
+html:root body .fh{font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px}
+html:root body .fcol ul{gap:6px}
+html:root body .foot-base{margin-top:clamp(72px,12vh,140px)}
+@media (min-width:901px){
+  html:root body .two{column-gap:var(--gut);row-gap:0;grid-template-rows:auto auto repeat(7,auto)}
+  html:root body .two>.idx{margin-bottom:clamp(56px,9vh,104px)}
+  html:root body .two>section{display:grid;grid-template-rows:subgrid;grid-row:2/span 8}
+  html:root body .two>section:first-of-type{grid-column:1/6}
+  html:root body .two>section:last-of-type{grid-column:7/-1}
+  html:root body .two>section>.list{display:grid;grid-template-rows:subgrid;grid-row:2/span 7}
+  html:root body .steps li{grid-template-columns:1fr auto;align-content:start}
+  html:root body .steps li::before{order:2;padding-top:.35rem}
+  html:root body .studio .wrap>.display{grid-column:1/7;margin:0 0 0 -.035em}
+  html:root body .studio .wrap>.statement{grid-column:7/-1!important;margin-top:.3em}
+  html:root body .entry{align-items:start}
+  html:root body .entry-w{grid-column:1/7}
+  html:root body .entry-d{grid-column:7/-1}
+  html:root body .ct-grid{column-gap:var(--gut)}
+  html:root body .ct-side{grid-column:1/6}
+  html:root body .ct-form{grid-column:7/-1}
+  html:root body .head h1{grid-column:1/7}
+  html:root body .head p{grid-column:7/-1;justify-self:start;text-align:left}
+  html:root body .projects{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gut);row-gap:clamp(64px,9vw,136px)}
+  html:root body .who{padding-top:0}
+  html:root body .photo{grid-column:1/6}
+  html:root body .foot-base{display:grid;grid-template-columns:repeat(12,minmax(0,1fr))}
+  html:root body .foot-base>:first-child{grid-column:1/7}
+  html:root body .foot-base>.flang{grid-column:7/10}
+  html:root body .foot-base>a{grid-column:10/-1;justify-self:start}
+}
+
+/* ---------- Ink: black text on off-white; blue only as touches (logo, links, buttons, index marks, hover, footer) ---------- */
+:root:root{--ink:#15171c;--soft:#50545d;--line:rgb(21 23 28 / .16)}
+html:root body{color:var(--ink)}
+html:root body main .display,html:root body .nm,html:root body .entry-w,html:root body .head h1,html:root body .who h1,html:root body .statement,html:root body .list h3,html:root body .names a,html:root body .ct-lead,html:root body .fld input,html:root body .fld textarea,html:root body .row,html:root body .bio{color:var(--ink)}
+html:root body .sec:not(.blue):not(.foot){color:var(--ink)}
+html:root body .sec.light{--paper:var(--ink);--paper-soft:var(--soft);--paper-line:rgb(21 23 28 / .22)}
+html:root body main .link,html:root body main .idx .sq,html:root body .ct-mail,html:root body .nm-link::after{color:var(--klein)}
+html:root body .nm-link:hover .nm{color:var(--klein)}
+html:root body .nm{transition:color .5s cubic-bezier(.16,1,.3,1)}
+html:root body main .link:hover,html:root body main .link:focus-visible{color:var(--chaux)}
+html:root body .contact .chips span{border-color:rgb(21 23 28 / .3)}
+html:root body .contact .chips input:checked+span{border-color:var(--klein)}
+/* the colour bands are gone */
+html:root body .blocks{display:none!important}
+/* ---------- One section skeleton: label, then title on the first axis and content on the second ---------- */
+html:root body main>.sec:not(#projets){padding-top:clamp(112px,18vh,208px)!important;padding-bottom:clamp(112px,18vh,208px)!important}
+html:root body main>.sec .idx{margin-bottom:clamp(48px,8vh,88px)!important}
+html:root body .display,html:root body .head h1,html:root body .who h1{font-size:clamp(2.25rem,4vw,4.25rem);margin-bottom:0;text-wrap:balance}
+html:root body .list li:first-child{border-top:0;padding-top:.35em}
+@media (min-width:901px){
+  html:root body .two{display:block}
+  html:root body .two>section{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);grid-template-rows:none}
+  html:root body .two>section>.display{grid-column:1/6}
+  html:root body .two>section>.list{display:block;grid-column:7/-1;grid-row:1}
+  html:root body .two>section+section{margin-top:clamp(112px,18vh,208px)}
+  html:root body .list li{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gut);align-items:baseline}
+  html:root body .steps li{grid-template-columns:1fr}
+  html:root body .steps li>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gut);align-items:baseline}
+  html:root body .steps li::before{display:none}
+  html:root body .list h3{margin:0;font-size:1.25rem}
+  html:root body .list p{max-width:none}
+  html:root body .list li{padding:28px 0}
+  html:root body .studio .wrap>.statement{margin-top:.2em}
+  html:root body .team .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut)}
+  html:root body .team .wrap>.idx{grid-column:1/-1}
+  html:root body .team .sec-head{grid-column:1/7;display:block;margin:0}
+  html:root body .team .names{grid-column:7/-1;margin:0;border-top:0}
+  html:root body .team .names li:first-child{padding-top:0}
+  html:root body .team .studio-cta{grid-column:7/-1}
+  html:root body .nm{font-size:clamp(1.75rem,3vw,3.25rem);margin-left:-.03em}
+}
+/* sections follow each other plainly (no overlap, no grey veil); only Contact stays put under the glass footer */
+html.stack main>.sec:not(#contact){position:relative!important;top:auto!important}
+html:root main>.sec::after{opacity:0!important}
+html:root body .monument{transform-origin:0 100%;scale:.98 1}
+html:root body .f-foot{margin-top:32px}
+@media (max-width:900px){
+  html:root body .two{gap:0}
+  html:root body .two>section>.display{margin-bottom:28px}
+  html:root body .two>section+section{margin-top:96px}
+  html:root body .steps li{display:block}
+  html:root body .steps li::before{display:none}
+}
+`;

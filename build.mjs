@@ -15,7 +15,7 @@ const out = (p, s) => { fs.mkdirSync(path.dirname(r(p)), { recursive: true }); f
 const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k).join(v), s);
 
 const { rowsHTML, cardsHTML, featuredOf, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
-const { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerInner, footerHTML } = await import(pathToFileURL(r('shared/chrome.js')).href);
+const { BURGER_CSS, CHROME_CSS, LANG_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, BOLD_CSS, footerInner, footerHTML } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
 const renderSrc = read('shared/render.js').replace(/^export \{[^}]*\};?\s*$/m, '');
 if (/^\s*export\b/m.test(renderSrc)) throw new Error('shared/render.js: keep `export` on the last line only');
@@ -33,7 +33,7 @@ const sizes = {
     __RENDER__: renderSrc,
     __BURGER_CSS__: BURGER_CSS,
     __GLASS_CSS__: GLASS_CSS,
-    __LANG_CSS__: LANG_CSS,
+    __LANG_CSS__: LANG_CSS + BOLD_CSS,
     __FOOTER_INNER__: footerInner({ home: true }),
     __ROWS__: cardsHTML(featuredOf(seed), 'fr'),
     __DATA__: dataJSON(seed)
@@ -43,7 +43,7 @@ const sizes = {
     __ROWS__: rowsHTML(seed.projects, 'fr'),
     __DATA__: dataJSON(seed),
     __LENIS__: lenis,
-    __CHROME_CSS__: CHROME_CSS + LANG_CSS + FOOTER_CSS + GLASS_CSS,
+    __CHROME_CSS__: CHROME_CSS + LANG_CSS + FOOTER_CSS + GLASS_CSS + BOLD_CSS,
     __CHROME_HEAD__: chromeHead(2),
     __FOOTER__: footerHTML()
   })),
