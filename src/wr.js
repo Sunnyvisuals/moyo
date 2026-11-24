@@ -14,10 +14,9 @@
 .wr.shut.par{animation:par linear both;animation-timeline:--v;animation-range:cover 0% cover 100%}
 .wr-ln{display:block;overflow:hidden;padding:.12em .08em .17em;margin:-.12em -.08em -.17em}
 .wr-w{display:inline-block;transform:translateY(118%);opacity:0;filter:blur(7px);
-  transition:transform .5s ${EASE} calc(var(--k) * 28ms),opacity .35s ease calc(var(--k) * 28ms),filter .4s ease calc(var(--k) * 28ms)}
+  transition:transform 1.1s ${EASE} calc(var(--k) * 70ms),opacity .9s ease calc(var(--k) * 70ms),filter 1s ease calc(var(--k) * 70ms)}
 .wr.in .wr-w{transform:none;opacity:1;filter:blur(0);
-  transition:transform 1.05s ${EASE} calc(var(--k) * 75ms),opacity .8s ease calc(var(--k) * 75ms),filter .9s ease calc(var(--k) * 75ms)}
-.wr.out .wr-w{transform:translateY(-118%)}
+  transition:transform 1.7s ${EASE} calc(var(--k) * 130ms),opacity 1.3s ease calc(var(--k) * 130ms),filter 1.4s ease calc(var(--k) * 130ms)}
 .wr.grad{background:none!important;-webkit-text-fill-color:currentColor}
 .wr.grad .wr-w{background-image:radial-gradient(circle at 50% 50%,var(--dot) .7px,#0000 1.1px),linear-gradient(90deg,var(--g1) 0%,var(--g1) 38%,var(--g2) 56%,var(--g3) 78%,var(--g3) 100%);
   background-size:4px 4px,calc(var(--W) * 2.6) 100%;background-position:0 0,calc(var(--ox) * -1 - var(--W) * 1.6 * (1 - var(--g))) 0;
@@ -46,14 +45,12 @@
     requestAnimationFrame(() => { el._wrBusy = false; });
   };
 
+  // in when the title is well inside the screen; out (the same animation played back) as it goes up under the header or down again
   const io = new IntersectionObserver(entries => entries.forEach(en => {
-    const el = en.target, s = state.get(el);
-    if (en.isIntersecting) { if (s !== 'in') { el.classList.remove('out'); el.classList.add('in'); state.set(el, 'in'); } }
-    else if (s === 'in') {
-      if (en.boundingClientRect.top < 0) { el.classList.remove('in'); el.classList.add('out'); state.set(el, 'out'); }
-      else { el.classList.remove('in', 'out'); state.delete(el); }
-    } else if (s === 'out' && en.boundingClientRect.top > 0) { el.classList.remove('out'); state.delete(el); }
-  }), { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+    const el = en.target;
+    if (en.isIntersecting) { if (state.get(el) !== 'in') { el.classList.add('in'); state.set(el, 'in'); } }
+    else if (state.get(el) === 'in') { el.classList.remove('in'); state.delete(el); }
+  }), { threshold: 0, rootMargin: '-14% 0px -34% 0px' });
 
   const els = [...document.querySelectorAll(TARGETS)].filter(e => !e.children.length || e.querySelector('.ln,.c,.w') === null);
   els.forEach(el => {
