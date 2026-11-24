@@ -4,8 +4,7 @@
    - they look away if you stare (Goffman: civil inattention), then steal a glance,
    - left alone, they look at "On se voit ?": we follow other people's eyes without deciding to,
    - they dilate in front of what interests them, wink for each founder, fall asleep when nobody moves, go round with joy on sign-up.
-   Hold an eye: it dilates until the whole footer is a blue monochrome, with one sustained chord (after Yves Klein's
-   Monotone-Silence Symphony, a D major chord then silence). Let go: silence.
+   Hold an eye: it dilates until the whole footer is a blue monochrome (after Yves Klein). Let go: it closes. No sound.
    Nothing is stored or sent: the time spent together lives in memory only. With reduced motion the eyes stay still. */
 (() => {
 'use strict';
@@ -126,7 +125,7 @@ if (!reduce) {
 }
 fit(); document.fonts?.ready.then(fit); new MutationObserver(() => setTimeout(fit, 80)).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] }); addEventListener('resize', () => { clearTimeout(fit.t); fit.t = setTimeout(fit, 120); });
 
-/* ---------- hold: monochrome and one chord ---------- */
+/* ---------- hold: monochrome ---------- */
 let layer = null, p = 0, dir = 0, fx = 0, fy = 0, r0 = 40, RM = 2000, fraf = 0, flast = 0;
 function build() {
   if (!layer) { layer = document.createElement('div'); layer.className = 'flood'; layer.setAttribute('aria-hidden', 'true'); layer.inert = true; }
@@ -135,7 +134,7 @@ function build() {
   [...foot.children].forEach(ch => layer.appendChild(ch.cloneNode(true)));
   $$('[id]', layer).forEach(e => e.removeAttribute('id')); $$('input', layer).forEach((e, i) => { e.value = ins[i]; e.removeAttribute('name'); });
   const note = $('.foot-note p', layer), hold = $('.hold', layer);
-  if (note) note.textContent = en() ? 'Monotone-Silence Symphony, after Yves Klein.' : 'Symphonie Monotone-Silence, d’après Yves Klein.';
+  if (note) note.textContent = en() ? 'Monochrome, after Yves Klein.' : 'Monochrome, d’après Yves Klein.';
   if (hold) hold.textContent = en() ? 'Let go' : 'Relâchez';
   foot.appendChild(layer);
 }
@@ -143,13 +142,12 @@ function paint() {
   const k = Math.pow(p, 2.3);
   layer.style.clipPath = `circle(${(r0 + (RM - r0) * k).toFixed(1)}px at ${fx.toFixed(1)}px ${fy.toFixed(1)}px)`;
   document.documentElement.classList.toggle('mono', p > .45);
-  chord.level(p);
 }
 function tick(t) {
   fraf = 0; const dt = Math.min(.05, (t - (flast || t)) / 1000); flast = t;
   p = clamp(p + (dir > 0 ? dt / 1.6 : -dt / 1.05)); paint();
-  if (dir < 0 && p <= 0) { dir = 0; layer.remove(); document.documentElement.classList.remove('mono'); chord.stop(); return; }
-  if (dir > 0 && p >= 1) { chord.level(1); return; }
+  if (dir < 0 && p <= 0) { dir = 0; layer.remove(); document.documentElement.classList.remove('mono'); return; }
+  if (dir > 0 && p >= 1) return;
   fraf = requestAnimationFrame(tick);
 }
 function press(i) {
@@ -160,13 +158,13 @@ function press(i) {
     fx = (reduce ? h.left + h.width / 2 : r.left + r.width / 2) - f.left; fy = (reduce ? h.top + h.height / 2 : r.top + r.height / 2) - f.top;
     RM = Math.hypot(Math.max(fx, f.width - fx), Math.max(fy, f.height - fy)) + 8; p = 0;
   }
-  dir = 1; chord.start(); document.documentElement.classList.add('holding');
+  dir = 1; document.documentElement.classList.add('holding');
   if (reduce) { p = 1; paint(); return; }
   flast = 0; if (!fraf) fraf = requestAnimationFrame(tick);
 }
 function release() {
   if (dir <= 0) return; dir = -1; alive(); document.documentElement.classList.remove('holding');
-  if (reduce) { p = 0; dir = 0; layer.remove(); document.documentElement.classList.remove('mono'); chord.stop(); return; }
+  if (reduce) { p = 0; dir = 0; layer.remove(); document.documentElement.classList.remove('mono'); return; }
   flast = 0; if (!fraf) fraf = requestAnimationFrame(tick);
 }
 eyes.forEach((e, i) => {
@@ -184,34 +182,6 @@ if (hold) {
 }
 addEventListener('blur', release); document.addEventListener('visibilitychange', () => { if (document.hidden) release(); });
 addEventListener('keydown', e => { if (e.key === 'Escape') release(); });
-
-/* one chord of D major, held: strings (detuned saws) behind a filter that opens with the pupil, in a large room */
-const chord = (() => {
-  let ac = null, out, lp, osc = [], off = 0;
-  const make = () => {
-    ac = new (window.AudioContext || window.webkitAudioContext)();
-    const len = ac.sampleRate * 3.2, ir = ac.createBuffer(2, len, ac.sampleRate);
-    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
-    const room = ac.createConvolver(); room.buffer = ir;
-    const wet = ac.createGain(), dry = ac.createGain(), comp = ac.createDynamicsCompressor();
-    out = ac.createGain(); out.gain.value = 0; lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260; lp.Q.value = .4;
-    wet.gain.value = .55; dry.gain.value = .6;
-    lp.connect(out); out.connect(dry); out.connect(room); room.connect(wet); dry.connect(comp); wet.connect(comp); comp.connect(ac.destination);
-  };
-  return {
-    start() {
-      try {
-        clearTimeout(off); if (!ac) make(); ac.resume(); if (osc.length) return;
-        [73.42, 110, 146.83, 185, 220, 293.66, 369.99, 440].forEach((f, i) => [-6, 5].forEach(det => {
-          const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det + (Math.random() - .5) * 3;
-          g.gain.value = .085 / (1 + i * .45); o.connect(g); g.connect(lp); o.start(); osc.push(o);
-        }));
-      } catch (_) {}
-    },
-    level(v) { if (!ac || !osc.length) return; const t = ac.currentTime; out.gain.setTargetAtTime(.3 * Math.pow(v, 1.4), t, .16); lp.frequency.setTargetAtTime(260 + 1250 * v * v, t, .25); },
-    stop() { if (!ac) return; const t = ac.currentTime; out.gain.setTargetAtTime(0, t, .25); const all = osc; osc = []; all.forEach(o => { try { o.stop(t + 1.6); } catch (_) {} }); off = setTimeout(() => { if (!osc.length) ac.suspend(); }, 5200); }
-  };
-})();
 
 /* ---------- the time spent together: in memory only ---------- */
 const line = $('#together'), secs = $$('main section[id]').filter(s => s.id !== 'top' && $('h2', s)), spent = new Map();

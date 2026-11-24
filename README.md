@@ -26,7 +26,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 | Méthode | Une scène épinglée, quatre temps, un champ de points |
 | Agence | La phrase s'encre mot à mot avec le scroll, puis le sens de « moyo » |
 | Équipe | Les noms, vers `/equipe/<id>` |
-| Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome et un accord |
+| Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome |
 
 Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exemples à remplacer.
 

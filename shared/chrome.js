@@ -270,7 +270,7 @@ const footerInner = ({ home = false, team } = {}) => {
     <p><a class="t-hero foot-cta" href="${home ? '#contact' : '/#contact'}"><span data-i="fSee">On se voit</span><span class="q">&nbsp;?</span></a></p>
     <div class="foot-note q4">
       <p id="together"></p>
-      <button class="hold" id="hold" type="button" data-i="fHold">Maintenez un œil, avec le son</button>
+      <button class="hold" id="hold" type="button" data-i="fHold">Maintenez un œil</button>
     </div>
   </div>
   <div class="mono-wrap" aria-hidden="true"><div class="monument"><span class="bl">m</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span><span class="bl">y</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span></div></div>`;

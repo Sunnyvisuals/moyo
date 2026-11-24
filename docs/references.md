@@ -9,7 +9,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 ## Créativité
 
 - Margaret Boden : une idée créative est nouvelle, surprenante **et** utile. Trois voies : combiner, explorer, transformer. [IJCAI](https://ijcai.org/proceedings/1997/229)
-- Arthur Koestler, la « bisociation » : faire se croiser deux cadres qui ne se rencontrent jamais. Ici, un logo et un visage ; un pied de page et une symphonie.
+- Arthur Koestler, la « bisociation » : faire se croiser deux cadres qui ne se rencontrent jamais. Ici, un logo et un visage ; un pied de page et un monochrome.
 
 ## Sociologie et perception
 
@@ -23,7 +23,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 ## Art
 
-- Yves Klein, [Symphonie Monotone-Silence](https://en.wikipedia.org/wiki/Monotone-Silence_Symphony) : un accord de ré majeur tenu vingt minutes, puis vingt minutes de silence. Maintenir un œil : le pied de page devient un monochrome, avec l'accord. Relâcher : silence.
+- Yves Klein, les [monochromes](https://en.wikipedia.org/wiki/Yves_Klein). Maintenir un œil : le pied de page devient un monochrome. Relâcher : il se referme. Sans son.
 
 ## Mouvement
 
@@ -33,7 +33,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 ## Techniques
 
-View Transitions, API Popover et couche supérieure (menu, curseur, voile), `@starting-style`, `text-box`, unités de conteneur, `:has()`, easing `linear()`, police variable, Web Audio (convolution), `feDisplacementMap` pour le verre. Chaque effet a un repli : sans JavaScript et en mouvement réduit, la page est complète.
+View Transitions, API Popover et couche supérieure (menu, curseur, voile), `@starting-style`, `text-box`, unités de conteneur, `:has()`, easing `linear()`, police variable, `feDisplacementMap` pour le verre. Chaque effet a un repli : sans JavaScript et en mouvement réduit, la page est complète.
 
 ## Grille Awwwards
 
