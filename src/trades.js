@@ -84,7 +84,7 @@ function draw() {
 function still() { if (cur < 0) return; for (let i = 0; i < N; i++) [X[i], Y[i], R[i], A[i], B[i]] = scene[cur](i, 1.1); draw(); }
 function frame(now) {
   raf = 0; if (!on) return;
-  const dt = Math.min(.034, (now - (last || now)) / 1000) || .016; last = now; since += dt; const t = (now - t0) / 1000, f = scene[cur];
+  const dt = Math.min(.034, (now - (last || now)) / 1000) || .016; last = now; since += dt; const t = Math.max(0, now - t0) / 1000, f = scene[cur]; // a frame can be dated before the moment it was asked for (Firefox)
   for (let i = 0; i < N; i++) {
     const p = f(i, t);
     if (since > .9 && Math.hypot(p[0] - LX[i], p[1] - LY[i]) > .5 && i) { X[i] = p[0]; Y[i] = p[1]; VX[i] = VY[i] = 0; A[i] = 0; } // a ring that starts again from the middle

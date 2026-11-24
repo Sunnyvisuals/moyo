@@ -7,6 +7,8 @@ root.classList.add('js');
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* View Transitions, where they are safe: WebKit (Safari, every browser on iPhone) crashes on the second one of this page (seen on WebKit 27.2) and has a simple version instead */
+const VT = !!document.startViewTransition && !reduce && !/Apple/.test(navigator.vendor || '');
 const json = id => { try { return JSON.parse($('#' + id).textContent); } catch (_) { return null; } };
 __RENDER__
 const main = $('#main'), EN = json('en') || {};
@@ -38,7 +40,7 @@ if (filters) filters.addEventListener('click', e => {
   cat = b.dataset.cat;
   const u = new URL(location.href); if (cat === 'all') u.searchParams.delete('cat'); else u.searchParams.set('cat', cat);
   history.replaceState(null, '', u);
-  if (!document.startViewTransition || reduce) return applyFilter();
+  if (!VT) { applyFilter(); if (!reduce) $$('#projects > li:not([hidden])').forEach((li, i) => li.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, delay: Math.min(i * 40, 240), fill: 'backwards', easing: 'ease' })); return; }
   const lis = $$('#projects > li');
   lis.forEach((li, i) => { li.style.viewTransitionName = 'p' + i; });
   const vt = document.startViewTransition(applyFilter);
@@ -97,7 +99,7 @@ const address = id => new URL('/projets/' + encodeURIComponent(id), location.ori
 /* the picture of the card becomes the picture of the sheet, and goes back to it. Where the browser cannot, the sheet rises. */
 function morph(open, i, update) {
   const plate = cardOf(i) && $('.plate', cardOf(i)), mine = $('#pPlate'), r = plate && plate.getBoundingClientRect();
-  const can = document.startViewTransition && !reduce && r && r.width > 24 && r.top < innerHeight - 60 && r.bottom > 60 && (open || dlg.scrollTop < innerHeight * .6);
+  const can = VT && r && r.width > 24 && r.top < innerHeight - 60 && r.bottom > 60 && (open || dlg.scrollTop < innerHeight * .6);
   if (!can) return false;
   root.style.setProperty('--vt', `${Math.max(0, r.top).toFixed(0)}px ${Math.max(0, innerWidth - r.right).toFixed(0)}px ${Math.max(0, innerHeight - r.bottom).toFixed(0)}px ${Math.max(0, r.left).toFixed(0)}px`);
   if (window.moyoDivide && plate.classList.contains('dv')) moyoDivide(plate, 'end');
@@ -213,7 +215,7 @@ function applyLang(l) {
 function swapLang(l) {
   if (l === lang) return;
   const run = () => applyLang(l);
-  if (!document.startViewTransition || reduce) return run();
+  if (!VT) { if (reduce) return run(); const all = $$('.under,#foot,#menu .menu-in'); Promise.all(all.map(e => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease', fill: 'forwards' }).finished)).catch(() => {}).then(o => { run(); all.forEach(e => e.getAnimations().forEach(a => a.cancel())); all.forEach(e => e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease' })); }); return; }
   let vt; try { vt = document.startViewTransition({ update: run, types: ['lang'] }); } catch (_) { vt = document.startViewTransition(run); }
   vt.ready.catch(() => {}); vt.finished.catch(() => {});
 }

@@ -108,7 +108,12 @@ html.kbd .bar:focus-within{translate:0 0}
   #menu:popover-open .pv-cap{animation:pvFade .8s ease .9s both}
 }
 @media (min-width:821px) and (prefers-reduced-motion:reduce){#menu:popover-open .pv-frame,#menu:popover-open .pv-cap{animation:none}}
-@media (max-width:820px){.menu-pv,.menu-list .arc-clone{display:none}}
+@media (max-width:820px){.menu-pv,.menu-list .arc-clone{display:none}
+  /* small screens: the foot of the menu follows the list, it never sits on it */
+  #menu:popover-open{display:flex;flex-direction:column}
+  .menu-in{flex:1 0 auto;min-height:0;padding-bottom:20px}
+  .menu-foot{position:static;flex:none;padding:0 var(--edge) max(16px,env(safe-area-inset-bottom))}
+}
 
 ${BURGER_CSS}
 html.menu-lock{overflow:hidden}

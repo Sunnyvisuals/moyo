@@ -129,7 +129,7 @@ Ces scripts ont été écrits pour l'accueil v8 : leurs sélecteurs sont à adap
 | Critère | Poids | Note |
 | --- | --- | --- |
 | Design | 40 % | 9,3 |
-| Utilisabilité | 30 % | 9,5 |
+| Utilisabilité | 30 % | 9,6 |
 | Créativité | 20 % | 9,8 |
 | Contenu | 10 % | 6,0 |
 | **Total pondéré** | | **environ 9,1** |
@@ -140,7 +140,7 @@ Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clie
 
 - Remplacer les projets d'exemple par de vrais projets, depuis `/admin`.
 - Remplacer les biographies (texte d'attente) et ajouter les portraits.
-- Essayer sur de vrais téléphones, Safari et Firefox.
+- Essayer sur de vrais téléphones (Chrome, Firefox 159 et WebKit 27 de test sont passés ; WebKit garde une version simple des View Transitions, voir `VT` dans `src/site.js`).
 - Ajouter d'autres moyens de contact si besoin (réseaux, téléphone).
 
 ## Historique

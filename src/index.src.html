@@ -88,6 +88,7 @@ __CSS__
 .fl{display:block;font-size:var(--fs-small);color:var(--mute);line-height:1.3;text-box:trim-both cap alphabetic;margin-bottom:8px}
 .fld input,.fld textarea{display:block;width:100%;padding:12px 0 14px;border:0;border-bottom:1px solid rgb(18 18 20 / .3);border-radius:0;background:none;font-size:var(--fs-lead);line-height:1.4;outline:none;transition:border-color .4s,box-shadow .4s}
 .fld textarea{resize:vertical;min-height:calc(4.2em + 26px)}
+@supports (field-sizing:content){.fld textarea{field-sizing:content;resize:none;max-height:60vh}}
 .fld input:hover,.fld textarea:hover{border-color:var(--ink)}
 .fld input:focus,.fld textarea:focus{border-color:var(--klein);box-shadow:0 1px 0 var(--klein)}
 .f-err{display:block;font-size:var(--fs-small);line-height:1.35;color:#B3261E}

@@ -232,6 +232,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .crumbs a:hover{color:var(--klein)}
 .crumbs [aria-current]::after{content:"";width:7px;height:7px;margin-left:8px;border-radius:50%;background:var(--klein)}
 .crumbs{margin-bottom:clamp(1.25rem,2.6vw,2.75rem)}
+@media (max-width:820px){.crumbs ol{flex-wrap:nowrap}.crumbs li{flex:none}.crumbs li:last-child{flex:0 1 auto;min-width:0}.crumbs [aria-current] span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 .next{margin-top:var(--sec);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 
 /* names as rows: team, and the next stop; the arrow says they open */
@@ -347,7 +348,7 @@ try{if(localStorage.getItem('moyo-calm')==='1'){document.documentElement.classLi
 /* what opens the page: the loading (first visit, reload), the dot closing on the title (coming from a link of the site), or nothing */
 try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var k=+sessionStorage.getItem('moyo-in')||0,n=performance.getEntriesByType('navigation')[0],o=document.referrer&&new URL(document.referrer).origin===location.origin,d=document.documentElement;sessionStorage.removeItem('moyo-in');
 if(Date.now()-k<8000)d.classList.add('enter');else if(n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},7000)}}catch(e){}
-for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTransition;if(v)for(const p of[v.ready,v.finished,v.updateCallbackDone])p&&p.catch(()=>{})});</script>`;
+for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTransition;if(v){for(const p of[v.ready,v.finished,v.updateCallbackDone])p&&p.catch(()=>{});if(/Apple/.test(navigator.vendor))v.skipTransition()}});</script>`;
 
 /* Scripts of every page, in order. */
 const scripts = `<script src="/lenis.js" defer></script>
