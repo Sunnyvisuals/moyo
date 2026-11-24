@@ -9,7 +9,7 @@ Contact : contact.moyostudio@gmail.com
 Le système est décrit et défini dans un seul fichier, `shared/design.js`, utilisé par toutes les pages.
 
 - **Couleur** : blanc cassé `#FAFAF8`, encre `#121214`, un gris `#65656B`. Le bleu Klein `#002FA7` est la seule couleur et il a toujours un sens : l'idée, l'action, la fin de page.
-- **Le point Klein** : l'idée unique. Il charge la page, termine les titres (celui d'une page se prend en main et se lance), est le curseur, montre le chemin, fait les sept métiers des services, regarde depuis les cases sans photo ; à la fin il quitte le chemin et devient la pupille des deux o du pied de page. Sources et choix : `docs/references.md`.
+- **Le point Klein** : l'idée unique. Il charge la page, termine les titres (celui d'une page se prend en main et se lance), est le curseur (une partie reste sous la main, l’autre va ponctuer ce qu’on pointe), montre le chemin, fait les sept métiers des services, regarde depuis les cases sans photo ; à la fin il quitte le chemin et devient la pupille des deux o du pied de page. Sources et choix : `docs/references.md`.
 - **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
@@ -27,7 +27,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 | Méthode | Une scène épinglée en plein écran, quatre étapes ; pour chacune une image, une vidéo ou un GIF, choisis dans l'admin, et les mots en blanc par-dessus |
 | Studio | La phrase s'encre d'une vague Klein avec le scroll, puis le sens de « moyo » |
 | Équipe | Les noms, vers `/equipe/<id>` |
-| Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome |
+| Contact et pied de page | Formulaire (les choix sont des lignes et des anneaux où le point tombe ; le budget, une ligne où il roule), e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome |
 
 Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exemples à remplacer.
 

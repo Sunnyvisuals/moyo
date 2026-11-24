@@ -131,15 +131,68 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .f-err{display:block;font-size:var(--fs-small);line-height:1.35;color:#B3261E}
 .f-err:not(:empty){margin-top:10px}
 .fld [aria-invalid]{border-color:#B3261E;box-shadow:0 1px 0 #B3261E}
-.chips{display:flex;flex-wrap:wrap;gap:8px 6px}
-.chips legend{float:left;width:100%;margin-bottom:20px}
 .opt{color:var(--mute)}
-.chips label{position:relative}
-.chips input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
-.chips label span{display:inline-flex;align-items:center;min-height:max(44px,2.3em);padding:0 max(15px,.85em);border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s,scale .3s var(--ease)}
-.chips label:hover span{border-color:var(--ink)}
-.chips input:checked+span{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.chips input:focus-visible+span{outline:2px solid var(--klein);outline-offset:3px}
+/* Choices. A line like the line of a field, a word, and the empty place of its point. Pointed at, the point comes to look (cursor.js): a ring and its
+   pupil. Chosen, it falls into its place, the line turns blue and the word is inked (pale, Klein, ink, like the sentences). */
+.chips{--o:clamp(12px,.66em,18px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut);font-size:var(--fs-body)}
+.chips legend{float:left;grid-column:1/-1;margin-bottom:clamp(6px,.5vw,14px)}
+.chips label,.scale label{position:relative;cursor:pointer}
+.chips input,.scale input{position:absolute;inset:0;z-index:1;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.chips label span{display:flex;align-items:center;min-height:max(50px,2.6em);padding-right:calc(var(--o) + .4em);border-bottom:1px solid rgb(18 18 20 / .3);background:linear-gradient(var(--klein),var(--klein)) 0 100%/0 2px no-repeat;transition:background-size .8s var(--ease)}
+.chips b,.scale b{font-weight:600;letter-spacing:-.022em;line-height:1.2;color:#0000;background:linear-gradient(90deg,var(--ink) 33%,var(--klein) 50%,var(--mute) 67%) 100% 0/300% 100%;-webkit-background-clip:text;background-clip:text;transition:background-position 1.1s var(--ease)}
+.chips label span::after,.scale label span::after{content:"";position:absolute;width:var(--o);height:var(--o);border-radius:50%;border:clamp(1.5px,calc(var(--w) * .00085),2px) solid rgb(18 18 20 / .52);transition:border-color .4s}
+.chips label span::after{right:0;top:calc(50% - var(--o) / 2)}
+.chips label span::before{content:"";position:absolute;right:0;top:calc(50% - var(--o) / 2);width:var(--o);height:var(--o);border-radius:50%;background:var(--klein);opacity:0;translate:0 -1.5em;transition:opacity .16s ease,translate .3s var(--ease-io)}
+.chips :checked+span{background-size:100% 2px}
+.chips :checked+span::before{opacity:1;translate:0 0;transition:opacity .1s ease,translate .95s linear(0,.0157,.0625,.1406,.25,.3906,.5625,.7656,1 36.4%,.8906 45.5%,.8125 50%,.7656 54.5%,.75 59%,.7656 63.6%,.8125 68.2%,.8906 72.7%,1 77.3%,.9531,.9375 86.4%,.9531,1 95.5%,.9844,1)}
+.chips :checked+span b,.scale :checked+span b{background-position:0 0}
+.chips :checked+span::after{border-color:#0000}
+@media (hover:hover){
+  .chips label:hover span{background-size:100% 2px}
+  .chips label:hover :not(:checked)+span b,.scale label:hover :not(:checked)+span b{background-position:58% 0}
+  .chips label:hover span::after,.scale label:hover span::after{border-color:var(--klein)}
+}
+:is(html.kbd,html:not(.js)) :is(.chips,.scale) :focus-visible+span{outline:2px solid var(--klein);outline-offset:4px}
+.chips label:active b,.scale label:active b{opacity:.6}
+/* The budget: one line, one point. The rings grow with the amount, and the point rolls from one to the other. Not knowing is off the line. */
+.scale{--r:clamp(10px,calc(var(--w) * .0072),17px);--ly:calc(var(--r) * 1.28 + 6px);--h1:max(46px,2.6em);--at:0;--dd:calc(var(--r) * (1 + var(--at) * .52));
+  position:relative;display:grid;grid-template:var(--h1) auto/repeat(4,minmax(0,1fr));column-gap:var(--gut);font-size:var(--fs-small);touch-action:pan-y}
+.scale label{--o:calc(var(--r) * (1 + var(--k,.6) * .52))}
+.scale>.fl{grid-area:1/1/2/3;align-self:center;margin:0}
+.scale .tbd{grid-area:1/3/2/-1;justify-self:start;display:flex;align-items:center}
+.scale .tbd span{padding-left:calc(var(--o) + .6em)}
+.scale .tbd span::after{left:0;top:calc(50% - var(--o) / 2);background:conic-gradient(from 8deg,rgb(18 18 20 / .52) 0 11%,#0000 0 25%,rgb(18 18 20 / .52) 0 36%,#0000 0 50%,rgb(18 18 20 / .52) 0 61%,#0000 0 75%,rgb(18 18 20 / .52) 0 86%,#0000 0);border:0;-webkit-mask:radial-gradient(closest-side,#0000 calc(100% - 1.6px),#000 calc(100% - 1.5px));mask:radial-gradient(closest-side,#0000 calc(100% - 1.6px),#000 calc(100% - 1.5px))}
+.scale label:not(.tbd){grid-area:2/calc(var(--k) + 1);padding:calc(var(--ly) * 2 + 4px) 0 6px}
+.scale label:not(.tbd) span{display:block}
+.scale label:not(.tbd) b{display:block;max-width:7.4em;text-wrap:balance}
+.scale label:not(.tbd) span::after{left:0;top:calc(var(--ly) - var(--o) / 2);background:var(--bg)}
+.scale::before,.scale::after{content:"";grid-area:2/1/3/-1;align-self:start;margin-top:calc(var(--ly) - .5px);height:1px;background:rgb(18 18 20 / .3)}
+.scale::after{justify-self:start;width:calc((100% + var(--gut)) / 4 * var(--at));height:2px;margin-top:calc(var(--ly) - 1px);background:var(--klein);transition:width .9s cubic-bezier(.3,1.18,.4,1)}
+.scale-d{position:absolute;z-index:1;pointer-events:none;left:calc((100% + var(--gut)) / 4 * var(--at));top:calc(var(--h1) + var(--ly));translate:0 -50%;width:var(--dd);height:var(--dd);border-radius:50%;background:var(--klein);scale:0;
+  transition:left .9s cubic-bezier(.3,1.18,.4,1),top .8s cubic-bezier(.36,-.7,.4,1),width .9s var(--ease),height .9s var(--ease),scale .5s var(--ease)}
+.scale:has(:checked) .scale-d{scale:1}
+.scale:has([value="5-15"]:checked){--at:1}.scale:has([value="15-40"]:checked){--at:2}.scale:has([value="gt40"]:checked){--at:3}
+.scale label:not(.tbd):has(~ label:not(.tbd) :checked) span::after{border-color:var(--klein)}
+.scale:has([value="tbd"]:checked) .scale-d{left:calc((100% + var(--gut)) / 2);top:calc(var(--h1) / 2);--dd:calc(var(--r) * 1.312)}
+@supports not selector(:has(a)){.scale :checked+span::after{background:var(--klein)!important;-webkit-mask:none!important;mask:none!important}}
+@media (max-width:1239px){.chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){
+  .chips{column-gap:20px}
+  .scale{--h1:34px;--rh:48px;grid-template:var(--h1) repeat(4,var(--rh)) calc(var(--rh) + 6px)/minmax(0,1fr)}
+  .scale>.fl{grid-area:1/1}
+  .scale label:not(.tbd){grid-area:calc(var(--k) + 2)/1;display:flex;align-items:center;padding:0 0 0 calc(var(--r) * 2.56 + 16px)}
+  .scale label:not(.tbd) b{max-width:none}
+  .scale label:not(.tbd) span::after{left:calc(var(--r) * 1.28 - var(--o) / 2);top:calc(50% - var(--o) / 2)}
+  .scale .tbd{grid-area:6/1;align-self:end;min-height:var(--rh)}
+  .scale .tbd span{padding-left:calc(var(--r) * 2.56 + 16px)}
+  .scale .tbd span::after{left:calc(var(--r) * 1.28 - var(--o) / 2)}
+  .scale::before{grid-area:2/1/6/2;justify-self:start;width:1px;height:auto;margin:calc(var(--rh) / 2) 0 calc(var(--rh) / 2) calc(var(--r) * 1.28 - .5px);align-self:stretch}
+  .scale::after{grid-area:2/1/6/2;width:2px;height:calc(var(--rh) * var(--at));margin:calc(var(--rh) / 2) 0 0 calc(var(--r) * 1.28 - 1px);transition:height .9s cubic-bezier(.3,1.18,.4,1)}
+  .scale-d{left:calc(var(--r) * 1.28);top:calc(var(--h1) + var(--rh) * (var(--at) + .5));translate:-50% -50%;transition:top .9s cubic-bezier(.3,1.18,.4,1),left .6s var(--ease),width .9s var(--ease),height .9s var(--ease),scale .5s var(--ease)}
+  .scale:has([value="tbd"]:checked) .scale-d{left:calc(var(--r) * 1.28);top:calc(var(--h1) + var(--rh) * 4.5 + 6px)}
+}
+@media (prefers-reduced-motion:reduce){.scale-d,.scale::after,.chips label span,.chips b,.scale b,.chips label span::before{transition:none!important}}
+@media (forced-colors:active){.chips b,.scale b{color:CanvasText;background:none}.chips label span::after,.scale label span::after{border-color:CanvasText}.chips :checked+span::before,.scale-d{background:Highlight;forced-color-adjust:none}}
 .f-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px}
 .f-foot p{max-width:26ch}
 .f-dots{display:inline-flex;gap:7px;margin-bottom:12px}
@@ -148,7 +201,6 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .f-dots.full i:nth-child(1){translate:18px 0}.f-dots.full i:nth-child(3){translate:-18px 0}.f-dots.full i{scale:1.5}
 .f-dots.busy i{animation:busy 1s var(--ease-io) infinite}.f-dots.busy i:nth-child(2){animation-delay:.12s}.f-dots.busy i:nth-child(3){animation-delay:.24s}
 @keyframes busy{50%{opacity:.25;scale:.6}}
-.chips label:active span{scale:.96}
 .f-status{font-size:var(--fs-small);min-height:1.5em}
 .f-status.err{color:#B3261E}
 
@@ -235,7 +287,7 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .path.gone .path-d{opacity:0}
 .path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--k);pointer-events:none}
 .path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((var(--p,0) - .5) * var(--row) * 6 * var(--k));pointer-events:none}
-.path ol{position:absolute;right:50%;top:0}
+.path ol{position:absolute;right:50%;top:0;pointer-events:none}
 .path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);padding:0 28px 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
 .path a span{opacity:0;translate:10px 0;transition:opacity .2s ease,translate .4s ease,color .3s}
 .path a[aria-current]{color:var(--ink)}
@@ -264,7 +316,7 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .crumbs a{display:inline-flex;align-items:center;min-height:44px;color:var(--mute);transition:color .4s}
 .crumbs a:hover{color:var(--klein)}
 .crumbs [aria-current]::after{content:"";width:7px;height:7px;margin-left:8px;border-radius:50%;background:var(--klein)}
-.crumbs{margin-bottom:clamp(1.25rem,2.6vw,2.75rem)}
+.crumbs{position:relative;z-index:1;margin-bottom:clamp(1.25rem,2.6vw,2.75rem)} /* above the line box of the big title, which is taller than its letters */
 @media (max-width:820px){.crumbs ol{flex-wrap:nowrap}.crumbs li{flex:none}.crumbs li:last-child{flex:0 1 auto;min-width:0}.crumbs [aria-current] span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 .next{margin-top:var(--sec);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 

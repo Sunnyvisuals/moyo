@@ -187,23 +187,24 @@ __CHROME_HEAD__
         <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" required maxlength="200" aria-describedby="e-email"><small class="f-err" id="e-email"></small></label>
       </div>
       <fieldset class="chips">
-        <legend class="fl"><span data-i="fType">Le projet</span> <span class="opt" data-i="fOpt">(facultatif)</span></legend>
-        <label><input type="radio" name="type" value="identite"><span data-i="tId">Identité</span></label>
-        <label><input type="radio" name="type" value="site"><span data-i="tSite">Site</span></label>
-        <label><input type="radio" name="type" value="donnees"><span data-i="tData">Données</span></label>
-        <label><input type="radio" name="type" value="motion"><span data-i="tMotion">Motion</span></label>
-        <label><input type="radio" name="type" value="audiovisuel"><span data-i="tAv">Audiovisuel</span></label>
-        <label><input type="radio" name="type" value="communication"><span data-i="tCom">Communication</span></label>
-        <label><input type="radio" name="type" value="autre"><span data-i="tOther">Autre</span></label>
+        <legend class="fl"><span data-i="fType">Le projet</span> <span class="opt" data-i="fOptM">(facultatif, plusieurs choix possibles)</span></legend>
+        <label><input type="checkbox" name="type" value="identite"><span><b data-i="tId">Identité</b></span></label>
+        <label><input type="checkbox" name="type" value="site"><span><b data-i="tSite">Site</b></span></label>
+        <label><input type="checkbox" name="type" value="donnees"><span><b data-i="tData">Données</b></span></label>
+        <label><input type="checkbox" name="type" value="motion"><span><b data-i="tMotion">Motion</b></span></label>
+        <label><input type="checkbox" name="type" value="audiovisuel"><span><b data-i="tAv">Audiovisuel</b></span></label>
+        <label><input type="checkbox" name="type" value="communication"><span><b data-i="tCom">Communication</b></span></label>
+        <label><input type="checkbox" name="type" value="autre"><span><b data-i="tOther">Autre</b></span></label>
       </fieldset>
-      <fieldset class="chips">
-        <legend class="fl"><span data-i="fBudget">Votre budget</span> <span class="opt" data-i="fOpt">(facultatif)</span></legend>
-        <label><input type="radio" name="budget" value="lt5"><span data-i="b1">Moins de 5&nbsp;000&nbsp;€</span></label>
-        <label><input type="radio" name="budget" value="5-15"><span data-i="b2">De 5&nbsp;000 à 15&nbsp;000&nbsp;€</span></label>
-        <label><input type="radio" name="budget" value="15-40"><span data-i="b3">De 15&nbsp;000 à 40&nbsp;000&nbsp;€</span></label>
-        <label><input type="radio" name="budget" value="gt40"><span data-i="b4">Plus de 40&nbsp;000&nbsp;€</span></label>
-        <label><input type="radio" name="budget" value="tbd"><span data-i="bTbd">Je ne sais pas encore</span></label>
-      </fieldset>
+      <fieldset><legend class="sr" data-i="fBudget">Votre budget</legend><div class="scale" id="scale">
+        <p class="fl" aria-hidden="true"><span data-i="fBudget">Votre budget</span> <span class="opt" data-i="fOpt">(facultatif)</span></p>
+        <label style="--k:0"><input type="radio" name="budget" value="lt5"><span><b data-i="b1">Moins de 5&nbsp;000&nbsp;€</b></span></label>
+        <label style="--k:1"><input type="radio" name="budget" value="5-15"><span><b data-i="b2">De 5&nbsp;000 à 15&nbsp;000&nbsp;€</b></span></label>
+        <label style="--k:2"><input type="radio" name="budget" value="15-40"><span><b data-i="b3">De 15&nbsp;000 à 40&nbsp;000&nbsp;€</b></span></label>
+        <label style="--k:3"><input type="radio" name="budget" value="gt40"><span><b data-i="b4">Plus de 40&nbsp;000&nbsp;€</b></span></label>
+        <label class="tbd"><input type="radio" name="budget" value="tbd"><span><b data-i="bTbd">Je ne sais pas encore</b></span></label>
+        <i class="scale-d" aria-hidden="true"></i>
+      </div></fieldset>
       <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" autocomplete="off" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="f-foot">
@@ -238,7 +239,7 @@ __SHEET__
 "enT":"Moyo, noun. From the Japanese moyō.","enD1":"pattern, design.","enD2":"the look of the sky.","enLink":"See the meaning",
 "enS":"We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.",
 "ctQ":"A place, an event, a brand?","ctLead":"Tell us about the project. We reply within 48 hours.","copy":"Copy the address",
-"fName":"Name","fMail":"Email","fType":"The project","fOpt":"(optional)","tId":"Identity","tSite":"Website","tData":"Data","tMotion":"Motion","tAv":"Audiovisual","tCom":"Communication","tOther":"Other",
+"fName":"Name","fMail":"Email","fType":"The project","fOpt":"(optional)","fOptM":"(optional, several if you like)","tId":"Identity","tSite":"Website","tData":"Data","tMotion":"Motion","tAv":"Audiovisual","tCom":"Communication","tOther":"Other",
 "fBudget":"Your budget","b1":"Under €5,000","b2":"€5,000 to €15,000","b3":"€15,000 to €40,000","b4":"Over €40,000","bTbd":"I don’t know yet","fMsg":"Message","fNote":"Your details are only used to reply to you.","fSend":"Send the message",
 "sProjL":"Projects","nextP":"Next project","fCat":"Category","fRole":"Role","fYear":"Year","fPlace":"Place","prev":"Previous","next":"Next","close":"Close"
 }</script>

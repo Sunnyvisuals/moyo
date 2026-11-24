@@ -41,14 +41,14 @@
     return !!other && other !== mine && !other.contains(e) && !t.closest('.bar,.scr');
   };
   const set = (e, v) => { if (e.dataset.rv !== v) e.dataset.rv = v; };
-  const io = new IntersectionObserver(es => es.forEach(en => {
+  const io = new IntersectionObserver(es => { es.forEach(en => {
     const e = en.target, r = en.boundingClientRect;
     if (en.isIntersecting) { inView.add(e); set(e, covered(e) ? 'post' : 'in'); }
     else { inView.delete(e); set(e, r.top < 0 ? 'post' : 'pre'); }
-  }), { threshold: [0, .6], rootMargin: '0px 0px -8% 0px' });
+  }); if (!raf) raf = requestAnimationFrame(check); }, { threshold: [0, .6], rootMargin: '0px 0px -8% 0px' });
   els.forEach(e => io.observe(e));
-  let raf = 0;
-  const check = () => { raf = 0; inView.forEach(e => set(e, covered(e) ? 'post' : 'in')); };
+  let raf = 0, again = 0;
+  const check = () => { raf = 0; let more = false; inView.forEach(e => { const c = covered(e); more = more || c; set(e, c ? 'post' : 'in'); }); clearTimeout(again); if (more) again = setTimeout(check, 450); }; // what covers it can leave while the page does not move
   addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(check); }, { passive: true });
   addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(check); });
 })();

@@ -236,7 +236,9 @@ footer#foot{--gh:clamp(260px,44vh,680px);--gr:calc(64px - var(--fr,.75) * 32px);
 .mist i{bottom:auto;-webkit-backdrop-filter:blur(var(--b));backdrop-filter:blur(var(--b));-webkit-mask:linear-gradient(to bottom,#0000,rgb(0 0 0 / .16) 18%,rgb(0 0 0 / .84) 46%,#000 64%);mask:linear-gradient(to bottom,#0000,rgb(0 0 0 / .16) 18%,rgb(0 0 0 / .84) 46%,#000 64%)}
 .mist i:nth-child(1){--b:3px;top:14%;height:48%}.mist i:nth-child(2){--b:10px;top:28%;height:50%}.mist i:nth-child(3){--b:26px;top:44%;height:52%}
 .mist canvas{left:-7%;width:114%;height:100%;translate:calc((var(--rise,.5) - .5) * 11%);will-change:translate}
-.flood .mist{display:none}
+.floor{position:absolute;z-index:-1;inset:calc(var(--gh) * .6) 0 0}
+footer#foot.clear{pointer-events:none}footer#foot.clear>:not(.mist,.mono-wrap){pointer-events:auto}
+.flood :is(.mist,.floor){display:none}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
 :is(footer#foot.foot,html.stack main>.over)::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
   background:radial-gradient(calc(380px + var(--fv,0) * 260px) 70px at var(--lx,50%) 0,#fff 10%,#0000),

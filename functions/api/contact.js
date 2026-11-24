@@ -16,7 +16,7 @@ export async function onRequestPost({ request, env }) {
     : json(ok ? { ok: true } : { error: true, message }, status);
 
   let body = {};
-  try { body = isForm ? Object.fromEntries(await request.formData()) : await request.json(); }
+  try { if (isForm) { const fd = await request.formData(); body = { ...Object.fromEntries(fd), type: fd.getAll('type') }; } else body = await request.json(); }
   catch { return reply(false, 400, 'Formulaire illisible.'); }
 
   // honeypot: humans never fill the hidden "website" field; pretend it worked
@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
   const msg = {
     name: str(body.name, 120),
     email: str(body.email, 200),
-    type: TYPES.includes(body.type) ? body.type : '',
+    type: TYPES.filter(t => [].concat(body.type || []).includes(t)).join(','), // one or several, always in the same order
     budget: BUDGETS.includes(body.budget) ? body.budget : '',
     message: str(body.message, 5000),
     lang: body.lang === 'en' ? 'en' : 'fr'
@@ -54,7 +54,7 @@ export async function onRequestPost({ request, env }) {
     const from = env.FROM_EMAIL || 'moyo <onboarding@resend.dev>';
     const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' };
     const budget = { lt5: 'Moins de 5 000 €', '5-15': 'De 5 000 à 15 000 €', '15-40': 'De 15 000 à 40 000 €', gt40: 'Plus de 40 000 €', tbd: 'Ne sait pas encore' };
-    const typeTxt = msg.type ? (label[msg.type] || msg.type) : '';
+    const typeTxt = msg.type.split(',').filter(Boolean).map(t => label[t] || t).join(', ');
     const budgetTxt = msg.budget ? (budget[msg.budget] || msg.budget) : '';
     const first = msg.name.split(/\s+/)[0] || msg.name;
     let when = at;
@@ -64,7 +64,7 @@ export async function onRequestPost({ request, env }) {
     const lines = [
       `Nom : ${msg.name}`,
       `E-mail : ${msg.email}`,
-      typeTxt ? `Type : ${typeTxt}` : null,
+      typeTxt ? `Projet : ${typeTxt}` : null,
       budgetTxt ? `Budget : ${budgetTxt}` : null,
       `Langue : ${msg.lang}`,
       '',
@@ -75,7 +75,7 @@ export async function onRequestPost({ request, env }) {
 
     // Styled HTML receipt (table-based, inline styles for e-mail clients)
     const chip = (k, v) => `<td style="padding:0 18px 0 0;vertical-align:top"><p style="margin:0 0 3px;font:600 11px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#9aa0a8">${esc(k)}</p><p style="margin:0;font:600 15px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0b1020">${esc(v)}</p></td>`;
-    const chips = [typeTxt ? chip('Type', typeTxt) : '', budgetTxt ? chip('Budget', budgetTxt) : '', chip('Langue', msg.lang === 'en' ? 'Anglais' : 'Français')].join('');
+    const chips = [typeTxt ? chip('Projet', typeTxt) : '', budgetTxt ? chip('Budget', budgetTxt) : '', chip('Langue', msg.lang === 'en' ? 'Anglais' : 'Français')].join('');
     const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#eef0ef;padding:28px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,10,50,.08)">
 <tr><td style="background:#002FA7;padding:20px 28px">

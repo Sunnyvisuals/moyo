@@ -289,7 +289,6 @@ if (form) {
   const dots = $('.f-dots', form), need = [['name', f => f.value.trim().length > 1], ['email', f => !!f.value && f.validity.valid && /\.[a-z]{2,}$/i.test(f.value.trim())], ['message', f => f.value.trim().length >= 10]];
   const fillDots = () => { let n = 0; need.forEach(([k, ok], i) => { const y = ok(form.elements[k]); n += y; dots.children[i].classList.toggle('ok', y); }); dots.classList.toggle('full', n === 3); };
   // what is wrong is said next to its field, when the field is left or the form is sent, and taken back as soon as it is right
-  const chosen = {};
   const ERR = { name: ['Indiquez votre nom.', 'Please enter your name.'], email: ['Indiquez une adresse complète, par exemple nom@domaine.fr.', 'Please enter a full address, for example name@domain.com.'], message: ['Encore quelques mots : dix caractères au minimum.', 'A few more words: ten characters at least.'] };
   const OK = { name: f => !!f.value.trim(), email: need[1][1], message: need[2][1] };
   const mark = (k, bad) => { const f = form.elements[k]; if (bad) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid'); $('#e-' + k).textContent = bad ? ERR[k][lang === 'en' ? 1 : 0] : ''; };
@@ -297,19 +296,32 @@ if (form) {
   form.addEventListener('focusout', e => { const k = e.target.name; if (OK[k] && e.target.value.trim() && !OK[k](e.target)) mark(k, true); });
   new MutationObserver(() => Object.keys(OK).forEach(k => { if (form.elements[k]?.hasAttribute('aria-invalid')) mark(k, true); })).observe(root, { attributes: true, attributeFilter: ['lang'] });
   // what is being written survives a reload or a visit to another page: kept in this tab only, forgotten once sent
+  const values = () => { const fd = new FormData(form), o = {}; for (const k of new Set(fd.keys())) if (k !== 'website') { const x = fd.getAll(k).filter(Boolean); if (x.length) o[k] = k === 'type' ? x : x[0]; } return o; };
   const DRAFT = 'moyo-brouillon', read = () => { try { return JSON.parse(sessionStorage.getItem(DRAFT)) || {}; } catch (_) { return {}; } };
-  const keepDraft = () => { try { sessionStorage.setItem(DRAFT, JSON.stringify(Object.fromEntries([...new FormData(form)].filter(([k, x]) => k !== 'website' && x)))); } catch (_) {} };
-  Object.entries(read()).forEach(([k, x]) => { const f = form.elements[k]; if (!f) return; if (f.length && !f.tagName) { const r = [...f].find(o => o.value === x); if (r) { r.checked = true; chosen[k] = r; } } else if (!f.value) f.value = x; });
+  const keepDraft = () => { try { sessionStorage.setItem(DRAFT, JSON.stringify(values())); } catch (_) {} };
+  Object.entries(read()).forEach(([k, x]) => $$(`[name="${k}"]`, form).forEach(f => { if (/radio|checkbox/.test(f.type)) f.checked = [].concat(x).includes(f.value); else if (!f.value && typeof x === 'string') f.value = x; }));
   ['input', 'change'].forEach(n => form.addEventListener(n, keepDraft)); fillDots();
-  // a choice can be taken back
-  form.addEventListener('click', e => { const r = e.target; if (r.type !== 'radio') return; if (chosen[r.name] === r) { r.checked = false; chosen[r.name] = null; keepDraft(); } else chosen[r.name] = r; });
+  // the budget: pressed again it is taken back, and the point can be dragged along its line
+  const scale = $('#scale'), stops = $$('label:not(.tbd) input', scale);
+  let was = null, held = null;
+  const set = r => { if (!r.checked) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); } };
+  scale.addEventListener('pointerdown', e => { const r = e.target.closest('label')?.querySelector('input'); was = r && r.checked ? r : null; held = e.pointerType !== 'touch' && e.button === 0 && r && stops.includes(r) ? { x: e.clientX, y: e.clientY, on: false } : null; });
+  scale.addEventListener('click', e => { const r = e.target; if (r.type === 'radio' && was === r) { r.checked = false; was = null; keepDraft(); } });
+  addEventListener('pointermove', e => {
+    if (!held) return;
+    if (!held.on && Math.hypot(e.clientX - held.x, e.clientY - held.y) < 8) return;
+    held.on = true; was = null;
+    const near = stops.map(r => { const b = r.getBoundingClientRect(); return [Math.abs(e.clientX - b.left) + (innerWidth > 620 ? 0 : Math.abs(e.clientY - b.top - b.height / 2) * 4), r]; }).sort((p, q) => p[0] - q[0])[0][1];
+    set(near); near.focus({ preventScroll: true });
+  }, { passive: true });
+  ['pointerup', 'pointercancel'].forEach(n => addEventListener(n, () => { held = null; }));
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const en = lang === 'en', wrong = Object.keys(OK).filter(k => { const bad = !OK[k](form.elements[k]); mark(k, bad); return bad; });
     if (wrong.length) { form.elements[wrong[0]].focus(); return say3(en ? (wrong.length > 1 ? `${wrong.length} fields to check.` : 'One field to check.') : (wrong.length > 1 ? `${wrong.length} champs à vérifier.` : 'Un champ à vérifier.'), true); }
     const btn = $('.btn', form); btn.disabled = true; dots.classList.add('busy'); say3(en ? 'Sending…' : 'Envoi…');
     try {
-      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), lang }) });
+      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...values(), website: form.elements.website.value, lang }) });
       const r = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(r.message || '');
       try { sessionStorage.removeItem(DRAFT); } catch (_) {}

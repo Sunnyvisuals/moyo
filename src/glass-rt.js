@@ -26,9 +26,12 @@
     }
     k.putImageData(im, 0, 0);
   };
+  /* how much paper there is at a place of a sheet or of the footer (0 to 1), for the cursor; null if it is not glass at all */
+  window.moyoFog = (el, x, y) => { const m = el.querySelector(':scope>.mist'); if (!m) return null; const r = m.getBoundingClientRect(), v = (y - r.top) / r.height, b = m.lastElementChild.getBoundingClientRect(), u = (x - b.left) / b.width * (1 + 2 * OUT) - OUT; return v >= 1 ? 1 : fog((v - horizon(u)) / soft(u) + .56); };
   const soon = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout: 900 }) : f => setTimeout(f, 60);
   [foot, ...document.querySelectorAll('html.stack main>.over')].forEach(el => {
     const m = document.createElement('div'), c = document.createElement('canvas'); m.className = 'mist'; m.setAttribute('aria-hidden', 'true'); m.innerHTML = '<i></i><i></i><i></i>'; m.append(c); el.prepend(m);
+    if (el === foot) { const fl = document.createElement('div'); fl.className = 'floor'; el.prepend(fl); el.classList.add('clear'); } // what is seen through the glass can still be clicked; the paper below is solid
     const kl = parseFloat(getComputedStyle(el).getPropertyValue('--kl')) || 1, r = el.getBoundingClientRect();
     r.top < innerHeight && r.bottom > 0 ? paint(c, kl) : soon(() => paint(c, kl));
   });
