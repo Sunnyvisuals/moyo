@@ -5,7 +5,7 @@
    Works from the elements' own classes: nothing to add in the markup. Skipped with reduced motion. */
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-  const SEL = '.link,.send,.sub-btn,.links a,.dlg-actions button';
+  const SEL = '.btn,.lnk,.sub-btn';
   const els = [...document.querySelectorAll(SEL)].filter(e => !e.closest('dialog,#menu'));
   if (!els.length) return;
   const st = document.createElement('style');

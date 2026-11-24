@@ -3,12 +3,10 @@
      are replaced on the fly with the current ones, so the pages stay complete without JavaScript.
    - Adds a few security headers everywhere, and keeps /admin out of search engines. */
 import { getData, hasStored } from './_lib/store.js';
-import { rowsHTML, cardsHTML, featuredOf, dataJSON } from '../shared/render.js';
-import { creditLinks } from '../shared/chrome.js';
+import { rowsHTML, featuredOf, dataJSON } from '../shared/render.js';
+import { creditLinks, teamRows } from '../shared/chrome.js';
 
 const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all' };
-
-const escA = v => String(v).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
 export async function onRequest({ request, env, next }) {
   const url = new URL(request.url);
@@ -20,9 +18,9 @@ export async function onRequest({ request, env, next }) {
     const data = await getData(env);
     const list = page === 'home' ? featuredOf(data) : data.projects;
     res = new HTMLRewriter()
-      .on('#projects', { element: el => { el.setInnerContent((page === 'home' ? cardsHTML : rowsHTML)(list, 'fr'), { html: true }); } })
+      .on('#projects', { element: el => { el.setInnerContent(rowsHTML(list, 'fr'), { html: true }); } })
       .on('.fby', { element: el => { el.setInnerContent(creditLinks(data.team), { html: true }); } })
-      .on('.names', { element: el => { if (page === 'home') el.setInnerContent((data.team || []).map(t => `<li><a class="nm-link" href="/equipe/${escA(t.id)}"><span class="nm par shut" style="--a:40px">${escA(t.name)}</span></a></li>`).join(''), { html: true }); } })
+      .on('.names', { element: el => { el.setInnerContent(teamRows(data.team), { html: true }); } })
       .on('script#moyo-data', { element: el => { el.setInnerContent(dataJSON(data), { html: true }); } })
       .transform(res);
   }

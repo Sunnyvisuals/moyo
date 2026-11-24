@@ -6,34 +6,26 @@ Contact : contact.moyostudio@gmail.com
 
 ## Direction artistique
 
-- Deux couleurs : bleu Klein `#002FA7` et blanc de chaux `#F1F3F2`.
-- Une famille typographique : Hanken Grotesk (variable), intégrée dans la page.
-- Idée centrale : un mur blanc de chaux, une fenêtre bleue qui s'ouvre au scroll, et **le soleil réel de Nice, calculé dans le navigateur**. Il pilote l'ombre de la fenêtre, l'ombre de la barre de navigation, le poids du titre, l'heure affichée et la journée qui défile avec le scroll.
-- Aucune ville dans le titre, le contact ni les métadonnées. La section « Lumière » reste calculée pour Nice.
-- Mouvement lent : scroll fluide (Lenis), parallax, volets sur les titres, boutons à store.
+Le système est décrit et défini dans un seul fichier, `shared/design.js`, utilisé par toutes les pages.
 
-## Aperçu
+- **Couleur** : blanc cassé `#F5F4F0`, encre `#121214`, un gris `#65656B`. Le bleu Klein `#002FA7` est la seule couleur et il a toujours un sens : l'idée, l'action, la fin de page.
+- **Le point Klein** : il termine les titres, il remplace une image manquante, c'est l'icône du site et le curseur.
+- **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
+- **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
+- **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
+- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas.
 
-![Hero : la fenêtre fermée, le soleil du jour et la barre de navigation](docs/screens/01-hero.jpg)
-
-| | |
-| --- | --- |
-| ![Projets](docs/screens/02-projets.jpg) | ![Studio](docs/screens/03-studio.jpg) |
-| ![Lumière](docs/screens/04-lumiere.jpg) | ![Pied de page](docs/screens/05-pied-de-page.jpg) |
-
-Captures prises en bureau 1440 px le 22 novembre 2026 ; les heures du soleil changent chaque jour.
-
-## Contenu de la page
+## Contenu
 
 | Section | Contenu |
 | --- | --- |
-| Hero | La fenêtre qui s'ouvre, le soleil du jour, l'heure réglable |
-| Approche | Une phrase, un lien vers les projets |
-| Projets | 5 projets d'exemple (plaques abstraites), ouverture en dialogue avec View Transitions |
-| Services | Quatre services, la méthode en quatre étapes |
-| Studio | Le sens de « moyo », trois principes, l'équipe (noms seulement) |
-| Lumière | Lever, midi solaire, coucher, direction du soleil, heure dorée, ombre à midi, écart avec la veille, heures de soleil par mois, durée du jour sur l'année, prochain solstice |
-| Contact et pied de page | E-mail, plan du site, lumière du moment, infos sur le site |
+| Ouverture | Une phrase |
+| Projets | Un projet par rangée : image sur l'axe 1, texte sur l'axe 7. Ouverture en fiche |
+| Services | Sept services, une ligne chacun |
+| Méthode | Quatre étapes sur les quatre axes |
+| Agence | La phrase s'encre mot à mot avec le scroll, puis le sens de « moyo » |
+| Équipe | Les noms, vers `/equipe/<id>` |
+| Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue |
 
 Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exemples à remplacer.
 
@@ -53,9 +45,15 @@ Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les 
 
 ```
 src/index.src.html     page d'accueil (gabarit)
-src/projets.src.html   page « Tous les projets »
+src/projets.src.html   page « Projets »
 src/admin.html         mode admin
+src/site.js            langue, scroll, projets, fiche, formulaire (toutes les pages)
+src/*.js               un fichier par comportement : menu, pied de page, verre, apparitions, sorties, curseur
+shared/design.js       système de design : couleurs, typographie, grille, composants, fiche projet
+shared/chrome.js       en-tête, menu, pied de page
 shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
+functions/equipe/      page de profil, rendue par le serveur
+archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres)
 data/projects.json     projets de départ (les 5 exemples)
 functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /img/<id>
 build.mjs              construit dist/
@@ -92,14 +90,13 @@ Sous Windows, si le dossier du projet a un chemin très long (plus de 260 caract
 
 ## Technique
 
-- **Page d'accueil autonome** : `dist/index.html` (environ 160 Ko) contient le CSS, le JavaScript, la police et Lenis. Pas de traceur, aucune requête vers un autre domaine. Le seul cookie est celui de la session admin.
-- **CSS 2026** : `@property`, `animation-timeline: view()`, View Transitions entre document et `<dialog>`, API Popover pour le menu, `linear()` pour les ressorts, `@starting-style`, `text-wrap`, masques CSS.
-- **Soleil** : formules d'éphéméride simplifiées (type NOAA), latitude 43,7102, longitude 7,2620, heure de Paris.
+- **Léger** : accueil d'environ 70 Ko (HTML et CSS), police et scripts en fichiers partagés par toutes les pages. Pas de traceur, aucune requête vers un autre domaine.
+- **CSS 2026** : `subgrid`, `text-box`, View Transitions entre documents, API Popover pour le menu, `@starting-style`, `text-wrap`.
 - **Accessibilité** : contenu visible sans JavaScript, état « animations réduites » conçu à part, contraste d'au moins 4,5:1, cibles tactiles d'au moins 24 px, navigation au clavier, FR/EN.
 
 ## Construire
 
-`build.mjs` (Node) écrit `dist/`. Dans `src/index.src.html`, il remplace `__FONT__` et `__LENIS__` (police en base64, `vendor/lenis.min.js`), `__RENDER__` (`shared/render.js`), `__ROWS__` et `__DATA__` (projets de `data/projects.json`).
+`build.mjs` (Node) écrit `dist/` : il injecte le système de design, l'en-tête, le pied de page et les projets dans les gabarits, et copie les scripts.
 
 ```bash
 npm run build
@@ -121,7 +118,7 @@ python3 tests/scroll.py      # scroll Lenis, menu, ancres, dialogue
 python3 tests/foot.py 1440 900   # le grand « moyo » est collé au bas de la page
 ```
 
-Les captures sont écrites dans `tests/out/`. Dernier résultat : 0 violation sur 20 états, aucune erreur console.
+Ces scripts ont été écrits pour l'accueil v8 : leurs sélecteurs sont à adapter à la version actuelle.
 
 ## Estimation Awwwards (auto-évaluation, pas un jury)
 

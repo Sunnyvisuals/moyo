@@ -10,12 +10,11 @@
   let live = [], leaving = false;
 
   /* what is worth animating: the visible pieces of content, not the containers */
-  const PIECES = '.hero-copy,.win,.sunui,.idx,h1,h2,h3,.lead,.statement,.display,.entry-w,.entry-d,.list li,.steps li,.names li,.proj-more,.studio-cta,.ct-side>*,.ct-form>*,' +
-    '.head>*,.filters,.projects>li,.acard,.photo,.who>*,.fcol,.foot-sub,.foot-base,.mono-wrap,.blocks,.small,p';
+  const PIECES = '.hero-top>*,h1,h2,.case .plate,.case .cap>*,.line,.step,.say,.defs>*,.names li,.ct-l>*,.ct-form>*,.filters,.sheet-g>*,.fcol,.foot-sub,.foot-base,.mono-wrap,p';
   function pieces(scope) {
     const H = innerHeight, out = [];
     (scope || document).querySelectorAll(PIECES).forEach(el => {
-      if (el.closest('.scr,#menu,dialog,.bar,[hidden]') || (el.parentElement && el.parentElement.closest(PIECES) && !el.matches('.hero-copy,.win,.photo,.who>*,.blocks'))) return;
+      if (el.closest('#menu,dialog,.bar,[hidden]') || (el.parentElement && el.parentElement.closest(PIECES) && !el.matches('.sheet-g>*'))) return;
       const r = el.getBoundingClientRect();
       if (r.bottom < 0 || r.top > H || !r.width || !r.height) return;
       out.push([r.top, el]);
@@ -60,7 +59,7 @@
   /* ----- the project window ----- */
   window.hbOut = (scope, done) => {
     if (reduce) return done();
-    const els = [...scope.querySelectorAll('.dlg-in>*,.dlg-actions>*')].filter(e => e.offsetParent !== null);
+    const els = [...scope.querySelectorAll('.sheet-t,.sheet-g>*,.gallery,.dlg-actions>*')].filter(e => e.offsetParent !== null);
     const a = els.map((el, i) => el.animate([{ opacity: 1, translate: '0 0' }, { opacity: 0, translate: '0 -14px' }], { duration: 260, delay: Math.min(i * 22, 130), easing: EASE, fill: 'forwards' }));
     const end = 260 + Math.min(els.length * 22, 130) + 20;
     setTimeout(() => { done(); a.forEach(x => { try { x.cancel(); } catch (_) {} }); }, end);

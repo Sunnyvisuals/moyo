@@ -1,13 +1,10 @@
 /* Project markup, shared by three places:
    - build.mjs renders the seed (data/projects.json) into the static pages,
    - functions/_middleware.js re-renders them from KV on every request,
-   - the pages' own script re-renders on language change.
+   - the pages' own script (src/site.js) updates them on language change and fills the project sheet.
    Keep it dependency-free, and keep `export` on the last line only: build.mjs strips that line to inline the file. */
 
 const escHTML = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-/* Fallback drawing for a project with neither image nor plate: three horizontal slats, like the window. */
-const FALLBACK_PLATE = '<svg class="f" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><rect x="110" y="70" width="280" height="76"/><rect x="110" y="162" width="280" height="76"/><rect x="110" y="254" width="280" height="76"/></g></svg>';
 
 const imgURL = id => (id && (id[0] === '/' || id.startsWith('http'))) ? id : '/img/' + encodeURIComponent(id);
 
@@ -16,51 +13,31 @@ function catLabel(data, id, lang) {
   return c ? (c[lang] || c.fr || c.id) : '';
 }
 
+/* texts of a project in a language, French where a translation is missing */
 function txt(p, lang) {
   return { ...(p.fr || {}), ...Object.fromEntries(Object.entries(p[lang] || {}).filter(([, v]) => v)) };
 }
 
 function plateInner(p, alt) {
-  if (p.cover) return `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}" loading="lazy" decoding="async">`;
-  return '';  // no cover -> plain grey block
+  return p.cover ? `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}" loading="lazy" decoding="async">` : ''; // no cover: the plate draws the dot
 }
 
-function plateAttrs(p) {
-  return '';  // placeholders are plain grey now
-}
+const metaText = (p, t) => [t.place, p.year].filter(Boolean).join(', ');
 
+/* One project. The same markup on the home (one per row, with its description) and on /projets (contact sheet). */
 function rowHTML(p, i, lang) {
   const t = txt(p, lang);
-  return `<li data-cat="${escHTML(p.category)}"><button class="row" type="button" data-p="${i}" data-id="${escHTML(p.id)}">` +
-    `<span class="plate row-bg"${plateAttrs(p)} aria-hidden="true">${plateInner(p)}</span>` +
-    `<span class="cap"><span class="r-year">${escHTML(p.year)}</span><span class="r-title">${escHTML(t.title)}</span>` +
-    `<span class="r-place">${escHTML(t.place)}</span><span class="r-type">${escHTML(t.type)}</span></span></button></li>`;
+  return `<li class="case" data-cat="${escHTML(p.category)}"><button class="row" type="button" data-p="${i}" data-id="${escHTML(p.id)}">` +
+    `<span class="plate${p.cover ? '' : ' plate--none'}" aria-hidden="true">${plateInner(p)}</span>` +
+    `<span class="cap"><span class="r-title">${escHTML(t.title)}</span><span class="r-desc">${escHTML(t.desc)}</span>` +
+    `<span class="r-type">${escHTML(t.type)}</span><span class="r-meta">${escHTML(metaText(p, t))}</span></span></button></li>`;
 }
 
+/* projects of the home page */
 function featuredOf(data) {
   const all = data.projects || [];
   const f = all.filter(p => p.featured);
   return f.length ? f : all.slice(0, 6);
-}
-
-function cardHTML(p, i, lang) {
-  const t = txt(p, lang);
-  const media = p.cover
-    ? `<img class="acard-img" src="${imgURL(p.cover)}" alt="${escHTML(t.title || '')}" loading="lazy" decoding="async">`
-    : plateInner(p, t.title);
-  const desc = t.desc || t.place || '';
-  return `<article class="acard" data-p="${i}" data-id="${escHTML(p.id)}" tabindex="0" role="button" aria-label="${escHTML(t.title || '')}">` +
-    `<span class="acard-media row-bg"${p.cover ? '' : ' data-noimg'}${plateAttrs(p)} aria-hidden="true">${media}</span>` +
-    `<span class="acard-grad" aria-hidden="true"></span>` +
-    `<span class="acard-no" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>` +
-    (t.type ? `<span class="acard-tag">${escHTML(t.type)}</span>` : '') +
-    `<span class="acard-body"><span class="acard-title">${escHTML(t.title)}</span>` +
-    `<span class="acard-rule" aria-hidden="true"></span>` +
-    `<span class="acard-desc">${escHTML(desc)}</span></span></article>`;
-}
-
-function cardsHTML(list, lang) {
-  return list.map((p, i) => cardHTML(p, i, lang)).join('');
 }
 
 function rowsHTML(list, lang) {
@@ -72,4 +49,4 @@ function dataJSON(data) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
-export { escHTML, FALLBACK_PLATE, imgURL, catLabel, txt, plateInner, plateAttrs, rowHTML, cardHTML, cardsHTML, featuredOf, rowsHTML, dataJSON };
+export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, dataJSON };

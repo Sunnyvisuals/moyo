@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#F1F3F2">
+<meta name="theme-color" content="#F5F4F0">
 <title>Projets · Moyo Studio</title>
 <meta name="description" content="Tous les projets de moyo, agence créative basée en Provence-Alpes-Côte d’Azur, rangés par catégorie : identités, sites, données, motion.">
 <meta property="og:title" content="Projets · Moyo Studio">
@@ -16,145 +16,31 @@
 <meta property="og:image:alt" content="moyo">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://moyo-d0n.pages.dev/og.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23002FA7'/%3E%3Cpath d='M0 11h32M0 21h32' stroke='%23F1F3F2' stroke-width='2'/%3E%3C/svg%3E">
-<link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-<script>/* page transitions can be cut short by a fast click: that is not an error */
-for(const t of ['pagereveal','pageswap']) addEventListener(t,e=>{const v=e.viewTransition; if(v) for(const p of [v.ready,v.finished,v.updateCallbackDone]) p&&p.catch(()=>{})});</script>
+__HEAD__
 <style>
-@font-face{font-family:"Hanken Grotesk";src:url(/fonts/hanken-grotesk.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
-:root{
-  --chaux:#F1F3F2;--klein:#002FA7;--paper:#F1F3F2;
-  --soft:color-mix(in oklab,var(--klein) 88%,var(--chaux));
-  --line:color-mix(in oklab,var(--klein) 24%,var(--chaux));
-  --wash:color-mix(in oklab,var(--klein) 7%,var(--chaux));
-  --paper-soft:color-mix(in oklab,var(--paper) 90%,var(--klein));
-  --paper-line:color-mix(in oklab,var(--paper) 34%,var(--klein));
-  --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --m:clamp(20px,3.2vw,56px);
-  --fs-small:.9375rem;--fs-lead:clamp(1.125rem,1.4vw,1.375rem);--fs-display:clamp(2.125rem,3.9vw,3.75rem);
-  --dur-1:450ms;--dur-3:950ms;--dur-4:1500ms;
-  --barw:min(380px,calc(100vw - 24px));
-  --hdr:clamp(64px,8vh,84px);
-  --ease-enter:cubic-bezier(.25,1,.5,1);
-  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  color-scheme:light;
-}
-*,*::before,*::after{box-sizing:border-box}
-html{background:var(--chaux);-webkit-text-size-adjust:100%;scrollbar-width:none}
-html::-webkit-scrollbar,#proj::-webkit-scrollbar{display:none}
-#proj{scrollbar-width:none}
-body{margin:0;background:var(--chaux);color:var(--klein);font-family:var(--sans);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
-h1,h2,h3,p,ol,ul,dl,dd{margin:0}
-ol,ul{padding:0;list-style:none}
-a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-::selection{background:var(--klein);color:var(--paper)}
-.skip{position:fixed;left:12px;top:-80px;z-index:200;background:var(--klein);color:var(--paper);padding:12px 16px;text-decoration:none;font-weight:600}
-.skip:focus{top:12px}
-.small{font-size:var(--fs-small);line-height:1.55}
-.muted{color:var(--soft)}
-
-.top{display:flex;justify-content:space-between;align-items:center;padding:var(--m) var(--m) 0}
-.wordmark{font-size:clamp(1.625rem,2.1vw,1.875rem);font-weight:700;letter-spacing:-.045em;line-height:1;text-decoration:none}
-.top nav{display:flex;gap:4px}
-.top nav a,.top nav button{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-size:var(--fs-small);font-weight:500;text-decoration:none}
-.top nav a:hover,.top nav button:hover{background:var(--wash)}
-
-main{padding:max(calc(var(--hdr) + 24px),clamp(56px,10vh,120px)) var(--m) clamp(88px,14vh,160px);max-width:calc(1500px + 2 * var(--m));margin:0 auto;position:relative;z-index:1;background:var(--chaux)}
-.head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px clamp(16px,2vw,32px);align-items:end;margin-bottom:clamp(32px,5vh,64px)}
-.head h1{grid-column:1/9;font-size:clamp(2.5rem,5.4vw,5.75rem);font-weight:300;letter-spacing:-.035em;line-height:1.03;text-wrap:balance}
-.head p{grid-column:9/-1;justify-self:end;text-align:right;max-width:30ch}
-
-/* Filters: square, outlined like the site's links; the active one is filled blue */
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:clamp(40px,7vh,88px);border-top:1px solid var(--line);padding-top:20px}
-.filters button{display:inline-flex;align-items:baseline;gap:8px;min-height:44px;padding:11px 18px;border:1px solid color-mix(in oklab,var(--klein) 45%,transparent);font-size:var(--fs-small);font-weight:550;transition:background var(--dur-1),color var(--dur-1),border-color var(--dur-1)}
-.filters button .n{font-weight:500;opacity:.85}
-.filters button:hover{background:var(--wash);border-color:color-mix(in oklab,var(--klein) 55%,transparent)}
-.filters button[aria-pressed="true"]{background:var(--klein);color:var(--paper)}
+__CSS__
+/* ---------- Every project: a contact sheet on the four axes ---------- */
+main{min-height:100vh;min-height:100svh;padding:calc(var(--hdr) + clamp(2.5rem,7vw,7rem)) var(--edge) var(--sec)}
+.page-t{margin-bottom:var(--gap)}
+/* Filters: plain words. The current one is blue; the categories still waiting for a project are faded. */
+.filters{display:flex;flex-wrap:wrap;gap:0 clamp(18px,2vw,34px);margin-bottom:clamp(3rem,5vw,5.5rem);font-weight:500}
+.filters button{display:inline-flex;align-items:baseline;gap:.35em;min-height:44px;color:var(--mute);transition:color .4s}
+.filters .n{font-size:.7em;translate:0 -.35em;font-weight:500}
+.filters button:hover{color:var(--ink)}
+.filters button[aria-pressed="true"]{color:var(--klein)}
+.filters button:disabled{opacity:.42;cursor:default;color:var(--mute)}
 html:not(.js) .filters{display:none}
-
-.projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(40px,6vw,88px) clamp(16px,2.4vw,40px);align-items:start}
-.projects li[hidden]{display:none}
-.row{position:relative;display:block;width:100%;text-align:left}
-.plate{position:relative;display:block;aspect-ratio:5/4;overflow:clip;background:#b0b4ba;color:var(--chaux)}
-.plate[data-t="wash"]{background:#b0b4ba;color:var(--klein)}
-.plate svg{position:absolute;left:0;top:-12%;width:100%;height:124%;display:block;overflow:visible}
-.plate img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.plate::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,#0000 36%,rgb(241 243 242 / .22) 50%,#0000 64%);translate:-100% 0;transition:translate 2000ms var(--ease-enter)}
-.plate[data-t="wash"]::after{background:linear-gradient(105deg,#0000 36%,rgb(0 47 167 / .10) 50%,#0000 64%)}
-.row:hover .plate::after,.row:focus-visible .plate::after{translate:100% 0}
-.cap{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 14px;align-items:baseline;padding-top:14px}
-.r-year{font-size:var(--fs-small);color:var(--soft)}
-.r-title{justify-self:start;font-size:clamp(1.25rem,1.8vw,1.75rem);font-weight:350;letter-spacing:-.025em;line-height:1.15;padding-bottom:3px;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size var(--dur-4) var(--ease-enter)}
-.r-type{grid-column:2/-1;font-size:var(--fs-small);color:var(--soft)}
-.r-place{font-size:var(--fs-small)}
-.row:hover .r-title,.row:focus-visible .r-title{background-size:100% 1px}
-.row:focus-visible{outline-offset:8px}
-.empty{padding:64px 0;border-top:1px solid var(--line);color:var(--soft)}
-
-/* Project dialog: the blue room, as on the home page */
-#proj{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--klein);color:var(--paper);overflow:auto;isolation:isolate}
-#proj::backdrop{background:var(--klein)}
-#proj :focus-visible{outline-color:var(--paper)}
-.dlg-in{min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--m) var(--m);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px clamp(16px,2vw,32px);align-content:start}
-.dlg-tag{grid-column:1/-1;font-size:var(--fs-small);color:var(--paper-soft)}
-.dlg-in h2{grid-column:1/-1;font-size:clamp(2.5rem,7vw,7rem);font-weight:350;letter-spacing:-.04em;line-height:.98;text-wrap:balance}
-.dlg-desc{grid-column:5/-1;font-size:var(--fs-lead);max-width:52ch;line-height:1.6;margin-top:clamp(12px,3vh,36px);white-space:pre-line}
-.dlg-facts{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:clamp(20px,6vh,72px);border-top:1px solid var(--paper-line);padding-top:16px}
-.dlg-facts dt{font-size:var(--fs-small);color:var(--paper-soft)}
-.dlg-facts dd{font-size:1.125rem;margin-top:2px}
-.dlg-plate{grid-column:5/-1;max-width:660px;margin-top:clamp(8px,3vh,36px)}
-.dlg-gallery{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:clamp(12px,2vw,24px);margin-top:clamp(8px,3vh,36px)}
-.dlg-gallery:empty{display:none}
-.dlg-gallery img{display:block;width:100%;height:auto;background:var(--paper-line)}
-.dlg-actions{position:fixed;z-index:3;top:0;right:var(--m);height:var(--hdr);display:flex;align-items:center;gap:clamp(18px,2.4vw,36px);color:var(--paper)}
-.dlg-actions button{min-height:44px;font-size:var(--fs-small);font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .8em)/0 1px no-repeat;transition:background-size var(--dur-3) var(--ease-enter)}
-.dlg-actions button:hover{background-size:100% 1px}
-.dlg-actions :focus-visible{outline-color:var(--paper);outline-offset:4px}
-.idx{display:flex;align-items:center;gap:14px;margin-bottom:clamp(40px,8vh,96px);font-size:.8125rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;line-height:1}
-.idx .sq{width:18px;height:7px;border-block:1px solid currentColor;display:block}
-.idx::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22}
-html.is-dialog{overflow:hidden}
-
-/* Footer : source unique dans shared/chrome.js (FOOTER_CSS), injectée via __CHROME_CSS__ */
-
-@media (prefers-reduced-motion:no-preference){
-  #proj[open] .dlg-in>*{animation:itemIn 900ms var(--ease-enter) both}
-  #proj[open] .dlg-in>:nth-child(2){animation-delay:80ms}
-  #proj[open] .dlg-in>:nth-child(n+3){animation-delay:160ms}
-  ::view-transition-group(*){animation-duration:600ms;animation-timing-function:var(--ease-enter)}
-}
-@keyframes itemIn{from{opacity:0;translate:0 24px}}
-
-/* Page change (home ↔ /projets): same transition as on the home page */
-@view-transition{navigation:auto;types:page}
-@media (prefers-reduced-motion:no-preference){
-  html:active-view-transition-type(page)::view-transition{background:color-mix(in oklab,var(--klein) 38%,#000614)}
-  html:active-view-transition-type(page)::view-transition-group(root){animation-duration:1300ms}
-  html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1300ms cubic-bezier(.76,0,.24,1) both;transform-origin:50% 50%}
-  html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1300ms cubic-bezier(.76,0,.24,1) both}
-}
-@keyframes pgOut{to{scale:.86;border-radius:28px;filter:brightness(.5)}}
-@keyframes pgIn{from{translate:0 100%;border-radius:28px 28px 0 0}to{translate:0 0;border-radius:0}}
-@media (max-width:1000px){.projects{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:760px){
-  .head h1,.head p{grid-column:1/-1}
-  .head p{justify-self:start;text-align:left}
-  .projects{grid-template-columns:1fr}
-  .dlg-desc,.dlg-plate{grid-column:1/-1}
-  .dlg-facts{grid-template-columns:1fr}
-}
-
-/* Language switch: the page blurs out and the other language fades in (no abrupt swap) */
-@media (prefers-reduced-motion:no-preference){
-  html:active-view-transition-type(lang)::view-transition-old(root){animation:langOut .42s cubic-bezier(.76,0,.24,1) both}
-  html:active-view-transition-type(lang)::view-transition-new(root){animation:langIn .7s cubic-bezier(.25,1,.5,1) .12s both}
-}
-@keyframes langOut{to{opacity:0;filter:blur(8px)}}
-@keyframes langIn{from{opacity:0;filter:blur(8px)}}
-
-__CHROME_CSS__
+.index{row-gap:clamp(3.5rem,6vw,6.5rem)}
+.index>li{grid-column:span 3}
+.index>li[hidden]{display:none}
+.index .cap{display:grid;grid-template-columns:1fr;gap:3px;padding-top:16px}
+.index .r-title{font-weight:600}
+.index .r-desc{display:none}
+.index .r-type,.index .r-meta{font-size:var(--fs-small);color:var(--mute);line-height:1.4}
+.empty{color:var(--mute)}
+@media (max-width:1180px){.index>li{grid-column:span 6}}
+@media (max-width:480px){.index>li{grid-column:1/-1}}
+@media (prefers-reduced-motion:no-preference){::view-transition-group(*){animation-duration:.6s;animation-timing-function:var(--ease)}}
 </style>
 </head>
 <body>
@@ -162,149 +48,22 @@ __CHROME_CSS__
 __CHROME_HEAD__
 
 <div class="under"><main id="main">
-  <p class="idx" aria-hidden="true"><i class="sq"></i><span data-i="idxL">Index des projets</span></p>
-  <div class="head">
-    <h1 data-i="title">Tous les projets.</h1>
-    <p class="small muted" id="count" aria-live="polite"></p>
-  </div>
+  <h1 class="t-hero page-t"><span data-i="title">Projets</span><i class="dot">.</i></h1>
   <div class="filters" id="filters" role="group" aria-label="Filtrer par catégorie" data-ia="filtersAria"></div>
-  <ol class="projects" id="projects">__ROWS__</ol>
+  <p class="sr" id="count" aria-live="polite"></p>
+  <ol class="g index" id="projects">__ROWS__</ol>
   <p class="empty" id="empty" hidden data-i="empty">Aucun projet dans cette catégorie pour l’instant.</p>
   <script type="application/json" id="moyo-data">__DATA__</script>
 </main></div>
 
 __FOOTER__
 
-<dialog id="proj" aria-labelledby="pTitle">
-  <div class="dlg-in">
-    <p class="dlg-tag" id="pTag"></p>
-    <h2 id="pTitle"></h2>
-    <p class="dlg-desc" id="pDesc"></p>
-    <dl class="dlg-facts">
-      <div><dt data-i="fRole">Rôle</dt><dd id="pRole"></dd></div>
-      <div><dt data-i="fYear">Année</dt><dd id="pYear"></dd></div>
-      <div><dt data-i="fPlace">Lieu</dt><dd id="pPlace"></dd></div>
-    </dl>
-    <span class="plate dlg-plate" id="pPlate" aria-hidden="true"></span>
-    <div class="dlg-gallery" id="pGallery"></div>
-  </div>
-  <div class="dlg-actions">
-    <button type="button" id="pPrev" data-i="prev">Précédent</button>
-    <button type="button" id="pNext" data-i="next">Suivant</button>
-    <button type="button" id="pClose" data-i="close">Fermer</button>
-  </div>
-</dialog>
+__SHEET__
 
-<script>__LENIS__</script>
-<script>
-(() => {
-'use strict';
-document.documentElement.classList.add('js');
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-__RENDER__
-let DATA={categories:[],projects:[]};
-try{DATA=JSON.parse($('#moyo-data').textContent)}catch(e){}
-const ALL=DATA.projects||[];
-
-const EN={idxL:'Project index',skip:'Skip to content',home:'Home',contact:'Contact',title:'All projects.',empty:'No project in this category yet.',back:'Back to home',
-  fRole:'Role',fYear:'Year',fPlace:'Place',prev:'Previous',next:'Next',close:'Close',all:'All',
-  homeAria:'moyo, home',nav:'Navigation',filtersAria:'Filter by category',
-  'sec.top':'Home','sec.projects':'Featured Projects','sec.all':'All projects','sec.services':'Services','sec.studio':'Agency','sec.team':'The team','sec.contact':'Contact',menu:'Menu',close:'Close',fStudio:'Agency',allL:'All projects',sTeam:'The team',fLive:'The light, right now',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',fStudioP:'An independent creative agency, based on the French Riviera: websites, identities, audiovisual and communication.',fNav:'Site map',
-  sIntro:'Approach',sProj:'Featured Projects',sSvc:'Services',sStu:'Agency',fWrite:'Write to the agency',top:'Back to top',footAria:'Site footer',langAria:'Language'};
-const FR={all:'Tous'};
-let lang='fr';
-try{const s=localStorage.getItem('hb-lang'); if(s==='en'||s==='fr') lang=s; else if(!/^fr/i.test(navigator.language||'fr')) lang='en';}catch(e){}
-
-let cat=new URLSearchParams(location.search).get('cat')||'all';
-if(cat!=='all' && !DATA.categories.some(c=>c.id===cat)) cat='all';
-
-const visible=()=>ALL.map((p,i)=>i).filter(i=>cat==='all'||ALL[i].category===cat);
-
-function renderFilters(){
-  const used=DATA.categories; // every category, even without a project yet
-  const btn=(id,label,n)=>`<button type="button" data-cat="${escHTML(id)}" aria-pressed="${id===cat}">${escHTML(label)}<span class="n">${n}</span></button>`;
-  $('#filters').innerHTML=btn('all',lang==='en'?EN.all:FR.all,ALL.length)+used.map(c=>btn(c.id,catLabel(DATA,c.id,lang),ALL.filter(p=>p.category===c.id).length)).join('');
-}
-function applyFilter(){
-  const vis=new Set(visible());
-  $$('#projects > li').forEach((li,i)=>{li.hidden=!vis.has(i)});
-  $$('#filters button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.cat===cat)));
-  $('#empty').hidden=vis.size>0;
-  const n=vis.size, label=cat==='all'?'':' · '+catLabel(DATA,cat,lang);
-  $('#count').textContent=(lang==='en'?`${n} project${n>1?'s':''}`:`${n} projet${n>1?'s':''}`)+label;
-}
-function setCat(c){
-  cat=c;
-  const u=new URL(location.href); if(c==='all') u.searchParams.delete('cat'); else u.searchParams.set('cat',c);
-  history.replaceState(null,'',u);
-  if(document.startViewTransition&&!reduce){
-    $$('#projects > li').forEach((li,i)=>{li.style.viewTransitionName='p'+i});
-    document.startViewTransition(applyFilter);
-  } else applyFilter();
-}
-$('#filters').addEventListener('click',e=>{const b=e.target.closest('button[data-cat]'); if(b&&b.dataset.cat!==cat) setCat(b.dataset.cat)});
-
-/* Language: same choice as on the home page (stored under "hb-lang") */
-function applyLang(l){
-  lang=l; document.documentElement.lang=l;
-  $$('[data-i]').forEach(el=>{ if(!('fr' in el.dataset)) el.dataset.fr=el.textContent; el.textContent=l==='en'&&EN[el.dataset.i]?EN[el.dataset.i]:el.dataset.fr; });
-  $$('[data-ia]').forEach(el=>{ if(!('frA' in el.dataset)) el.dataset.frA=el.getAttribute('aria-label'); el.setAttribute('aria-label',l==='en'&&EN[el.dataset.ia]?EN[el.dataset.ia]:el.dataset.frA); });
-  $$('[data-ph]').forEach(el=>{ if(!('frP' in el.dataset)) el.dataset.frP=el.getAttribute('placeholder')||''; el.setAttribute('placeholder',l==='en'&&EN[el.dataset.ph]?EN[el.dataset.ph]:el.dataset.frP); });
-  $$('#projects > li').forEach((li,i)=>{ const t=txt(ALL[i],l); $('.r-title',li).textContent=t.title; $('.r-type',li).textContent=t.type; $('.r-place',li).textContent=t.place; });
-  $$('.flang button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.l===l)));
-  const b=$('#langBtn'); b.hidden=false; b.textContent=l==='en'?'FR':'EN'; b.lang=l==='en'?'fr':'en'; b.setAttribute('aria-label',l==='en'?'Passer en français':'Switch to English');
-  document.title=(l==='en'?'Projects':'Projets')+' · Moyo Studio';
-  renderFilters(); applyFilter();
-  if(dlg.open) fill(cur);
-  try{localStorage.setItem('hb-lang',l)}catch(e){}
-}
-/* switch language through a soft view transition when the browser supports it */
-function swapLang(l){
-  if(l===lang) return;
-  const run=()=>applyLang(l);
-  if(!document.startViewTransition||matchMedia('(prefers-reduced-motion: reduce)').matches) return run();
-  try{ const vt=document.startViewTransition({update:run,types:['lang']}); vt.finished.catch(()=>{}); vt.ready.catch(()=>{}); }
-  catch(e){ const vt=document.startViewTransition(run); vt.finished.catch(()=>{}); }
-}
-$('#langBtn').addEventListener('click',()=>swapLang(lang==='fr'?'en':'fr'));
-$$('.flang button').forEach(x=>x.addEventListener('click',()=>swapLang(x.dataset.l)));
-
-/* Dialog: previous / next stay inside the current filter */
-const dlg=$('#proj');
-let cur=0, opener=null;
-function fill(i){
-  cur=i; const p=ALL[i], t=txt(p,lang);
-  $('#pTag').textContent=[catLabel(DATA,p.category,lang),t.type].filter(Boolean).join(' · ');
-  $('#pTitle').textContent=t.title; $('#pDesc').textContent=t.desc;
-  $('#pRole').textContent=t.role; $('#pYear').textContent=p.year; $('#pPlace').textContent=t.place;
-  const pl=$('#pPlate'); pl.innerHTML=plateInner(p); if(plateAttrs(p)) pl.dataset.t='wash'; else delete pl.dataset.t;
-  $('#pGallery').innerHTML=(p.images||[]).map(id=>`<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
-  dlg.scrollTop=0;
-}
-function step(d){ const v=visible(); const k=v.indexOf(cur); fill(v[(k+d+v.length)%v.length]); }
-$('#projects').addEventListener('click',e=>{
-  const b=e.target.closest('.row'); if(!b) return;
-  opener=b; fill(+b.dataset.p); dlg.showModal(); document.documentElement.classList.add('is-dialog'); $('#pClose').focus();
-});
-function close(){ if(window.hbOut&&!dlg.dataset.leaving){ dlg.dataset.leaving='1'; window.hbOut(dlg,()=>{ dlg.dataset.leaving=''; dlg.close(); }); } else dlg.close(); }
-dlg.addEventListener('close',()=>{ document.documentElement.classList.remove('is-dialog'); opener?.focus(); });
-$('#pClose').addEventListener('click',close);
-$('#pNext').addEventListener('click',()=>step(1));
-$('#pPrev').addEventListener('click',()=>step(-1));
-dlg.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') step(1); else if(e.key==='ArrowLeft') step(-1); });
-
-/* Smooth scroll, comme sur l'accueil */
-if(!reduce && typeof Lenis!=='undefined') new Lenis({lerp:.055,wheelMultiplier:.8,smoothWheel:true,autoRaf:true});
-applyLang(lang);
-})();
-</script>
-<script src="/chrome.js" defer></script>
-<script src="/footer.js" defer></script>
-<script src="/glass.js" defer></script>
-<script src="/stage.js" defer></script>
-<script src="/reveal.js" defer></script>
-<script src="/leave.js" defer></script>
-<script src="/cursor.js" defer></script>
+<script type="application/json" id="en">{
+"skip":"Skip to content","title":"Projects","empty":"No project in this category yet.","filtersAria":"Filter by category",
+"fCat":"Category","fRole":"Role","fYear":"Year","fPlace":"Place","prev":"Previous","next":"Next","close":"Close"
+}</script>
+__SCRIPTS__
 </body>
 </html>

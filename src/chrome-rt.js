@@ -1,6 +1,5 @@
-/* Shared chrome runtime (header burger + arc dropdown menu), self-contained, for pages other than the home.
-   Copied from the home's menu so the behaviour matches exactly. Reads the language from <html lang> and re-renders
-   when the page toggles it. No dependency on the page's own script. */
+/* Header and full-screen menu, the same on every page. Reads the language from <html lang> and re-renders when the page changes it.
+   No dependency on the page's own script. */
 (() => {
 'use strict';
 const menu = document.getElementById('menu');
@@ -16,8 +15,8 @@ let lang = getLang();
 
 /* The chrome owns its own labels so it works on any page, whatever that page's own language system. */
 const I18N = {
-  fr: { 'sec.top': 'Accueil', 'sec.projects': 'Projets choisis', 'sec.all': 'Tous les projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'L’équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
-  en: { 'sec.top': 'Home', 'sec.projects': 'Featured Projects', 'sec.all': 'All projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'The team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
+  fr: { 'sec.top': 'Accueil', 'sec.all': 'Projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'Équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
+  en: { 'sec.top': 'Home', 'sec.all': 'Projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'Team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
 };
 const ARIA = { fr: { homeAria: 'moyo, accueil', nav: 'Navigation principale', menu: 'Menu' }, en: { homeAria: 'moyo, home', nav: 'Main navigation', menu: 'Menu' } };
 const bar = document.getElementById('bar');
@@ -26,7 +25,6 @@ function applyChromeLang(l){
     root.querySelectorAll('[data-i]').forEach(el => { const k = el.dataset.i; if (I18N[l][k] != null) el.textContent = I18N[l][k]; });
     root.querySelectorAll('[data-ia]').forEach(el => { const k = el.dataset.ia; if (ARIA[l][k] != null) el.setAttribute('aria-label', ARIA[l][k]); });
   });
-  const lb = document.getElementById('langBtn'); if (lb) { lb.textContent = l === 'en' ? 'FR' : 'EN'; lb.lang = l === 'en' ? 'fr' : 'en'; lb.setAttribute('aria-label', l === 'en' ? 'Passer en français' : 'Switch to English'); }
 }
 
 /* letter-roll split for each menu label */
@@ -47,14 +45,15 @@ arcReal.forEach(li => arcList.insertBefore(arcClone(li), arcReal[0]));
 arcReal.forEach(li => arcList.appendChild(arcClone(li)));
 const arcItems = $$('.menu-list.arc li');
 const ARC_DESC = {
-  fr: ['La fenêtre qui s’ouvre et le soleil de Nice.', 'Une sélection de nos travaux récents.', 'Tous les projets, rangés par catégorie.', 'Direction artistique, sites, données, audiovisuel, communication.', 'L’agence, sa méthode, ses principes.', 'Zahia et Yacine : les profils.', 'Parlons de votre projet.'],
-  en: ['The opening window and the sun of Nice.', 'A selection of recent work.', 'Every project, sorted by category.', 'Art direction, websites, data, audiovisual, communication.', 'The agency, its method, its principles.', 'Zahia and Yacine: the profiles.', 'Let’s talk about your project.']
+  fr: ['Des images, des sites, des films. Une seule idée.', 'Tous les projets, par catégorie.', 'Direction artistique, sites, données, audiovisuel, communication.', 'L’agence, et le sens de son nom.', 'Zahia et Yacine.', 'Parlons de votre projet.'],
+  en: ['Images, websites, films. A single idea.', 'Every project, by category.', 'Art direction, websites, data, audiovisual, communication.', 'The agency, and the meaning of its name.', 'Zahia and Yacine.', 'Let’s talk about your project.']
 };
 const ARC = { curve: 60, spacing: 1.08, edgeFade: 16, wRest: 280, wFocus: 720, spread: 1, omega: (3 + 50 * .09) * 1.5, waveDur: .7, wheelTau: 80 };
 const A = { pos: 0, target: 0, av: 0, pv: 0, lastPos: 0, lean: 0, lensC: 0, lensV: 0, lensAmp: 1, hoverK: null, focusK: null, moving: false,
   wOn: false, wFrom: 0, wRaw: 0, wR: 0, wLast: 0, wCount: 0, wheelT: -1e9, waves: new Map, waveRel: new Map, waveK: null, waveCand: null, waveCandT: 0,
   introT: -1e9, raf: 0, last: 0, shown: -1, chars: [], stp: 0, stv: 0, sdir: 1, pin: false, mx: 0, my: 0, cx: 0, cy: 0, cvx: 0, cvy: 0 };
-const ARC_IMG = [];
+/* one picture per entry; the entries without one show the dot */
+const ARC_IMG = ['/proj/2.jpg', '/proj/1.jpg', '/proj/3.jpg', '/proj/4.jpg'];
 const pvA = $('#pvA'), pvB = $('#pvB'), pvFrame = $('#pvLink'), pvPanel = $('.menu-pv'), pvCS = $('#pvCS'), pvNS = $('#pvNS');
 const pvCI = [...pvCS.children], pvNI = [...pvNS.children];
 const arcWrap = x => x - arcM * Math.round(x / arcM);
@@ -109,7 +108,7 @@ function arcCard(dt){
   pvB.style.clipPath = fr > 0 ? 'polygon(' + mid.concat(rev(bot)).join(',') + ')' : 'inset(100% 0 0 0)';
   pvA.style.filter = fr > 0 ? 'brightness(' + (1 - .42 * fr).toFixed(3) + ')' : '';
   pvA.style.setProperty('--py', (50 - fr * 22).toFixed(1) + '%'); pvB.style.setProperty('--py', (50 + (1 - fr) * 22).toFixed(1) + '%');
-  const img = i => ARC_IMG[i] ? 'url("' + ARC_IMG[i] + '")' : 'none';
+  const img = i => ARC_IMG[i] ? 'url("' + ARC_IMG[i] + '")' : 'radial-gradient(circle,#002FA7 0 13%,#F5F4F0 13.3%)';
   if (pvA.dataset.i !== String(ia)) { pvA.dataset.i = ia; pvA.style.setProperty('--img', img(ia)); }
   if (pvB.dataset.i !== String(ib)) { pvB.dataset.i = ib; pvB.style.setProperty('--img', img(ib)); }
   const key = ia + '|' + ib + '|' + lang;
@@ -251,13 +250,13 @@ new MutationObserver(() => {
   if (menu.matches(':popover-open')) arcKick();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
-/* header: hides while reading down, returns on the way up, white over the blue footer */
+/* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up, white over the blue footer */
 if (bar) {
   let last = scrollY, upAt = scrollY, q = 0;
-  const ft = document.getElementById('foot');
+  const ft = document.getElementById('foot'), land = bar.hasAttribute('data-land');
   const upd = () => { q = 0; const y = scrollY, dy = y - last; last = y; if (dy < -2) upAt = y;
-    if (dy) bar.classList.toggle('away', !reduce && y > 80 && dy > 0 && y - upAt > 80 && !bar.contains(document.activeElement));
-    bar.classList.toggle('scrolled', y > 20);
+    const first = land && y < innerHeight * .85, busy = bar.contains(document.activeElement) || menu.matches(':popover-open');
+    if (dy || land) bar.classList.toggle('away', !busy && (first || (!reduce && y > 80 && (dy > 0 ? y - upAt > 80 : bar.classList.contains('away') && dy === 0))));
     bar.dataset.tone = ft && ft.getBoundingClientRect().top <= bar.offsetHeight / 2 ? 'paper' : 'klein'; };
   addEventListener('scroll', () => { if (!q) q = requestAnimationFrame(upd); }, { passive: true });
   bar.addEventListener('focusin', () => bar.classList.remove('away'));

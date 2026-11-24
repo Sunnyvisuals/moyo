@@ -10,14 +10,13 @@
     n.innerHTML = `<span class="rl"><span class="r1">${esc(t)}</span><span class="r2" aria-hidden="true">${esc(t)}</span></span>`;
   });
   const st = document.createElement('style');
-  st.textContent = `.nm .rl{display:block;position:relative;overflow:hidden;padding-bottom:.14em;margin-bottom:-.14em}
+  st.textContent = `.nm .rl{display:block;position:relative;overflow:hidden;padding:.1em .06em .2em 0;margin:-.1em -.06em -.2em 0}
 .nm .r1,.nm .r2{display:block;transition:translate .6s cubic-bezier(.65,0,.15,1),clip-path .6s cubic-bezier(.65,0,.15,1)}
 .nm .r1{clip-path:inset(0)}
-.nm .r2{position:absolute;left:0;top:0;width:100%;translate:0 100%;clip-path:inset(0 0 100%)}
+.nm .r2{position:absolute;left:0;top:.1em;width:100%;translate:0 100%;clip-path:inset(0 0 100%)}
 @media (hover:hover) and (prefers-reduced-motion:no-preference){
   .nm-link:hover .r1,.nm-link:focus-visible .r1{translate:0 -100%;clip-path:inset(100% 0 0)}
   .nm-link:hover .r2,.nm-link:focus-visible .r2{translate:0 0;clip-path:inset(0)}
-  .nm-link:hover .nm{letter-spacing:-.045em;font-style:normal}
 }`;
   document.head.appendChild(st);
 })();

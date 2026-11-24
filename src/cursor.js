@@ -20,7 +20,7 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
 .cur{position:fixed;left:0;top:0;z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .3s}
 .cur.on{opacity:1}
 .cur{--c:#002FA7}
-.cur.inv{--c:#F1F3F2}
+.cur.inv{--c:#F5F4F0}
 .cur::before{content:"";position:absolute;left:0;top:0;width:clamp(13px,.8vw,24px);aspect-ratio:1;translate:-50% -50%;box-sizing:border-box;border-radius:50%;background:var(--c);border:1.5px solid var(--c);
   transition:width .45s cubic-bezier(.2,.9,.2,1),background .25s,border-color .18s,scale .25s}
 .cur.hot::before{width:clamp(44px,2.8vw,84px);background:transparent}
@@ -43,17 +43,12 @@ html.cur-off a,html.cur-off button,html.cur-off label,html.cur-off a *,html.cur-
   };
   const under = (mx, my) => {
     for (const el of document.elementsFromPoint(mx, my)) {
-      const card = el.classList.contains('acard') ? el : null;
-      const im = el.tagName === 'IMG' ? el : card && card.querySelector('img');
-      let dim = 1;
-      const ac = el.closest('.acard');
-      if (ac) { const r = ac.getBoundingClientRect(), f = (my - r.top) / r.height; dim = 1 - (f < .5 ? .05 + f * .3 : .2 + (f - .5) * 1.3); } // its dark veil
-      if (im && im.naturalWidth) { try { const l = imgLum(im, mx, my); if (l !== null) return l * dim; } catch (_) {} }
-      if (el.classList.contains('acard-grad')) continue;
-      // outlined buttons fill up through ::before on hover: read that layer
-      if (el.matches('.link:hover,.menu-list a:hover')) { const f = colorOf(getComputedStyle(el, '::before').backgroundColor); if (f[1] > .5) return f[0]; }
+      const im = el.tagName === 'IMG' ? el : null;
+      if (im && im.naturalWidth) { try { const l = imgLum(im, mx, my); if (l !== null) return l; } catch (_) {} }
+      // the dot of the plates without a picture is blue
+      if (el.matches('.plate--none')) { const r = el.getBoundingClientRect(), R = r.width * .13; return Math.hypot(mx - r.left - r.width / 2, my - r.top - r.height / 2) < R ? .05 : .8; }
       const c = colorOf(getComputedStyle(el).backgroundColor);
-      if (c[1] > .5) return c[0] * dim;
+      if (c[1] > .5) return c[0];
     }
     return 1;
   };
