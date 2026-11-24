@@ -23,9 +23,7 @@ function label() {
   if (cur >= 0) { here.textContent = NAME[l][cur]; btn.textContent = NAME[l][cur]; }
 }
 let cur = -1, tops = [], pos = 0, goal = 0, raf = 0, h = 0, swap = 0;
-/* where a section really starts (the content is sticky under the footer) */
-const natural = el => { let y = 0, e = el; while (e && !e.classList.contains('under')) { y += e.offsetTop; e = e.offsetParent; } return y; };
-function measure() { tops = els.map(natural); h = nav.clientHeight; read(); }
+function measure() { tops = els.map(moyoTop); h = nav.clientHeight; read(); }
 function read() {
   const H = innerHeight, y = scrollY + H * .5, n = els.length;
   let i = 0; while (i < n - 1 && y >= tops[i + 1]) i++;

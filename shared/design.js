@@ -85,6 +85,16 @@ html.js .sec .dot.in b{opacity:1;translate:0 0;transition:opacity .15s ease .2s,
   .c5{grid-column:1/6!important}
 }
 
+/* ---------- Home: sections pass over each other (stack.js). Each is a sheet of paper whose top edge is the glass of the footer ---------- */
+html.stack main>.hero,html.stack main>.sec{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100svh - var(--h,100svh)));translate:0 calc(var(--cv,0) * -15vh)}
+html.stack main>.hero{background:var(--bg)}
+html.stack main>.sec{min-height:calc(100vh + var(--gh) - 96px);min-height:calc(100svh + var(--gh) - 96px);--gh:calc(var(--sec) * .9);--gp:calc(var(--gh) - 36px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;scroll-margin-top:calc(96px - var(--gh));
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),var(--bg) calc(var(--gh) - 1px));box-shadow:0 -2px 8px rgb(18 18 20 / .05),0 -26px 52px -14px rgb(18 18 20 / .15)}
+html.stack main>.sec:not(.mth):not(.contact){padding-bottom:clamp(5rem,10vw,10rem)}
+html.stack main>.mth.live{margin-top:0;padding:var(--gh) 0 0;height:calc(460vh + var(--gh));height:calc(460svh + var(--gh));scroll-margin-top:calc(var(--gh) * -1)}
+html.stack main>.contact{position:relative;top:auto}
+.veil{position:absolute;inset:0;z-index:20;border-radius:inherit;background:var(--bg);opacity:calc(var(--cv,0) * .82);pointer-events:none}
+
 /* ---------- Links and buttons ---------- */
 .lnk{display:inline-flex;align-items:center;gap:.45em;min-height:44px;font-weight:600;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .72em)/100% 1px no-repeat;transition:color .4s,background-size .7s var(--ease)}
 .lnk:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .72em)}
@@ -297,6 +307,7 @@ for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTra
 /* Scripts of every page, in order. */
 const scripts = `<script src="/lenis.js" defer></script>
 <script src="/load.js" defer></script>
+<script src="/stack.js" defer></script>
 <script src="/site.js" defer></script>
 <script src="/chrome.js" defer></script>
 <script src="/path.js" defer></script>
@@ -304,6 +315,7 @@ const scripts = `<script src="/lenis.js" defer></script>
 <script src="/eyes.js" defer></script>
 <script src="/glass.js" defer></script>
 <script src="/method.js" defer></script>
+<script src="/ink.js" defer></script>
 <script src="/stage.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/roll.js" defer></script>

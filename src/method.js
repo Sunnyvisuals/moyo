@@ -5,7 +5,7 @@
 'use strict';
 const sec = document.getElementById('methode'), cv = sec && sec.querySelector('.mth-c');
 if (!cv || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-const steps = [...sec.querySelectorAll('.step')], tabs = [...sec.querySelectorAll('.tab')], g = cv.getContext('2d');
+const steps = [...sec.querySelectorAll('.step')], says = steps.map(s => s.querySelector('p')), tabs = [...sec.querySelectorAll('.tab')], g = cv.getContext('2d');
 sec.classList.add('live');
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), smooth = t => t * t * t * (t * (t * 6 - 15) + 10), TAU = Math.PI * 2, N = 130;
 
@@ -28,11 +28,12 @@ let W = 0, H = 0, S = 1, D = 1, p = 0, ptr = null, on = false, raf = 0, cur = -1
 const px = new Float32Array(N), py = new Float32Array(N);
 function size() { const r = cv.getBoundingClientRect(); D = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = Math.round(W * D); cv.height = Math.round(H * D); S = Math.min(W, H) / 2 * .98; }
 function read() {
-  const r = sec.getBoundingClientRect(), len = r.height - innerHeight;
-  p = clamp(-r.top / Math.max(1, len)) * 4;
+  const r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, len = r.height - pad - innerHeight;
+  p = clamp((-r.top - pad) / Math.max(1, len)) * 4;
   const k = Math.min(3, Math.floor(Math.min(p, 3.999) + .16));
   if (k !== cur) { cur = k; steps.forEach((s, i) => { s.classList.toggle('now', i === k); s.classList.toggle('was', i < k); }); tabs.forEach((s, i) => s.classList.toggle('now', i === k)); }
   tabs.forEach((s, i) => s.style.setProperty('--f', clamp(p - i).toFixed(3)));
+  if (window.moyoWave) says.forEach((e, i) => moyoWave(e, clamp((p - i + .16) / .5))); // the sentence of the scene is inked as the scene passes (ink.js)
 }
 function frame(now) {
   raf = 0; if (!on) return;
@@ -58,6 +59,6 @@ addEventListener('resize', () => { size(); read(); }); new ResizeObserver(size).
 cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); ptr = e.pointerType === 'mouse' ? [e.clientX - r.left, e.clientY - r.top] : null; }, { passive: true });
 cv.addEventListener('pointerleave', () => { ptr = null; });
 /* a tab goes to its scene (site.js owns the smooth scroll) */
-tabs.forEach((b, i) => b.addEventListener('click', () => { const r = sec.getBoundingClientRect(), y = scrollY + r.top + (r.height - innerHeight) * (i + .3) / 4; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
+tabs.forEach((b, i) => b.addEventListener('click', () => { const pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, y = moyoTop(sec) + pad + (sec.offsetHeight - pad - innerHeight) * (i + .3) / 4; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
 size(); read();
 })();

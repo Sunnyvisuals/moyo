@@ -190,7 +190,7 @@ const fmt = s => s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + String(s % 6
 setInterval(() => {
   if (document.hidden) return;
   total += 1;
-  const at = secs.find(s => { const r = s.getBoundingClientRect(); return r.top < innerHeight * .5 && r.bottom > innerHeight * .5; });
+  const at = secs.filter(s => { const r = s.getBoundingClientRect(); return r.top < innerHeight * .5 && r.bottom > innerHeight * .5; }).pop(); // the last one is the one on top
   if (at && foot.getBoundingClientRect().top > innerHeight * .5) spent.set(at, (spent.get(at) || 0) + 1);
   if (line && foot.getBoundingClientRect().top < innerHeight) {
     const best = [...spent].sort((a, b) => b[1] - a[1])[0], name = best && best[1] > 4 ? $('h2', best[0]).textContent.replace(/⁠/g, '').trim() : '';

@@ -18,10 +18,14 @@
     const snell = t => { if (t >= 1) return 0; const u = 1 - t, a = Math.atan(u ** 3 / (1 - u ** 4 + .12) ** .75), r = Math.asin(Math.sin(a) / 1.5); return Math.tan(a - r) * (1 - u ** 4 + .35) ** .25; };
     const peak = snell(0), N = 256, lut = Float32Array.from({ length: N + 1 }, (_, i) => snell(i / N) / peak);
     const lens = (d, size, pull) => d < size ? lut[Math.round(d / size * N)] * pull : 0;
-    let last = '', n = 0, t0 = 0;
-    const build = () => {
-      const W = foot.clientWidth, H = Math.ceil(parseFloat(getComputedStyle(foot, '::before').height)) || 0;
-      if (!W || !H || last === W + 'x' + H) return; last = W + 'x' + H;
+    let n = 0, t0 = 0;
+    /* one filter per size of glass: the footer, and the top edge of the sections (home) */
+    const sec = document.querySelector('html.stack main>.sec');
+    const PANES = [[foot, v => foot.style.setProperty('--liquid', v)], [sec, v => document.documentElement.style.setProperty('--liquid-s', v)]].filter(p => p[0])
+      .map(([el, set]) => ({ el, set, last: '', box: svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g')) }));
+    const build = () => PANES.forEach(pane => {
+      const W = pane.el.clientWidth, H = Math.ceil(parseFloat(getComputedStyle(pane.el, '::before').height)) || 0;
+      if (!W || !H || pane.last === W + 'x' + H) return; pane.last = W + 'x' + H;
       const small = W < 821, TOP = small ? 70 : 110, PULL = small ? 20 : 34, SIDE = small ? 20 : 50, PULLX = small ? 8 : 16, Q = 2, SCALE = 2.1 * PULL;
       const w = Math.ceil(W / Q), h = Math.ceil(H / Q), im = g.createImageData(cv.width = w, cv.height = h), d = im.data;
       for (let py = 0, o = 0; py < h; py++) { const my = lens((py + .5) * Q, TOP, PULL);
@@ -29,14 +33,14 @@
           d[o] = 127.5 + mx / SCALE * 255 + Math.random(); d[o + 1] = 127.5 + my / SCALE * 255 + Math.random(); d[o + 2] = 128; d[o + 3] = 255; } }
       g.putImageData(im, 0, 0);
       const id = 'liquid' + (++n), ch = ['1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0', '0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0', '0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0'];
-      svg.innerHTML = `<filter id="${id}" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      pane.box.innerHTML = `<filter id="${id}" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feImage href="${cv.toDataURL()}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none" result="m"/><feGaussianBlur in="m" stdDeviation="2" result="map"/>
 ${ch.map((m, i) => `<feDisplacementMap in="SourceGraphic" in2="map" scale="${SCALE * K[i]}" xChannelSelector="R" yChannelSelector="G" result="d${i}"/><feColorMatrix in="d${i}" values="${m}" result="c${i}"/>`).join('')}
 <feBlend in="c0" in2="c1" mode="screen" result="rg"/><feBlend in="rg" in2="c2" mode="screen" result="o"/><feGaussianBlur in="o" stdDeviation=".7"/></filter>`;
-      foot.style.setProperty('--liquid', `url(#${id})`);
-    };
+      pane.set(`url(#${id})`);
+    });
     const later = () => { clearTimeout(t0); t0 = setTimeout(build, 120); };
-    new ResizeObserver(later).observe(foot); addEventListener('resize', later); build();
+    PANES.forEach(p => new ResizeObserver(later).observe(p.el)); addEventListener('resize', later); build();
   }
 
   if (still) return;

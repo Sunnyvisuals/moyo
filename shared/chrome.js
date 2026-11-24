@@ -206,7 +206,7 @@ footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(6
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(245 244 240) calc(var(--gh) - 1px));
   box-shadow:0 -2px 8px rgb(18 18 20 / .06),0 -24px 48px -12px rgb(18 18 20 / .16)!important}
 /* the glass: clear, it bends what is behind it (glass.js sets --liquid where the browser can), then turns blue downwards */
-footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
+:is(footer#foot.foot,html.stack main>.sec)::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
   background:linear-gradient(to bottom in oklab,rgb(245 244 240 / 0.012) calc(var(--gp) * 0.000),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.049),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.098),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.147),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.196),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.245),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.294),rgb(245 244 240 / 0.016) calc(var(--gp) * 0.343),rgb(245 244 240 / 0.037) calc(var(--gp) * 0.392),rgb(245 244 240 / 0.086) calc(var(--gp) * 0.441),rgb(245 244 240 / 0.166) calc(var(--gp) * 0.490),rgb(245 244 240 / 0.272) calc(var(--gp) * 0.539),rgb(245 244 240 / 0.398) calc(var(--gp) * 0.588),rgb(245 244 240 / 0.533) calc(var(--gp) * 0.637),rgb(245 244 240 / 0.666) calc(var(--gp) * 0.686),rgb(245 244 240 / 0.785) calc(var(--gp) * 0.735),rgb(245 244 240 / 0.882) calc(var(--gp) * 0.784),rgb(245 244 240 / 0.949) calc(var(--gp) * 0.833),rgb(245 244 240 / 0.987) calc(var(--gp) * 0.882),rgb(245 244 240 / 0.999) calc(var(--gp) * 0.931),rgb(245 244 240 / 1.000) calc(var(--gp) * 0.980)),
     radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
     linear-gradient(rgb(255 255 255 / .09),#0000 130px);
@@ -214,7 +214,7 @@ footer#foot.foot::before{content:"";display:block;position:absolute;z-index:-1;i
   box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),inset 0 calc(6px + var(--fv,0) * 8px) calc(10px + var(--fv,0) * 6px) calc(-8px - var(--fv,0) * 3px) rgb(18 18 20 / calc(.16 + var(--fv,0) * .14));
   -webkit-backdrop-filter:blur(4px) saturate(1.08);backdrop-filter:var(--liquid,blur(4px)) saturate(1.08) brightness(1.015)}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
-footer#foot.foot::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
+:is(footer#foot.foot,html.stack main>.sec)::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
   background:radial-gradient(calc(380px + var(--fv,0) * 260px) 70px at var(--lx,50%) 0,#fff 10%,#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),

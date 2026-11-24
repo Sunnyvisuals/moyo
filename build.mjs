@@ -51,7 +51,7 @@ const sizes = {
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
-const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight' };
+const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink' };
 for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, read(`src/${from}.js`));
 out('dist/lenis.js', lenis);
 fs.copyFileSync(r('assets/og.png'), r('dist/og.png')); // image shown when the site is shared

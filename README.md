@@ -13,7 +13,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 - **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
-- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe.
+- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe. Les sections de l'accueil passent l'une sur l'autre, avec le bord de verre du pied de page (`src/stack.js`).
 - **Chemin** : une ligne dans la marge (accueil), un fil d'Ariane et une étape suivante (autres pages), une page 404.
 
 ## Contenu

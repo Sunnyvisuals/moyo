@@ -1,4 +1,4 @@
-/* Page runtime, the same on every page: language, scroll and anchors, optical alignment of titles, the agency statement,
+/* Page runtime, the same on every page: language, scroll and anchors, optical alignment of titles,
    project list + filters + sheet, contact form. The header, the menu and the footer have their own files (chrome.js, footer.js). */
 (() => {
 'use strict';
@@ -134,24 +134,6 @@ document.addEventListener('visibilitychange', () => {
   else { document.title = page; if (icon) icon.href = ICON; }
 });
 
-/* ---------- Agency statement: each word is inked as it is read ---------- */
-const say = $('#say');
-let words = [];
-function splitSay() {
-  if (!say || reduce) return;
-  const t = say.textContent.trim();
-  say.innerHTML = `<span class="sr">${escHTML(t)}</span><span aria-hidden="true">${t.split(/\s+/).map(w => `<span class="w">${escHTML(w)}</span>`).join(' ')}</span>`;
-  words = $$('.w', say); ink();
-}
-function ink() {
-  if (!words.length) return;
-  const r = say.getBoundingClientRect(), H = innerHeight;
-  if (r.bottom < -H || r.top > H * 2) return;
-  // it starts when the first line is well on screen and ends when the last one is
-  const p = clamp((H * .84 - r.top) / (H * .16 + r.height)), n = words.length, reach = 7; // 7 words are being inked at a time
-  words.forEach((w, i) => { const o = clamp((p * (n + reach) - i) / reach); w.style.setProperty('--o', (.16 + .84 * o).toFixed(3)); });
-}
-
 /* ---------- Language: French is in the page, English in #en. The choice is kept under "hb-lang". ---------- */
 const store = new WeakMap();
 const keep = (el, get) => { if (!store.has(el)) store.set(el, get()); return store.get(el); };
@@ -165,7 +147,7 @@ function applyLang(l) {
     $('.r-title', li).textContent = t.title; $('.r-desc', li).textContent = t.desc || ''; $('.r-type', li).textContent = t.type || ''; $('.r-meta', li).textContent = metaText(p, t); });
   if (filters) { renderFilters(); applyFilter(); document.title = (l === 'en' ? 'Projects' : 'Projets') + ' · Moyo Studio'; }
   if (dlg && dlg.open) fill(cur);
-  splitSay(); optical();
+  optical();
   try { localStorage.setItem('hb-lang', l); } catch (_) {}
 }
 function swapLang(l) {
@@ -180,12 +162,12 @@ $$('.flang button').forEach(b => b.addEventListener('click', () => swapLang(b.da
 /* ---------- Scroll: Lenis (MIT) for the mouse wheel, native on touch, none with reduced motion ---------- */
 let lenis = null;
 if (!reduce && typeof Lenis !== 'undefined') lenis = new Lenis({ lerp: .07, wheelMultiplier: .85, smoothWheel: true, autoRaf: true });
-/* where a block really is in the page (the content is sticky under the footer, so its rectangle cannot be trusted there) */
-function natural(el) { let y = 0, e = el; while (e && !e.classList.contains('under')) { y += e.offsetTop; e = e.offsetParent; } return y; }
 window.moyoScroll = y => { if (lenis) lenis.scrollTo(y, { duration: 1.6, easing: t => 1 - Math.pow(1 - t, 4), force: true }); else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); };
 function goTo(id) {
   const el = id === 'top' || id === 'main' || !id ? null : document.getElementById(id);
-  const y = el ? Math.max(0, Math.round(natural(el) + (parseFloat(getComputedStyle(el).paddingTop) || 0) * .42)) : 0;
+  // a section is read once its glass edge has gone up: the title sits just under the header
+  const pad = el ? parseFloat(getComputedStyle(el).paddingTop) || 0 : 0, glass = el && root.classList.contains('stack') && el.matches('main>.sec') ? parseFloat(getComputedStyle(el, '::before').height) || 0 : 0;
+  const y = el ? Math.max(0, Math.round(moyoTop(el) + (el.matches('.mth.live') ? pad : glass ? glass - (innerWidth > 820 ? 96 : 64) : pad * .42))) : 0;
   const done = () => { if (el) { el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); } try { history.replaceState(null, '', el ? '#' + id : location.pathname + location.search); } catch (_) {} };
   if (lenis) lenis.scrollTo(y, { duration: clamp(1 + Math.abs(y - scrollY) / 3200, 1.2, 2.8), easing: t => 1 - Math.pow(1 - t, 4), force: true, onComplete: done });
   else { scrollTo(0, y); done(); }
@@ -204,7 +186,7 @@ document.addEventListener('click', e => {
 });
 
 /* the menu opens on the section being read (home) */
-const SECTIONS = { services: 2, methode: 2, studio: 3, equipe: 4, contact: 5, projets: 1 };
+const SECTIONS = { projets: 1, services: 2, methode: 2, studio: 3, equipe: 4, contact: 5 }; // in the order of the page: the last one on screen is the one on top
 const menuEl = $('#menu');
 if (menuEl && $('#services')) menuEl.addEventListener('beforetoggle', e => {
   if (e.newState !== 'open') return;
@@ -254,10 +236,12 @@ if (form) {
   });
 }
 
+/* the pictures of the accordion are decoded once the page is quiet, not during the first scroll */
+if (list && !filters) addEventListener('load', () => (window.requestIdleCallback || (f => setTimeout(f, 600)))(() => $$('#projects img').forEach(i => { i.loading = 'eager'; i.decode?.().catch(() => {}); })), { once: true });
+
 /* ---------- Start ---------- */
 applyLang(lang);
 document.fonts?.ready.then(() => optical());
-let rt = 0, q2 = 0;
-addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { optical(); ink(); }, 120); });
-addEventListener('scroll', () => { if (!q2) q2 = requestAnimationFrame(() => { q2 = 0; ink(); }); }, { passive: true });
+let rt = 0;
+addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(optical, 120); });
 })();
