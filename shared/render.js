@@ -13,9 +13,10 @@ function catLabel(data, id, lang) {
   return c ? (c[lang] || c.fr || c.id) : '';
 }
 
-/* texts of a project in a language, French where a translation is missing */
+/* texts of a project in a language, French where a translation is missing; in French no line starts with : ; ? or ! */
 function txt(p, lang) {
-  return { ...(p.fr || {}), ...Object.fromEntries(Object.entries(p[lang] || {}).filter(([, v]) => v)) };
+  const t = { ...(p.fr || {}), ...Object.fromEntries(Object.entries(p[lang] || {}).filter(([, v]) => v)) };
+  return lang === 'fr' ? Object.fromEntries(Object.entries(t).map(([k, v]) => [k, typeof v === 'string' ? v.replace(/ ([:;?!])/g, '\u00a0$1') : v])) : t;
 }
 
 function plateInner(p, alt) {

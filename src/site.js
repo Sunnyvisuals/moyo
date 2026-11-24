@@ -56,7 +56,29 @@ function fill(i) {
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
   const pl = $('#pPlate'); pl.innerHTML = plateInner(p); pl.classList.toggle('plate--none', !p.cover);
   $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
+  const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
+  $('#pPos').textContent = `${at + 1}/${v.length}`; $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
   dlg.scrollTop = 0; optical(dlg);
+}
+/* accordion (home, large screens): the card under the pointer or the focus opens. A finger opens it first, then opens the sheet. */
+const wide = matchMedia('(min-width:821px)');
+let armed = null;
+if (list && !filters) {
+  const cards = $$('#projects > .case'); let on = 0, lock = 0;
+  list.style.setProperty('--n', cards.length);
+  const set = i => { on = i; cards.forEach((c, k) => c.classList.toggle('on', k === i)); lock = performance.now() + 220; };
+  set(0);
+  cards.forEach((c, i) => {
+    const plate = $('.plate', c), img = $('img', c);
+    plate.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || !wide.matches) return;
+      if (i !== on && (e.movementX || e.movementY) && performance.now() > lock) set(i); // a card that slides under a still pointer does not open
+      if (img && !reduce) { const r = plate.getBoundingClientRect(); img.style.setProperty('--px', ((e.clientX - r.left) / r.width * -24 + 12).toFixed(1) + 'px'); }
+    });
+    plate.addEventListener('pointerleave', () => { if (img) img.style.setProperty('--px', '0px'); });
+    $('.row', c).addEventListener('focus', () => { if (root.classList.contains('kbd')) set(i); });
+    c.addEventListener('click', e => { if (wide.matches && i !== on && !matchMedia('(hover:hover)').matches) { e.stopPropagation(); set(i); } }, true);
+  });
 }
 function step(d) { const v = visible(), k = v.indexOf(cur); fill(v[(k + d + v.length) % v.length]); }
 function closeSheet() {
@@ -73,7 +95,7 @@ if (dlg && list) {
   dlg.addEventListener('cancel', e => { e.preventDefault(); closeSheet(); });
   dlg.addEventListener('keydown', e => { if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); });
   $('#pClose').addEventListener('click', closeSheet);
-  $('#pNext').addEventListener('click', () => step(1));
+  $('#pNext').addEventListener('click', () => step(1)); $('#pNext2').addEventListener('click', () => step(1));
   $('#pPrev').addEventListener('click', () => step(-1));
 }
 
@@ -104,6 +126,13 @@ function optical(scope) {
     el.style.marginLeft = bear > .2 ? (-bear).toFixed(2) + 'px' : '';
   });
 }
+
+/* ---------- Leaving the tab: the dot closes its eye, and waits ---------- */
+const icon = $('link[rel=icon]'), ICON = icon && icon.href; let page = document.title;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'See you soon?' : 'On se voit ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F5F4F0'/%3E%3Crect x='8' y='15' width='16' height='3' rx='1.5' fill='%23002FA7'/%3E%3C/svg%3E"; }
+  else { document.title = page; if (icon) icon.href = ICON; }
+});
 
 /* ---------- Agency statement: each word is inked as it is read ---------- */
 const say = $('#say');
@@ -153,6 +182,7 @@ let lenis = null;
 if (!reduce && typeof Lenis !== 'undefined') lenis = new Lenis({ lerp: .07, wheelMultiplier: .85, smoothWheel: true, autoRaf: true });
 /* where a block really is in the page (the content is sticky under the footer, so its rectangle cannot be trusted there) */
 function natural(el) { let y = 0, e = el; while (e && !e.classList.contains('under')) { y += e.offsetTop; e = e.offsetParent; } return y; }
+window.moyoScroll = y => { if (lenis) lenis.scrollTo(y, { duration: 1.6, easing: t => 1 - Math.pow(1 - t, 4), force: true }); else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); };
 function goTo(id) {
   const el = id === 'top' || id === 'main' || !id ? null : document.getElementById(id);
   const y = el ? Math.max(0, Math.round(natural(el) + (parseFloat(getComputedStyle(el).paddingTop) || 0) * .42)) : 0;
@@ -197,6 +227,10 @@ if (form) {
   const q = new URLSearchParams(location.search);
   if (q.has('envoye')) say3(lang === 'en' ? 'Message sent. Thank you!' : 'Message envoyé. Merci !');
   if (q.has('erreur')) say3(lang === 'en' ? 'The message could not be sent. Check the fields and try again.' : 'Le message n’a pas pu partir. Vérifiez les champs et réessayez.', true);
+  // three dots, one per required field: what is started wants to be finished
+  const dots = $('.f-dots', form), need = [['name', f => f.value.trim().length > 1], ['email', f => !!f.value && f.validity.valid && /\.[a-z]{2,}$/i.test(f.value.trim())], ['message', f => f.value.trim().length >= 10]];
+  const fillDots = () => { let n = 0; need.forEach(([k, ok], i) => { const y = ok(form.elements[k]); n += y; dots.children[i].classList.toggle('ok', y); }); dots.classList.toggle('full', n === 3); };
+  form.addEventListener('input', fillDots);
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const en = lang === 'en', f = form.elements;

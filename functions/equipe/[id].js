@@ -13,7 +13,7 @@ export async function onRequestGet({ params, env, request }) {
   const team = data.team || [];
   const i = team.findIndex(m => m.id === params.id);
   if (i < 0) return Response.redirect(new URL('/#equipe', request.url).toString(), 302);
-  const m = team[i];
+  const m = team[i], next = team.length > 1 ? team[(i + 1) % team.length] : null;
   const fr = m.fr || {}, en = { role: m.en?.role || fr.role, bio: m.en?.bio || fr.bio };
   const about = `${e(m.name)}, ${e(fr.role)}. Moyo, agence créative basée en Provence-Alpes-Côte d’Azur.`;
 
@@ -35,6 +35,7 @@ export async function onRequestGet({ params, env, request }) {
 <meta property="og:image:alt" content="moyo">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://moyo-d0n.pages.dev/og.png">
+<link rel="canonical" href="https://moyo-d0n.pages.dev/equipe/${e(m.id)}">
 ${headCommon}
 <style>
 ${DESIGN_CSS}${CHROME_CSS}${FOOTER_CSS}${GLASS_CSS}
@@ -47,10 +48,11 @@ html[lang=fr] [data-l=fr]:is(span,div),html[lang=en] [data-l=en]:is(span,div){di
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Aller au contenu</a>
+<a class="skip" href="#main" data-i="skip">Aller au contenu</a>
 ${chromeHead(4)}
 <div class="under"><main class="sheet" id="main">
-  <h1 class="t-hero sheet-t">${e(m.name)}<i class="dot">.</i></h1>
+  <nav class="crumbs" aria-label="Vous êtes ici" data-ia="here"><ol><li><a href="/" data-i="home">Accueil</a></li><li><a href="/#equipe" data-i="team">Équipe</a></li><li aria-current="page"><span>${e(m.name)}</span></li></ol></nav>
+  <h1 class="t-hero sheet-t">${e(m.name)}<i class="dot">&#8288;<b></b></i></h1>
   <div class="g sheet-g">
     <div class="plate c5${m.photo ? '' : ' plate--none'}"${m.photo ? '' : ' aria-hidden="true"'}>${m.photo ? `<img src="${imgURL(m.photo)}" alt="${e(m.name)}">` : ''}</div>
     <div class="h2">
@@ -58,8 +60,10 @@ ${chromeHead(4)}
       <div class="bio"><div data-l="fr">${para(fr.bio)}</div><div data-l="en">${para(en.bio)}</div></div>
     </div>
   </div>
+  ${next ? `<a class="nm-link g next" href="/equipe/${e(next.id)}"><span class="nm">${e(next.name)}</span><span class="nm-role q4" data-i="nextS">Suivant</span></a>` : ''}
 </main></div>
 ${footerHTML(team)}
+<script type="application/json" id="en">{"skip":"Skip to content","here":"You are here","home":"Home","team":"Team","nextS":"Next"}</script>
 ${scripts}
 </body>
 </html>`;

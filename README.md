@@ -9,23 +9,24 @@ Contact : contact.moyostudio@gmail.com
 Le système est décrit et défini dans un seul fichier, `shared/design.js`, utilisé par toutes les pages.
 
 - **Couleur** : blanc cassé `#F5F4F0`, encre `#121214`, un gris `#65656B`. Le bleu Klein `#002FA7` est la seule couleur et il a toujours un sens : l'idée, l'action, la fin de page.
-- **Le point Klein** : il termine les titres, il remplace une image manquante, c'est l'icône du site et le curseur.
+- **Le point Klein** : l'idée unique. Il charge la page, termine les titres, est le curseur, montre le chemin, joue la méthode et devient la pupille des deux o dans le pied de page. Sources et choix : `docs/references.md`.
 - **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
-- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas.
+- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe.
+- **Chemin** : une ligne dans la marge (accueil), un fil d'Ariane et une étape suivante (autres pages), une page 404.
 
 ## Contenu
 
 | Section | Contenu |
 | --- | --- |
 | Ouverture | Une phrase |
-| Projets | Un projet par rangée : image sur l'axe 1, texte sur l'axe 7. Ouverture en fiche |
+| Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche |
 | Services | Sept services, une ligne chacun |
-| Méthode | Quatre étapes sur les quatre axes |
+| Méthode | Une scène épinglée, quatre temps, un champ de points |
 | Agence | La phrase s'encre mot à mot avec le scroll, puis le sens de « moyo » |
 | Équipe | Les noms, vers `/equipe/<id>` |
-| Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue |
+| Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome et un accord |
 
 Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exemples à remplacer.
 

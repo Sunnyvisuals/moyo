@@ -37,6 +37,8 @@ export async function onRequest({ request, env, next }) {
   const h = res.headers;
   h.set('X-Content-Type-Options', 'nosniff');
   h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (url.pathname.startsWith('/fonts/') && res.ok) h.set('Cache-Control', 'public, max-age=31536000, immutable');
+  if (url.pathname.startsWith('/proj/') && res.ok) h.set('Cache-Control', 'public, max-age=86400');
   if (isHTML) {
     h.set('X-Frame-Options', 'DENY');
     h.set('Cache-Control', 'no-cache');

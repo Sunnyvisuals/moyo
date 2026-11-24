@@ -250,14 +250,14 @@ new MutationObserver(() => {
   if (menu.matches(':popover-open')) arcKick();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
-/* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up, white over the blue footer */
+/* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up */
 if (bar) {
   let last = scrollY, upAt = scrollY, q = 0;
-  const ft = document.getElementById('foot'), land = bar.hasAttribute('data-land');
+  const land = bar.hasAttribute('data-land');
   const upd = () => { q = 0; const y = scrollY, dy = y - last; last = y; if (dy < -2) upAt = y;
     const first = land && y < innerHeight * .85, busy = bar.contains(document.activeElement) || menu.matches(':popover-open');
     if (dy || land) bar.classList.toggle('away', !busy && (first || (!reduce && y > 80 && (dy > 0 ? y - upAt > 80 : bar.classList.contains('away') && dy === 0))));
-    bar.dataset.tone = ft && ft.getBoundingClientRect().top <= bar.offsetHeight / 2 ? 'paper' : 'klein'; };
+  };
   addEventListener('scroll', () => { if (!q) q = requestAnimationFrame(upd); }, { passive: true });
   bar.addEventListener('focusin', () => bar.classList.remove('away'));
   upd();

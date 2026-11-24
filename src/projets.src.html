@@ -16,11 +16,12 @@
 <meta property="og:image:alt" content="moyo">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://moyo-d0n.pages.dev/og.png">
+<link rel="canonical" href="https://moyo-d0n.pages.dev/projets">
 __HEAD__
 <style>
 __CSS__
 /* ---------- Every project: a contact sheet on the four axes ---------- */
-main{min-height:100vh;min-height:100svh;padding:calc(var(--hdr) + clamp(2.5rem,7vw,7rem)) var(--edge) var(--sec)}
+main{min-height:100vh;min-height:100svh;padding:calc(var(--hdr) + clamp(1.5rem,4.5vw,4.5rem)) var(--edge) var(--sec)}
 .page-t{margin-bottom:var(--gap)}
 /* Filters: plain words. The current one is blue; the categories still waiting for a project are faded. */
 .filters{display:flex;flex-wrap:wrap;gap:0 clamp(18px,2vw,34px);margin-bottom:clamp(3rem,5vw,5.5rem);font-weight:500}
@@ -48,11 +49,13 @@ html:not(.js) .filters{display:none}
 __CHROME_HEAD__
 
 <div class="under"><main id="main">
-  <h1 class="t-hero page-t"><span data-i="title">Projets</span><i class="dot">.</i></h1>
+  <nav class="crumbs" aria-label="Vous êtes ici" data-ia="here"><ol><li><a href="/" data-i="home">Accueil</a></li><li aria-current="page"><span data-i="title2">Projets</span></li></ol></nav>
+  <h1 class="t-hero page-t"><span data-i="title">Projets</span><i class="dot">&#8288;<b></b></i></h1>
   <div class="filters" id="filters" role="group" aria-label="Filtrer par catégorie" data-ia="filtersAria"></div>
   <p class="sr" id="count" aria-live="polite"></p>
   <ol class="g index" id="projects">__ROWS__</ol>
   <p class="empty" id="empty" hidden data-i="empty">Aucun projet dans cette catégorie pour l’instant.</p>
+  <a class="nm-link g next" href="/#contact"><span class="nm" data-i="contact">Contact</span><span class="nm-role q4" data-i="nextS">Étape suivante</span></a>
   <script type="application/json" id="moyo-data">__DATA__</script>
 </main></div>
 
@@ -61,7 +64,7 @@ __FOOTER__
 __SHEET__
 
 <script type="application/json" id="en">{
-"skip":"Skip to content","title":"Projects","empty":"No project in this category yet.","filtersAria":"Filter by category",
+"skip":"Skip to content","here":"You are here","home":"Home","title":"Projects","title2":"Projects","contact":"Contact","nextS":"Next stop","sProjL":"Projects","nextP":"Next project","empty":"No project in this category yet.","filtersAria":"Filter by category",
 "fCat":"Category","fRole":"Role","fYear":"Year","fPlace":"Place","prev":"Previous","next":"Next","close":"Close"
 }</script>
 __SCRIPTS__
