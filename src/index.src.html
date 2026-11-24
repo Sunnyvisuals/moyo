@@ -5,19 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F5F4F0">
-<title>Moyo Studio</title>
-<meta name="description" content="Moyo, agence créative basée en Provence-Alpes-Côte d’Azur : images, sites, films et campagnes, à partir d’une seule idée.">
-<meta property="og:title" content="Moyo Studio">
-<meta property="og:description" content="Agence créative basée en Provence-Alpes-Côte d’Azur. Des images, des sites et des films à partir d’une seule idée.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://moyo-d0n.pages.dev/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="moyo">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://moyo-d0n.pages.dev/og.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"Moyo","description":"Agence créative basée en Provence-Alpes-Côte d’Azur : sites, identités, audiovisuel et communication.","areaServed":"Provence-Alpes-Côte d’Azur","address":{"@type":"PostalAddress","addressRegion":"Provence-Alpes-Côte d’Azur","addressCountry":"FR"},"email":"contact.moyostudio@gmail.com","knowsLanguage":["fr","en"]}</script>
-<link rel="canonical" href="https://moyo-d0n.pages.dev/">
+<!--meta-->__META__<!--/meta-->
 __HEAD__
 <style>
 __CSS__
@@ -66,7 +54,7 @@ __CSS__
   .live .tab{grid-column:span 1!important}.live .tab span{display:none}
 }
 
-/* Agency: the statement is inked as it is read (ink.js) */
+/* Studio: the statement is inked as it is read (ink.js) */
 .say{max-width:24em;text-wrap:pretty}
 .defs{margin-top:var(--gap);row-gap:40px;align-items:start}
 .defs h3{font-size:inherit;font-weight:600;margin-bottom:14px}
@@ -99,7 +87,7 @@ __CSS__
 .opt{color:var(--mute)}
 .chips label{position:relative}
 .chips input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
-.chips label span{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s,scale .3s var(--ease)}
+.chips label span{display:inline-flex;align-items:center;min-height:max(44px,2.3em);padding:0 max(15px,.85em);border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s,scale .3s var(--ease)}
 .chips label:hover span{border-color:var(--ink)}
 .chips input:checked+span{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .chips input:focus-visible+span{outline:2px solid var(--klein);outline-offset:3px}
@@ -128,7 +116,7 @@ __CHROME_HEAD__
 <!-- First screen -->
 <section class="hero" id="top">
   <div class="g hero-top">
-    <p class="h1" data-i="heroWhat">Agence créative indépendante</p>
+    <p class="h1" data-i="heroWhat">Studio créatif indépendant</p>
     <p class="q3" data-i="heroWhere">Provence-Alpes-Côte d’Azur</p>
     <p class="q4"><a class="lnk" href="#projets"><span data-i="heroCta">Voir les projets</span><i class="dn" aria-hidden="true">↓</i></a></p>
   </div>
@@ -171,10 +159,10 @@ __CHROME_HEAD__
   </div>
 </section>
 
-<!-- Agency -->
+<!-- Studio -->
 <section class="sec over" id="studio" aria-labelledby="stuT">
-  <h2 class="t-xl" id="stuT"><span data-i="stuT">Agence</span><i class="dot">&#8288;<b></b></i></h2>
-  <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est une agence créative basée en Provence-Alpes-Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
+  <h2 class="t-xl" id="stuT"><span data-i="stuT">Studio</span><i class="dot">&#8288;<b></b></i></h2>
+  <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est un studio créatif basé en Provence-Alpes-Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
   <div class="g defs">
     <div class="q3">
       <h3 data-i="enT">Moyo, nom. Du japonais moyō.</h3>
@@ -247,10 +235,11 @@ __FOOTER__
 __SHEET__
 
 <script type="application/json" id="en">{
+"_title":"Moyo Studio · Creative studio on the French Riviera",
 "skip":"Skip to content",
-"heroWhat":"Independent creative agency","heroWhere":"French Riviera","heroCta":"See the projects",
+"heroWhat":"Independent creative studio","heroWhere":"French Riviera","heroCta":"See the projects",
 "h1a":"Moyo designs images, websites and films from ","h1b":"a single idea",
-"projT":"Projects","svcT":"Services","mthT":"Method","stuT":"Agency","teamT":"Team","teamAria":"Team","ctT":"Contact",
+"projT":"Projects","svcT":"Services","mthT":"Method","stuT":"Studio","teamT":"Team","teamAria":"Team","ctT":"Contact",
 "s1t":"Art direction","s1p":"One idea, a type system, a palette. Everything is decided before the first pixel.",
 "s2t":"Immersive websites","s2p":"Narrative scroll, WebGL only when it serves the subject, readable without a mouse or animation.",
 "s3t":"Data visualisation","s3p":"Charts you can explore, with their sources and a table version.",
@@ -262,7 +251,7 @@ __SHEET__
 "m2t":"Choose","m2p":"We keep one idea, and what it rules out.",
 "m3t":"Build","m3p":"Grid, type, image and code: everything is designed, then tested on real screens.",
 "m4t":"Support","m4p":"We stay on after launch: measuring, adjusting, new content.",
-"stuP":"Moyo is a creative agency based on the French Riviera. We imagine images, websites, films and campaigns for places, events and brands that have something precise to show.",
+"stuP":"Moyo is a creative studio based on the French Riviera. We imagine images, websites, films and campaigns for places, events and brands that have something precise to show.",
 "enT":"Moyo, noun. From the Japanese moyō.","enD1":"pattern, design.","enD2":"the look of the sky.","enLink":"See the meaning",
 "enS":"We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.",
 "ctQ":"A place, an event, a brand?","ctLead":"Tell us about the project. We reply within 48 hours.","copy":"Copy the address",

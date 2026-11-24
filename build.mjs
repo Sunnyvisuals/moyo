@@ -18,23 +18,31 @@ const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k
 
 const { rowsHTML, featuredOf, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
 const { DESIGN_CSS, sheetHTML, headCommon, scripts } = await import(pathToFileURL(r('shared/design.js')).href);
+const { SITE, HOME, LIST, LOST, SERVICES, METHOD, head, ldHome, ldList, sample } = await import(pathToFileURL(r('shared/seo.js')).href);
+const { CHROME, CHROME_ARIA, FOOT_EN } = await import(pathToFileURL(r('shared/i18n.js')).href);
 const { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML, teamRows } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
 const renderSrc = read('shared/render.js').replace(/^export \{[^}]*\};?\s*$/m, '');
 if (/^\s*export\b/m.test(renderSrc)) throw new Error('shared/render.js: keep `export` on the last line only');
 
-const SITE = 'https://moyo-d0n.pages.dev';
 const CSS = DESIGN_CSS + CHROME_CSS + FOOTER_CSS + GLASS_CSS;
 const lenis = read('vendor/lenis.min.js').replace('//# sourceMappingURL=lenis.min.js.map', '');
 /* a service that has projects leads to them */
 const services = html => html.replace(/<a class="la" data-cat="([^"]+)"/g, (m, c) => seed.projects.some(p => p.category === c) ? `${m} href="/projets?cat=${c}"` : m);
+/* what the structured data and llms.txt say is what the page says */
+const homeSrc = read('src/index.src.html'), homeEN = JSON.parse(homeSrc.match(/id="en">([\s\S]*?)<\/script>/)[1]);
+for (const [k, t] of [...SERVICES.map(s => [s[0], s[2]]), ...METHOD.map(m => [m[0], m[1]])]) for (const [i, f] of [[0, 't'], [1, 'p']]) {
+  const fr = (homeSrc.match(new RegExp(`data-i="${k}${f}">([^<]*)<`)) || [])[1], plain = x => String(x).replace(/&amp;/g, '&').replace(/&nbsp;| /g, ' ');
+  if (plain(fr) !== plain(t.fr[i]) || homeEN[k + f] !== t.en[i]) throw new Error(`shared/seo.js and the page differ: ${k}${f}`);
+}
 const common = { __HEAD__: headCommon, __CSS__: CSS, __DATA__: dataJSON(seed), __SHEET__: sheetHTML, __SCRIPTS__: scripts };
 
 fs.rmSync(r('dist'), { recursive: true, force: true });
 
 const sizes = {
-  'index.html': out('dist/index.html', services(fill(read('src/index.src.html'), {
+  'index.html': out('dist/index.html', services(fill(homeSrc, {
     ...common,
+    __META__: head({ path: '/', ...HOME.fr, ogTitle: 'Moyo Studio', ld: ldHome(seed.team) }),
     __CHROME_HEAD__: chromeHead(0, { land: true }),
     __ROWS__: rowsHTML(featuredOf(seed), 'fr'),
     __TEAM__: teamRows(seed.team),
@@ -42,20 +50,27 @@ const sizes = {
   }))),
   'projets.html': out('dist/projets.html', fill(read('src/projets.src.html'), {
     ...common,
+    __META__: head({ path: '/projets', ...LIST.fr, ld: ldList(seed.projects.filter(p => !sample(p, seed))) }),
     __CHROME_HEAD__: chromeHead(1),
     __ROWS__: rowsHTML(seed.projects, 'fr'),
     __FOOTER__: footerHTML(seed.team)
   })),
-  '404.html': out('dist/404.html', fill(read('src/404.src.html'), { ...common, __CHROME_HEAD__: chromeHead(0), __FOOTER__: footerHTML(seed.team) })),
+  '404.html': out('dist/404.html', fill(read('src/404.src.html'), { ...common, __META__: head({ path: '/', ...LOST.fr, robots: 'noindex', alternates: false }), __CHROME_HEAD__: chromeHead(0), __FOOTER__: footerHTML(seed.team) })),
   'admin/index.html': out('dist/admin/index.html', read('src/admin.html')),
-  'robots.txt': out('dist/robots.txt', `User-agent: *\nDisallow: /admin\nDisallow: /api/\nSitemap: ${SITE}/sitemap.xml\n`),
+  // search engines, and the engines that answer (AI): same rules for all
+  'robots.txt': out('dist/robots.txt', `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\n# Moteurs de réponse\n${['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot', 'Applebot-Extended', 'Bingbot', 'DuckAssistBot', 'MistralAI-User', 'Amazonbot', 'CCBot', 'meta-externalagent'].map(b => 'User-agent: ' + b).join('\n')}\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`),
+  'site.webmanifest': out('dist/site.webmanifest', JSON.stringify({ name: 'Moyo Studio', short_name: 'moyo', description: HOME.fr.desc, lang: 'fr', start_url: '/', scope: '/', display: 'browser', background_color: '#F5F4F0', theme_color: '#F5F4F0', icons: [192, 512].map(n => ({ src: `/icon-${n}.png`, sizes: `${n}x${n}`, type: 'image/png', purpose: 'any' })).concat({ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' }) }, null, 1)),
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
 const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink', trades: 'trades', play: 'play', divide: 'divide' };
-for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, read(`src/${from}.js`));
+const words = { __CHROME__: JSON.stringify(CHROME), __CHROME_ARIA__: JSON.stringify(CHROME_ARIA), __FOOT_EN__: JSON.stringify(FOOT_EN) };
+for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, fill(read(`src/${from}.js`), words));
 out('dist/lenis.js', lenis);
-fs.copyFileSync(r('assets/og.png'), r('dist/og.png')); // image shown when the site is shared
+for (const n of ['partage.png', 'og.png']) fs.copyFileSync(r('assets/' + n), r('dist/' + n)); // image shown when the site is shared (og.png: the older one, for links shared before)
+for (const n of fs.readdirSync(r('assets/icons'))) fs.copyFileSync(r('assets/icons/' + n), r('dist/' + n));
+fs.mkdirSync(r('dist/og'), { recursive: true });
+for (const n of fs.readdirSync(r('assets/og'))) fs.copyFileSync(r('assets/og/' + n), r('dist/og/' + n)); // the projects of the start, cut for a preview
 fs.mkdirSync(r('dist/proj'), { recursive: true });
 for (const n of fs.readdirSync(r('assets/proj'))) fs.copyFileSync(r('assets/proj/' + n), r('dist/proj/' + n));
 fs.mkdirSync(r('dist/fonts'), { recursive: true });

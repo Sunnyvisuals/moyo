@@ -29,7 +29,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 - [Scroll Slides](https://scrollslides.framer.website/) : une scène épinglée et quatre temps. Repris pour la méthode, avec un seul acteur, un champ de points.
 - [Accordion Cards Pro](https://www.framer.com/marketplace/components/accordion-cards-pro/) : la carte regardée s'ouvre. Repris pour les projets, la légende restant sur la grille.
-- [Gradient Text Reveal](https://www.framer.com/marketplace/components/gradient-text-reveal/) : chaque lettre passe par trois couleurs avec le scroll. Repris avec une vague Klein, seulement pour les phrases qui parlent : agence, méthode, contact.
+- [Gradient Text Reveal](https://www.framer.com/marketplace/components/gradient-text-reveal/) : chaque lettre passe par trois couleurs avec le scroll. Repris avec une vague Klein, seulement pour les phrases qui parlent : studio, méthode, contact.
 - [Font Weight Hover](https://www.framer.com/marketplace/components/font-weight-hover/) : la graisse suit le pointeur. Repris pour les services.
 
 ## Détails à trouver

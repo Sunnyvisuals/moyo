@@ -6,7 +6,7 @@
 const IDS = ['top', 'projets', 'services', 'methode', 'studio', 'equipe', 'contact'];
 const els = IDS.map(id => document.getElementById(id));
 if (els.some(e => !e)) return;
-const NAME = { fr: ['Accueil', 'Projets', 'Services', 'Méthode', 'Agence', 'Équipe', 'Contact'], en: ['Home', 'Projects', 'Services', 'Method', 'Agency', 'Team', 'Contact'] };
+const NAME = { fr: ['Accueil', 'Projets', 'Services', 'Méthode', 'Studio', 'Équipe', 'Contact'], en: ['Home', 'Projects', 'Services', 'Method', 'Studio', 'Team', 'Contact'] };
 const root = document.documentElement, lang = () => root.lang === 'en' ? 'en' : 'fr';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));

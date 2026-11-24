@@ -13,6 +13,15 @@ const json = id => { try { return JSON.parse($('#' + id).textContent); } catch (
 __RENDER__
 const main = $('#main'), EN = json('en') || {};
 let lang = root.lang === 'en' ? 'en' : 'fr';
+/* French at /…, English at /en/… : the address and the links follow the language of the page */
+const served = root.dataset.served === 'en' ? 'en' : 'fr', bare = p => p.replace(/^\/en(?=\/|$)/, '') || '/', local = (p, l = lang) => l === 'en' ? '/en' + (p === '/' ? '' : p) : p;
+const TITLE = { fr: document.title, en: EN._title || document.title };
+function place(l) {
+  const here = location.pathname.replace(/(.)\/$/, '$1'), want = local(bare(here), l);
+  if (want !== here) try { history.replaceState(history.state, '', want + location.search + location.hash); } catch (_) {}
+  $$('a[href^="/"]').forEach(a => { const h = a.getAttribute('href'); if (/^\/(api|admin|proj|img)(\/|$)/.test(h)) return;
+    const f = h.replace(/^\/en(?=[\/?#]|$)/, ''), p = f === '' || f[0] !== '/' ? '/' + f : f; const t = l === 'en' ? '/en' + (p === '/' ? '' : /^\/[#?]/.test(p) ? p.slice(1) : p) : p; if (t !== h) a.setAttribute('href', t); });
+}
 
 /* ---------- Projects ---------- */
 const DATA = json('moyo-data') || { categories: [], projects: [] };
@@ -51,7 +60,7 @@ if (filters) filters.addEventListener('click', e => {
 $$('.la[data-cat]').forEach(a => {
   const n = (DATA.projects || []).filter(p => p.category === a.dataset.cat).length;
   if (!n) return a.removeAttribute('href');
-  a.href = '/projets?cat=' + encodeURIComponent(a.dataset.cat);
+  a.setAttribute('href', local('/projets?cat=' + encodeURIComponent(a.dataset.cat)));
   const k = document.createElement('span'); k.className = 'n'; k.setAttribute('aria-hidden', 'true'); k.textContent = n; a.after(k);
 });
 
@@ -94,8 +103,8 @@ if (list && !filters) {
   });
 }
 const cardOf = i => list && $$('#projects > li')[i];
-const asked = () => { const m = location.pathname.match(/^\/projets\/([^/]+)\/?$/); return m ? ALL.findIndex(p => p.id === decodeURIComponent(m[1])) : -1; }; // the project of the address
-const address = id => new URL('/projets/' + encodeURIComponent(id), location.origin);
+const asked = () => { const m = bare(location.pathname).match(/^\/projets\/([^/]+)\/?$/); return m ? ALL.findIndex(p => p.id === decodeURIComponent(m[1])) : -1; }; // the project of the address
+const address = id => new URL(local('/projets/' + encodeURIComponent(id)), location.origin);
 /* the picture of the card becomes the picture of the sheet, and goes back to it. Where the browser cannot, the sheet rises. */
 function morph(open, i, update) {
   const plate = cardOf(i) && $('.plate', cardOf(i)), mine = $('#pPlate'), r = plate && plate.getBoundingClientRect();
@@ -149,7 +158,7 @@ const closeSheet = () => { if (pushed) history.back(); else hideSheet(); };
 if (dlg && list) {
   list.addEventListener('click', e => { const b = e.target.closest('.row'); if (!b || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); openSheet(+b.dataset.p, true); }); // a new tab gets the page
   dlg.addEventListener('close', () => {
-    root.classList.remove('is-dialog'); lenis?.start(); document.title = (filters ? (lang === 'en' ? 'Projects' : 'Projets') + ' · ' : '') + 'Moyo Studio';
+    root.classList.remove('is-dialog'); lenis?.start(); document.title = TITLE[lang];
     if (pushed && asked() >= 0) { pushed = false; history.back(); } // closed by the browser itself
     opener?.focus({ preventScroll: true });
   });
@@ -207,13 +216,15 @@ function applyLang(l) {
   $$('[data-fr][data-en]').forEach(el => { el.textContent = el.dataset[l] || el.dataset.fr; });
   if (list) $$('#projects > li').forEach((li, i) => { const p = ALL[i]; if (!p) return; const t = txt(p, l);
     $('.r-title', li).textContent = t.title; $('.r-desc', li).textContent = t.desc || ''; $('.r-type', li).textContent = t.type || ''; $('.r-meta', li).textContent = metaText(p, t); });
-  if (filters) { renderFilters(); applyFilter(); document.title = (l === 'en' ? 'Projects' : 'Projets') + ' · Moyo Studio'; }
-  if (dlg && dlg.open) fill(cur);
+  if (filters) { renderFilters(); applyFilter(); }
+  document.title = TITLE[l];
+  if (dlg && dlg.open) fill(cur); else place(l); // the sheet has its own address
   optical();
-  try { localStorage.setItem('hb-lang', l); } catch (_) {}
 }
 function swapLang(l) {
   if (l === lang) return;
+  try { localStorage.setItem('hb-lang', l); } catch (_) {}
+  if (served === 'en' && l === 'fr') { location.href = bare(location.pathname) + location.search + location.hash; return; } // the French words are on the French page
   const run = () => applyLang(l);
   if (!VT) { if (reduce) return run(); const all = $$('.under,#foot,#menu .menu-in'); Promise.all(all.map(e => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease', fill: 'forwards' }).finished)).catch(() => {}).then(o => { run(); all.forEach(e => e.getAnimations().forEach(a => a.cancel())); all.forEach(e => e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease' })); }); return; }
   let vt; try { vt = document.startViewTransition({ update: run, types: ['lang'] }); } catch (_) { vt = document.startViewTransition(run); }

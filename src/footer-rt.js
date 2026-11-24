@@ -6,8 +6,7 @@ const $=(s,r=document)=>r.querySelector(s);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const getLang=()=>document.documentElement.lang==='en'?'en':'fr';
 let lang=getLang();
-const EN={contact:'Contact',footAria:'Site footer',langAria:'Language',fNav:'Site map',sProj:'Projects',sSvc:'Services',sMth:'Method',sStu:'Agency',sTeam:'Team',
-  fBy:'Made by',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',top:'Back to top',fSee:'See you soon',fHold:'Hold an eye',fCalm:'Less motion'};
+const EN=__FOOT_EN__; // shared/i18n.js
 function label(){
   const ft=document.getElementById('foot'); if(!ft) return;
   const put=(el,k,store,get,set)=>{ if(!(store in el.dataset)) el.dataset[store]=get(); set(lang==='en'&&EN[k]?EN[k]:el.dataset[store]); };

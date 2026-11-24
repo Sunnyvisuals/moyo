@@ -6,22 +6,23 @@
 /* Menu button, the same on every page (home included). */
 const BURGER_CSS = `/* Menu button: two clean lines. Opening the menu, the close button folds them into a centred cross;
    closing, the header button unfolds the cross back into two lines. Minimal, precise motion. */
+#menuBtn,#menuClose{--bxw:clamp(22px,calc(var(--w) * .0142),34px);--bxt:calc(var(--bxw) / 11);--bxg:calc(var(--bxw) / 4.4);--bxd:calc((var(--bxt) + var(--bxg)) / 2)}
 #menuBtn{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px}
-#menuBtn .bx,#menuClose .bx{display:flex;flex-direction:column;justify-content:center;gap:5px;width:22px;height:15px}
-#menuBtn .bx i,#menuClose .bx i{display:block;width:22px;height:2px;background:currentColor;translate:none!important;transform-origin:50% 50%;
+#menuBtn .bx,#menuClose .bx{display:flex;flex-direction:column;justify-content:center;gap:var(--bxg);width:var(--bxw);height:calc(var(--bxw) * .68)}
+#menuBtn .bx i,#menuClose .bx i{display:block;width:var(--bxw);height:var(--bxt);background:currentColor;translate:none!important;transform-origin:50% 50%;
   transition:transform .5s cubic-bezier(.76,0,.24,1)}
 /* hover (closed): the two lines ease together — a quiet, precise nudge */
 #menuBtn:hover .bx i:nth-of-type(1){transform:translateY(1px)}
 #menuBtn:hover .bx i:nth-of-type(2){transform:translateY(-1px)}
 /* open state (close button): a centred cross */
-#menuClose .bx i:nth-of-type(1){transform:translateY(3.5px) rotate(45deg)}
-#menuClose .bx i:nth-of-type(2){transform:translateY(-3.5px) rotate(-45deg)}
-#menuClose:hover .bx i:nth-of-type(1){transform:translateY(3.5px) rotate(135deg)}
-#menuClose:hover .bx i:nth-of-type(2){transform:translateY(-3.5px) rotate(-135deg)}
-@keyframes x1{0%{transform:none}50%{transform:translateY(3.5px)}100%{transform:translateY(3.5px) rotate(45deg)}}
-@keyframes x2{0%{transform:none}50%{transform:translateY(-3.5px)}100%{transform:translateY(-3.5px) rotate(-45deg)}}
-@keyframes b1{0%{transform:translateY(3.5px) rotate(45deg)}50%{transform:translateY(3.5px)}100%{transform:none}}
-@keyframes b2{0%{transform:translateY(-3.5px) rotate(-45deg)}50%{transform:translateY(-3.5px)}100%{transform:none}}
+#menuClose .bx i:nth-of-type(1){transform:translateY(var(--bxd)) rotate(45deg)}
+#menuClose .bx i:nth-of-type(2){transform:translateY(calc(var(--bxd) * -1)) rotate(-45deg)}
+#menuClose:hover .bx i:nth-of-type(1){transform:translateY(var(--bxd)) rotate(135deg)}
+#menuClose:hover .bx i:nth-of-type(2){transform:translateY(calc(var(--bxd) * -1)) rotate(-135deg)}
+@keyframes x1{0%{transform:none}50%{transform:translateY(var(--bxd))}100%{transform:translateY(var(--bxd)) rotate(45deg)}}
+@keyframes x2{0%{transform:none}50%{transform:translateY(calc(var(--bxd) * -1))}100%{transform:translateY(calc(var(--bxd) * -1)) rotate(-45deg)}}
+@keyframes b1{0%{transform:translateY(var(--bxd)) rotate(45deg)}50%{transform:translateY(var(--bxd))}100%{transform:none}}
+@keyframes b2{0%{transform:translateY(calc(var(--bxd) * -1)) rotate(-45deg)}50%{transform:translateY(calc(var(--bxd) * -1))}100%{transform:none}}
 @media (prefers-reduced-motion:no-preference){
   #menu:popover-open #menuClose .bx i:nth-of-type(1){animation:x1 .55s cubic-bezier(.65,0,.35,1) both}
   #menu:popover-open #menuClose .bx i:nth-of-type(2){animation:x2 .55s cubic-bezier(.65,0,.35,1) both}
@@ -32,10 +33,10 @@ const BURGER_CSS = `/* Menu button: two clean lines. Opening the menu, the close
 @media (min-width:821px){
   .menu-pv .pv-frame{z-index:2}
   .menu-pv .pv-cap{position:relative;z-index:1}
-  .menu-pv .pv-cw{height:66px;overflow:visible;clip-path:inset(-120px -8px 0)}
-  .menu-pv .pv-ci{height:66px}
+  .menu-pv .pv-cw{height:5.6em;overflow:visible;clip-path:inset(-120px -8px 0)}
+  .menu-pv .pv-ci{height:5.6em}
   .menu-pv .pv-nw{overflow:visible;clip-path:inset(-120px -4px -8px)}
-  .menu-pv .pv-ns>span{height:66px}
+  .menu-pv .pv-ns>span{height:5.6em}
 }
 `;
 
@@ -45,7 +46,7 @@ const CHROME_CSS = `
 .bar>*{pointer-events:auto}
 .bar.away{translate:0 -100%}
 html.kbd .bar:focus-within{translate:0 0}
-.bar-mark,.menu-mark{font-size:clamp(1.5rem,1.9vw,1.875rem);font-weight:700;letter-spacing:-.052em;line-height:1;margin-left:-.06em}
+.bar-mark,.menu-mark{font-size:clamp(1.5rem,calc(var(--w) * .0204),2.75rem);font-weight:700;letter-spacing:-.052em;line-height:1;margin-left:-.06em}
 .bar-mark{display:inline-flex;align-items:center;min-height:44px;color:inherit}
 .bar-mark::before{content:"moyo"}
 .bar :focus-visible{outline-color:currentColor;outline-offset:4px}
@@ -59,7 +60,7 @@ html.kbd .bar:focus-within{translate:0 0}
 #menu::backdrop{background:transparent}
 #menu :focus-visible{outline-color:var(--bg)}
 .menu-in{min-height:100%;padding:calc(var(--hdr) + clamp(24px,6vh,72px)) var(--edge) var(--edge);display:flex;flex-direction:column;justify-content:center;position:relative;isolation:isolate}
-.menu-mark{position:absolute;left:var(--edge);top:0;height:var(--hdr);display:flex;align-items:center;color:var(--bg)}
+.menu-mark{position:absolute;z-index:2;left:var(--edge);top:0;height:var(--hdr);display:flex;align-items:center;color:var(--bg)}
 .menu-close{position:absolute;z-index:2;top:0;right:var(--edge);height:var(--hdr);display:inline-flex;align-items:center;justify-content:flex-end;min-width:44px;color:var(--bg)}
 .menu-foot{position:absolute;z-index:2;left:var(--edge);right:var(--edge);bottom:clamp(14px,2.4vw,34px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0 24px;font-size:var(--fs-small);font-weight:600}
 .menu-foot a,.menu-foot button{display:inline-flex;align-items:center;min-height:44px}
@@ -75,33 +76,33 @@ html.kbd .bar:focus-within{translate:0 0}
 /* Arc carousel (desktop) */
 @media (min-width:821px){
   #menu{--arc-on:var(--paper);--arc-off:color-mix(in srgb,var(--paper) 22%,transparent);--arc-frame:#A3A7AF}
-  #menu .menu-in{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:clamp(24px,4vw,80px);padding:0 var(--m);min-height:100%;height:100%}
-  .menu-list.arc{position:relative;flex:none;width:clamp(300px,30vw,520px);height:100svh;margin:0;padding:0}
+  #menu .menu-in{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:clamp(24px,calc(var(--w) * .043),130px);padding:0 var(--m);min-height:100%;height:100%}
+  .menu-list.arc{position:relative;flex:none;width:clamp(300px,calc(var(--w) * .322),780px);height:100svh;margin:0;padding:0}
   .menu-list.arc li{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity}
   .menu-list.arc a{transform-origin:0 50%;border:0!important;padding:0!important;white-space:nowrap;display:inline-flex;align-items:baseline;gap:.3em;color:var(--arc-off);overflow:visible;outline:none!important;transition:none!important}
   .menu-list.arc .mn,.menu-list.arc .c{transition:none!important}
   .menu-list.arc a::before{display:none!important}
-  .menu-list.arc a::after{content:"↗";position:static;display:inline-block;font-size:clamp(1.1rem,1.5vw,1.6rem);font-weight:500;opacity:var(--arw,0);
+  .menu-list.arc a::after{content:"↗";position:static;display:inline-block;font-size:.48em;font-weight:500;opacity:var(--arw,0);
     translate:calc((var(--arw,0) - 1) * .12em) calc((1 - var(--arw,0)) * .12em);transition:none}
-  .menu-list.arc .mn{font-size:clamp(2rem,3.2vw,3.5rem);font-weight:280;line-height:1.08;letter-spacing:-.025em}
+  .menu-list.arc .mn{font-size:clamp(2rem,calc(var(--w) * .0343),5.25rem);font-weight:280;line-height:1.08;letter-spacing:-.025em}
   .menu-list.arc .roll{overflow:visible}
   .menu-list.arc .roll .r2{display:none}
   .menu-list.arc .roll .c{transform:none!important;transition:none}
   .menu-list.arc a:hover,.menu-list.arc a:focus-visible{background:none!important}
   #menu .menu-list.arc li{transition:none!important;translate:none!important}
-  .menu-pv{flex:none;width:clamp(220px,20vw,330px);will-change:transform}
+  .menu-pv{flex:none;width:clamp(220px,calc(var(--w) * .2146),520px);will-change:transform}
   .pv-frame{display:block;cursor:pointer;position:relative;aspect-ratio:4/5;transform-origin:50% 50%}
   .pv-l{position:absolute;left:0;right:0;top:-12%;bottom:-12%;background:var(--arc-frame) var(--img,none) 50% var(--py,50%)/cover no-repeat;clip-path:inset(12% 0)}
-  .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:10px}
-  .pv-cw{height:50px;overflow:hidden;flex:1;min-width:0}
-  .pv-ci{height:50px;overflow:hidden}
+  .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:.9em;font-size:clamp(.8125rem,calc(var(--w) * .0098),1.375rem)}
+  .pv-cw{height:5em;overflow:hidden;flex:1;min-width:0}
+  .pv-ci{height:5em;overflow:hidden}
   .pv-cs,.pv-ns{display:block;will-change:transform}
-  .pv-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.6875rem;line-height:1.35;opacity:.6;max-width:28ch}
-  .pv-name{margin-top:2px;font-size:.8125rem;font-weight:600}
-  .pv-n{font-size:.6875rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pv-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:1em;line-height:1.35;opacity:.72;max-width:30ch}
+  .pv-name{margin-top:.25em;font-size:1.12em;font-weight:600}
+  .pv-n{font-size:1em;font-variant-numeric:tabular-nums;white-space:nowrap}
   .pv-nw{display:inline-block;height:1.3em;line-height:1.3em;overflow:hidden;vertical-align:top}
   .pv-ns>span{display:block;height:1.3em}
-  .pv-t{opacity:.5}
+  .pv-t{opacity:.72}
   @keyframes pvRise{from{clip-path:inset(100% -10% 0 -10%);translate:0 2.5rem}to{clip-path:inset(-20% -10%);translate:0 0}}
   @keyframes pvFade{from{opacity:0}}
   #menu:popover-open .pv-frame{animation:pvRise 1.2s cubic-bezier(.22,1,.36,1) .35s both}
@@ -125,12 +126,13 @@ const chromeHead = (start = 0, { land = false } = {}) => `<header class="bar${la
   <button type="button" id="menuBtn" class="bar-menu" popovertarget="menu" popovertargetaction="toggle" aria-expanded="false"><span class="sr" data-i="menu">Menu</span><span class="bx" aria-hidden="true"><i></i><i></i></span></button>
 </header>
 <nav id="menu" popover aria-label="Menu" data-ia="menu" data-start="${start}">
+  <a class="menu-mark" href="/" aria-label="moyo, accueil" data-ia="homeAria" translate="no">moyo</a>
   <div class="menu-in">
     <ol class="menu-list arc">
       <li><a href="/"><span class="mn" data-i="sec.top">Accueil</span></a></li>
       <li><a href="/projets"><span class="mn" data-i="sec.all">Projets</span></a></li>
       <li><a href="/#services"><span class="mn" data-i="sec.services">Services</span></a></li>
-      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Agence</span></a></li>
+      <li><a href="/#studio"><span class="mn" data-i="sec.studio">Studio</span></a></li>
       <li><a href="/#equipe"><span class="mn" data-i="sec.team">Équipe</span></a></li>
       <li><a href="/#contact"><span class="mn" data-i="sec.contact">Contact</span></a></li>
     </ol>
@@ -146,7 +148,6 @@ const chromeHead = (start = 0, { land = false } = {}) => `<header class="bar${la
     </div>
   </div>
   <div class="menu-foot"><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span></div>
-  <span class="menu-mark" aria-hidden="true" translate="no">moyo</span>
   <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i></span></button>
 </nav>`;
 
@@ -262,7 +263,7 @@ const footerInner = ({ home = false, team } = {}) => {
         <li><a href="/projets" data-i="sProj">Projets</a></li>
         <li><a href="${h}services" data-i="sSvc">Services</a></li>
         <li><a href="${h}methode" data-i="sMth">Méthode</a></li>
-        <li><a href="${h}studio" data-i="sStu">Agence</a></li>
+        <li><a href="${h}studio" data-i="sStu">Studio</a></li>
         <li><a href="${h}equipe" data-i="sTeam">Équipe</a></li>
       </ul>
     </nav>

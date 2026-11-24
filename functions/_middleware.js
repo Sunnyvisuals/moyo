@@ -2,9 +2,7 @@
    - Home and /projets: once the admin has saved projects in KV, the static lists (built from the seed)
      are replaced on the fly with the current ones, so the pages stay complete without JavaScript.
    - Adds a few security headers everywhere, and keeps /admin out of search engines. */
-import { getData, hasStored } from './_lib/store.js';
-import { rowsHTML, featuredOf, dataJSON } from '../shared/render.js';
-import { creditLinks, teamRows } from '../shared/chrome.js';
+import { fresh } from './_lib/fresh.js';
 
 const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all' };
 
@@ -20,17 +18,7 @@ export async function onRequest({ request, env, next }) {
   const page = request.method === 'GET' && PAGES[url.pathname];
   const isHTML = (res.headers.get('Content-Type') || '').includes('text/html');
 
-  if (page && isHTML && res.ok && (await hasStored(env))) {
-    const data = await getData(env);
-    const list = page === 'home' ? featuredOf(data) : data.projects;
-    res = new HTMLRewriter()
-      .on('#projects', { element: el => { el.setInnerContent(rowsHTML(list, 'fr'), { html: true }); } })
-      .on('.fby', { element: el => { el.setInnerContent(creditLinks(data.team), { html: true }); } })
-      .on('.names', { element: el => { el.setInnerContent(teamRows(data.team), { html: true }); } })
-      .on('a.la', { element: el => { const c = el.getAttribute('data-cat'); if (data.projects.some(p => p.category === c)) el.setAttribute('href', '/projets?cat=' + c); else el.removeAttribute('href'); } })
-      .on('script#moyo-data', { element: el => { el.setInnerContent(dataJSON(data), { html: true }); } })
-      .transform(res);
-  }
+  if (page && isHTML && res.ok) res = await fresh(res, page, env);
 
   // contact form posted without JavaScript: say so on the page it lands on
   if (page === 'home' && isHTML && res.ok && (url.searchParams.has('envoye') || url.searchParams.has('erreur'))) {

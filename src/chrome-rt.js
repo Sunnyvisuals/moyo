@@ -14,11 +14,7 @@ const getLang = () => document.documentElement.lang === 'en' ? 'en' : 'fr';
 let lang = getLang();
 
 /* The chrome owns its own labels so it works on any page, whatever that page's own language system. */
-const I18N = {
-  fr: { 'sec.top': 'Accueil', 'sec.all': 'Projets', 'sec.services': 'Services', 'sec.studio': 'Agence', 'sec.team': 'Équipe', 'sec.contact': 'Contact', menu: 'Menu', close: 'Fermer' },
-  en: { 'sec.top': 'Home', 'sec.all': 'Projects', 'sec.services': 'Services', 'sec.studio': 'Agency', 'sec.team': 'Team', 'sec.contact': 'Contact', menu: 'Menu', close: 'Close' }
-};
-const ARIA = { fr: { homeAria: 'moyo, accueil', menu: 'Menu', langAria: 'Langue' }, en: { homeAria: 'moyo, home', menu: 'Menu', langAria: 'Language' } };
+const I18N = __CHROME__, ARIA = __CHROME_ARIA__; // shared/i18n.js
 const bar = document.getElementById('bar');
 function applyChromeLang(l){
   [bar, menu].forEach(root => { if (!root) return;
@@ -46,8 +42,8 @@ arcReal.forEach(li => arcList.insertBefore(arcClone(li), arcReal[0]));
 arcReal.forEach(li => arcList.appendChild(arcClone(li)));
 const arcItems = $$('.menu-list.arc li');
 const ARC_DESC = {
-  fr: ['Des images, des sites, des films. Une seule idée.', 'Tous les projets, par catégorie.', 'Direction artistique, sites, données, audiovisuel, communication.', 'L’agence, et le sens de son nom.', 'Zahia et Yacine.', 'Parlons de votre projet.'],
-  en: ['Images, websites, films. A single idea.', 'Every project, by category.', 'Art direction, websites, data, audiovisual, communication.', 'The agency, and the meaning of its name.', 'Zahia and Yacine.', 'Let’s talk about your project.']
+  fr: ['Des images, des sites, des films. Une seule idée.', 'Tous les projets, par catégorie.', 'Direction artistique, sites, données, audiovisuel, communication.', 'Le studio, et le sens de son nom.', 'Zahia et Yacine.', 'Parlons de votre projet.'],
+  en: ['Images, websites, films. A single idea.', 'Every project, by category.', 'Art direction, websites, data, audiovisual, communication.', 'The studio, and the meaning of its name.', 'Zahia and Yacine.', 'Let’s talk about your project.']
 };
 const ARC = { curve: 60, spacing: 1.08, edgeFade: 16, wRest: 280, wFocus: 720, spread: 1, omega: (3 + 50 * .09) * 1.5, waveDur: .7, wheelTau: 80 };
 const A = { pos: 0, target: 0, av: 0, pv: 0, lastPos: 0, lean: 0, lensC: 0, lensV: 0, lensAmp: 1, hoverK: null, focusK: null, moving: false,

@@ -1,6 +1,6 @@
 /* Sentences are inked as they are read: each letter goes from pale to Klein blue, then to its own colour, in a wave that follows the scroll
    (after the idea of the Framer component "Gradient Text Reveal": pale, middle colour, final colour; written for this site).
-   Only for the sentences that speak: the statement of the agency, the four of the method, the invitation of the contact. Never titles.
+   Only for the sentences that speak: the statement of the studio, the four of the method, the invitation of the contact. Never titles.
    - data-ink="scroll": the wave follows the place of the text on screen. data-ink="step": method.js drives it (window.moyoWave).
    - Real text: a hidden copy for screen readers, the letters are only drawn. A language switch rewrites the text and it is split again.
    - Nothing with reduced motion or without JavaScript: the text is simply there. */

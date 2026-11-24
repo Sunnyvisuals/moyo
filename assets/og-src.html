@@ -1,11 +1,33 @@
-<!doctype html>
-<meta charset="utf-8">
-<!-- Source of assets/og.png (1200 x 630, shared on Discord, Messages, LinkedIn...). Rebuild: see scripts/og.mjs -->
+<!doctype html><meta charset="utf-8">
+<!-- The picture shown when the site is shared (Discord, Slack, iMessage…), drawn by scripts/og.mjs. The end of the site: the wordmark that looks back.
+     The eyes look up, at the title and the text that the applications write above the picture. 1200 x 630, drawn twice as large. -->
 <style>
 @font-face{font-family:"Hanken Grotesk";src:url(../fonts/hanken-grotesk-latin-wght-normal.woff2) format("woff2");font-weight:100 900}
-html,body{margin:0;width:1200px;height:630px;background:#002FA7;overflow:hidden}
-body{display:grid;place-items:center;color:#F1F3F2;font-family:"Hanken Grotesk",system-ui,sans-serif}
-/* the wordmark, as big as the frame allows; the descender of the y is kept inside */
-h1{margin:0;font-size:420px;font-weight:700;letter-spacing:-.055em;line-height:.8;padding-bottom:.12em;translate:-17px -14px}
+html,body{margin:0}
+body{width:1200px;height:630px;background:#F5F4F0;overflow:hidden;position:relative}
+.m{position:absolute;left:0;top:0;font:700 400px/1 "Hanken Grotesk",sans-serif;letter-spacing:-.055em;color:#121214;white-space:nowrap}
+.p{position:absolute;border-radius:50%;background:#002FA7}
 </style>
-<h1>moyo</h1>
+<div class="m" id="m">moyo</div>
+<script>
+/* the wordmark is as wide as the picture minus its margins; its two o are found on the drawing itself, the pupils are put inside them */
+document.fonts.load('700 400px "Hanken Grotesk"', 'moyo').then(() => {
+  const M = 74, W = 1200 - 2 * M, BASE = 560, el = document.getElementById('m'), S = 800, cv = document.createElement('canvas'), g = cv.getContext('2d', { willReadFrequently: true });
+  cv.width = S * 4; cv.height = S * 2; g.font = `700 ${S}px "Hanken Grotesk"`; g.letterSpacing = (-.055 * S) + 'px'; g.fillText('moyo', S * .3, S * 1.2);
+  const d = g.getImageData(0, 0, cv.width, cv.height).data, on = (x, y) => d[((y | 0) * cv.width + (x | 0)) * 4 + 3] > 110, X0 = S * .3, Y0 = S * 1.2;
+  let a = cv.width, b = 0; for (let y = 0; y < cv.height; y += 3) for (let x = 0; x < cv.width; x++) if (on(x, y)) { if (x < a) a = x; if (x > b) b = x; }
+  const size = W / ((b - a) / S); el.style.fontSize = size + 'px';
+  // place it on its baseline
+  const pr = document.createElement('i'); pr.style.cssText = 'display:inline-block;width:0;height:0'; el.appendChild(pr); const base = pr.getBoundingClientRect().bottom; pr.remove();
+  el.style.left = (M - (a - X0) / S * size) + 'px'; el.style.top = (BASE - base) + 'px';
+  // the holes of the two o, on the line of their middle
+  const mid = Y0 - S * .262, runs = []; let s = -1; for (let x = a; x <= b; x++) { const v = on(x, mid); if (!v && s < 0) s = x; if (v && s >= 0) { runs.push([s, x]); s = -1; } }
+  const holes = runs.filter(r => { const w = (r[1] - r[0]) / S, cx = (r[0] + r[1]) / 2; let up = 0, dn = 0; while (up < S * .5 && !on(cx, mid - up)) up++; while (dn < S * .5 && !on(cx, mid + dn)) dn++; r.up = up; r.dn = dn; return w > .15 && up < S * .4 && dn < S * .4; });
+  holes.slice(-2).forEach((r, i) => {
+    const k = size / S, rx = (r[1] - r[0]) / 2 * k, ry = (r.up + r.dn) / 2 * k, cx = M + ((r[0] + r[1]) / 2 - a) * k, cy = BASE - (Y0 - (mid + (r.dn - r.up) / 2)) * k, R = Math.min(rx, ry) * .6, p = document.createElement('i');
+    const ang = -2.06, ax = (rx - R) * .86, ay = (ry - R) * .9; // up, a little to the left: towards the text
+    p.className = 'p'; p.style.cssText += `width:${R * 2}px;height:${R * 2}px;left:${cx - R + Math.cos(ang) * ax}px;top:${cy - R + Math.sin(ang) * ay}px`; document.body.appendChild(p);
+  });
+  document.title = 'ok ' + holes.length;
+});
+</script>

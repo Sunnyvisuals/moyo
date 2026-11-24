@@ -1,5 +1,5 @@
 /* Home: three times a sheet of paper passes over the screen before it, like the footer over the page: the projects over the first sentence,
-   the agency over the method (the footer does it by itself). The screen underneath stays in place once its end is reached (CSS sticky), drifts up
+   the studio over the method (the footer does it by itself). The screen underneath stays in place once its end is reached (CSS sticky), drifts up
    more slowly and fades (--cv: how much it is covered). Which sections pass over: the class .over in the page. The others simply follow.
    Off with reduced motion and without JavaScript. Also gives window.moyoTop(el): where an element really is in the page, since a sticky
    section moves its own rectangle. */

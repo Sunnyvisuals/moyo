@@ -28,8 +28,8 @@ const metaText = (p, t) => [t.place, p.year].filter(Boolean).join(', ');
 /* One project. The same markup on the home (one per row, with its description) and on /projets (contact sheet). */
 function rowHTML(p, i, lang) {
   const t = txt(p, lang);
-  return `<li class="case" data-cat="${escHTML(p.category)}"><a class="row" href="/projets/${encodeURIComponent(p.id)}" data-p="${i}" data-id="${escHTML(p.id)}">` +
-    `<span class="plate${p.cover ? '' : ' plate--none'}" aria-hidden="true">${plateInner(p)}</span>` +
+  return `<li class="case" data-cat="${escHTML(p.category)}"><a class="row" href="${lang === 'en' ? '/en' : ''}/projets/${encodeURIComponent(p.id)}" data-p="${i}" data-id="${escHTML(p.id)}">` +
+    `<span class="plate${p.cover ? '' : ' plate--none'}" aria-hidden="true">${plateInner(p, [t.title, t.type].filter(Boolean).join(', '))}</span>` +
     `<span class="cap"><span class="r-title">${escHTML(t.title)}</span><span class="r-desc">${escHTML(t.desc)}</span>` +
     `<span class="r-type">${escHTML(t.type)}</span><span class="r-meta">${escHTML(metaText(p, t))}</span></span></a></li>`;
 }

@@ -5,17 +5,21 @@ import { getData } from '../_lib/store.js';
 import { escHTML as e, imgURL } from '../../shared/render.js';
 import { DESIGN_CSS, headCommon, scripts } from '../../shared/design.js';
 import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
+import { head, ldPerson, waiting } from '../../shared/seo.js';
 
 const para = t => String(t || '').split(/\n{2,}/).map(p => `<p>${e(p).replace(/\n/g, '<br>')}</p>`).join('');
 
-export async function onRequestGet({ params, env, request }) {
+/* lang: the language of the <head>; functions/en translates the rest */
+export async function page({ params, env, request }, lang = 'fr') {
   const data = await getData(env);
   const team = data.team || [];
   const i = team.findIndex(m => m.id === params.id);
-  if (i < 0) return Response.redirect(new URL('/#equipe', request.url).toString(), 302);
+  if (i < 0) return null;
   const m = team[i], next = team.length > 1 ? team[(i + 1) % team.length] : null;
   const fr = m.fr || {}, en = { role: m.en?.role || fr.role, bio: m.en?.bio || fr.bio };
-  const about = `${e(m.name)}, ${e(fr.role)}. Moyo, agence créative basée en Provence-Alpes-Côte d’Azur.`;
+  const L = lang === 'en' ? en : fr, what = lang === 'en' ? 'Moyo, creative studio based on the French Riviera.' : 'Moyo, studio créatif basé en Provence-Alpes-Côte d’Azur.';
+  const meta = head({ path: '/equipe/' + encodeURIComponent(m.id), lang, title: [m.name, L.role].filter(Boolean).join(', ') + ' · Moyo Studio', desc: `${[m.name, L.role].filter(Boolean).join(', ')}. ${what}`, type: 'profile',
+    robots: waiting(m) ? 'noindex,follow' : '', ld: ldPerson(m, lang, m.photo && new URL(imgURL(m.photo), request.url).href) });
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -24,18 +28,7 @@ export async function onRequestGet({ params, env, request }) {
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F5F4F0">
-<title>${e(m.name)} · Moyo Studio</title>
-<meta name="description" content="${about}">
-<meta property="og:title" content="${e(m.name)} · Moyo Studio">
-<meta property="og:description" content="${about}">
-<meta property="og:type" content="profile">
-<meta property="og:image" content="https://moyo-d0n.pages.dev/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="moyo">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://moyo-d0n.pages.dev/og.png">
-<link rel="canonical" href="https://moyo-d0n.pages.dev/equipe/${e(m.id)}">
+${meta}
 ${headCommon}
 <style>
 ${DESIGN_CSS}${CHROME_CSS}${FOOTER_CSS}${GLASS_CSS}
@@ -63,9 +56,11 @@ ${chromeHead(4)}
   ${next ? `<a class="nm-link g next" href="/equipe/${e(next.id)}"><span class="nm">${e(next.name)}</span><span class="nm-role q4" data-i="nextS">Suivant</span></a>` : ''}
 </main></div>
 ${footerHTML(team)}
-<script type="application/json" id="en">{"skip":"Skip to content","here":"You are here","home":"Home","team":"Team","nextS":"Next"}</script>
+<script type="application/json" id="en">{"_title":"${e([m.name, en.role].filter(Boolean).join(', '))} · Moyo Studio","skip":"Skip to content","here":"You are here","home":"Home","team":"Team","nextS":"Next"}</script>
 ${scripts}
 </body>
 </html>`;
   return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' } });
 }
+
+export const onRequestGet = async ctx => (await page(ctx)) || Response.redirect(new URL('/#equipe', ctx.request.url).toString(), 302);

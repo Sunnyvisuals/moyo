@@ -93,7 +93,7 @@ html.js.calm .sec .dot b{opacity:1;translate:0 0}
 }
 
 /* ---------- Home: three times, and no more, a sheet of paper passes over the screen before it (stack.js): the projects over the first
-   sentence, the agency over the method, the footer over the contact. Its top edge is the glass of the footer. The other sections simply follow. */
+   sentence, the studio over the method, the footer over the contact. Its top edge is the glass of the footer. The other sections simply follow. */
 html.stack main>*{position:relative;background:var(--bg)}
 html.stack main>.pin{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100svh - var(--h,100svh)));translate:0 calc(var(--cv,0) * -15vh)}
 html.stack main>.over{--gh:calc(var(--sec) * .9);--gp:calc(var(--gh) - 36px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;scroll-margin-top:calc(96px - var(--gh));
@@ -106,7 +106,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .lnk:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .72em)}
 .lnk i{transition:translate .6s var(--ease)}
 .lnk:hover i{translate:3px 0}.lnk:hover i.dn{translate:0 3px}.lnk:hover i.up{translate:2px -2px}
-.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:2.5em;min-height:60px;padding:0 30px;border-radius:999px;background:var(--klein);color:var(--bg);font-weight:600;transition:background .5s,gap .7s var(--ease),scale .3s var(--ease)}
+.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:2.5em;min-height:max(60px,3em);padding:0 max(30px,1.4em);border-radius:999px;background:var(--klein);color:var(--bg);font-weight:600;transition:background .5s,gap .7s var(--ease),scale .3s var(--ease)}
 /* pressed */
 .btn:active{scale:.97}
 .lnk:active,.la:active,.nm-link:active,.dlg-actions button:active,.crumbs a:active{opacity:.6}
@@ -200,8 +200,9 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .path a span{position:absolute;right:calc(50% + 22px);font-size:var(--fs-small);font-weight:500;white-space:nowrap;opacity:0;translate:10px 0;transition:opacity .35s ease,translate .6s var(--ease),color .3s;pointer-events:none}
 .path a[aria-current]{color:var(--klein)}
 .path a:hover{color:var(--klein)}
-.path-d{position:absolute;left:50%;top:0;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:var(--klein);translate:0 var(--py,0px);pointer-events:none}
-.path-h{display:none;position:absolute;left:calc(50% + 8px);top:0;font-size:14px;line-height:1;font-weight:500;white-space:nowrap;writing-mode:vertical-rl;translate:0 calc(var(--py,0px) - 50%);opacity:var(--ho,1);transition:opacity .3s ease;pointer-events:none}
+.path{--pd:clamp(13px,calc(var(--w) * .0078),19px)}
+.path-d{position:absolute;left:50%;top:0;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 var(--py,0px);pointer-events:none}
+.path-h{display:none;position:absolute;left:calc(50% + var(--pd) * .62);top:0;font-size:clamp(14px,calc(var(--w) * .0088),21px);line-height:1;font-weight:500;white-space:nowrap;writing-mode:vertical-rl;translate:0 calc(var(--py,0px) - 50%);opacity:var(--ho,1);transition:opacity .3s ease;pointer-events:none}
 .path::before{content:"";position:absolute;right:0;top:-50vh;bottom:-50vh;width:calc(var(--edge) * .5 + 230px);background:linear-gradient(to left,var(--bg) 62%,rgb(245 244 240 / 0));opacity:0;transition:opacity .4s ease;pointer-events:none}
 .path-b{display:none}
 @media (min-width:1300px){.path-h{display:block}}
@@ -339,10 +340,14 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle">
 </dialog>`;
 
 /* What every <head> needs, besides its own title and description. */
-const headCommon = `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F5F4F0'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23002FA7'/%3E%3C/svg%3E">
+const headCommon = `<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-<script>/* before anything is drawn: the language (?lang=, the one chosen on the site, or the first of the browser), and less motion if it was asked for in the footer */
-try{var S=localStorage,q=new URLSearchParams(location.search).get('lang'),l=/^(fr|en)$/.test(q)?q:S.getItem('hb-lang');if(l===q)S.setItem('hb-lang',l);if(l!=='fr'&&l!=='en')l=((navigator.languages||[navigator.language||'fr']).find(x=>/^(fr|en)/i.test(x))||'en').slice(0,2).toLowerCase();document.documentElement.lang=l}catch(e){}
+<script>/* before anything is drawn: the language, and less motion if it was asked for in the footer */
+try{var D=document.documentElement,S=localStorage,q=new URLSearchParams(location.search).get('lang'),l='en';D.dataset.served=D.lang; /* /en is always in English; elsewhere: ?lang=, the choice made on the site, the language of the visitor. Robots read the page as it is. */
+if(D.lang!=='en'){l=/^(fr|en)$/.test(q)?q:S.getItem('hb-lang');if(q&&l===q)S.setItem('hb-lang',l);if(l!=='fr'&&l!=='en')l=/bot|crawl|spider|slurp|lighthouse|preview/i.test(navigator.userAgent)?'fr':((navigator.languages||[navigator.language||'fr']).find(x=>/^(fr|en)/i.test(x))||'en').slice(0,2).toLowerCase()}D.lang=l}catch(e){}
 try{if(localStorage.getItem('moyo-calm')==='1'){document.documentElement.classList.add('calm');const m=matchMedia.bind(window);window.matchMedia=x=>/prefers-reduced-motion: ?reduce/.test(x)?{matches:true,media:x,addEventListener(){},removeEventListener(){},addListener(){},removeListener(){}}:m(x)}}catch(e){}
 /* Page transitions can be cut short by a fast click: that is not an error. */
 /* what opens the page: the loading (first visit, reload), the dot closing on the title (coming from a link of the site), or nothing */
