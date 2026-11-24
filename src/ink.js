@@ -42,7 +42,7 @@ function frame(h, now) {
 const kick = h => { if (!h.raf) h.raf = requestAnimationFrame(t => frame(h, t)); };
 function read(h) { // starts when the first line is well on screen, ends when the last one is
   const r = h.el.getBoundingClientRect(), H = innerHeight;
-  const g = clamp((H * .86 - r.top) / (H * .2 + r.height)); if (g !== h.goal) { h.goal = g; kick(h); }
+  const g = clamp((H * .86 - r.top) / (H * .12 + r.height)); if (g !== h.goal) { h.goal = g; kick(h); }
 }
 window.moyoWave = (el, g) => { const h = hosts.find(x => x.el === el); if (h && h.goal !== g) { h.goal = g; kick(h); } };
 

@@ -52,7 +52,7 @@ html.kbd .bar:focus-within{translate:0 0}
 .bar #menuBtn{justify-content:flex-end}
 
 /* Menu: the page turns blue */
-#menu{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--klein);color:var(--bg);overflow:auto;clip-path:inset(0);
+#menu{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--klein);color:var(--bg);overflow:auto;overscroll-behavior:contain;clip-path:inset(0);
   transition:clip-path 1.1s var(--ease-io),overlay 1.1s allow-discrete,display 1.1s allow-discrete}
 #menu:not(:popover-open){clip-path:inset(0 0 100% 0)}
 @starting-style{#menu:popover-open{clip-path:inset(0 0 100% 0)}}
@@ -141,7 +141,7 @@ const chromeHead = (start = 0, { land = false } = {}) => `<header class="bar${la
     </div>
   </div>
   <div class="menu-foot"><a href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><span class="flang" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span></div>
-  <span class="menu-mark" aria-hidden="true">moyo</span>
+  <span class="menu-mark" aria-hidden="true" translate="no">moyo</span>
   <button type="button" class="menu-close" id="menuClose" popovertarget="menu" popovertargetaction="hide"><span class="sr" data-i="close">Fermer</span><span class="bx" aria-hidden="true"><i></i><i></i></span></button>
 </nav>`;
 
@@ -151,7 +151,7 @@ const FOOTER_CSS = `
 .foot{position:relative;z-index:2;color:var(--ink);padding:0 var(--edge);overflow:clip}
 .foot-grid{row-gap:56px;align-items:start}
 .fh{font-size:var(--fs-small);font-weight:400;line-height:1.3;color:var(--mute);margin-bottom:14px}
-.fcol a{display:inline-flex;align-items:center;min-height:36px;font-weight:600;background:linear-gradient(currentColor,currentColor) 0 calc(100% - 7px)/0 1px no-repeat;transition:background-size .7s var(--ease),color .4s}
+.fcol a{display:inline-flex;align-items:center;min-height:40px;font-weight:600;background:linear-gradient(currentColor,currentColor) 0 calc(100% - 7px)/0 1px no-repeat;transition:background-size .7s var(--ease),color .4s}
 .fcol a:hover{background-size:100% 1px;color:var(--klein)}
 .fby a{gap:.4em}.fby a::after{content:"↗";font-size:.8em;opacity:.6;transition:translate .5s var(--ease),opacity .3s}.fby a:hover::after{translate:2px -2px;opacity:1}
 .sub-row{display:flex;align-items:center;border-bottom:1px solid rgb(18 18 20 / .3);transition:border-color .4s,box-shadow .4s}
@@ -163,13 +163,15 @@ const FOOTER_CSS = `
 .sub-btn:disabled{opacity:.5;cursor:progress}
 .sub-msg{margin-top:12px;min-height:1.4em;font-size:var(--fs-small)}
 .foot-base{margin-top:clamp(3.5rem,6vw,6rem);padding-top:20px;border-top:1px solid var(--line);font-size:var(--fs-small);row-gap:4px;align-items:center}
-.foot-base a,.flang button{display:inline-flex;align-items:center;min-height:36px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(100% - 7px)/0 1px no-repeat;transition:background-size .7s var(--ease),color .4s}
-.foot-base a{justify-self:start}
+.foot-base a,.foot-base .calm,.flang button{display:inline-flex;align-items:center;min-height:40px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(100% - 7px)/0 1px no-repeat;transition:background-size .7s var(--ease),color .4s}
+.foot-base a,.foot-base .calm{justify-self:start}
+.calm[aria-pressed="true"]{background-size:100% 1px}
+@media (prefers-reduced-motion:reduce){.foot-base .calm{display:none}}
 .flang{display:inline-flex;gap:18px}
 .flang button{color:var(--mute)}
 .flang button:hover{color:var(--ink)}
 .flang button[aria-pressed="true"]{color:var(--ink);background-size:100% 1px}
-.foot-base a:hover{background-size:100% 1px;color:var(--klein)}
+.foot-base a:hover,.foot-base .calm:hover{background-size:100% 1px;color:var(--klein)}
 .foot-end{margin-top:clamp(7rem,17vw,17rem);align-items:last baseline;row-gap:28px}
 .foot-cta{display:inline-block}
 .foot-cta .q{position:relative;color:var(--klein)}
@@ -196,9 +198,10 @@ const FOOTER_CSS = `
 .flood .pu{opacity:0}
 html.mono .bar{mix-blend-mode:normal;background:none;color:var(--bg)}
 @media (prefers-reduced-motion:reduce){.foot .mono-wrap{transform:none}}
+html.calm .foot .mono-wrap{transform:none}
 @media (max-width:1080px){.fcol{grid-column:span 6!important}}
 @media (max-width:820px){
-  .fcol a,.foot-base a,.flang button{min-height:44px}
+  .fcol a,.foot-base a,.foot-base .calm,.flang button{min-height:44px}
   .fcol.foot-sub{grid-column:1/-1!important}
 }
 @media (max-width:480px){.fcol{grid-column:1/-1!important}}
@@ -231,6 +234,7 @@ footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(6
 /* pages other than the home: what comes before stays put while the footer slides over it (--st is set in footer.js) */
 .under{position:sticky;top:var(--st,0px);z-index:1;background:var(--chaux)}
 @media (prefers-reduced-motion:reduce){.under{position:relative;top:0}}
+html.calm .under{position:relative;top:0}
 `;
 
 /* Single source of the footer content. `home`: in-page anchors. */
@@ -263,12 +267,13 @@ const footerInner = ({ home = false, team } = {}) => {
     </div>
     <form class="fcol q4 foot-sub" id="subForm" novalidate>
       <h2 class="fh" data-i="subH">Inscrivez-vous pour un peu de joie.</h2>
-      <div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" aria-label="S’inscrire" data-ia="subBtn">→</button></div>
+      <div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" aria-label="S’inscrire" data-ia="subBtn">→</button></div>
       <p class="sub-msg" id="subMsg" role="status" aria-live="polite"></p>
     </form>
   </div>
   <div class="g foot-base">
-    <span class="h1">© 2026 moyo</span>
+    <span class="q1" translate="no">© 2026 moyo</span>
+    <button type="button" class="calm q2" id="calm" aria-pressed="false" data-i="fCalm">Moins de mouvement</button>
     <span class="flang q3" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span>
     <a class="q4" href="${home ? '#top' : '#main'}" data-i="top">Retour en haut</a>
   </div>
@@ -279,7 +284,7 @@ const footerInner = ({ home = false, team } = {}) => {
       <button class="hold" id="hold" type="button" data-i="fHold">Maintenez un œil</button>
     </div>
   </div>
-  <div class="mono-wrap" aria-hidden="true"><div class="monument"><span class="bl">m</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span><span class="bl">y</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span></div></div>`;
+  <div class="mono-wrap" aria-hidden="true" translate="no"><div class="monument"><span class="bl">m</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span><span class="bl">y</span><span class="bl eye">o<i class="pu"></i><i class="hit"></i></span></div></div>`;
 };
 
 const footerHTML = (team, opts = {}) => `<footer class="foot" id="foot" aria-label="Pied de page" data-ia="footAria">

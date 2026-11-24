@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F5F4F0">
 <title>Moyo Studio</title>
@@ -98,7 +98,7 @@ __CSS__
 .opt{color:var(--mute)}
 .chips label{position:relative}
 .chips input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
-.chips label span{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s}
+.chips label span{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s,scale .3s var(--ease)}
 .chips label:hover span{border-color:var(--ink)}
 .chips input:checked+span{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .chips input:focus-visible+span{outline:2px solid var(--klein);outline-offset:3px}
@@ -108,6 +108,9 @@ __CSS__
 .f-dots i{width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgb(18 18 20 / .35);transition:background .4s,box-shadow .4s,translate .9s var(--ease),scale .9s var(--ease)}
 .f-dots i.ok{background:var(--klein);box-shadow:none}
 .f-dots.full i:nth-child(1){translate:18px 0}.f-dots.full i:nth-child(3){translate:-18px 0}.f-dots.full i{scale:1.5}
+.f-dots.busy i{animation:busy 1s var(--ease-io) infinite}.f-dots.busy i:nth-child(2){animation-delay:.12s}.f-dots.busy i:nth-child(3){animation-delay:.24s}
+@keyframes busy{50%{opacity:.25;scale:.6}}
+.chips label:active span{scale:.96}
 .f-status{font-size:var(--fs-small);min-height:1.5em}
 .f-status.err{color:#B3261E}
 .f-done{padding-top:8px;outline:none}
@@ -205,7 +208,7 @@ __CHROME_HEAD__
     <form class="ct-form h2" id="ctForm" action="/api/contact" method="post" novalidate>
       <div class="f-two">
         <label class="fld"><span class="fl" data-i="fName">Nom</span><input name="name" autocomplete="name" required maxlength="120" aria-describedby="e-name"><small class="f-err" id="e-name"></small></label>
-        <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="e-email"><small class="f-err" id="e-email"></small></label>
+        <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" required maxlength="200" aria-describedby="e-email"><small class="f-err" id="e-email"></small></label>
       </div>
       <fieldset class="chips">
         <legend class="fl"><span data-i="fType">Le projet</span> <span class="opt" data-i="fOpt">(facultatif)</span></legend>
@@ -219,17 +222,17 @@ __CHROME_HEAD__
       </fieldset>
       <fieldset class="chips">
         <legend class="fl"><span data-i="fBudget">Budget</span> <span class="opt" data-i="fOpt">(facultatif)</span></legend>
-        <label><input type="radio" name="budget" value="lt5"><span data-i="b1">Moins de 5 k€</span></label>
-        <label><input type="radio" name="budget" value="5-15"><span data-i="b2">5 à 15 k€</span></label>
-        <label><input type="radio" name="budget" value="15-40"><span data-i="b3">15 à 40 k€</span></label>
-        <label><input type="radio" name="budget" value="gt40"><span data-i="b4">Plus de 40 k€</span></label>
+        <label><input type="radio" name="budget" value="lt5"><span data-i="b1">Moins de 5&nbsp;k€</span></label>
+        <label><input type="radio" name="budget" value="5-15"><span data-i="b2">5 à 15&nbsp;k€</span></label>
+        <label><input type="radio" name="budget" value="15-40"><span data-i="b3">15 à 40&nbsp;k€</span></label>
+        <label><input type="radio" name="budget" value="gt40"><span data-i="b4">Plus de 40&nbsp;k€</span></label>
         <label><input type="radio" name="budget" value="tbd"><span data-i="bTbd">À définir</span></label>
       </fieldset>
-      <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
+      <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" autocomplete="off" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="f-foot">
         <div class="f-say"><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span><p class="t-small mute" data-i="fNote">Vos informations servent uniquement à vous répondre.</p></div>
-        <button class="btn" type="submit"><span data-i="fSend">Envoyer</span><i aria-hidden="true">→</i></button>
+        <button class="btn" type="submit"><span data-i="fSend">Envoyer le message</span><i aria-hidden="true">→</i></button>
       </div>
       <p class="f-status" id="ctStatus" role="status" aria-live="polite"></p>
     </form>
@@ -263,7 +266,7 @@ __SHEET__
 "enS":"We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.",
 "ctQ":"A place, an event, a brand?","ctLead":"Tell us about the project. We reply within 48 hours.","copy":"Copy the address",
 "fName":"Name","fMail":"Email","fType":"The project","fOpt":"(optional)","tId":"Identity","tSite":"Website","tData":"Data","tMotion":"Motion","tAv":"Audiovisual","tCom":"Communication","tOther":"Other",
-"fBudget":"Budget","b1":"Under €5k","b2":"€5k to €15k","b3":"€15k to €40k","b4":"Over €40k","bTbd":"To be defined","fMsg":"Message","fNote":"Your details are only used to reply to you.","fSend":"Send",
+"fBudget":"Budget","b1":"Under €5k","b2":"€5k to €15k","b3":"€15k to €40k","b4":"Over €40k","bTbd":"To be defined","fMsg":"Message","fNote":"Your details are only used to reply to you.","fSend":"Send the message",
 "sProjL":"Projects","nextP":"Next project","fCat":"Category","fRole":"Role","fYear":"Year","fPlace":"Place","prev":"Previous","next":"Next","close":"Close"
 }</script>
 __SCRIPTS__

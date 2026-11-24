@@ -2,6 +2,8 @@
 import seed from '../../data/projects.json';
 
 export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif)$/;
+// an uploaded picture, or one of the pictures that come with the site (/proj/…)
+const PICTURE = /^([a-f0-9-]{36}\.(webp|jpg|png|avif|gif)|\/proj\/[\w-]{1,60}\.(webp|jpg|jpeg|png|avif))$/;
 
 export async function getData(env) {
   const stored = env.MOYO ? await env.MOYO.get('projects', 'json') : null;
@@ -69,8 +71,8 @@ export function validate(input) {
     if (!fr.title) { errors.push(`Projet ${id} : titre français manquant.`); continue; }
     const category = str(p.category, 60);
     if (category && !categories.some(c => c.id === category)) { errors.push(`Projet « ${label} » : catégorie inconnue « ${category} ».`); continue; }
-    const cover = typeof p.cover === 'string' && IMAGE_ID.test(p.cover) ? p.cover : null;
-    const images = (Array.isArray(p.images) ? p.images : []).filter(i => typeof i === 'string' && IMAGE_ID.test(i)).slice(0, 40);
+    const cover = typeof p.cover === 'string' && PICTURE.test(p.cover) ? p.cover : null;
+    const images = (Array.isArray(p.images) ? p.images : []).filter(i => typeof i === 'string' && PICTURE.test(i)).slice(0, 40);
     let plate = typeof p.plate === 'string' ? p.plate.trim() : '';
     if (plate && (plate.length > 20000 || !/^<svg[\s>][\s\S]*<\/svg>$/i.test(plate) || UNSAFE_SVG.test(plate))) {
       errors.push(`Projet « ${label} » : motif SVG refusé.`); plate = '';
@@ -101,7 +103,7 @@ export function validate(input) {
       .filter(l => l.label && /^(https?:\/\/|mailto:)/i.test(l.url));
     team.push({
       id, name, first, last,
-      photo: typeof m.photo === 'string' && IMAGE_ID.test(m.photo) ? m.photo : null,
+      photo: typeof m.photo === 'string' && PICTURE.test(m.photo) ? m.photo : null,
       fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000), phrase: str(m.fr?.phrase, 80) },
       en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000), phrase: str(m.en?.phrase, 80) },
       links

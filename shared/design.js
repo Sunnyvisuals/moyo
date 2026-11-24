@@ -15,7 +15,7 @@ const DESIGN_CSS = `
   --bg:#F5F4F0;--tint:#E8E6DF;--ink:#121214;--mute:#65656B;--line:rgb(18 18 20 / .15);--klein:#002FA7;
   --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   /* grid: its width drives everything, so a very large screen gets a larger page, not a lost one */
-  --m:clamp(20px,3.4vw,64px);--max:clamp(1680px,80vw,2400px);
+  --m:max(clamp(20px,3.4vw,64px),env(safe-area-inset-left),env(safe-area-inset-right));--max:clamp(1680px,80vw,2400px);
   --edge:max(var(--m),calc((100vw - var(--max)) / 2));--w:calc(100vw - 2 * var(--edge));
   --gut:clamp(16px,calc(var(--w) * .0193),44px);
   /* type */
@@ -39,13 +39,16 @@ const DESIGN_CSS = `
   --ease-enter:var(--ease);--dur-1:.45s;--dur-3:.9s;--dur-4:1.2s;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-width:none}
+html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-width:none;scroll-padding-top:calc(var(--hdr) + 12px)}
+@media (pointer:fine){html{overscroll-behavior-y:none}}
 html::-webkit-scrollbar,#proj::-webkit-scrollbar,#menu::-webkit-scrollbar{display:none}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:var(--fs-body);font-weight:400;line-height:1.5;letter-spacing:-.008em;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:clip}
 h1,h2,h3,p,ol,ul,dl,dd,figure,fieldset{margin:0}
 ol,ul,legend{padding:0;list-style:none}
 fieldset{border:0;padding:0;min-width:0}
 a{color:inherit;text-decoration:none}
+a,button,label,input,textarea{touch-action:manipulation}
+h1,h2,h3,.nm,.r-title{overflow-wrap:break-word}
 i{font-style:normal}
 button{font:inherit;color:inherit;letter-spacing:inherit;text-align:inherit;background:none;border:0;padding:0;cursor:pointer}
 input,textarea{font:inherit;color:inherit;letter-spacing:inherit}
@@ -75,6 +78,7 @@ p,.r-desc{text-wrap:pretty}
 html.js .sec .dot b{opacity:0;translate:0 -1.35em}
 html.js .sec .dot.in b{opacity:1;translate:0 0;transition:opacity .15s ease .2s,translate 1.05s linear(0,.0157,.0625,.1406,.25,.3906,.5625,.7656,1 36.4%,.8906 45.5%,.8125 50%,.7656 54.5%,.75 59%,.7656 63.6%,.8125 68.2%,.8906 72.7%,1 77.3%,.9531,.9375 86.4%,.9531,1 95.5%,.9844,1) .2s}
 @media (prefers-reduced-motion:reduce){html.js .sec .dot b{opacity:1;translate:0 0}}
+html.js.calm .sec .dot b{opacity:1;translate:0 0}
 .dot b{display:inline-block;width:.155em;aspect-ratio:1;margin-left:.075em;border-radius:50%;background:var(--klein)}
 
 /* ---------- Grid: four axes ---------- */
@@ -102,7 +106,10 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .lnk:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .72em)}
 .lnk i{transition:translate .6s var(--ease)}
 .lnk:hover i{translate:3px 0}.lnk:hover i.dn{translate:0 3px}.lnk:hover i.up{translate:2px -2px}
-.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:2.5em;min-height:60px;padding:0 30px;border-radius:999px;background:var(--klein);color:var(--bg);font-weight:600;transition:background .5s,gap .7s var(--ease)}
+.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:2.5em;min-height:60px;padding:0 30px;border-radius:999px;background:var(--klein);color:var(--bg);font-weight:600;transition:background .5s,gap .7s var(--ease),scale .3s var(--ease)}
+/* pressed */
+.btn:active{scale:.97}
+.lnk:active,.la:active,.nm-link:active,.dlg-actions button:active,.crumbs a:active{opacity:.6}
 .btn:hover{background:var(--ink);gap:3.25em}
 .btn:disabled{opacity:.5;cursor:progress}
 
@@ -207,7 +214,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .path:focus-within a span{opacity:1;translate:0 0}
 .path:focus-within .path-h{opacity:0}
 @media (max-width:820px){
-  .path{right:auto;left:var(--m);top:auto;bottom:14px;width:auto;height:auto;translate:none}
+  .path{right:auto;left:var(--m);top:auto;bottom:max(14px,env(safe-area-inset-bottom));width:auto;height:auto;translate:none}
   .path.end{opacity:0;visibility:hidden}
   .path::before,.path-l,.path-d,.path-h{display:none}
   .path-b{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 18px 0 16px;border-radius:999px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 8px 24px -10px rgb(18 18 20 / .25);font-size:var(--fs-small);font-weight:600}
@@ -265,9 +272,9 @@ html.vt-sheet:not(.vt-in)::view-transition-old(root){z-index:2;animation:sheetOu
 ::view-transition-new(cur){animation:none}
 @keyframes sheetIn{from{clip-path:inset(var(--vt,50%) round 0)}to{clip-path:inset(0)}}
 @keyframes sheetOut{from{clip-path:inset(0)}to{clip-path:inset(var(--vt,50%))}}
-#proj .plate{aspect-ratio:auto}
-#proj .plate img{position:static;height:auto}
-#proj .plate--none{aspect-ratio:4/5}
+:is(#proj,.work) .plate{aspect-ratio:auto}
+:is(#proj,.work) .plate img{position:static;width:100%;height:auto;aspect-ratio:auto 4/5}
+:is(#proj,.work) .plate--none{aspect-ratio:4/5}
 .dlg-actions{position:fixed;z-index:3;top:0;left:var(--edge);right:var(--edge);height:var(--hdr);justify-content:flex-end;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px);color:#fff;background:#000;mix-blend-mode:difference;pointer-events:none}
 .dlg-actions button{pointer-events:auto}
 .dlg-actions :focus-visible{outline-color:currentColor}
@@ -300,6 +307,7 @@ html.load,html.enter{overflow:hidden}
 @keyframes langOut{to{opacity:0;filter:blur(8px)}}
 @keyframes langIn{from{opacity:0;filter:blur(8px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+html.calm *,html.calm *::before,html.calm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 `;
 
 /* Project sheet (home and /projets). Filled by site.js. */
@@ -332,17 +340,20 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle">
 /* What every <head> needs, besides its own title and description. */
 const headCommon = `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F5F4F0'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23002FA7'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-<script>/* the language chosen on the site, before anything is drawn. Page transitions can be cut short by a fast click: that is not an error. */
-try{var l=localStorage.getItem('hb-lang');if(l!=='fr'&&l!=='en')l=/^fr/i.test(navigator.language||'fr')?'fr':'en';document.documentElement.lang=l}catch(e){}
+<script>/* before anything is drawn: the language (?lang=, the one chosen on the site, or the first of the browser), and less motion if it was asked for in the footer */
+try{var S=localStorage,q=new URLSearchParams(location.search).get('lang'),l=/^(fr|en)$/.test(q)?q:S.getItem('hb-lang');if(l===q)S.setItem('hb-lang',l);if(l!=='fr'&&l!=='en')l=((navigator.languages||[navigator.language||'fr']).find(x=>/^(fr|en)/i.test(x))||'en').slice(0,2).toLowerCase();document.documentElement.lang=l}catch(e){}
+try{if(localStorage.getItem('moyo-calm')==='1'){document.documentElement.classList.add('calm');const m=matchMedia.bind(window);window.matchMedia=x=>/prefers-reduced-motion: ?reduce/.test(x)?{matches:true,media:x,addEventListener(){},removeEventListener(){},addListener(){},removeListener(){}}:m(x)}}catch(e){}
+/* Page transitions can be cut short by a fast click: that is not an error. */
 /* what opens the page: the loading (first visit, reload), the dot closing on the title (coming from a link of the site), or nothing */
 try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var k=+sessionStorage.getItem('moyo-in')||0,n=performance.getEntriesByType('navigation')[0],o=document.referrer&&new URL(document.referrer).origin===location.origin,d=document.documentElement;sessionStorage.removeItem('moyo-in');
-if(Date.now()-k<8000)d.classList.add('enter');else if(!/[?&]projet=/.test(location.search)&&n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},7000)}}catch(e){}
+if(Date.now()-k<8000)d.classList.add('enter');else if(n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},7000)}}catch(e){}
 for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTransition;if(v)for(const p of[v.ready,v.finished,v.updateCallbackDone])p&&p.catch(()=>{})});</script>`;
 
 /* Scripts of every page, in order. */
 const scripts = `<script src="/lenis.js" defer></script>
 <script src="/load.js" defer></script>
 <script src="/stack.js" defer></script>
+<script src="/divide.js" defer></script>
 <script src="/site.js" defer></script>
 <script src="/chrome.js" defer></script>
 <script src="/path.js" defer></script>

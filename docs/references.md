@@ -39,6 +39,11 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 - Sur la page introuvable, « Rien à voir » : les yeux sont fermés.
 - Le mot « moyo » tapé au clavier : un monochrome, une seconde.
 - Une case sans photo est un point qui regarde le pointeur.
+- Une image naît d'un point : il se divise en deux, quatre, huit, jusqu'à être l'image. D'un projet à l'autre, l'image redevient un point, puis la suivante en naît.
+
+## Règles d'interface
+
+- [Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) : relues une à une. Elles ont donné les pages projet, le bouton « Moins de mouvement », le brouillon gardé, les messages d'erreur qui disent quoi faire, le retour au toucher, les marges des écrans à encoche.
 
 ## Techniques
 
@@ -48,4 +53,4 @@ View Transitions, API Popover et couche supérieure (menu, curseur, voile), `@st
 
 [Critères officiels](https://www.awwwards.com/about-evaluation/) : design 40 %, utilisabilité 30 %, créativité 20 %, contenu 10 %. Mention honorable à partir de 6,5.
 
-Ce qui manque encore pour le contenu : de vraies photos de projets (celles d'aujourd'hui font 700 px de large), les portraits, les biographies (texte d'attente), de vrais projets.
+Ce qui manque encore pour le contenu : de vraies photos de projets (celles d'aujourd'hui faisaient 700 px de large ; elles sont agrandies deux fois, originaux dans `archive/proj-675`), les portraits, les biographies (texte d'attente), de vrais projets.

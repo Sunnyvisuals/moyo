@@ -49,11 +49,10 @@ const sizes = {
   '404.html': out('dist/404.html', fill(read('src/404.src.html'), { ...common, __CHROME_HEAD__: chromeHead(0), __FOOTER__: footerHTML(seed.team) })),
   'admin/index.html': out('dist/admin/index.html', read('src/admin.html')),
   'robots.txt': out('dist/robots.txt', `User-agent: *\nDisallow: /admin\nDisallow: /api/\nSitemap: ${SITE}/sitemap.xml\n`),
-  'sitemap.xml': out('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${['/', '/projets', ...seed.team.map(m => '/equipe/' + m.id)].map(p => `<url><loc>${SITE}${p}</loc></url>`).join('')}</urlset>\n`),
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
-const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink', trades: 'trades', play: 'play' };
+const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink', trades: 'trades', play: 'play', divide: 'divide' };
 for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, read(`src/${from}.js`));
 out('dist/lenis.js', lenis);
 fs.copyFileSync(r('assets/og.png'), r('dist/og.png')); // image shown when the site is shared

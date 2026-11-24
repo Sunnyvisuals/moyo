@@ -13,7 +13,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 - **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
-- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe. Trois passages seulement se font l'un sur l'autre, avec le bord de verre : les projets sur la première phrase, l'agence sur la méthode, le pied de page sur le contact (classe `.over`, `src/stack.js`). L'image d'une carte devient l'image de la fiche (View Transitions).
+- **Mouvement** : une seule courbe. Les éléments apparaissent un par un et repartent de la même façon ; les titres ne bougent pas, seul leur point tombe. Trois passages seulement se font l'un sur l'autre, avec le bord de verre : les projets sur la première phrase, l'agence sur la méthode, le pied de page sur le contact (classe `.over`, `src/stack.js`). Une image naît d'un seul point, qui se divise jusqu'à la former (`src/divide.js`) ; celle d'une carte devient celle de la fiche (View Transitions). « Moins de mouvement », en bas de page, coupe tout.
 - **Chemin** : une ligne dans la marge (accueil), un fil d'Ariane et une étape suivante (autres pages), une page 404.
 
 ## Contenu
@@ -21,7 +21,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 | Section | Contenu |
 | --- | --- |
 | Ouverture | Une phrase |
-| Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`?projet=<id>`), le bouton Retour la ferme |
+| Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`/projets/<id>`, une vraie page), le bouton Retour la ferme |
 | Services | Sept services, une ligne chacun, et le point au travail sur le quatrième axe (`src/trades.js`). Une ligne qui a des projets y mène |
 | Méthode | Une scène épinglée, quatre temps, un champ de points |
 | Agence | La phrase s'encre d'une vague Klein avec le scroll, puis le sens de « moyo » |
@@ -38,6 +38,8 @@ Site : https://moyo-d0n.pages.dev
 | --- | --- |
 | `/` | La page d'accueil. La section Projets montre les projets marqués « accueil » (★) |
 | `/projets` | Tous les projets, filtrés par catégorie (`/projets?cat=identite`) |
+| `/projets/<id>` | Un projet. Depuis l'accueil ou la liste, il s'ouvre en fiche par-dessus la page ; partagé, rechargé ou ouvert dans un onglet, c'est cette page |
+| `/equipe/<id>` | Un profil |
 | `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie |
 
 Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les pages sont rendues côté serveur avec les données à jour (`functions/_middleware.js`), donc elles restent complètes sans JavaScript et lisibles par les moteurs de recherche. Tant que rien n'a été publié depuis l'admin, c'est `data/projects.json` qui sert.
@@ -54,6 +56,7 @@ shared/design.js       système de design : couleurs, typographie, grille, compo
 shared/chrome.js       en-tête, menu, pied de page
 shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
 functions/equipe/      page de profil, rendue par le serveur
+functions/projets/     page de projet, rendue par le serveur
 archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres)
 data/projects.json     projets de départ (les 5 exemples)
 functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /img/<id>
@@ -93,7 +96,7 @@ Sous Windows, si le dossier du projet a un chemin très long (plus de 260 caract
 
 - **Léger** : accueil d'environ 90 Ko (HTML et CSS, 21 Ko compressés), police et scripts en fichiers partagés par toutes les pages. Pas de traceur, aucune requête vers un autre domaine.
 - **CSS 2026** : `subgrid`, `text-box`, View Transitions entre documents, API Popover pour le menu, `@starting-style`, `text-wrap`.
-- **Accessibilité** : contenu visible sans JavaScript, état « animations réduites » conçu à part, contraste d'au moins 4,5:1, cibles tactiles d'au moins 24 px, navigation au clavier, FR/EN.
+- **Accessibilité** : contenu visible sans JavaScript, état « animations réduites » conçu à part, bouton « Moins de mouvement », contraste d'au moins 4,5:1, cibles d'au moins 40 px, navigation au clavier, brouillon du formulaire gardé dans l'onglet, FR/EN (`?lang=en`).
 
 ## Construire
 
@@ -125,11 +128,11 @@ Ces scripts ont été écrits pour l'accueil v8 : leurs sélecteurs sont à adap
 
 | Critère | Poids | Note |
 | --- | --- | --- |
-| Design | 40 % | 9,0 |
-| Utilisabilité | 30 % | 9,1 |
-| Créativité | 20 % | 9,5 |
+| Design | 40 % | 9,3 |
+| Utilisabilité | 30 % | 9,5 |
+| Créativité | 20 % | 9,8 |
 | Contenu | 10 % | 6,0 |
-| **Total pondéré** | | **environ 8,8** |
+| **Total pondéré** | | **environ 9,1** |
 
 Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clients.
 

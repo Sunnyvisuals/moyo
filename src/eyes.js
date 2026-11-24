@@ -215,7 +215,7 @@ setInterval(() => {
   if (line && foot.getBoundingClientRect().top < innerHeight) {
     const best = [...spent].sort((a, b) => b[1] - a[1])[0], name = best && best[1] > 4 ? $('h2', best[0]).textContent.replace(/⁠/g, '').trim() : '';
     const d = new Date(), h = d.getHours(), mm = String(d.getMinutes()).padStart(2, '0');
-    if (night() && total % 14 > 8) { line.textContent = en() ? `It is ${h % 12 || 12}:${mm} ${h < 12 ? 'am' : 'pm'}. Go to sleep.` : `Il est ${h} h ${mm}. Allez dormir.`; return; }
+    if (night() && total % 14 > 8) { line.textContent = en() ? `It is ${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(d)}. Go to sleep.` : `Il est ${h} h ${mm}. Allez dormir.`; return; }
     line.textContent = en() ? `${fmt(total)} together${name ? ', mostly on ' + name : ''}. Nothing is recorded.` : `${fmt(total)} ensemble${name ? ', surtout sur ' + name : ''}. Rien n’est enregistré.`;
   }
 }, 1000);

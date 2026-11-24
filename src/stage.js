@@ -1,5 +1,5 @@
 /* Staging: every page builds itself in front of the reader. Pieces fade and rise as they arrive, one after the other (90 ms apart),
-   pictures are uncovered from top to bottom. They leave the same way when they go off screen, up or down, and play again next time.
+   pictures are born from one dot (divide.js). They leave the same way when they go off screen, up or down, and play again next time.
    Titles (h1, h2) never move. Nothing changes the layout (opacity, translate, clip-path). Skipped with reduced motion. */
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return document.querySelectorAll('.sec .dot').forEach(d => d.classList.add('in'));
@@ -11,7 +11,12 @@
 .stg.up{translate:0 -22px}
 .stg.clip{opacity:1;translate:none;clip-path:inset(0 0 100% 0);transition:clip-path .7s cubic-bezier(.64,0,.78,0)}
 .stg.clip.in{clip-path:inset(0);transition:clip-path 1.5s cubic-bezier(.76,0,.24,1) var(--sd,0ms)}
-.stg.clip.up{clip-path:inset(100% 0 0 0)}`;
+.stg.clip.up{clip-path:inset(100% 0 0 0)}
+.stg.dv{opacity:1;translate:none;transition:none}
+.stg.pop{opacity:1;translate:none;background-color:rgb(232 230 223 / 0);transition:background-color .5s ease}
+.stg.pop.in{background-color:var(--tint);transition:background-color 1s ease calc(var(--sd,0ms) + .3s)}
+.stg.pop::after{scale:0;transition:scale .45s cubic-bezier(.64,0,.78,0),translate .55s cubic-bezier(.22,1,.36,1)}
+.stg.pop.in::after{scale:1;transition:scale 1.1s cubic-bezier(.16,1,.3,1) var(--sd,0ms),translate .55s cubic-bezier(.22,1,.36,1)}`;
   document.head.appendChild(st);
 
   /* the final point of each section title falls when the title is there */
@@ -20,13 +25,13 @@
 
   const els = [...document.querySelectorAll(TARGETS)].filter(e => !e.closest('dialog,#menu,.bar,[hidden]') && !(e.parentElement && e.parentElement.closest('.stg')) && !e.matches('script,.sr,.hp') && !(innerWidth > 820 && e.matches('.cases .cap>*'))); // the accordion shows its own captions
   if (!els.length) return;
-  els.forEach(e => { e.style.transition = 'none'; e.classList.add('stg'); if (e.matches('.plate')) e.classList.add('clip'); }); // put away at once, without playing the exit
+  els.forEach(e => { e.style.transition = 'none'; e.classList.add('stg'); if (e.matches('.plate')) { if (e.matches('.plate--none')) e.classList.add('pop'); else if (window.moyoDivide) moyoDivide(e, 'hide'); else e.classList.add('clip'); } }); // put away at once, without playing the exit
   requestAnimationFrame(() => requestAnimationFrame(() => els.forEach(e => { e.style.transition = ''; })));
 
   const on = new WeakSet();
   const show = list => list.sort((a, b) => a[1].top - b[1].top || a[1].left - b[1].left)
-    .forEach(([e], i) => { on.add(e); e.style.setProperty('--sd', Math.min(i * 90, 630) + 'ms'); e.classList.remove('up'); e.classList.add('in'); });
-  const hide = (e, up) => { on.delete(e); e.style.removeProperty('--sd'); e.classList.remove('in'); e.classList.toggle('up', up); };
+    .forEach(([e], i) => { on.add(e); e.style.setProperty('--sd', Math.min(i * 90, 630) + 'ms'); e.classList.remove('up'); e.classList.add('in'); if (e.classList.contains('dv')) moyoDivide(e, true, { delay: Math.min(i * 90, 630) }); });
+  const hide = (e, up) => { on.delete(e); e.style.removeProperty('--sd'); e.classList.remove('in'); e.classList.toggle('up', up); if (e.classList.contains('dv')) moyoDivide(e, false); };
 
   const io = new IntersectionObserver(entries => {
     show(entries.filter(en => en.isIntersecting && !on.has(en.target)).map(en => [en.target, en.boundingClientRect]));
@@ -34,7 +39,7 @@
   }, { threshold: 0, rootMargin: `${-TOP * 100}% 0px ${-BOTTOM * 100}% 0px` });
 
   /* pictures: an observer would see their clip (nothing) instead of their place, so their place is read on scroll */
-  const pics = els.filter(e => e.classList.contains('clip'));
+  const pics = els.filter(e => e.matches('.plate'));
   let raf = 0;
   const look = () => {
     raf = 0;
@@ -49,7 +54,7 @@
 
   /* once the opening is over (load.js) */
   (window.moyoReady || Promise.resolve()).then(() => setTimeout(() => {
-    els.forEach(e => { if (!e.classList.contains('clip')) io.observe(e); });
+    els.forEach(e => { if (!e.matches('.plate')) io.observe(e); });
     if (pics.length) { look(); addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick); new ResizeObserver(kick).observe(document.body); }
   }, 60));
 })();

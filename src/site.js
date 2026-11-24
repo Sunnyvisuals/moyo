@@ -53,8 +53,8 @@ $$('.la[data-cat]').forEach(a => {
   const k = document.createElement('span'); k.className = 'n'; k.setAttribute('aria-hidden', 'true'); k.textContent = n; a.after(k);
 });
 
-/* ---------- Project sheet: opens from its card; previous and next stay inside the current filter. Each project has its own address (?projet=id):
-   it can be shared, and the Back button closes the sheet. ---------- */
+/* ---------- Project sheet: opens from its card; previous and next stay inside the current filter. Each project has its own address (/projets/id,
+   a real page for a shared link, a new tab or a reload): the Back button closes the sheet. ---------- */
 const dlg = $('#proj');
 let cur = 0, opener = null, pushed = false, openCard = null;
 function fill(i) {
@@ -63,8 +63,8 @@ function fill(i) {
   $('#pTag').textContent = [catLabel(DATA, p.category, lang), t.type].filter(Boolean).join(', ');
   $('#pRole').textContent = t.role; $('#pPlace').textContent = t.place; $('#pYear').textContent = p.year;
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
-  const pl = $('#pPlate'); pl.innerHTML = plateInner(p, t.title); pl.classList.toggle('plate--none', !p.cover);
-  const im = $('img', pl); if (im) { im.loading = 'eager'; im.decoding = 'sync'; }
+  const pl = $('#pPlate'); pl.className = 'plate c5' + (p.cover ? '' : ' plate--none'); pl.style.removeProperty('--dx'); pl.style.removeProperty('--dy'); pl.innerHTML = plateInner(p, t.title);
+  const im = $('img', pl), known = cardOf(i) && $('img', cardOf(i)); if (im) { im.loading = 'eager'; im.decoding = 'sync'; if (known && known.naturalWidth) { im.width = known.naturalWidth; im.height = known.naturalHeight; } }
   $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
   const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
   $('#pPos').textContent = `${at + 1}/${v.length}`; $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
@@ -83,22 +83,24 @@ if (list && !filters) {
     const plate = $('.plate', c), img = $('img', c);
     plate.addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse' || !wide.matches) return;
-      if (i !== on && (e.movementX || e.movementY) && performance.now() > lock) set(i); // a card that slides under a still pointer does not open
+      if (i !== on && (e.movementX || e.movementY) && performance.now() > lock && !list.querySelector('.dvc')) set(i); // a card that slides under a still pointer does not open
       if (img && !reduce) { const r = plate.getBoundingClientRect(); img.style.setProperty('--px', ((e.clientX - r.left) / r.width * -24 + 12).toFixed(1) + 'px'); }
     });
     plate.addEventListener('pointerleave', () => { if (img) img.style.setProperty('--px', '0px'); });
     $('.row', c).addEventListener('focus', () => { if (root.classList.contains('kbd')) set(i); });
-    c.addEventListener('click', e => { if (wide.matches && i !== on && !matchMedia('(hover:hover)').matches) { e.stopPropagation(); set(i); } }, true);
+    c.addEventListener('click', e => { if (wide.matches && i !== on && !matchMedia('(hover:hover)').matches) { e.preventDefault(); e.stopPropagation(); set(i); } }, true);
   });
 }
 const cardOf = i => list && $$('#projects > li')[i];
-const address = id => { const u = new URL(location.href); if (id) u.searchParams.set('projet', id); else u.searchParams.delete('projet'); return u; };
+const asked = () => { const m = location.pathname.match(/^\/projets\/([^/]+)\/?$/); return m ? ALL.findIndex(p => p.id === decodeURIComponent(m[1])) : -1; }; // the project of the address
+const address = id => new URL('/projets/' + encodeURIComponent(id), location.origin);
 /* the picture of the card becomes the picture of the sheet, and goes back to it. Where the browser cannot, the sheet rises. */
 function morph(open, i, update) {
   const plate = cardOf(i) && $('.plate', cardOf(i)), mine = $('#pPlate'), r = plate && plate.getBoundingClientRect();
   const can = document.startViewTransition && !reduce && r && r.width > 24 && r.top < innerHeight - 60 && r.bottom > 60 && (open || dlg.scrollTop < innerHeight * .6);
   if (!can) return false;
   root.style.setProperty('--vt', `${Math.max(0, r.top).toFixed(0)}px ${Math.max(0, innerWidth - r.right).toFixed(0)}px ${Math.max(0, innerHeight - r.bottom).toFixed(0)}px ${Math.max(0, r.left).toFixed(0)}px`);
+  if (window.moyoDivide && plate.classList.contains('dv')) moyoDivide(plate, 'end');
   root.style.setProperty('--vp', ALL[i].cover ? '50% 8%' : '50% 50%');
   root.classList.add('vt-sheet'); root.classList.toggle('vt-in', open);
   (open ? plate : mine).style.viewTransitionName = 'shot';
@@ -106,8 +108,9 @@ function morph(open, i, update) {
     plate.style.viewTransitionName = mine.style.viewTransitionName = ''; update(); (open ? mine : plate).style.viewTransitionName = 'shot';
     const im = open && $('img', mine); if (im) await Promise.race([im.decode().catch(() => {}), new Promise(done => setTimeout(done, 400))]);
   });
+  const skip = () => vt.skipTransition(); ['pointerdown', 'keydown'].forEach(n => addEventListener(n, skip)); // a second click does not wait
   vt.ready.catch(() => {});
-  vt.finished.catch(() => {}).finally(() => { plate.style.viewTransitionName = mine.style.viewTransitionName = ''; root.classList.remove('vt-sheet', 'vt-in'); });
+  vt.finished.catch(() => {}).finally(() => { plate.style.viewTransitionName = mine.style.viewTransitionName = ''; root.classList.remove('vt-sheet', 'vt-in'); ['pointerdown', 'keydown'].forEach(n => removeEventListener(n, skip)); });
   return true;
 }
 function openSheet(i, push) {
@@ -117,13 +120,20 @@ function openSheet(i, push) {
   if (!push || !morph(true, i, show)) show();
 }
 let stepping = false;
-function step(d) { // the page of a project goes one way, the next one comes from the other
+function step(d) { // the words go one way and the next ones come from the other; the picture goes back to one dot, the next one is born from it
   const v = visible(), n = v[(v.indexOf(cur) + d + v.length) % v.length]; if (n === cur || stepping) return;
   const turn = () => { fill(n); history.replaceState(history.state, '', address(ALL[n].id)); };
   if (reduce) return turn();
   stepping = true;
-  const els = $$('.sheet-t,.sheet-g>*', dlg), out = els.map((el, i) => el.animate([{ opacity: 1, translate: '0 0' }, { opacity: 0, translate: `${d * -26}px 0` }], { duration: 210, delay: i * 22, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' }));
-  Promise.all(out.map(a => a.finished)).catch(() => {}).then(() => { turn(); stepping = false; out.forEach(a => a.cancel()); els.forEach((el, i) => el.animate([{ opacity: 0, translate: `${d * 40}px 0` }, { opacity: 1, translate: '0 0' }], { duration: 720, delay: i * 55, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' })); });
+  const pl = $('#pPlate'), far = dlg.scrollTop > innerHeight * .8, words = $$('.sheet-t,.sheet-g>:not(.plate)', dlg), divide = window.moyoDivide;
+  const out = words.map((el, i) => el.animate([{ opacity: 1, translate: '0 0' }, { opacity: 0, translate: `${d * -26}px 0` }], { duration: 230, delay: i * 24, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' }));
+  if (divide && $('img', pl)) pl.classList.add('dv', 'born');
+  const r = pl.getBoundingClientRect(), from = [r.left + r.width / 2, r.top + r.height / 2];
+  Promise.all([...out.map(a => a.finished), divide && $('img', pl) && !far ? divide(pl, 'dot') : 0]).catch(() => {}).then(() => {
+    turn(); stepping = false; out.forEach(a => a.cancel());
+    if (divide && $('img', pl)) divide(pl, true, { p: 0, ms: 900, from: far ? undefined : from });
+    words.forEach((el, i) => el.animate([{ opacity: 0, translate: `${d * 40}px 0` }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 60, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+  });
 }
 function hideSheet() { // really closes it: the address has already changed
   if (!dlg.open || dlg.dataset.leaving) return;
@@ -133,12 +143,12 @@ function hideSheet() { // really closes it: the address has already changed
   if (!morph(false, cur, end)) { if (!window.hbOut) end(); else { dlg.dataset.leaving = '1'; window.hbOut(dlg, end); } }
   if (list) requestAnimationFrame(() => list.classList.remove('still'));
 }
-const closeSheet = () => { if (pushed) history.back(); else { history.replaceState(null, '', address()); hideSheet(); } };
+const closeSheet = () => { if (pushed) history.back(); else hideSheet(); };
 if (dlg && list) {
-  list.addEventListener('click', e => { const b = e.target.closest('.row'); if (b) openSheet(+b.dataset.p, true); });
+  list.addEventListener('click', e => { const b = e.target.closest('.row'); if (!b || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); openSheet(+b.dataset.p, true); }); // a new tab gets the page
   dlg.addEventListener('close', () => {
     root.classList.remove('is-dialog'); lenis?.start(); document.title = (filters ? (lang === 'en' ? 'Projects' : 'Projets') + ' · ' : '') + 'Moyo Studio';
-    if (new URLSearchParams(location.search).has('projet')) history.replaceState(null, '', address()); // closed by the browser itself
+    if (pushed && asked() >= 0) { pushed = false; history.back(); } // closed by the browser itself
     opener?.focus({ preventScroll: true });
   });
   dlg.addEventListener('cancel', e => { e.preventDefault(); closeSheet(); });
@@ -146,9 +156,7 @@ if (dlg && list) {
   $('#pClose').addEventListener('click', closeSheet);
   $('#pNext').addEventListener('click', () => step(1)); $('#pNext2').addEventListener('click', () => step(1));
   $('#pPrev').addEventListener('click', () => step(-1));
-  const asked = () => { const id = new URLSearchParams(location.search).get('projet'); return id ? ALL.findIndex(p => p.id === id) : -1; };
   addEventListener('popstate', () => { const i = asked(); if (i < 0) { pushed = false; hideSheet(); } else if (!dlg.open) { pushed = true; openSheet(i, false); } else if (i !== cur) fill(i); });
-  if (asked() >= 0) addEventListener('DOMContentLoaded', () => openSheet(asked(), false), { once: true }); // a shared address
 }
 
 /* ---------- Optical alignment: the ink of the first letter sits on the axis, not its invisible side bearing ----------
@@ -265,27 +273,34 @@ if (form) {
   const dots = $('.f-dots', form), need = [['name', f => f.value.trim().length > 1], ['email', f => !!f.value && f.validity.valid && /\.[a-z]{2,}$/i.test(f.value.trim())], ['message', f => f.value.trim().length >= 10]];
   const fillDots = () => { let n = 0; need.forEach(([k, ok], i) => { const y = ok(form.elements[k]); n += y; dots.children[i].classList.toggle('ok', y); }); dots.classList.toggle('full', n === 3); };
   // what is wrong is said next to its field, when the field is left or the form is sent, and taken back as soon as it is right
-  const ERR = { name: ['Indiquez votre nom.', 'Please enter your name.'], email: ['Indiquez une adresse e-mail valide.', 'Please enter a valid email address.'], message: ['Votre message est un peu court.', 'Your message is a little short.'] };
+  const chosen = {};
+  const ERR = { name: ['Indiquez votre nom.', 'Please enter your name.'], email: ['Indiquez une adresse complète, par exemple nom@domaine.fr.', 'Please enter a full address, for example name@domain.com.'], message: ['Encore quelques mots : dix caractères au minimum.', 'A few more words: ten characters at least.'] };
   const OK = { name: f => !!f.value.trim(), email: need[1][1], message: need[2][1] };
   const mark = (k, bad) => { const f = form.elements[k]; if (bad) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid'); $('#e-' + k).textContent = bad ? ERR[k][lang === 'en' ? 1 : 0] : ''; };
   form.addEventListener('input', e => { fillDots(); const k = e.target.name; if (OK[k] && e.target.hasAttribute('aria-invalid') && OK[k](e.target)) { mark(k, false); say3(''); } });
   form.addEventListener('focusout', e => { const k = e.target.name; if (OK[k] && e.target.value.trim() && !OK[k](e.target)) mark(k, true); });
   new MutationObserver(() => Object.keys(OK).forEach(k => { if (form.elements[k]?.hasAttribute('aria-invalid')) mark(k, true); })).observe(root, { attributes: true, attributeFilter: ['lang'] });
+  // what is being written survives a reload or a visit to another page: kept in this tab only, forgotten once sent
+  const DRAFT = 'moyo-brouillon', read = () => { try { return JSON.parse(sessionStorage.getItem(DRAFT)) || {}; } catch (_) { return {}; } };
+  const keepDraft = () => { try { sessionStorage.setItem(DRAFT, JSON.stringify(Object.fromEntries([...new FormData(form)].filter(([k, x]) => k !== 'website' && x)))); } catch (_) {} };
+  Object.entries(read()).forEach(([k, x]) => { const f = form.elements[k]; if (!f) return; if (f.length && !f.tagName) { const r = [...f].find(o => o.value === x); if (r) { r.checked = true; chosen[k] = r; } } else if (!f.value) f.value = x; });
+  ['input', 'change'].forEach(n => form.addEventListener(n, keepDraft)); fillDots();
   // a choice can be taken back
-  const chosen = {}; form.addEventListener('click', e => { const r = e.target; if (r.type !== 'radio') return; if (chosen[r.name] === r) { r.checked = false; chosen[r.name] = null; } else chosen[r.name] = r; });
+  form.addEventListener('click', e => { const r = e.target; if (r.type !== 'radio') return; if (chosen[r.name] === r) { r.checked = false; chosen[r.name] = null; keepDraft(); } else chosen[r.name] = r; });
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const en = lang === 'en', wrong = Object.keys(OK).filter(k => { const bad = !OK[k](form.elements[k]); mark(k, bad); return bad; });
     if (wrong.length) { form.elements[wrong[0]].focus(); return say3(en ? (wrong.length > 1 ? `${wrong.length} fields to check.` : 'One field to check.') : (wrong.length > 1 ? `${wrong.length} champs à vérifier.` : 'Un champ à vérifier.'), true); }
-    const btn = $('.btn', form); btn.disabled = true; say3(en ? 'Sending…' : 'Envoi…');
+    const btn = $('.btn', form); btn.disabled = true; dots.classList.add('busy'); say3(en ? 'Sending…' : 'Envoi…');
     try {
       const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), lang }) });
       const r = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(r.message || '');
+      try { sessionStorage.removeItem(DRAFT); } catch (_) {}
       form.innerHTML = `<div class="f-done" tabindex="-1"><h3 class="t-m">${en ? 'Thank you. Message received.' : 'Merci. Message bien reçu.'}</h3><p>${en ? 'We will get back to you within 48 hours, at the address you gave.' : 'Nous vous répondons sous 48 heures, à l’adresse indiquée.'}</p></div>`;
       $('.f-done', form).focus({ preventScroll: true });
     } catch (err) {
-      btn.disabled = false;
+      btn.disabled = false; dots.classList.remove('busy');
       say3(err.message || (en ? 'Sending failed. Write to contact.moyostudio@gmail.com.' : 'L’envoi a échoué. Écrivez à contact.moyostudio@gmail.com.'), true);
     }
   });

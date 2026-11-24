@@ -7,7 +7,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const getLang=()=>document.documentElement.lang==='en'?'en':'fr';
 let lang=getLang();
 const EN={contact:'Contact',footAria:'Site footer',langAria:'Language',fNav:'Site map',sProj:'Projects',sSvc:'Services',sMth:'Method',sStu:'Agency',sTeam:'Team',
-  fBy:'Made by',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',top:'Back to top',fSee:'See you soon',fHold:'Hold an eye'};
+  fBy:'Made by',subH:'Sign up for a little joy.',subBtn:'Sign up',subPh:'you@example.com',top:'Back to top',fSee:'See you soon',fHold:'Hold an eye',fCalm:'Less motion'};
 function label(){
   const ft=document.getElementById('foot'); if(!ft) return;
   const put=(el,k,store,get,set)=>{ if(!(store in el.dataset)) el.dataset[store]=get(); set(lang==='en'&&EN[k]?EN[k]:el.dataset[store]); };
@@ -48,6 +48,13 @@ if(subForm) subForm.addEventListener('submit',async e=>{
   }catch(_){ show(en?'Sign-up failed. Check your connection.':'L’inscription a échoué. Vérifiez votre connexion.',true); }
   finally{ btn.disabled=false; }
 });
+
+/* less motion, chosen here: kept in this browser, read in the <head> of every page */
+const calm=$('#calm');
+if(calm){ let on=false; try{ on=localStorage.getItem('moyo-calm')==='1' }catch(_){} calm.setAttribute('aria-pressed',String(on));
+  calm.addEventListener('click',()=>{ try{ on?localStorage.removeItem('moyo-calm'):localStorage.setItem('moyo-calm','1'); sessionStorage.setItem('moyo-calm-at','1') }catch(_){} location.reload(); });
+  let at=false; try{ at=!!sessionStorage.getItem('moyo-calm-at'); sessionStorage.removeItem('moyo-calm-at') }catch(_){}
+  if(at) addEventListener('load',()=>setTimeout(()=>{ calm.scrollIntoView({block:'center',behavior:'instant'}); calm.focus({preventScroll:true}); },60)); } // the page is laid out differently: come back to the button
 
 /* the content before the footer stays put (bottom aligned) while the footer slides over it */
 const under=$('.under');
