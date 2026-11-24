@@ -21,14 +21,14 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 | Section | Contenu |
 | --- | --- |
 | Ouverture | Une phrase |
-| Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`?projet=<id>`), le bouton Retour la ferme |
+| Projets | Un accordéon d'images, la légende sur la grille. Chaque carte est un lien vers la page du projet (`/projets/<id>`) ; un clic l'ouvre en fiche (`?projet=<id>`), le bouton Retour la ferme |
 | Services | Sept services, une ligne chacun, et le point au travail sur le quatrième axe (`src/trades.js`). Une ligne qui a des projets y mène |
 | Méthode | Une scène épinglée, quatre temps, un champ de points |
 | Agence | La phrase s'encre d'une vague Klein avec le scroll, puis le sens de « moyo » |
 | Équipe | Les noms, vers `/equipe/<id>` |
 | Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome |
 
-Les projets se gèrent depuis `/admin`. Les 5 projets de départ sont des exemples à remplacer.
+Les projets et l'équipe se gèrent depuis `/admin` (un guide s'affiche à la première connexion). Les 5 projets de départ sont des exemples à remplacer.
 
 ## En ligne (Cloudflare Pages)
 
@@ -38,7 +38,10 @@ Site : https://moyo-d0n.pages.dev
 | --- | --- |
 | `/` | La page d'accueil. La section Projets montre les projets marqués « accueil » (★) |
 | `/projets` | Tous les projets, filtrés par catégorie (`/projets?cat=identite`) |
-| `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie |
+| `/projets/<id>` | La page d'un projet, rendue par le serveur (`functions/projets/[id].js`) |
+| `/equipe/<id>` | La page d'une personne de l'équipe (`functions/equipe/[id].js`) |
+| `/sitemap.xml`, `/llms.txt` | Plan du site (avec les images) et résumé du site pour les assistants IA, générés à partir des données publiées |
+| `/admin` | Mode admin, protégé par mot de passe : projets (textes FR/EN, client, lien, photo principale avec cadrage et texte alternatif, galerie), ordre et accueil, catégories, équipe (photo et cadrage, prénom, nom, sous-titre, présentation, liens, ordre), messages du formulaire et inscriptions (export CSV) |
 
 Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les pages sont rendues côté serveur avec les données à jour (`functions/_middleware.js`), donc elles restent complètes sans JavaScript et lisibles par les moteurs de recherche. Tant que rien n'a été publié depuis l'admin, c'est `data/projects.json` qui sert.
 
@@ -49,14 +52,15 @@ src/index.src.html     page d'accueil (gabarit)
 src/projets.src.html   page « Projets »
 src/admin.html         mode admin
 src/site.js            langue, scroll, projets, fiche, formulaire (toutes les pages)
+shared/seo.js          balises meta, données structurées schema.org (agence, personnes, projets, fil d'Ariane)
+shared/page.js         pages projet et profil, rendues par le serveur
 src/*.js               un fichier par comportement : menu, pied de page, yeux, verre, passages, métiers, méthode, encre, apparitions, point lancé, sorties, curseur
 shared/design.js       système de design : couleurs, typographie, grille, composants, fiche projet
 shared/chrome.js       en-tête, menu, pied de page
 shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
-functions/equipe/      page de profil, rendue par le serveur
-archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres)
+functions/equipe/      page de profil ; functions/projets/ : page de projet
 data/projects.json     projets de départ (les 5 exemples)
-functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /img/<id>
+functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /api/messages, /api/subscribers, /img/<id>, /sitemap.xml, /llms.txt
 build.mjs              construit dist/
 wrangler.toml          configuration Cloudflare (projet « moyo », KV « MOYO »)
 ```
@@ -107,19 +111,21 @@ Le site a besoin des Functions Cloudflare pour l'admin et les données à jour. 
 
 ## Tester
 
-Les tests utilisent Playwright (Python) et Google Chrome.
+`tests/smoke.mjs` (Node, Playwright, axe-core) vérifie chaque page en bureau et en mobile : statut, erreurs de script, images et liens internes, SEO (h1, titre, description, canonique, JSON-LD), accessibilité (axe, erreurs graves), fiche projet, filtres, sitemap et llms.txt.
 
 ```bash
-npm install                  # installe axe-core
-pip install playwright
-python3 tests/qa.py          # axe-core sur 20 états : bureau 1440 px (FR) et mobile 390 px (EN)
-python3 tests/modes.py       # sans JavaScript, animations réduites
-python3 tests/rm2.py         # animations réduites : aucune animation active
-python3 tests/scroll.py      # scroll Lenis, menu, ancres, dialogue
-python3 tests/foot.py 1440 900   # le grand « moyo » est collé au bas de la page
+npm run dev                                  # dans un autre terminal
+npm test                                     # ou BASE=https://moyo-d0n.pages.dev npm test
 ```
 
-Ces scripts ont été écrits pour l'accueil v8 : leurs sélecteurs sont à adapter à la version actuelle.
+Playwright doit être installé (`npm i -D playwright` puis `npx playwright install chromium`) s'il ne l'est pas sur la machine.
+
+## SEO et GEO
+
+- Chaque projet et chaque personne a sa page, avec titre, description (160 caractères), adresse canonique, Open Graph (photo du projet ou portrait) et données structurées : `ProfessionalService` et `WebSite` (accueil), `CreativeWork` (projet), `Person` (équipe), `BreadcrumbList`.
+- `/sitemap.xml` liste toutes les pages et leurs images ; `/llms.txt` résume le studio, ses services, ses projets et son équipe pour les moteurs de réponse (ChatGPT, Perplexity, Google AI…).
+- Les cartes de projet sont de vrais liens : le site se parcourt sans JavaScript et les robots trouvent chaque projet.
+- Dans l'admin : texte alternatif de la photo principale, compteur de caractères pour le titre et la description.
 
 ## Estimation Awwwards (auto-évaluation, pas un jury)
 
@@ -142,7 +148,7 @@ Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clie
 
 ## Historique
 
-Le dossier `archive/` garde les versions précédentes, les scripts de modification et les anciens tests. Voir `archive/README.md`.
+Les anciennes versions (dossier `archive/`, retiré en novembre 2026) restent dans l'historique git.
 
 ## Crédits et licences
 

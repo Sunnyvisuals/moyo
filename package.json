@@ -9,7 +9,7 @@
     "build": "node build.mjs",
     "dev": "node build.mjs && wrangler pages dev",
     "deploy": "node build.mjs && wrangler pages deploy",
-    "test:a11y": "python3 tests/qa.py"
+    "test": "node tests/smoke.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.14.1",

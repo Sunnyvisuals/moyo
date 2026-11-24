@@ -55,17 +55,18 @@ $$('.la[data-cat]').forEach(a => {
 
 /* ---------- Project sheet: opens from its card; previous and next stay inside the current filter. Each project has its own address (?projet=id):
    it can be shared, and the Back button closes the sheet. ---------- */
-const dlg = $('#proj');
+const dlg = $('#proj'), baseTitle = /[?&]projet=/.test(location.search) ? 'Moyo Studio' : document.title;
 let cur = 0, opener = null, pushed = false, openCard = null;
 function fill(i) {
   cur = i; const p = ALL[i], t = txt(p, lang);
   $('#pTitle').textContent = t.title; $('#pDesc').textContent = t.desc;
   $('#pTag').textContent = [catLabel(DATA, p.category, lang), t.type].filter(Boolean).join(', ');
-  $('#pRole').textContent = t.role; $('#pPlace').textContent = t.place; $('#pYear').textContent = p.year;
+  $('#pRole').textContent = t.role; $('#pPlace').textContent = t.place; $('#pYear').textContent = p.year; $('#pClient').textContent = t.client || '';
+  $('#pLinkW').hidden = !p.link; if (p.link) $('#pLink').href = p.link;
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
-  const pl = $('#pPlate'); pl.innerHTML = plateInner(p, t.title); pl.classList.toggle('plate--none', !p.cover);
+  const pl = $('#pPlate'); pl.innerHTML = plateInner(p, t.alt || t.title); pl.classList.toggle('plate--none', !p.cover);
   const im = $('img', pl); if (im) { im.loading = 'eager'; im.decoding = 'sync'; }
-  $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
+  $('#pGallery').innerHTML = (p.images || []).map((id, k) => `<img src="${imgURL(id)}" alt="${escHTML(t.title + ', image ' + (k + 2))}" loading="lazy" decoding="async">`).join('');
   const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
   $('#pPos').textContent = `${at + 1}/${v.length}`; $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
   document.title = t.title + ' · Moyo Studio';
@@ -88,7 +89,7 @@ if (list && !filters) {
     });
     plate.addEventListener('pointerleave', () => { if (img) img.style.setProperty('--px', '0px'); });
     $('.row', c).addEventListener('focus', () => { if (root.classList.contains('kbd')) set(i); });
-    c.addEventListener('click', e => { if (wide.matches && i !== on && !matchMedia('(hover:hover)').matches) { e.stopPropagation(); set(i); } }, true);
+    c.addEventListener('click', e => { if (wide.matches && i !== on && !matchMedia('(hover:hover)').matches) { e.preventDefault(); e.stopPropagation(); set(i); } }, true);
   });
 }
 const cardOf = i => list && $$('#projects > li')[i];
@@ -99,7 +100,7 @@ function morph(open, i, update) {
   const can = document.startViewTransition && !reduce && r && r.width > 24 && r.top < innerHeight - 60 && r.bottom > 60 && (open || dlg.scrollTop < innerHeight * .6);
   if (!can) return false;
   root.style.setProperty('--vt', `${Math.max(0, r.top).toFixed(0)}px ${Math.max(0, innerWidth - r.right).toFixed(0)}px ${Math.max(0, innerHeight - r.bottom).toFixed(0)}px ${Math.max(0, r.left).toFixed(0)}px`);
-  root.style.setProperty('--vp', ALL[i].cover ? '50% 8%' : '50% 50%');
+  root.style.setProperty('--vp', ALL[i].cover ? ALL[i].focus || '50% 8%' : '50% 50%');
   root.classList.add('vt-sheet'); root.classList.toggle('vt-in', open);
   (open ? plate : mine).style.viewTransitionName = 'shot';
   const vt = document.startViewTransition(async () => {
@@ -135,9 +136,10 @@ function hideSheet() { // really closes it: the address has already changed
 }
 const closeSheet = () => { if (pushed) history.back(); else { history.replaceState(null, '', address()); hideSheet(); } };
 if (dlg && list) {
-  list.addEventListener('click', e => { const b = e.target.closest('.row'); if (b) openSheet(+b.dataset.p, true); });
+  // each card is a link to the page of its project (/projets/<id>); a plain click opens it here, as a sheet. A new tab still gets the page.
+  list.addEventListener('click', e => { const b = e.target.closest('.row'); if (!b || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); openSheet(+b.dataset.p, true); });
   dlg.addEventListener('close', () => {
-    root.classList.remove('is-dialog'); lenis?.start(); document.title = (filters ? (lang === 'en' ? 'Projects' : 'Projets') + ' · ' : '') + 'Moyo Studio';
+    root.classList.remove('is-dialog'); lenis?.start(); document.title = filters ? (lang === 'en' ? 'Projects' : 'Projets') + ' · Moyo Studio' : baseTitle;
     if (new URLSearchParams(location.search).has('projet')) history.replaceState(null, '', address()); // closed by the browser itself
     opener?.focus({ preventScroll: true });
   });

@@ -162,6 +162,7 @@ const FOOTER_CSS = `
 .sub-btn:hover{color:var(--klein);translate:4px 0}
 .sub-btn:disabled{opacity:.5;cursor:progress}
 .sub-msg{margin-top:12px;min-height:1.4em;font-size:var(--fs-small)}
+.sub-msg.err{color:#B3261E}
 .foot-base{margin-top:clamp(3.5rem,6vw,6rem);padding-top:20px;border-top:1px solid var(--line);font-size:var(--fs-small);row-gap:4px;align-items:center}
 .foot-base a,.flang button{display:inline-flex;align-items:center;min-height:36px;font-weight:500;background:linear-gradient(currentColor,currentColor) 0 calc(100% - 7px)/0 1px no-repeat;transition:background-size .7s var(--ease),color .4s}
 .foot-base a{justify-self:start}
@@ -261,7 +262,7 @@ const footerInner = ({ home = false, team } = {}) => {
       <h2 class="fh" data-i="fBy">Réalisé par</h2>
       <ul class="fnames fby">${creditLinks(team)}</ul>
     </div>
-    <form class="fcol q4 foot-sub" id="subForm" novalidate>
+    <form class="fcol q4 foot-sub" id="subForm" action="/api/subscribe" method="post" novalidate>
       <h2 class="fh" data-i="subH">Inscrivez-vous pour un peu de joie.</h2>
       <div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" aria-label="S’inscrire" data-ia="subBtn">→</button></div>
       <p class="sub-msg" id="subMsg" role="status" aria-live="polite"></p>

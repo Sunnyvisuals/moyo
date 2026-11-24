@@ -244,6 +244,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .facts{margin-top:clamp(2.5rem,5vw,5rem);border-top:1px solid var(--line)}
 .facts>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gut);padding:16px 0;border-bottom:1px solid var(--line);font-size:var(--fs-small)}
 .facts dt{color:var(--mute)}
+.p-link{margin-top:24px}
 
 #proj{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--bg);color:var(--ink);overflow:auto;overscroll-behavior:contain;translate:0 100%;
   transition:translate .95s var(--ease-io),overlay .95s allow-discrete,display .95s allow-discrete}
@@ -317,11 +318,13 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle">
       <div class="h2">
         <p class="t-lead" id="pDesc"></p>
         <dl class="facts">
+          <div><dt data-i="fClient">Client</dt><dd id="pClient"></dd></div>
           <div><dt data-i="fCat">Catégorie</dt><dd id="pTag"></dd></div>
           <div><dt data-i="fRole">Rôle</dt><dd id="pRole"></dd></div>
           <div><dt data-i="fPlace">Lieu</dt><dd id="pPlace"></dd></div>
           <div><dt data-i="fYear">Année</dt><dd id="pYear"></dd></div>
         </dl>
+        <p class="p-link" id="pLinkW" hidden><a class="lnk" id="pLink" href="/" target="_blank" rel="noopener"><span data-i="fVisit">Voir le projet en ligne</span><i class="up" aria-hidden="true">↗</i></a></p>
       </div>
     </div>
     <div class="gallery" id="pGallery"></div>
@@ -332,6 +335,7 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle">
 /* What every <head> needs, besides its own title and description. */
 const headCommon = `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F5F4F0'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23002FA7'/%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<noscript><style>.bar.away{translate:0 0}</style></noscript>
 <script>/* the language chosen on the site, before anything is drawn. Page transitions can be cut short by a fast click: that is not an error. */
 try{var l=localStorage.getItem('hb-lang');if(l!=='fr'&&l!=='en')l=/^fr/i.test(navigator.language||'fr')?'fr':'en';document.documentElement.lang=l}catch(e){}
 /* what opens the page: the loading (first visit, reload), the dot closing on the title (coming from a link of the site), or nothing */

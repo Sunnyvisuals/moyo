@@ -9,7 +9,7 @@ const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 export async function onRequestPost({ request, env }) {
   const isForm = !(request.headers.get('Content-Type') || '').includes('application/json');
   const reply = (ok, status, body) => isForm
-    ? Response.redirect(new URL(ok ? '/?inscrit=1#foot' : '/?erreur=1#foot', request.url).toString(), 303)
+    ? Response.redirect(new URL(ok ? '/?inscription=ok#foot' : '/?inscription=erreur#foot', request.url).toString(), 303)
     : json(ok ? { ok: true, ...body } : { error: true, ...body }, status);
 
   let body = {};

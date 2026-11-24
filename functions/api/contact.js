@@ -2,7 +2,7 @@
    Messages are kept in KV under "msg:<15-digit time>-<8 hex>" and read from /admin. */
 import { json } from '../_lib/auth.js';
 
-const TYPES = ['identite', 'site', 'donnees', 'motion', 'audiovisuel', 'communication', 'autre'];
+const TYPES = ['identite', 'site', 'donnees', 'motion', 'audiovisuel', 'communication', 'print', 'autre'];
 const BUDGETS = ['lt5', '5-15', '15-40', 'gt40', 'tbd'];
 const MAX_PER_HOUR = 5;
 const EMAIL = /^[^\s@<>()[\]\\,;:"]{1,64}@[^\s@<>()[\]\\,;:"]{1,190}\.[a-z]{2,24}$/i;
@@ -52,7 +52,7 @@ export async function onRequestPost({ request, env }) {
   if (env.RESEND_API_KEY) {
     const to = env.TO_EMAIL || 'contact.moyostudio@gmail.com';
     const from = env.FROM_EMAIL || 'moyo <onboarding@resend.dev>';
-    const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' };
+    const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', print: 'Édition & print', autre: 'Autre' };
     const budget = { lt5: 'Moins de 5 000 €', '5-15': '5 000 à 15 000 €', '15-40': '15 000 à 40 000 €', gt40: 'Plus de 40 000 €', tbd: 'À définir' };
     const typeTxt = msg.type ? (label[msg.type] || msg.type) : '';
     const budgetTxt = msg.budget ? (budget[msg.budget] || msg.budget) : '';

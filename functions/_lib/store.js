@@ -2,6 +2,7 @@
 import seed from '../../data/projects.json';
 
 export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif)$/;
+const STATIC_IMAGE = /^\/proj\/[\w-]+\.(jpe?g|webp|png|avif)$/; // pictures shipped with the site (the examples)
 
 export async function getData(env) {
   const stored = env.MOYO ? await env.MOYO.get('projects', 'json') : null;
@@ -32,8 +33,9 @@ export function imagesOf(data) {
 /* ---------- Validation: keep only known fields, with limits ---------- */
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const SLUG = /^[a-z0-9][a-z0-9-]{0,59}$/;
-// Plates are hand-made SVG drawings. Only the admin can write them, but refuse anything that could run code anyway.
-const UNSAFE_SVG = /<script|<foreignobject|<iframe|<image|<use|\son[a-z]+\s*=|javascript:|href\s*=|url\s*\(\s*['"]?\s*(?!#)/i;
+const FOCUS = /^\d{1,3}(\.\d)?% \d{1,3}(\.\d)?%$/; // where a cropped picture is centred, e.g. "50% 30%"
+const focus = v => (typeof v === 'string' && FOCUS.test(v) ? v : '');
+const image = v => (typeof v === 'string' && (IMAGE_ID.test(v) || STATIC_IMAGE.test(v)) ? v : null);
 
 function text(t = {}) {
   return {
@@ -41,7 +43,9 @@ function text(t = {}) {
     type: str(t.type, 120),
     role: str(t.role, 200),
     place: str(t.place, 120),
-    desc: str(t.desc, 6000)
+    desc: str(t.desc, 6000),
+    client: str(t.client, 120),
+    alt: str(t.alt, 200)
   };
 }
 
@@ -69,21 +73,15 @@ export function validate(input) {
     if (!fr.title) { errors.push(`Projet ${id} : titre français manquant.`); continue; }
     const category = str(p.category, 60);
     if (category && !categories.some(c => c.id === category)) { errors.push(`Projet « ${label} » : catégorie inconnue « ${category} ».`); continue; }
-    const cover = typeof p.cover === 'string' && IMAGE_ID.test(p.cover) ? p.cover : null;
-    const images = (Array.isArray(p.images) ? p.images : []).filter(i => typeof i === 'string' && IMAGE_ID.test(i)).slice(0, 40);
-    let plate = typeof p.plate === 'string' ? p.plate.trim() : '';
-    if (plate && (plate.length > 20000 || !/^<svg[\s>][\s\S]*<\/svg>$/i.test(plate) || UNSAFE_SVG.test(plate))) {
-      errors.push(`Projet « ${label} » : motif SVG refusé.`); plate = '';
-    }
     projects.push({
       id,
       year: str(p.year, 12),
       category,
       featured: !!p.featured,
-      tone: p.tone === 'wash' ? 'wash' : 'klein',
-      cover,
-      images,
-      plate,
+      cover: image(p.cover),
+      focus: focus(p.focus),
+      images: (Array.isArray(p.images) ? p.images : []).map(image).filter(Boolean).slice(0, 40),
+      link: /^https?:\/\//i.test(str(p.link, 300)) ? str(p.link, 300) : '',
       fr,
       en
     });
@@ -101,9 +99,10 @@ export function validate(input) {
       .filter(l => l.label && /^(https?:\/\/|mailto:)/i.test(l.url));
     team.push({
       id, name, first, last,
-      photo: typeof m.photo === 'string' && IMAGE_ID.test(m.photo) ? m.photo : null,
-      fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000), phrase: str(m.fr?.phrase, 80) },
-      en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000), phrase: str(m.en?.phrase, 80) },
+      photo: image(m.photo),
+      focus: focus(m.focus),
+      fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000) },
+      en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000) },
       links
     });
   }
