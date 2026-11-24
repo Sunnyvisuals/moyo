@@ -211,5 +211,63 @@
       "first": "Yacine",
       "last": "Bouabdallah"
     }
+  ],
+  "method": [
+    {
+      "id": "m1",
+      "media": "/proj/2.jpg",
+      "poster": null,
+      "fit": "top",
+      "fr": {
+        "title": "Écouter",
+        "text": "Un premier échange pour comprendre le lieu, le public, les contraintes et le calendrier."
+      },
+      "en": {
+        "title": "Listen",
+        "text": "A first conversation to understand the place, the audience, the constraints and the timeline."
+      }
+    },
+    {
+      "id": "m2",
+      "media": "/proj/3.jpg",
+      "poster": null,
+      "fit": "center",
+      "fr": {
+        "title": "Choisir",
+        "text": "Nous retenons une seule idée, et ce qu’elle exclut."
+      },
+      "en": {
+        "title": "Choose",
+        "text": "We keep one idea, and what it rules out."
+      }
+    },
+    {
+      "id": "m3",
+      "media": "/proj/4.jpg",
+      "poster": null,
+      "fit": "center",
+      "fr": {
+        "title": "Construire",
+        "text": "Grille, typographie, image et code : tout est dessiné, puis testé sur de vrais écrans."
+      },
+      "en": {
+        "title": "Build",
+        "text": "Grid, type, image and code: everything is designed, then tested on real screens."
+      }
+    },
+    {
+      "id": "m4",
+      "media": "/proj/1.jpg",
+      "poster": null,
+      "fit": "top",
+      "fr": {
+        "title": "Accompagner",
+        "text": "Nous restons là après le lancement : mesures, ajustements, nouveaux contenus."
+      },
+      "en": {
+        "title": "Support",
+        "text": "We stay on after launch: measuring, adjusting, new content."
+      }
+    }
   ]
 }

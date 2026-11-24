@@ -1,64 +1,51 @@
-/* Method, in four scenes. The section stays on screen while its four steps pass with the scroll; one field of dots is the only actor:
-   it listens (waves), it chooses (one among many), it builds (the dots write the name, the blue one is its final point), it stays (an orbit).
-   The dots step aside under the pointer. Without JavaScript or with reduced motion the section is a plain list of four steps. */
+/* Method: four steps. The section stays on screen while they pass with the scroll. The picture, the video or the GIF of the step (chosen in the
+   admin) takes the whole screen, the next one rises over it, and the words are in white over them. A video is fetched when the section is near
+   and plays only while its step is on screen. Without JavaScript or with reduced motion: a plain list of four steps, each with its picture. */
 (() => {
 'use strict';
-const sec = document.getElementById('methode'), cv = sec && sec.querySelector('.mth-c');
-if (!cv || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-const steps = [...sec.querySelectorAll('.step')], says = steps.map(s => s.querySelector('p')), tabs = [...sec.querySelectorAll('.tab')], g = cv.getContext('2d');
+const sec = document.getElementById('methode'), box = sec && sec.querySelector('.mth-s'), root = document.documentElement;
+if (!box) return;
+const steps = [...sec.querySelectorAll('.step')], films = steps.map(s => s.querySelector('video'));
+if (!steps.length) return;
+const fetchFilms = () => films.forEach(v => { if (v && !v.src && v.dataset.src) v.src = v.dataset.src; });
+new IntersectionObserver((es, io) => { if (es.some(e => e.isIntersecting)) { io.disconnect(); document.readyState === 'complete' ? fetchFilms() : addEventListener('load', fetchFilms, { once: true }); } }, { rootMargin: '150% 0px' }).observe(sec);
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+const says = steps.map(s => s.querySelector('p')), tabs = [...sec.querySelectorAll('.tab')], pics = steps.map(s => s.querySelector('.mth-m'));
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), n = steps.length, next = sec.nextElementSibling;
 sec.classList.add('live');
-const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), smooth = t => t * t * t * (t * (t * 6 - 15) + 10), TAU = Math.PI * 2, N = 130;
+const media = document.createElement('div'); media.className = 'mth-media'; box.prepend(media);
+pics.forEach(f => { if (f) media.append(f); });
+films.forEach(v => { if (v) { v.controls = false; v.muted = true; v.setAttribute('aria-hidden', 'true'); } });
 
-/* where each dot is in each scene: [x, y, radius, alpha], in a square from -1 to 1. Dot 0 is the blue one. */
-const ringOf = (() => { const a = [[0, 0]]; for (let k = 1; k <= 6; k++) for (let j = 0; j < 6 * k; j++) a.push([k, j / (6 * k) * TAU + k * .21]); while (a.length < N) a.push([0, 0]); return a; })();
-const cells = (() => { const a = []; for (let r = 0; r < 10; r++) for (let c = 0; c < 13; c++) a.push([(c - 6) * .152, (r - 4.5) * .152]); const i = 4 * 13 + 8; [a[0], a[i]] = [a[i], a[0]]; return a; })();
-const word = (() => {
-  const G = { m: ['11110', '10101', '10101', '10101', '10101'], o: ['0110', '1001', '1001', '1001', '0110'], y: ['1001', '1001', '1001', '1001', '0111', '0001', '0110'] }, a = []; let x = 0;
-  for (const ch of 'moyo') { G[ch].forEach((row, r) => [...row].forEach((v, c) => { if (v === '1') a.push([x + c, r]); })); x += G[ch][0].length + 1; }
-  const s = 1.92 / (x + .2), w = x - 1; return { dots: a.map(([c, r]) => [(c - w / 2 - .6) * s, (r - 2.6) * s]), end: [(w - w / 2 - .6 + .35) * s, (4 - 2.6) * s], s };
-})();
-const SCENES = [
-  (i, t) => { const [k, a] = ringOf[i]; if (!i) return [0, 0, .062 + .006 * Math.sin(t * 2.2), 1]; const w = Math.sin(t * 2.1 - k * .95), r = k * .152 * (1 + .03 * w); return [Math.cos(a) * r, Math.sin(a) * r, k ? .0125 + .0055 * w : 0, 1 - k * .13]; },
-  (i, t) => { const [x, y] = cells[i]; return i ? [x, y, .0125 + .012 * Math.pow(Math.max(0, Math.sin(t * 1.1 + i * 2.399)), 14), .34] : [x, y, .062, 1]; },
-  (i) => { if (!i) return [word.end[0], word.end[1], word.s * .46, 1]; const [x, y] = word.dots[(i - 1) % word.dots.length]; return [x, y, word.s * .4, 1]; },
-  (i, t) => { const a = t * .62 - i / N * TAU, q = 1 - i / N; return [Math.cos(a) * .76, Math.sin(a) * .76, i ? .004 + .03 * Math.pow(q, 1.5) : .062, i ? .06 + .94 * q : 1]; }
-];
-
-let W = 0, H = 0, S = 1, D = 1, p = 0, ptr = null, on = false, raf = 0, cur = -1;
-const px = new Float32Array(N), py = new Float32Array(N);
-function size() { const r = cv.getBoundingClientRect(); D = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = Math.round(W * D); cv.height = Math.round(H * D); S = Math.min(W, H) / 2 * .98; }
+let p = 0, on = false, cur = -2;
 function read() {
-  const r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, len = r.height - pad - innerHeight;
-  p = clamp((-r.top - pad) / Math.max(1, len)) * 4;
-  const k = Math.min(3, Math.floor(Math.min(p, 3.999) + .16));
-  if (k !== cur) { cur = k; steps.forEach((s, i) => { s.classList.toggle('now', i === k); s.classList.toggle('was', i < k); }); tabs.forEach((s, i) => s.classList.toggle('now', i === k)); }
+  const H = innerHeight, r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, top = r.top + pad, len = r.height - pad - H;
+  p = clamp(-top / Math.max(1, len)) * n;
+  const e = clamp(1 - top / (H * .62)); sec.style.setProperty('--e', (1 - Math.pow(1 - e, 2)).toFixed(4)); // the scene opens as it comes
+  root.classList.toggle('on-film', top < H * .4 && (!next || next.getBoundingClientRect().top > H * .5)); // what is fixed over the picture turns white
+  const k = Math.min(n - 1, Math.floor(Math.min(p, n - .001) + .16)), here = top < H * .3;
+  const now = here ? k : -1;
+  if (now !== cur) { cur = now;
+    steps.forEach((s, i) => { s.classList.toggle('now', i === now); s.classList.toggle('was', i < now); });
+    tabs.forEach((s, i) => s.classList.toggle('now', i === now));
+    pics.forEach((f, i) => { if (f) { f.classList.toggle('in', i <= Math.max(0, now)); f.classList.toggle('was', i < now); } }); // the first one is there from the start
+    play(); }
   tabs.forEach((s, i) => s.style.setProperty('--f', clamp(p - i).toFixed(3)));
-  if (window.moyoWave) says.forEach((e, i) => moyoWave(e, clamp((p - i + .16) / .5))); // the sentence of the scene is inked as the scene passes (ink.js)
+  if (window.moyoWave) says.forEach((e, i) => moyoWave(e, i <= now ? 1 : 0)); // the sentence of the step is inked once it is there, slowly (ink.js)
 }
-function frame(now) {
-  raf = 0; if (!on) return;
-  const t = now / 1000, f = Math.min(p, 3.999), a = Math.floor(f), m = clamp((f - a - .56) / .44), b = Math.min(3, a + 1);
-  g.setTransform(D, 0, 0, D, 0, 0); g.clearRect(0, 0, W, H);
-  const cx = W / 2, cy = H / 2;
-  for (let n = N - 1; n >= 0; n--) {
-    const A = SCENES[a](n, t); let [x, y, r, al] = A;
-    if (m > 0 && b !== a) { const B = SCENES[b](n, t), u = smooth(clamp(m * 1.45 - n / N * .45)), arc = Math.sin(u * Math.PI) * .13 * (n % 2 ? 1 : -1), dx = B[0] - x, dy = B[1] - y; x += dx * u - dy * arc; y += dy * u + dx * arc; r += (B[2] - r) * u; al += (B[3] - al) * u; }
-    let X = cx + x * S, Y = cy + y * S, ox = 0, oy = 0;
-    if (ptr) { const dx = X - ptr[0], dy = Y - ptr[1], d = Math.hypot(dx, dy) || 1, k = 34 * Math.exp(-(d * d) / 5200); ox = dx / d * k; oy = dy / d * k; }
-    px[n] += (ox - px[n]) * .14; py[n] += (oy - py[n]) * .14;
-    if (r <= 0) continue;
-    g.beginPath(); g.arc(X + px[n], Y + py[n], Math.max(.4, r * S), 0, TAU);
-    g.fillStyle = n ? `rgba(18,18,20,${al.toFixed(3)})` : '#002FA7'; g.fill();
-  }
-  raf = requestAnimationFrame(frame);
+/* the film of the step plays, the one before ends its way out, the others wait; the next one is fetched ahead */
+function play() {
+  const at = Math.max(0, cur);
+  films.forEach((v, i) => { if (!v) return;
+    if (on && i === at) { fetchFilms(); v.preload = 'auto'; v.play().catch(() => {}); }
+    else if (!on || Math.abs(i - at) > 1) v.pause(); else { if (i === at + 1) v.preload = 'auto'; setTimeout(() => { if (i !== Math.max(0, cur)) v.pause(); }, 1700); } });
 }
-const go = () => { if (on && !raf) raf = requestAnimationFrame(frame); };
-new IntersectionObserver(es => { on = es[es.length - 1].isIntersecting; if (on) { read(); go(); } }).observe(sec);
+new IntersectionObserver(es => { on = es[es.length - 1].isIntersecting; read(); play(); if (!on) root.classList.remove('on-film'); }, { rootMargin: '10% 0px' }).observe(sec);
+document.addEventListener('visibilitychange', () => { if (document.hidden) films.forEach(v => v && v.pause()); else play(); });
 addEventListener('scroll', () => { if (on) read(); }, { passive: true });
-addEventListener('resize', () => { size(); read(); }); new ResizeObserver(size).observe(cv);
-cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); ptr = e.pointerType === 'mouse' ? [e.clientX - r.left, e.clientY - r.top] : null; }, { passive: true });
-cv.addEventListener('pointerleave', () => { ptr = null; });
-/* a tab goes to its scene (site.js owns the smooth scroll) */
-tabs.forEach((b, i) => b.addEventListener('click', () => { const pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, y = moyoTop(sec) + pad + (sec.offsetHeight - pad - innerHeight) * (i + .3) / 4; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
-size(); read();
+addEventListener('resize', read);
+/* a tab goes to its step (site.js owns the smooth scroll) */
+tabs.forEach((b, i) => b.addEventListener('click', () => { const pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, y = moyoTop(sec) + pad + (sec.offsetHeight - pad - innerHeight) * (i + .3) / n; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
+read(); dispatchEvent(new Event('resize')); // the title is smaller now: its optical margin is measured again (site.js)
 })();

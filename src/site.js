@@ -201,7 +201,7 @@ function optical(scope) {
 /* ---------- Leaving the tab: the dot closes its eye, and waits ---------- */
 const icon = $('link[rel=icon]'), ICON = icon && icon.href; let page = document.title;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'See you soon?' : 'On se voit ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F5F4F0'/%3E%3Crect x='8' y='15' width='16' height='3' rx='1.5' fill='%23002FA7'/%3E%3C/svg%3E"; }
+  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'See you soon?' : 'On se voit ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FAFAF8'/%3E%3Crect x='8' y='15' width='16' height='3' rx='1.5' fill='%23002FA7'/%3E%3C/svg%3E"; }
   else { document.title = page; if (icon) icon.href = ICON; }
 });
 

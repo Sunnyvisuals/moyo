@@ -84,6 +84,6 @@ if (document.getElementById('top')) {
   let tries = 0, timer = 0;
   const hop = () => { if (document.hidden || ball || tries++ > 2) return; mark.animate([{ translate: '0 0', easing: 'cubic-bezier(.2,.7,.3,1)' }, { translate: '0 -.55em', offset: .34, easing: 'cubic-bezier(.7,0,.8,.3)' }, { translate: '0 0', offset: .62, easing: 'cubic-bezier(.2,.7,.3,1)' }, { translate: '0 -.15em', offset: .8, easing: 'cubic-bezier(.7,0,.8,.3)' }, { translate: '0 0' }], { duration: 900 }); timer = setTimeout(hop, 9000); };
   const stop = () => { clearTimeout(timer); ['scroll', 'pointerdown', 'keydown'].forEach(n => removeEventListener(n, stop)); tries = 9; };
-  (window.moyoReady || Promise.resolve()).then(() => { timer = setTimeout(hop, 5200); ['scroll', 'pointerdown', 'keydown'].forEach(n => addEventListener(n, stop, { passive: true })); });
+  (window.moyoDrawn || Promise.resolve()).then(() => { timer = setTimeout(hop, 5200); ['scroll', 'pointerdown', 'keydown'].forEach(n => addEventListener(n, stop, { passive: true })); });
 }
 })();

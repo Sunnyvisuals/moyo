@@ -9,7 +9,7 @@
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- refraction ---------- */
-  const K = [1.012, 1, .988]; // red, green, blue: just enough to feel like glass on a black and white page
+  const K = [1.005, 1, .995]; // red, green, blue: just enough to feel like glass on a black and white page
   if ((navigator.userAgentData?.brands || []).some(b => b.brand === 'Chromium')) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden');

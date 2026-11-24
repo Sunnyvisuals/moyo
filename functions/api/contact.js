@@ -53,7 +53,7 @@ export async function onRequestPost({ request, env }) {
     const to = env.TO_EMAIL || 'contact.moyostudio@gmail.com';
     const from = env.FROM_EMAIL || 'moyo <onboarding@resend.dev>';
     const label = { identite: 'Identité', site: 'Site / web', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' };
-    const budget = { lt5: 'Moins de 5 000 €', '5-15': '5 000 à 15 000 €', '15-40': '15 000 à 40 000 €', gt40: 'Plus de 40 000 €', tbd: 'À définir' };
+    const budget = { lt5: 'Moins de 5 000 €', '5-15': 'De 5 000 à 15 000 €', '15-40': 'De 15 000 à 40 000 €', gt40: 'Plus de 40 000 €', tbd: 'Ne sait pas encore' };
     const typeTxt = msg.type ? (label[msg.type] || msg.type) : '';
     const budgetTxt = msg.budget ? (budget[msg.budget] || msg.budget) : '';
     const first = msg.name.split(/\s+/)[0] || msg.name;

@@ -4,7 +4,7 @@ Ce qui a été lu avant de dessiner, et ce que chaque lecture a donné sur le si
 
 ## L'idée
 
-Une seule idée pour tout le site : **le point Klein**. Il charge la page (il dessine la phrase), termine les titres, devient le curseur, voyage sur le chemin, fait les sept métiers, joue la méthode, et finit dans le pied de page : il quitte le chemin, entre dans le dernier o, saute dans le premier. C'était un œil.
+Une seule idée pour tout le site : **le point Klein**. Il charge la page (il dessine la phrase), termine les titres, devient le curseur, voyage sur le chemin, fait les sept métiers, et finit dans le pied de page : il quitte le chemin, entre dans le dernier o, saute dans le premier. C'était un œil.
 
 ## Créativité
 
@@ -27,7 +27,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 ## Mouvement
 
-- [Scroll Slides](https://scrollslides.framer.website/) : une scène épinglée et quatre temps. Repris pour la méthode, avec un seul acteur, un champ de points.
+- [Scroll Slides](https://scrollslides.framer.website/) : une scène épinglée et quatre temps. Repris pour la méthode : une étape à la fois, et son image, sa vidéo ou son GIF, choisis dans l'admin.
 - [Accordion Cards Pro](https://www.framer.com/marketplace/components/accordion-cards-pro/) : la carte regardée s'ouvre. Repris pour les projets, la légende restant sur la grille.
 - [Gradient Text Reveal](https://www.framer.com/marketplace/components/gradient-text-reveal/) : chaque lettre passe par trois couleurs avec le scroll. Repris avec une vague Klein, seulement pour les phrases qui parlent : studio, méthode, contact.
 - [Font Weight Hover](https://www.framer.com/marketplace/components/font-weight-hover/) : la graisse suit le pointeur. Repris pour les services.

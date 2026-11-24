@@ -1,7 +1,7 @@
 /* /llms.txt: the studio in plain facts, for answer engines (the convention of llmstxt.org). French first, then English. Always from the data of the moment. */
 import seed from '../data/projects.json';
 import { getData } from './_lib/store.js';
-import { SITE, MAIL, HOME, SERVICES, METHOD, sample, waiting } from '../shared/seo.js';
+import { SITE, MAIL, HOME, SERVICES, sample, waiting } from '../shared/seo.js';
 
 export async function onRequestGet({ env }) {
   const d = await getData(env), team = d.team || [], real = (d.projects || []).filter(p => !sample(p, seed));
@@ -32,7 +32,7 @@ ${SERVICES.map(s => `- ${s[2].fr[0]} : ${s[2].fr[1]}`).join('\n')}
 
 ## Méthode
 
-${METHOD.map((m, i) => `${i + 1}. ${m[1].fr[0]} : ${m[1].fr[1]}`).join('\n')}
+${(d.method || []).map((m, i) => `${i + 1}. ${m.fr.title} : ${m.fr.text}`).join('\n')}
 ${works('fr')}
 ## Pages
 
@@ -67,7 +67,7 @@ ${SERVICES.map(s => `- ${s[2].en[0]}: ${s[2].en[1]}`).join('\n')}
 
 ## Method
 
-${METHOD.map((m, i) => `${i + 1}. ${m[1].en[0]}: ${m[1].en[1]}`).join('\n')}
+${(d.method || []).map((m, i) => `${i + 1}. ${(m.en && m.en.title) || m.fr.title}: ${(m.en && m.en.text) || m.fr.text}`).join('\n')}
 ${works('en')}
 ## Pages
 

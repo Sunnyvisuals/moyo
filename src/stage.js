@@ -13,7 +13,7 @@
 .stg.clip.in{clip-path:inset(0);transition:clip-path 1.5s cubic-bezier(.76,0,.24,1) var(--sd,0ms)}
 .stg.clip.up{clip-path:inset(100% 0 0 0)}
 .stg.dv{opacity:1;translate:none;transition:none}
-.stg.pop{opacity:1;translate:none;background-color:rgb(232 230 223 / 0);transition:background-color .5s ease}
+.stg.pop{opacity:1;translate:none;background-color:rgb(239 239 236 / 0);transition:background-color .5s ease}
 .stg.pop.in{background-color:var(--tint);transition:background-color 1s ease calc(var(--sd,0ms) + .3s)}
 .stg.pop::after{scale:0;transition:scale .45s cubic-bezier(.64,0,.78,0),translate .55s cubic-bezier(.22,1,.36,1)}
 .stg.pop.in::after{scale:1;transition:scale 1.1s cubic-bezier(.16,1,.3,1) var(--sd,0ms),translate .55s cubic-bezier(.22,1,.36,1)}`;

@@ -12,7 +12,7 @@ const DESIGN_CSS = `
 @font-face{font-family:"Hanken Grotesk";src:url(/fonts/hanken-grotesk.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 :root{
   color-scheme:light;
-  --bg:#F5F4F0;--tint:#E8E6DF;--ink:#121214;--mute:#65656B;--line:rgb(18 18 20 / .15);--klein:#002FA7;
+  --bg:#FAFAF8;--tint:#EFEFEC;--ink:#121214;--mute:#65656B;--line:rgb(18 18 20 / .15);--klein:#002FA7;
   --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   /* grid: its width drives everything, so a very large screen gets a larger page, not a lost one */
   --m:max(clamp(20px,3.4vw,64px),env(safe-area-inset-left),env(safe-area-inset-right));--max:clamp(1680px,80vw,2400px);
@@ -205,7 +205,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .path.open a{pointer-events:auto}
 .path.open a span{opacity:1;translate:0 0;transition:opacity .4s ease calc(var(--i) * 24ms),translate .8s var(--ease) calc(var(--i) * 24ms),color .3s}
 /* paper under the names, only while they are there */
-.path::before{content:"";position:absolute;z-index:-1;right:calc(50% - var(--px));top:-50vh;bottom:-50vh;width:calc(var(--px) + 250px);background:linear-gradient(to left,var(--bg) 58%,rgb(245 244 240 / 0));opacity:0;transition:opacity .4s ease;pointer-events:none}
+.path::before{content:"";position:absolute;z-index:-1;right:calc(50% - var(--px));top:-50vh;bottom:-50vh;width:calc(var(--px) + 250px);background:linear-gradient(to left,var(--bg) 58%,rgb(250 250 248 / 0));opacity:0;transition:opacity .4s ease;pointer-events:none}
 .path.open::before{opacity:1}
 /* very large screens: the line stays near the page, and the names have the margin for themselves */
 @media (min-width:2400px){
@@ -345,7 +345,7 @@ try{if(localStorage.getItem('moyo-calm')==='1'){document.documentElement.classLi
 /* Page transitions can be cut short by a fast click: that is not an error. */
 /* what opens the page: the loading (first visit, reload), the dot closing on the title (coming from a link of the site), or nothing */
 try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var k=+sessionStorage.getItem('moyo-in')||0,n=performance.getEntriesByType('navigation')[0],o=document.referrer&&new URL(document.referrer).origin===location.origin,d=document.documentElement;sessionStorage.removeItem('moyo-in');
-if(Date.now()-k<8000)d.classList.add('enter');else if(n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},7000)}}catch(e){}
+if(Date.now()-k<8000)d.classList.add('enter');else if(n&&(n.type==='reload'||n.type==='navigate'&&!o))d.classList.add('load');setTimeout(function(){d.classList.remove('load','enter')},9000)}}catch(e){}
 for(const t of['pagereveal','pageswap'])addEventListener(t,e=>{const v=e.viewTransition;if(v){for(const p of[v.ready,v.finished,v.updateCallbackDone])p&&p.catch(()=>{});if(/Apple/.test(navigator.vendor))v.skipTransition()}});</script>`;
 
 /* Scripts of every page, in order. */

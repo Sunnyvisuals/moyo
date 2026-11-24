@@ -105,7 +105,7 @@ function arcCard(dt){
   pvB.style.clipPath = fr > 0 ? 'polygon(' + mid.concat(rev(bot)).join(',') + ')' : 'inset(100% 0 0 0)';
   pvA.style.filter = fr > 0 ? 'brightness(' + (1 - .42 * fr).toFixed(3) + ')' : '';
   pvA.style.setProperty('--py', (50 - fr * 22).toFixed(1) + '%'); pvB.style.setProperty('--py', (50 + (1 - fr) * 22).toFixed(1) + '%');
-  const img = i => ARC_IMG[i] ? 'url("' + ARC_IMG[i] + '")' : 'radial-gradient(circle,#002FA7 0 13%,#F5F4F0 13.3%)';
+  const img = i => ARC_IMG[i] ? 'url("' + ARC_IMG[i] + '")' : 'radial-gradient(circle,#002FA7 0 13%,#FAFAF8 13.3%)';
   if (pvA.dataset.i !== String(ia)) { pvA.dataset.i = ia; pvA.style.setProperty('--img', img(ia)); }
   if (pvB.dataset.i !== String(ib)) { pvB.dataset.i = ib; pvB.style.setProperty('--img', img(ib)); }
   const key = ia + '|' + ib + '|' + lang;
@@ -247,16 +247,27 @@ new MutationObserver(() => {
   if (menu.matches(':popover-open')) arcKick();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
-/* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up */
+/* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up, and goes away by itself after a few
+   seconds. It comes back on the way up, when the pointer goes to the top of the screen, on a touch, or with the keyboard. */
 if (bar) {
-  let last = scrollY, upAt = scrollY, q = 0;
-  const land = bar.hasAttribute('data-land');
+  const root = document.documentElement, land = bar.hasAttribute('data-land'), REST = 2600;
+  let last = scrollY, upAt = scrollY, q = 0, t = 0;
+  const first = () => land && scrollY < innerHeight * .85;
+  const busy = () => (root.classList.contains('kbd') && bar.contains(document.activeElement)) || menu.matches(':popover-open') || !!bar.querySelector(':hover');
+  const hide = () => bar.classList.add('away');
+  const rest = () => { clearTimeout(t); if (!reduce) t = setTimeout(() => busy() ? rest() : hide(), REST); };
+  const show = () => { if (first()) return; bar.classList.remove('away'); rest(); };
   const upd = () => { q = 0; const y = scrollY, dy = y - last; last = y; if (dy < -2) upAt = y;
-    const first = land && y < innerHeight * .85, busy = bar.contains(document.activeElement) || menu.matches(':popover-open');
-    if (dy || land) bar.classList.toggle('away', !busy && (first || (!reduce && y > 80 && (dy > 0 ? y - upAt > 80 : bar.classList.contains('away') && dy === 0))));
+    if (busy()) return;
+    if (first()) return hide();
+    if (reduce) return bar.classList.remove('away');
+    if (dy < -2 || y <= 80 && dy) show(); else if (dy > 0 && y > 80 && y - upAt > 80) hide();
   };
   addEventListener('scroll', () => { if (!q) q = requestAnimationFrame(upd); }, { passive: true });
-  bar.addEventListener('focusin', () => bar.classList.remove('away'));
-  upd();
+  addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && e.clientY < 110 && bar.classList.contains('away')) show(); }, { passive: true });
+  addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && e.clientY < innerHeight * .4) show(); }, { passive: true });
+  bar.addEventListener('focusin', () => { bar.classList.remove('away'); rest(); });
+  menu.addEventListener('toggle', e => { if (e.newState === 'closed') { if (first()) hide(); else rest(); } });
+  if (first()) hide(); else { bar.classList.remove('away'); (window.moyoReady || Promise.resolve()).then(rest); }
 }
 })();

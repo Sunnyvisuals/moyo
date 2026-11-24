@@ -5,7 +5,7 @@ import sharp from 'sharp';
 
 fs.mkdirSync('assets/icons', { recursive: true }); fs.mkdirSync('assets/og', { recursive: true });
 /* the dot on its paper: rounded for a browser tab, square (the system rounds it) for a phone */
-const svg = (n, r, dot) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" width="${n}" height="${n}"><rect width="${n}" height="${n}" rx="${r}" fill="#F5F4F0"/><circle cx="${n / 2}" cy="${n / 2}" r="${dot}" fill="#002FA7"/></svg>`;
+const svg = (n, r, dot) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" width="${n}" height="${n}"><rect width="${n}" height="${n}" rx="${r}" fill="#FAFAF8"/><circle cx="${n / 2}" cy="${n / 2}" r="${dot}" fill="#002FA7"/></svg>`;
 fs.writeFileSync('assets/icons/favicon.svg', svg(48, 10, 11));
 const png = (n, r, dot) => sharp(Buffer.from(svg(n, r, dot)), { density: 144 }).resize(n, n).png({ compressionLevel: 9 }).toBuffer();
 for (const n of [192, 512]) fs.writeFileSync(`assets/icons/icon-${n}.png`, await png(n, 0, n * .23));

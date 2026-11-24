@@ -2,13 +2,13 @@
    - html.load: first visit or reload. A number counts up where the title will be, followed by the dot. At 100 the number leaves and the dot
      draws the title, line after line, then stays as its final point ("Moyo dessine…").
    - html.enter: coming from a link of the site. The screen is blue (the dot opened on the click, see leave.js) and closes on the final point of the title.
-   window.moyoReady resolves when the stage is free (stage.js waits for it). Any key, click or scroll jumps to the end. Nothing with reduced motion. */
+   window.moyoReady resolves when the stage is free (stage.js waits for it), window.moyoDrawn when the title is there. Any key, click or scroll jumps to the end. Nothing with reduced motion. */
 (() => {
 'use strict';
 const root = document.documentElement;
-let free; window.moyoReady = new Promise(r => { free = r; });
+let free, drawn; window.moyoReady = new Promise(r => { free = r; }); window.moyoDrawn = new Promise(r => { drawn = r; });
 const mode = root.classList.contains('load') ? 'load' : root.classList.contains('enter') ? 'enter' : '';
-if (!mode) return free();
+if (!mode) { free(); return drawn(); }
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const io = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, out = t => 1 - Math.pow(1 - t, 4);
 let hurry = false, layer = null, title = null, mark = null;
@@ -18,7 +18,7 @@ function end() {
   if (layer) layer.remove();
   if (title) title.style.clipPath = '';
   if (mark) mark.style.visibility = '';
-  free();
+  free(); drawn();
 }
 const skip = () => { hurry = true; };
 ['wheel', 'touchmove', 'keydown', 'pointerdown'].forEach(n => addEventListener(n, skip, { once: true, passive: true }));
@@ -67,17 +67,18 @@ async function load() {
   root.classList.remove('load');
   let full = document.readyState === 'complete'; addEventListener('load', () => { full = true; }, { once: true });
   const t0 = performance.now();
-  await new Promise(done => { let v = 0; const f = t => { const e = (t - t0) / 620, goal = full || t - t0 > 3200 ? out(Math.min(1, e)) : Math.min(.9, out(Math.min(1, e)) * .9); v = hurry ? 1 : Math.max(v, goal);
+  await new Promise(done => { let v = 0; const f = t => { const e = (t - t0) / 1250, goal = full || t - t0 > 3200 ? out(Math.min(1, e)) : Math.min(.9, out(Math.min(1, e)) * .9); v = hurry ? 1 : Math.max(v, goal);
     dig.textContent = String(Math.round(v * 100)); px = after(); put(px, py); (v >= .999 || hurry) ? done() : requestAnimationFrame(f); }; requestAnimationFrame(f); });
   // the number leaves, the dot goes to the first line
-  dig.animate([{ translate: '0 0' }, { translate: '0 -125%' }], { duration: hurry ? 1 : 420, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' });
+  dig.animate([{ translate: '0 0' }, { translate: '0 -125%' }], { duration: hurry ? 1 : 760, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' });
   const x0 = px, y0 = py, sx = rows[0].l, sy = rows[0].base - d;
-  await tween(400, io, u => put(x0 + (sx - x0) * u, y0 + (sy - y0) * u - Math.sin(u * Math.PI) * fs * .5));
+  free(); // the rest of the first screen arrives while the sentence is being written
+  await tween(900, io, u => put(x0 + (sx - x0) * u, y0 + (sy - y0) * u - Math.sin(u * Math.PI) * fs * .5));
   // it draws
   for (let i = 0; i < rows.length; i++) {
-    const o = rows[i], last = i === rows.length - 1, len = o.r - o.l, ms = 170 + len / innerWidth * 330;
+    const o = rows[i], last = i === rows.length - 1, len = o.r - o.l, ms = 720 + len / innerWidth * 1150; // slow enough to be watched
     await tween(ms, last ? out : io, u => { const x = o.l + len * u; ws[i] = x + (u >= 1 && !last ? fs : d * .5); cut(ws); put(x, o.base - d); });
-    if (!last) { const n = rows[i + 1], xa = o.r, ya = o.base - d, xb = n.l, yb = n.base - d; await tween(170, io, u => put(xa + (xb - xa) * u, ya + (yb - ya) * u)); }
+    if (!last) { const n = rows[i + 1], xa = o.r, ya = o.base - d, xb = n.l, yb = n.base - d; await tween(520, io, u => put(xa + (xb - xa) * u, ya + (yb - ya) * u)); }
   }
   put(m.left, m.top);
   const b = mark; end(); b.animate([{ scale: 1.9 }, { scale: 1 }], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)' });

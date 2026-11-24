@@ -125,12 +125,13 @@ function frame(t) {
 }
 const start = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
 if (!reduce) {
-  eyes.forEach(e => e.pu.style.setProperty('--gy', '-200vh')); // above, waiting
+  const away = () => eyes.forEach(e => { e.lid = 1; e.el.style.setProperty('--lid', '1'); e.pu.style.setProperty('--gy', '-200vh'); e.pu.style.setProperty('--pd', '0'); }); // above, waiting, whatever the lids were doing
+  away();
   new IntersectionObserver(es => es.forEach(x => {
     if (!seen && x.intersectionRatio > .34) { seen = true; const t = performance.now(); dropT = t; act = t; asleep = false; wanderT = 0; nextBlink = t + 5200; from = null;
       if (wayDot && way.classList.contains('end') && wayDot.offsetParent !== null) { const r = wayDot.getBoundingClientRect(); from = [r.left + r.width / 2, r.top + r.height / 2, r.width]; way.classList.add('gone'); }
       const done = from ? GO + JUMP + 160 : 1750; blink = t + done; setTimeout(() => { blink = performance.now(); }, done + 400); start(); }
-    else if (seen && x.intersectionRatio < .04) { seen = false; if (way) way.classList.remove('gone'); eyes.forEach(e => e.pu.style.setProperty('--gy', '-200vh')); }
+    else if (seen && x.intersectionRatio < .04) { seen = false; if (way) way.classList.remove('gone'); away(); }
   }), { threshold: [0, .04, .34, .6] }).observe(mono.parentElement);
 }
 fit(); document.fonts?.ready.then(fit); new MutationObserver(() => setTimeout(fit, 80)).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] }); addEventListener('resize', () => { clearTimeout(fit.t); fit.t = setTimeout(fit, 120); });

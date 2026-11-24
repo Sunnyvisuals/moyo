@@ -16,9 +16,9 @@ const read = p => fs.readFileSync(r(p), 'utf8');
 const out = (p, s) => { fs.mkdirSync(path.dirname(r(p)), { recursive: true }); fs.writeFileSync(r(p), s); return s.length; };
 const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k).join(v), s);
 
-const { rowsHTML, featuredOf, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
+const { rowsHTML, featuredOf, stepsHTML, tabsHTML, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
 const { DESIGN_CSS, sheetHTML, headCommon, scripts } = await import(pathToFileURL(r('shared/design.js')).href);
-const { SITE, HOME, LIST, LOST, SERVICES, METHOD, head, ldHome, ldList, sample } = await import(pathToFileURL(r('shared/seo.js')).href);
+const { SITE, HOME, LIST, LOST, SERVICES, head, ldHome, ldList, sample } = await import(pathToFileURL(r('shared/seo.js')).href);
 const { CHROME, CHROME_ARIA, FOOT_EN } = await import(pathToFileURL(r('shared/i18n.js')).href);
 const { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML, teamRows } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
@@ -31,11 +31,11 @@ const lenis = read('vendor/lenis.min.js').replace('//# sourceMappingURL=lenis.mi
 const services = html => html.replace(/<a class="la" data-cat="([^"]+)"/g, (m, c) => seed.projects.some(p => p.category === c) ? `${m} href="/projets?cat=${c}"` : m);
 /* what the structured data and llms.txt say is what the page says */
 const homeSrc = read('src/index.src.html'), homeEN = JSON.parse(homeSrc.match(/id="en">([\s\S]*?)<\/script>/)[1]);
-for (const [k, t] of [...SERVICES.map(s => [s[0], s[2]]), ...METHOD.map(m => [m[0], m[1]])]) for (const [i, f] of [[0, 't'], [1, 'p']]) {
+for (const [k, t] of SERVICES.map(s => [s[0], s[2]])) for (const [i, f] of [[0, 't'], [1, 'p']]) {
   const fr = (homeSrc.match(new RegExp(`data-i="${k}${f}">([^<]*)<`)) || [])[1], plain = x => String(x).replace(/&amp;/g, '&').replace(/&nbsp;| /g, ' ');
   if (plain(fr) !== plain(t.fr[i]) || homeEN[k + f] !== t.en[i]) throw new Error(`shared/seo.js and the page differ: ${k}${f}`);
 }
-const common = { __HEAD__: headCommon, __CSS__: CSS, __DATA__: dataJSON(seed), __SHEET__: sheetHTML, __SCRIPTS__: scripts };
+const common = { __HEAD__: headCommon, __CSS__: CSS, __DATA__: dataJSON({ categories: seed.categories, projects: seed.projects }), __SHEET__: sheetHTML, __SCRIPTS__: scripts };
 
 fs.rmSync(r('dist'), { recursive: true, force: true });
 
@@ -45,6 +45,8 @@ const sizes = {
     __META__: head({ path: '/', ...HOME.fr, ogTitle: 'Moyo Studio', ld: ldHome(seed.team) }),
     __CHROME_HEAD__: chromeHead(0, { land: true }),
     __ROWS__: rowsHTML(featuredOf(seed), 'fr'),
+    __MTH_STEPS__: stepsHTML(seed.method),
+    __MTH_TABS__: tabsHTML(seed.method),
     __TEAM__: teamRows(seed.team),
     __FOOTER__: footerHTML(seed.team, { home: true })
   }))),
@@ -59,7 +61,7 @@ const sizes = {
   'admin/index.html': out('dist/admin/index.html', read('src/admin.html')),
   // search engines, and the engines that answer (AI): same rules for all
   'robots.txt': out('dist/robots.txt', `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\n# Moteurs de réponse\n${['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot', 'Applebot-Extended', 'Bingbot', 'DuckAssistBot', 'MistralAI-User', 'Amazonbot', 'CCBot', 'meta-externalagent'].map(b => 'User-agent: ' + b).join('\n')}\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`),
-  'site.webmanifest': out('dist/site.webmanifest', JSON.stringify({ name: 'Moyo Studio', short_name: 'moyo', description: HOME.fr.desc, lang: 'fr', start_url: '/', scope: '/', display: 'browser', background_color: '#F5F4F0', theme_color: '#F5F4F0', icons: [192, 512].map(n => ({ src: `/icon-${n}.png`, sizes: `${n}x${n}`, type: 'image/png', purpose: 'any' })).concat({ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' }) }, null, 1)),
+  'site.webmanifest': out('dist/site.webmanifest', JSON.stringify({ name: 'Moyo Studio', short_name: 'moyo', description: HOME.fr.desc, lang: 'fr', start_url: '/', scope: '/', display: 'browser', background_color: '#FAFAF8', theme_color: '#FAFAF8', icons: [192, 512].map(n => ({ src: `/icon-${n}.png`, sizes: `${n}x${n}`, type: 'image/png', purpose: 'any' })).concat({ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' }) }, null, 1)),
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
@@ -67,7 +69,7 @@ const RUNTIME = { chrome: 'chrome-rt', footer: 'footer-rt', glass: 'glass-rt', s
 const words = { __CHROME__: JSON.stringify(CHROME), __CHROME_ARIA__: JSON.stringify(CHROME_ARIA), __FOOT_EN__: JSON.stringify(FOOT_EN) };
 for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, fill(read(`src/${from}.js`), words));
 out('dist/lenis.js', lenis);
-for (const n of ['partage.png', 'og.png']) fs.copyFileSync(r('assets/' + n), r('dist/' + n)); // image shown when the site is shared (og.png: the older one, for links shared before)
+for (const n of ['partage-2.png', 'partage.png', 'og.png']) fs.copyFileSync(r('assets/' + n), r('dist/' + n)); // image shown when the site is shared (the older ones stay, for links shared before)
 for (const n of fs.readdirSync(r('assets/icons'))) fs.copyFileSync(r('assets/icons/' + n), r('dist/' + n));
 fs.mkdirSync(r('dist/og'), { recursive: true });
 for (const n of fs.readdirSync(r('assets/og'))) fs.copyFileSync(r('assets/og/' + n), r('dist/og/' + n)); // the projects of the start, cut for a preview

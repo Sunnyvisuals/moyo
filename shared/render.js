@@ -45,9 +45,23 @@ function rowsHTML(list, lang) {
   return list.map((p, i) => rowHTML(p, i, lang)).join('');
 }
 
+/* Method: the four steps (home). A picture, a video or a GIF for each, from the admin; without one, the dot. A video is silent and loops;
+   method.js fetches it when the section is near, plays it when its step is on screen, and takes its controls away (they stay with reduced motion). */
+const isVideo = id => /\.(mp4|webm)$/i.test(id || '');
+const bi = (fr, en) => `data-fr="${escHTML(fr)}" data-en="${escHTML(en || fr)}">${escHTML(fr)}`;
+function mediaHTML(s) {
+  const t = escHTML((s.fr && s.fr.title) || ''), fit = ['top', 'bottom', 'contain'].includes(s.fit) ? s.fit : 'center';
+  const inner = !s.media ? '' : isVideo(s.media)
+    ? `<video data-src="${imgURL(s.media)}"${s.poster ? ` poster="${imgURL(s.poster)}"` : ''} muted loop playsinline controls preload="none" aria-label="${t}"></video>`
+    : `<img src="${imgURL(s.media)}" alt="${t}" loading="lazy" decoding="async">`;
+  return `<figure class="mth-m${s.media ? '' : ' plate--none'}" data-fit="${fit}">${inner}</figure>`;
+}
+const stepsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<li class="step q${i + 1}">${mediaHTML(s)}<h3 class="t-m" ${bi(s.fr.title, s.en && s.en.title)}</h3><p class="mute" data-ink="step" ${bi(s.fr.text, s.en && s.en.text)}</p></li>`).join('');
+const tabsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<button type="button" tabindex="-1" class="tab q${i + 1}"><span ${bi(s.fr.title, s.en && s.en.title)}</span></button>`).join('');
+
 /* JSON that can sit inside <script type="application/json"> without closing it. */
 function dataJSON(data) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
-export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, dataJSON };
+export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON };

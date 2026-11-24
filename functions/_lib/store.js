@@ -1,8 +1,9 @@
 /* Projects live in KV (binding MOYO) under the key "projects". Until the admin saves once, the seed file is served. */
 import seed from '../../data/projects.json';
 
-export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif)$/;
+export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif|mp4|webm)$/; // anything uploaded: pictures, GIFs, videos
 // an uploaded picture, or one of the pictures that come with the site (/proj/…)
+const MEDIA = /^([a-f0-9-]{36}\.(webp|jpg|png|avif|gif|mp4|webm)|\/proj\/[\w-]{1,60}\.(webp|jpg|jpeg|png|avif))$/; // … or a video
 const PICTURE = /^([a-f0-9-]{36}\.(webp|jpg|png|avif|gif)|\/proj\/[\w-]{1,60}\.(webp|jpg|jpeg|png|avif))$/;
 
 export async function getData(env) {
@@ -10,6 +11,7 @@ export async function getData(env) {
   if (!stored) return seed;
   // documents saved before profiles existed: start from the seed team
   if (!Array.isArray(stored.team)) stored.team = seed.team || [];
+  if (!Array.isArray(stored.method) || stored.method.length !== 4) stored.method = seed.method || []; // … or before the method could be edited
   return stored;
 }
 
@@ -28,6 +30,7 @@ export function imagesOf(data) {
     for (const i of p.images || []) s.add(i);
   }
   for (const m of data.team || []) if (m.photo) s.add(m.photo);
+  for (const m of data.method || []) { if (m.media) s.add(m.media); if (m.poster) s.add(m.poster); }
   return s;
 }
 
@@ -109,5 +112,12 @@ export function validate(input) {
       links
     });
   }
-  return { errors, data: { version: 1, categories, projects, team } };
+  // Method: always four steps, in order, each with a picture, a video or a GIF
+  const method = (seed.method || []).map((d, i) => {
+    const m = (Array.isArray(input.method) ? input.method[i] : null) || d, fr = { title: str(m.fr?.title, 60), text: str(m.fr?.text, 400) };
+    if (!fr.title) errors.push(`Méthode, étape ${i + 1} : titre français manquant.`);
+    return { id: d.id, media: typeof m.media === 'string' && MEDIA.test(m.media) ? m.media : null, poster: typeof m.poster === 'string' && PICTURE.test(m.poster) ? m.poster : null,
+      fit: ['center', 'top', 'bottom', 'contain'].includes(m.fit) ? m.fit : 'center', fr, en: { title: str(m.en?.title, 60), text: str(m.en?.text, 400) } };
+  });
+  return { errors, data: { version: 1, categories, projects, team, method } };
 }

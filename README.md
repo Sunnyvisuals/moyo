@@ -8,8 +8,8 @@ Contact : contact.moyostudio@gmail.com
 
 Le système est décrit et défini dans un seul fichier, `shared/design.js`, utilisé par toutes les pages.
 
-- **Couleur** : blanc cassé `#F5F4F0`, encre `#121214`, un gris `#65656B`. Le bleu Klein `#002FA7` est la seule couleur et il a toujours un sens : l'idée, l'action, la fin de page.
-- **Le point Klein** : l'idée unique. Il charge la page, termine les titres (celui d'une page se prend en main et se lance), est le curseur, montre le chemin, fait les sept métiers des services, joue la méthode, regarde depuis les cases sans photo ; à la fin il quitte le chemin et devient la pupille des deux o du pied de page. Sources et choix : `docs/references.md`.
+- **Couleur** : blanc cassé `#FAFAF8`, encre `#121214`, un gris `#65656B`. Le bleu Klein `#002FA7` est la seule couleur et il a toujours un sens : l'idée, l'action, la fin de page.
+- **Le point Klein** : l'idée unique. Il charge la page, termine les titres (celui d'une page se prend en main et se lance), est le curseur, montre le chemin, fait les sept métiers des services, regarde depuis les cases sans photo ; à la fin il quitte le chemin et devient la pupille des deux o du pied de page. Sources et choix : `docs/references.md`.
 - **Typographie** : une famille, Hanken Grotesk (variable), trois graisses (400, 600, 700). Les titres sont coupés à la hauteur des capitales (`text-box`) et leur première lettre est calée sur l'axe au pixel (`optical()` dans `src/site.js`).
 - **Grille** : 12 colonnes, quatre axes (1, 4, 7, 10). Chaque bloc de chaque page commence sur l'un d'eux.
 - **Blancs** : ce qui va ensemble est proche, les groupes sont séparés, les sections sont très éloignées.
@@ -23,7 +23,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 | Ouverture | Une phrase |
 | Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`/projets/<id>`, une vraie page), le bouton Retour la ferme |
 | Services | Sept services, une ligne chacun, et le point au travail sur le quatrième axe (`src/trades.js`). Une ligne qui a des projets y mène |
-| Méthode | Une scène épinglée, quatre temps, un champ de points |
+| Méthode | Une scène épinglée en plein écran, quatre étapes ; pour chacune une image, une vidéo ou un GIF, choisis dans l'admin, et les mots en blanc par-dessus |
 | Studio | La phrase s'encre d'une vague Klein avec le scroll, puis le sens de « moyo » |
 | Équipe | Les noms, vers `/equipe/<id>` |
 | Contact et pied de page | Formulaire, e-mail, plan du site, inscription, langue ; le logo vous regarde, maintenir un œil ouvre un monochrome |
@@ -42,7 +42,7 @@ Site : https://moyo-d0n.pages.dev
 | `/equipe/<id>` | Un profil |
 | `/en`, `/en/projets`… | Les mêmes pages en anglais, rendues par le serveur (`functions/en`) |
 | `/sitemap.xml`, `/llms.txt`, `/robots.txt` | Pour les moteurs de recherche et les moteurs de réponse (IA) |
-| `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie |
+| `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie ; la méthode (image, vidéo ou GIF, titre et texte de chaque étape) ; l'équipe ; les messages |
 
 Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les pages sont rendues côté serveur avec les données à jour (`functions/_middleware.js`), donc elles restent complètes sans JavaScript et lisibles par les moteurs de recherche. Tant que rien n'a été publié depuis l'admin, c'est `data/projects.json` qui sert.
 
@@ -76,7 +76,7 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 - **Anglais** : `/en/…`, de vraies pages. Sur le site, changer de langue change l'adresse.
 - **Moteurs de réponse** : `robots.txt` les accueille, `/llms.txt` donne les faits en clair, toujours à jour avec l'admin.
 - **Attente** : les cinq projets d'exemple et les profils encore en lorem ipsum sont visibles mais en `noindex`, hors du plan du site et de `/llms.txt`. Ils y entrent dès qu'ils sont remplacés dans l'admin.
-- **Image de partage** : `assets/partage.png`, dessinée par `scripts/og.mjs`. Pour en changer, donner un nouveau nom de fichier (Discord garde l'ancienne image). Icônes et aperçus des projets : `scripts/icons.mjs`.
+- **Image de partage** : `assets/partage-2.png`, dessinée par `scripts/og.mjs`. Pour en changer, donner un nouveau nom de fichier (Discord garde l'ancienne image). Icônes et aperçus des projets : `scripts/icons.mjs`.
 - **À faire avec le compte du studio** : déclarer le site et `sitemap.xml` dans Google Search Console et Bing Webmaster Tools, créer la fiche Google Business Profile. Si le site change de domaine, changer `SITE` dans `shared/seo.js`.
 
 ### Mot de passe admin

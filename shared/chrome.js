@@ -199,8 +199,8 @@ const FOOTER_CSS = `
 .eye .hit{width:calc(var(--ecr,.27) * 2em);aspect-ratio:1;margin:calc(var(--ecr,.27) * -1em) 0 0 calc(var(--ecr,.27) * -1em);pointer-events:auto;cursor:pointer;touch-action:none;-webkit-touch-callout:none}
 .foot .mono-wrap{transform:translateY(calc((1 - var(--fp,1)) * 60px))}
 /* the flood: an inverted copy of the footer, seen through a circle that opens from the pupil */
-.flood{position:absolute;inset:0;z-index:6;padding:inherit;background:#002FA7;color:var(--bg);overflow:clip;clip-path:circle(0 at 50% 50%);cursor:none;--ink:#F5F4F0;--mute:#B9C2E0;--line:rgb(245 244 240 / .3);--klein:#F5F4F0}
-.flood .sub-row{border-color:rgb(245 244 240 / .4)}
+.flood{position:absolute;inset:0;z-index:6;padding:inherit;background:#002FA7;color:var(--bg);overflow:clip;clip-path:circle(0 at 50% 50%);cursor:none;--ink:#FAFAF8;--mute:#B9C2E0;--line:rgb(250 250 248 / .3);--klein:#FAFAF8}
+.flood .sub-row{border-color:rgb(250 250 248 / .4)}
 .flood .pu{opacity:0}
 html.mono .bar{mix-blend-mode:normal;background:none;color:var(--bg)}
 @media (prefers-reduced-motion:reduce){.foot .mono-wrap{transform:none}}
@@ -218,11 +218,11 @@ html.calm .foot .mono-wrap{transform:none}
 const GLASS_CSS = `
 footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(64px - var(--fr,.75) * 32px);
   border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
-  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(245 244 240) calc(var(--gh) - 1px));
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(250 250 248) calc(var(--gh) - 1px));
   box-shadow:0 -2px 8px rgb(18 18 20 / .06),0 -24px 48px -12px rgb(18 18 20 / .16)!important}
 /* the glass: clear, it bends what is behind it (glass.js sets --liquid where the browser can), then turns blue downwards */
 :is(footer#foot.foot,html.stack main>.over)::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
-  background:linear-gradient(to bottom in oklab,rgb(245 244 240 / 0.012) calc(var(--gp) * 0.000),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.049),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.098),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.147),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.196),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.245),rgb(245 244 240 / 0.012) calc(var(--gp) * 0.294),rgb(245 244 240 / 0.016) calc(var(--gp) * 0.343),rgb(245 244 240 / 0.037) calc(var(--gp) * 0.392),rgb(245 244 240 / 0.086) calc(var(--gp) * 0.441),rgb(245 244 240 / 0.166) calc(var(--gp) * 0.490),rgb(245 244 240 / 0.272) calc(var(--gp) * 0.539),rgb(245 244 240 / 0.398) calc(var(--gp) * 0.588),rgb(245 244 240 / 0.533) calc(var(--gp) * 0.637),rgb(245 244 240 / 0.666) calc(var(--gp) * 0.686),rgb(245 244 240 / 0.785) calc(var(--gp) * 0.735),rgb(245 244 240 / 0.882) calc(var(--gp) * 0.784),rgb(245 244 240 / 0.949) calc(var(--gp) * 0.833),rgb(245 244 240 / 0.987) calc(var(--gp) * 0.882),rgb(245 244 240 / 0.999) calc(var(--gp) * 0.931),rgb(245 244 240 / 1.000) calc(var(--gp) * 0.980)),
+  background:linear-gradient(to bottom in oklab,rgb(250 250 248 / 0.012) calc(var(--gp) * 0.000),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.049),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.098),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.147),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.196),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.245),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.294),rgb(250 250 248 / 0.016) calc(var(--gp) * 0.343),rgb(250 250 248 / 0.037) calc(var(--gp) * 0.392),rgb(250 250 248 / 0.086) calc(var(--gp) * 0.441),rgb(250 250 248 / 0.166) calc(var(--gp) * 0.490),rgb(250 250 248 / 0.272) calc(var(--gp) * 0.539),rgb(250 250 248 / 0.398) calc(var(--gp) * 0.588),rgb(250 250 248 / 0.533) calc(var(--gp) * 0.637),rgb(250 250 248 / 0.666) calc(var(--gp) * 0.686),rgb(250 250 248 / 0.785) calc(var(--gp) * 0.735),rgb(250 250 248 / 0.882) calc(var(--gp) * 0.784),rgb(250 250 248 / 0.949) calc(var(--gp) * 0.833),rgb(250 250 248 / 0.987) calc(var(--gp) * 0.882),rgb(250 250 248 / 0.999) calc(var(--gp) * 0.931),rgb(250 250 248 / 1.000) calc(var(--gp) * 0.980)),
     radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
     linear-gradient(rgb(255 255 255 / .09),#0000 130px);
   /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */

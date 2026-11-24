@@ -20,9 +20,9 @@
   const st = document.createElement('style');
   st.textContent = `html.has-cur,html.has-cur *{cursor:none!important}
 html.has-cur :is(${TEXT}){cursor:text!important}
-.cur{view-transition-name:cur;position:fixed;inset:auto;left:0;top:0;width:0;height:0;margin:0;padding:0;border:0;overflow:visible;background:none;pointer-events:none;opacity:0;transition:opacity .25s;z-index:2147483000;--c:#002FA7;--t:#F5F4F0}
+.cur{view-transition-name:cur;position:fixed;inset:auto;left:0;top:0;width:0;height:0;margin:0;padding:0;border:0;overflow:visible;background:none;pointer-events:none;opacity:0;transition:opacity .25s;z-index:2147483000;--c:#002FA7;--t:#FAFAF8}
 .cur.on{opacity:1}
-.cur.inv{--c:#F5F4F0;--t:#002FA7}
+.cur.inv{--c:#FAFAF8;--t:#002FA7}
 .cur i{position:absolute;left:0;top:0;border-radius:50%;background:var(--c);transition:background .25s,box-shadow .25s}
 .cur.ring i{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c)}
 .cur em{position:absolute;left:0;top:0;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--c);opacity:0;transition:opacity .25s}
@@ -37,12 +37,12 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   const lum = (r, v, b) => (.2126 * r + .7152 * v + .0722 * b) / 255;
   const colorOf = css => { let o = colors.get(css); if (!o) { g.clearRect(0, 0, 1, 1); g.fillStyle = '#000'; g.fillStyle = css; g.fillRect(0, 0, 1, 1); const d = g.getImageData(0, 0, 1, 1).data; o = [lum(d[0], d[1], d[2]), d[3] / 255]; colors.set(css, o); } return o; };
   const imgLum = (im, mx, my) => {
-    const r = im.getBoundingClientRect(), k = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight), s = 24 / k, sx = (mx - r.left - r.width / 2) / k + im.naturalWidth / 2 - s / 2, sy = (my - r.top - r.height / 2) / k + im.naturalHeight / 2 - s / 2;
+    const W = im.naturalWidth || im.videoWidth, H = im.naturalHeight || im.videoHeight, r = im.getBoundingClientRect(), k = Math.max(r.width / W, r.height / H), s = 24 / k, sx = (mx - r.left - r.width / 2) / k + W / 2 - s / 2, sy = (my - r.top - r.height / 2) / k + H / 2 - s / 2;
     g.clearRect(0, 0, 1, 1); g.drawImage(im, sx, sy, s, s, 0, 0, 1, 1); const d = g.getImageData(0, 0, 1, 1).data; return d[3] ? lum(d[0], d[1], d[2]) : null;
   };
   const under = (mx, my) => {
     for (const el of document.elementsFromPoint(mx, my)) {
-      if (el.tagName === 'IMG' && el.naturalWidth) { try { const l = imgLum(el, mx, my); if (l !== null) return l; } catch (_) {} }
+      if (el.naturalWidth || el.videoWidth) { try { const l = imgLum(el, mx, my); if (l !== null) return l; } catch (_) {} }
       if (el.matches('.plate--none')) { const r = el.getBoundingClientRect(), R = Math.min(r.width, r.height) * .13; return Math.hypot(mx - r.left - r.width / 2 - (parseFloat(el.style.getPropertyValue('--dx')) || 0), my - r.top - r.height / 2 - (parseFloat(el.style.getPropertyValue('--dy')) || 0)) < R ? .05 : .8; }
       const c = colorOf(getComputedStyle(el).backgroundColor);
       if (c[1] > .5) return c[0];

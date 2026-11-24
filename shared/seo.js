@@ -3,7 +3,7 @@
    Only facts that are on the site. Keep `export` on the last line only. */
 const SITE = 'https://moyo-d0n.pages.dev';
 const MAIL = 'contact.moyostudio@gmail.com';
-const SHARE = { url: SITE + '/partage.png', w: 2400, h: 1260, alt: { fr: 'moyo, écrit en grand : les deux o sont des yeux qui regardent vers le haut', en: 'moyo, written large: the two o are eyes looking up' } };
+const SHARE = { url: SITE + '/partage-2.png', w: 2400, h: 1260, alt: { fr: 'moyo, écrit en grand : les deux o sont des yeux qui regardent vers le haut', en: 'moyo, written large: the two o are eyes looking up' } };
 const REGION = { fr: 'Provence-Alpes-Côte d’Azur', en: 'French Riviera' };
 
 const HOME = {
@@ -25,13 +25,6 @@ const SERVICES = [
   ['s6', 'communication', { fr: ['Communication', 'Stratégie, campagnes et réseaux sociaux : un message clair, tenu sur chaque support.'], en: ['Communication', 'Strategy, campaigns and social media: one clear message, held on every medium.'] }],
   ['s7', 'print', { fr: ['Édition & print', 'Affiches, catalogues, signalétique : la même rigueur sur le papier que sur l’écran.'], en: ['Print & publishing', 'Posters, catalogues, signage: the same rigour on paper as on screen.'] }]
 ];
-const METHOD = [
-  ['m1', { fr: ['Écouter', 'Un premier échange pour comprendre le lieu, le public, les contraintes et le calendrier.'], en: ['Listen', 'A first conversation to understand the place, the audience, the constraints and the timeline.'] }],
-  ['m2', { fr: ['Choisir', 'Nous retenons une seule idée, et ce qu’elle exclut.'], en: ['Choose', 'We keep one idea, and what it rules out.'] }],
-  ['m3', { fr: ['Construire', 'Grille, typographie, image et code : tout est dessiné, puis testé sur de vrais écrans.'], en: ['Build', 'Grid, type, image and code: everything is designed, then tested on real screens.'] }],
-  ['m4', { fr: ['Accompagner', 'Nous restons là après le lancement : mesures, ajustements, nouveaux contenus.'], en: ['Support', 'We stay on after launch: measuring, adjusting, new content.'] }]
-];
-
 const at = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 /* /projets in French, /en/projets in English */
 const local = (path, lang) => lang === 'en' ? '/en' + (path === '/' ? '' : path) : path;
@@ -94,4 +87,4 @@ function head({ path, lang = 'fr', title, desc, og, ogTitle, type = 'website', i
 const sample = (p, seed) => { const s = ((seed && seed.projects) || []).find(x => x.id === p.id); return !!s && s.fr.title === (p.fr && p.fr.title) && s.fr.desc === (p.fr && p.fr.desc); };
 const waiting = m => /lorem ipsum/i.test((m.fr && m.fr.bio) || '') || /lorem ipsum/i.test((m.en && m.en.bio) || '');
 
-export { SITE, MAIL, SHARE, REGION, HOME, LIST, LOST, SERVICES, METHOD, ROBOTS, local, full, ldHome, ldList, ldWork, ldPerson, head, sample, waiting };
+export { SITE, MAIL, SHARE, REGION, HOME, LIST, LOST, SERVICES, ROBOTS, local, full, ldHome, ldList, ldWork, ldPerson, head, sample, waiting };

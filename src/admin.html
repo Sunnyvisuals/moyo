@@ -10,7 +10,7 @@
 <style>
 @font-face{font-family:"Hanken Grotesk";src:url(/fonts/hanken-grotesk.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
-  --chaux:#F1F3F2;--klein:#002FA7;--paper:#F1F3F2;--white:#fff;
+  --chaux:#FAFAF8;--klein:#002FA7;--paper:#FAFAF8;--white:#fff;
   --soft:color-mix(in oklab,var(--klein) 74%,var(--chaux));
   --line:color-mix(in oklab,var(--klein) 24%,var(--chaux));
   --wash:color-mix(in oklab,var(--klein) 7%,var(--chaux));
@@ -104,6 +104,10 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
 .preview svg{position:absolute;left:0;top:-12%;width:100%;height:124%}
 .preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cover .actions{display:grid;gap:10px;justify-items:start}
+.mt-prev{aspect-ratio:16/9;background:var(--klein)}
+.mt-prev>:is(img,video){position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.mt-prev[data-fit=top]>*{object-position:50% 8%}.mt-prev[data-fit=bottom]>*{object-position:50% 92%}.mt-prev[data-fit=contain]{background:#121214}.mt-prev[data-fit=contain]>*{object-fit:contain}
+.mt-prev:empty::after{content:"";position:absolute;left:50%;top:50%;height:30%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:var(--paper)}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .gallery li{border:1px solid var(--line);background:var(--chaux)}
 .gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
@@ -168,6 +172,7 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
       <div class="side-head">
         <button class="btn primary" type="button" id="addBtn">+ Nouveau projet</button>
         <button class="btn" type="button" id="catsBtn">Catégories</button>
+        <button class="btn" type="button" id="methodBtn">Méthode</button>
         <button class="btn" type="button" id="teamBtn">Équipe</button>
         <button class="btn" type="button" id="msgsBtn">Messages <span id="msgCount" class="muted"></span></button>
       </div>
@@ -187,7 +192,9 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const H={'X-Moyo-Admin':'1'};
-const imgURL=id=>'/img/'+encodeURIComponent(id);
+const imgURL=id=>id&&(id[0]==='/'||id.startsWith('http'))?id:'/img/'+encodeURIComponent(id);
+const isVideo=id=>/\.(mp4|webm)$/i.test(id||'');
+const mo=n=>(n/1048576).toLocaleString('fr-FR',{maximumFractionDigits:1})+' Mo';
 const FALLBACK='<svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet"><g fill="currentColor"><rect x="110" y="70" width="280" height="76"/><rect x="110" y="162" width="280" height="76"/><rect x="110" y="254" width="280" height="76"/></g></svg>';
 
 let data=null;        // working copy
@@ -207,7 +214,7 @@ async function api(path,opt={}){
 }
 const slugify=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'projet';
 function uniqueId(base,except){let id=base,n=2;while(data.projects.some(p=>p.id===id&&p!==except)) id=(base.slice(0,56)+'-'+n++);return id}
-const imagesOf=d=>{const s=new Set();for(const p of d.projects){if(p.cover)s.add(p.cover);(p.images||[]).forEach(i=>s.add(i))}return s};
+const imagesOf=d=>{const s=new Set();for(const p of d.projects){if(p.cover)s.add(p.cover);(p.images||[]).forEach(i=>s.add(i))}for(const m of d.team||[])if(m.photo)s.add(m.photo);for(const m of d.method||[]){if(m.media)s.add(m.media);if(m.poster)s.add(m.poster)}return s};
 const dirty=()=>JSON.stringify(data)!==savedJSON;
 function refreshDirty(){const d=dirty();$('#saveBtn').disabled=!d;$('#status').textContent=d?'Modifications non publiées':'Tout est publié'}
 const catName=id=>data.categories.find(c=>c.id===id)?.fr||'Sans catégorie';
@@ -257,7 +264,7 @@ function field(id,label,val,{req,area,hint,lang}={}){
 
 /* ---------- contact messages ---------- */
 const TYPE_FR={identite:'Identité',site:'Site',donnees:'Données',motion:'Motion',audiovisuel:'Audiovisuel',communication:'Communication',autre:'Autre'};
-const BUDGET_FR={lt5:'Moins de 5 000 €','5-15':'5 000 à 15 000 €','15-40':'15 000 à 40 000 €',gt40:'Plus de 40 000 €',tbd:'Budget à définir'};
+const BUDGET_FR={lt5:'Moins de 5 000 €','5-15':'De 5 000 à 15 000 €','15-40':'De 15 000 à 40 000 €',gt40:'Plus de 40 000 €',tbd:'Budget : ne sait pas encore'};
 let msgs=null;
 async function loadMsgs(){
   try{ const r=await api('/api/messages'); msgs=r.messages; $('#msgCount').textContent=r.total?`(${r.total})`:''; }
@@ -347,6 +354,83 @@ $('#editor').addEventListener('click',e=>{
   }
   renderTeam(); refreshDirty();
 });
+/* ---------- method: four steps, a picture, a video or a GIF for each ---------- */
+function renderMethod(){
+  const E=$('#editor');
+  E.innerHTML=`<h2>Méthode</h2>
+  <p class="small muted">Quatre étapes, l’une après l’autre sur l’accueil. Chacune a une image, une vidéo ou un GIF, en plein écran : un format paysage d’au moins 1920 px de large convient le mieux (sur téléphone, le centre est gardé). Le titre et le texte sont écrits en blanc, en bas à gauche. Une vidéo est jouée sans son, en boucle, quand son étape est à l’écran. Les champs anglais vides reprennent le français.</p>
+  ${(data.method||[]).map((m,i)=>`<div class="section" data-mt="${i}">
+    <h3>${i+1}. ${esc(m.fr.title||'(sans titre)')}</h3>
+    <div class="cover">
+      <div class="preview mt-prev" data-fit="${esc(m.fit||'center')}">${m.media?(isVideo(m.media)?`<video src="${imgURL(m.media)}"${m.poster?` poster="${imgURL(m.poster)}"`:''} muted loop playsinline autoplay></video>`:`<img src="${imgURL(m.media)}" alt="">`):''}</div>
+      <div class="actions">
+        <p class="small muted">${m.media?(isVideo(m.media)?'Vidéo.':/\.gif$/i.test(m.media)?'GIF.':'Image.'):'Rien pour l’instant : un fond bleu et le point.'}</p>
+        <label class="btn" style="margin:0">${m.media?'Remplacer':'Choisir une image, une vidéo ou un GIF'}<input type="file" accept="image/*,video/mp4,video/webm" hidden data-k="media"></label>
+        ${m.media?'<button type="button" class="btn danger sm" data-act="mtRm">Retirer</button>':''}
+        <div><label for="fit${i}">Cadrage</label><select id="fit${i}" data-k="fit">${[['center','Remplir le cadre, au centre'],['top','Remplir le cadre, en haut'],['bottom','Remplir le cadre, en bas'],['contain','Montrer en entier']].map(([v,t])=>`<option value="${v}"${(m.fit||'center')===v?' selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="drop" data-mtdrop>Ou glissez un fichier ici.<br><span class="small">Image : réduite à 2400 px de côté. GIF : 20 Mo. Vidéo MP4 (H.264) ou WebM : 24 Mo, quelques secondes suffisent.</span></div>
+        <span class="busy" data-busy role="status"></span>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div><label class="req" for="mt${i}a"><span class="lang">FR</span>Titre</label><input type="text" id="mt${i}a" data-k="fr.title" value="${esc(m.fr.title)}" maxlength="60"></div>
+      <div><label for="mt${i}b"><span class="lang">EN</span>Titre</label><input type="text" id="mt${i}b" data-k="en.title" value="${esc(m.en?.title)}" maxlength="60"></div>
+      <div><label for="mt${i}c"><span class="lang">FR</span>Texte</label><textarea id="mt${i}c" data-k="fr.text" maxlength="400" style="min-height:96px">${esc(m.fr.text)}</textarea></div>
+      <div><label for="mt${i}d"><span class="lang">EN</span>Texte</label><textarea id="mt${i}d" data-k="en.text" maxlength="400" style="min-height:96px">${esc(m.en?.text)}</textarea></div>
+    </div>
+  </div>`).join('')}
+  <p class="section"><a class="btn" href="/#methode" target="_blank" rel="noopener">Voir la section ↗</a> <button type="button" class="btn" data-act="back">← Retour aux projets</button></p>`;
+}
+$('#methodBtn').addEventListener('click',()=>{sel='__method';renderList();renderEditor()});
+const mtOf=el=>{const b=el.closest('[data-mt]');return b?[data.method[+b.dataset.mt],b]:[null,null]};
+async function setMedia(m,box,f){
+  const say=t=>{const s=$('[data-busy]',box);if(s) s.textContent=t};
+  try{
+    let id,poster=null;
+    if(f.type.startsWith('video/')){
+      if(!['video/mp4','video/webm'].includes(f.type)) throw new Error('Ce format de vidéo n’est pas lu par tous les navigateurs. Exportez-la en MP4 (H.264).');
+      if(f.size>24*1048576) throw new Error(`Vidéo trop lourde (${mo(f.size)}, 24 Mo maximum). Raccourcissez-la ou baissez sa qualité.`);
+      say('Lecture de la vidéo…'); poster=await posterOf(f);
+      id=await send(f,f.type,p=>say(`Envoi ${p} %`));
+    }else if(f.type.startsWith('image/')){
+      if(f.type==='image/gif'&&f.size>20*1048576) throw new Error(`GIF trop lourd (${mo(f.size)}, 20 Mo maximum). Une vidéo MP4 serait dix fois plus légère.`);
+      say('Envoi…'); id=await upload(f);
+    }else throw new Error('Choisissez une image, une vidéo MP4 ou WebM, ou un GIF.');
+    const old=[m.media,m.poster]; m.media=id; m.poster=poster; old.forEach(dropIfUnsaved);
+    if(sel==='__method') renderMethod(); refreshDirty(); toast('Fichier ajouté. Pensez à publier.');
+  }catch(err){ say(''); if(err.message!=='401') toast(err.message,true); }
+}
+/* the first picture of a video, shown while it loads */
+function posterOf(file){
+  return new Promise(done=>{
+    const v=document.createElement('video'),u=URL.createObjectURL(file); v.muted=true; v.playsInline=true; v.preload='auto';
+    const end=r=>{URL.revokeObjectURL(u);v.removeAttribute('src');done(r)}; const t=setTimeout(()=>end(null),12000);
+    v.onerror=()=>{clearTimeout(t);end(null)};
+    v.onloadeddata=()=>{ v.currentTime=Math.min(.1,(v.duration||1)/2); };
+    v.onseeked=async()=>{ clearTimeout(t);
+      try{ const s=Math.min(1,1600/Math.max(v.videoWidth,v.videoHeight)),c=document.createElement('canvas'); c.width=Math.round(v.videoWidth*s); c.height=Math.round(v.videoHeight*s); c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+        let b=await new Promise(r=>c.toBlob(r,'image/webp',.82)); if(!b||b.type!=='image/webp') b=await new Promise(r=>c.toBlob(r,'image/jpeg',.85)); end(b?await send(b,b.type):null); }catch(e){ end(null); } };
+    v.src=u;
+  });
+}
+/* upload with its progress */
+function send(body,type,progress){
+  return new Promise((ok,no)=>{ const x=new XMLHttpRequest(); x.open('POST','/api/images'); x.setRequestHeader('X-Moyo-Admin','1'); x.setRequestHeader('Content-Type',type);
+    if(progress) x.upload.onprogress=e=>{ if(e.lengthComputable) progress(Math.round(e.loaded/e.total*100)) };
+    x.onload=()=>{ let r=null; try{r=JSON.parse(x.responseText)}catch(e){} if(x.status===401){ showLogin('Session expirée, reconnectez-vous.'); return no(new Error('401')) } x.status<300&&r?.id?ok(r.id):no(new Error(r?.message||'Erreur '+x.status)) };
+    x.onerror=()=>no(new Error('L’envoi a échoué. Vérifiez la connexion.')); x.send(body); });
+}
+$('#editor').addEventListener('input',e=>{
+  if(sel!=='__method') return; const [m,box]=mtOf(e.target), k=e.target.dataset.k; if(!m||!k||k==='media') return;
+  if(k==='fit'){ m.fit=e.target.value; $('.mt-prev',box).dataset.fit=m.fit; } else { const [lg,f]=k.split('.'); (m[lg]||={})[f]=e.target.value; if(k==='fr.title') $('h3',box).textContent=`${+box.dataset.mt+1}. ${e.target.value||'(sans titre)'}`; }
+  refreshDirty();
+});
+$('#editor').addEventListener('change',e=>{ if(sel!=='__method'||e.target.dataset.k!=='media') return; const [m,box]=mtOf(e.target), f=e.target.files[0]; if(m&&f) setMedia(m,box,f); });
+$('#editor').addEventListener('click',e=>{ if(sel!=='__method') return; const b=e.target.closest('[data-act="mtRm"]'); if(!b) return; const [m]=mtOf(b), old=[m.media,m.poster]; m.media=m.poster=null; old.forEach(dropIfUnsaved); renderMethod(); refreshDirty(); });
+$('#editor').addEventListener('dragover',e=>{const d=e.target.closest('[data-mtdrop]'); if(d){e.preventDefault();d.classList.add('over')}});
+$('#editor').addEventListener('dragleave',e=>{e.target.closest('[data-mtdrop]')?.classList.remove('over')});
+$('#editor').addEventListener('drop',e=>{const d=e.target.closest('[data-mtdrop]'); if(!d) return; e.preventDefault(); d.classList.remove('over'); const [m,box]=mtOf(d), f=e.dataTransfer.files[0]; if(m&&f) setMedia(m,box,f); });
+
 function uniqueTeamId(base){let id=base,n=2;while(data.team.some(m=>m.id===id)) id=base+'-'+n++;return id}
 
 function renderEditor(){
@@ -354,6 +438,7 @@ function renderEditor(){
   if(sel==='__cats') return renderCats();
   if(sel==='__msgs') return renderMsgs();
   if(sel==='__team') return renderTeam();
+  if(sel==='__method') return renderMethod();
   const p=data.projects.find(p=>p.id===sel);
   if(!p){E.innerHTML='<div class="empty-state"><p>Aucun projet sélectionné.</p><p class="small">Créez un projet avec « + Nouveau projet ».</p></div>';return}
   E.innerHTML=`
@@ -411,7 +496,7 @@ function renderEditor(){
 
 /* Editor events: delegated once on #editor (its content is redrawn often). */
 const E=$('#editor');
-const curP=()=>data&&sel!=='__cats'?data.projects.find(p=>p.id===sel):null;
+const curP=()=>data&&!String(sel).startsWith('__')?data.projects.find(p=>p.id===sel):null;
 const KEYS=['title','type','role','place','desc'];
 E.addEventListener('input',e=>{
   if(sel==='__cats'){
@@ -506,7 +591,7 @@ async function upload(file){
       if(!blob||blob.type!=='image/webp') blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.88));
     }catch(e){ blob=file; }
   }
-  if(blob.size>10*1024*1024) throw new Error('Image trop lourde (10 Mo maximum).');
+  if(blob.size>(blob.type==='image/gif'?20:10)*1024*1024) throw new Error(`${blob.type==='image/gif'?'GIF trop lourd (20':'Image trop lourde (10'} Mo maximum).`);
   const r=await api('/api/images',{method:'POST',headers:{'Content-Type':blob.type},body:blob});
   return r.id;
 }
@@ -544,12 +629,14 @@ $('#catsBtn').addEventListener('click',()=>{sel='__cats';renderList();renderEdit
 
 $('#saveBtn').addEventListener('click',async()=>{
   const missing=data.projects.find(p=>!p.fr.title.trim());
+  const step=(data.method||[]).findIndex(m=>!m.fr.title.trim());
+  if(step>=0){ sel='__method'; renderList(); renderEditor(); $(`#mt${step}a`).focus(); toast('Chaque étape de la méthode doit avoir un titre en français.',true); return; }
   if(missing){ sel=missing.id; renderList(); renderEditor(); $('#fr_title').focus(); toast('Chaque projet doit avoir un titre en français.',true); return; }
   const b=$('#saveBtn'); b.disabled=true; $('#status').textContent='Publication…';
   try{
     const r=await api('/api/projects',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     data=r.data; savedJSON=JSON.stringify(data); savedImages=imagesOf(data);
-    if(sel!=='__cats'&&!data.projects.some(p=>p.id===sel)) sel=data.projects[0]?.id||null;
+    if(!String(sel).startsWith('__')&&!data.projects.some(p=>p.id===sel)) sel=data.projects[0]?.id||null;
     renderList(); renderEditor(); refreshDirty();
     toast('Publié. Le site est à jour.');
   }catch(err){ refreshDirty(); if(err.message!=='401') toast(err.message,true); }
