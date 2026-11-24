@@ -2,7 +2,7 @@
    What they do is what people do:
    - they look at you (Simmel: the mutual glance is the purest reciprocity, you cannot look without being seen),
    - they look away if you stare (Goffman: civil inattention), then steal a glance,
-   - left alone, they look at "On se voit ?": we follow other people's eyes without deciding to,
+   - left alone, they look at "Quelle est votre idée ?": we follow other people's eyes without deciding to,
    - at the end of the home, the dot that showed the way leaves it, goes into the last o, and jumps into the first one: it was an eye all along,
    - they dilate in front of what interests them, wink for each founder, fall asleep when nobody moves, go round with joy on sign-up.
    At night they are half closed and tell the time. On the lost page they are shut ("nothing to see").
@@ -47,7 +47,7 @@ function question(w, f) {
   const pr = probe.getBoundingClientRect(), qr = q.getBoundingClientRect(), size = parseFloat(getComputedStyle(q).fontSize), ls = parseFloat(getComputedStyle(q).letterSpacing) || 0; probe.remove();
   m.style.left = ((pr.left - qr.left - ls) / size - (adv - ((a + b) / 2 - S * .2)) / S).toFixed(4) + 'em';
   m.style.top = ((pr.bottom - qr.top) / size - (S - (y0 + y1) / 2) / S).toFixed(4) + 'em';
-  m.style.setProperty('--qd', (Math.max(b - a, y1 - y0) / S * 1.36).toFixed(4) + 'em');
+  m.style.setProperty('--qd', (Math.max(b - a, y1 - y0) / S * 1.46).toFixed(4) + 'em');
 }
 function fit() {
   if (!window.moyoInk) return;

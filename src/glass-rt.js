@@ -1,15 +1,39 @@
 /* Liquid glass at the top of the footer (styles: GLASS_CSS in shared/chrome.js).
    - Refraction (Chromium only, the other browsers keep a light frost): an SVG displacement map used as a backdrop filter.
      The map is a thick convex slab, flat in the middle and curved along the top and the sides, where it pulls the page inwards.
-   - Dispersion: red, green and blue are bent by slightly different amounts, so edges open into a hint of colour.
    - The rim is a bevel whose thickness, radius and light follow the scroll. */
 (() => {
   const foot = document.getElementById('foot');
   if (!foot) return;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ---------- the frost and the fog (GLASS_CSS): between the glass and its content ----------
+     The fog is one picture per glass, stretched over it: paper with a horizon that is not a straight line, and a light behind it (Klein) where the
+     horizon is lowest. Both are mixed here with decimals, and a grain is added before they are rounded to 8 bits: this is what keeps such a slow
+     fade clean, where gradients laid over each other show their steps. u: 0 to 1 across the glass, v: 0 at its rim, 1 where the page starts. */
+  const G = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
+  const curve = (a, b) => { const N = 4096, t = new Float32Array(N + 1); for (let i = 0; i <= N; i++) { const x = i / N; t[i] = x ** a / (x ** a + (1 - x) ** b); } return x => x <= 0 ? 0 : x >= 1 ? 1 : t[x * N | 0]; };
+  const fog = curve(2.35, 1.9), glow = curve(2, 1.5), OUT = .07; // the picture is a little wider than the glass: it slides with the scroll
+  const horizon = u => .725 - .27 * G(u, 0, .33) - .1 * G(u, 1.04, .2) - .03 * G(u, .4, .13) + .006 * Math.sin(10.6 * u + 1.2); // where paper is half there: a high dune, a valley, a low one
+  const soft = u => .57 + .17 * G(u, 0, .36) + .06 * G(u, 1, .2); // over how much it fades
+  const paint = (c, kl) => {
+    const W = c.width = Math.round(Math.min(2048, Math.max(720, innerWidth * (devicePixelRatio || 1) * .6))), H = c.height = 300, k = c.getContext('2d'), im = k.createImageData(W, H), d = im.data;
+    for (let x = 0; x < W; x++) {
+      const u = (x + .5) / W * (1 + 2 * OUT) - OUT, w = soft(u), h = horizon(u), light = kl * .95 * (.17 + .83 * G(u, .64, .27));
+      for (let y = 0, o = x * 4; y < H; y++, o += W * 4) {
+        const v = (y + .5) / H, A = fog((v - h) / w + .56), L = light * glow((v - h + .57) / .64) * (1 - A), n = A > .998 ? .5 : Math.random() + Math.random() - .5, q = Math.min(255, (A + L) * 255 + n | 0);
+        if (q) { const s = 255 / q; d[o] = (A * 250 + n | 0) * s; d[o + 1] = (A * 250 + L * 47 + n | 0) * s; d[o + 2] = (A * 248 + L * 167 + n | 0) * s; d[o + 3] = q; }
+      }
+    }
+    k.putImageData(im, 0, 0);
+  };
+  const soon = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout: 900 }) : f => setTimeout(f, 60);
+  [foot, ...document.querySelectorAll('html.stack main>.over')].forEach(el => {
+    const m = document.createElement('div'), c = document.createElement('canvas'); m.className = 'mist'; m.setAttribute('aria-hidden', 'true'); m.innerHTML = '<i></i><i></i><i></i>'; m.append(c); el.prepend(m);
+    const kl = parseFloat(getComputedStyle(el).getPropertyValue('--kl')) || 1, r = el.getBoundingClientRect();
+    r.top < innerHeight && r.bottom > 0 ? paint(c, kl) : soon(() => paint(c, kl));
+  });
 
   /* ---------- refraction ---------- */
-  const K = [1.005, 1, .995]; // red, green, blue: just enough to feel like glass on a black and white page
   if ((navigator.userAgentData?.brands || []).some(b => b.brand === 'Chromium')) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden');
@@ -32,11 +56,10 @@
         for (let px = 0; px < w; px++, o += 4) { const x = (px + .5) * Q, mx = x < W / 2 ? lens(x, SIDE, PULLX) : -lens(W - x, SIDE, PULLX);
           d[o] = 127.5 + mx / SCALE * 255 + Math.random(); d[o + 1] = 127.5 + my / SCALE * 255 + Math.random(); d[o + 2] = 128; d[o + 3] = 255; } }
       g.putImageData(im, 0, 0);
-      const id = 'liquid' + (++n), ch = ['1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0', '0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0', '0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0'];
+      const id = 'liquid' + (++n);
       pane.box.innerHTML = `<filter id="${id}" x="0" y="0" width="${W}" height="${H}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feImage href="${cv.toDataURL()}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none" result="m"/><feGaussianBlur in="m" stdDeviation="2" result="map"/>
-${ch.map((m, i) => `<feDisplacementMap in="SourceGraphic" in2="map" scale="${SCALE * K[i]}" xChannelSelector="R" yChannelSelector="G" result="d${i}"/><feColorMatrix in="d${i}" values="${m}" result="c${i}"/>`).join('')}
-<feBlend in="c0" in2="c1" mode="screen" result="rg"/><feBlend in="rg" in2="c2" mode="screen" result="o"/><feGaussianBlur in="o" stdDeviation=".7"/></filter>`;
+<feDisplacementMap in="SourceGraphic" in2="map" scale="${SCALE}" xChannelSelector="R" yChannelSelector="G" result="o"/><feGaussianBlur in="o" stdDeviation=".7"/></filter>`;
       pane.set(`url(#${id})`);
     });
     const later = () => { clearTimeout(t0); t0 = setTimeout(build, 120); };

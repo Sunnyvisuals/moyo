@@ -23,7 +23,7 @@ let raf = 0;
 function cover() {
   raf = 0;
   const H = innerHeight;
-  pairs.forEach(p => { const v = Math.min(1, Math.max(0, (H - p.over.getBoundingClientRect().top) / H)).toFixed(4); if (p.cv !== v) { p.cv = v; p.under.style.setProperty('--cv', v); p.over.style.setProperty('--ov', Math.min(1, v * 7).toFixed(3)); } });
+  pairs.forEach(p => { const v = Math.min(1, Math.max(0, (H - p.over.getBoundingClientRect().top) / H)).toFixed(4); if (p.cv !== v) { p.cv = v; p.under.style.setProperty('--cv', v); p.over.style.setProperty('--ov', Math.min(1, v * 7).toFixed(3)); (p.mist ||= p.over.querySelector('.mist'))?.style.setProperty('--rise', v); } });
 }
 const kick = () => { if (!raf) raf = requestAnimationFrame(cover); };
 const ro = new ResizeObserver(fit); pairs.forEach(p => ro.observe(p.under));

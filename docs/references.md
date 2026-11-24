@@ -17,7 +17,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 | --- | --- |
 | Georg Simmel, [sociologie des sens](https://cuny.manifoldapp.org/read/georg-simmel-some-collected-works/section/8895b310-16c0-4ef8-8b27-de3e4988526d) : le regard échangé est une réciprocité, on ne peut pas regarder sans être vu | Le logo du pied de page vous regarde |
 | Erving Goffman, [l'inattention civile](https://en.wikipedia.org/wiki/Civil_inattention) : on ne fixe pas un inconnu | Si on fixe un œil, il se détourne, puis revient en douce |
-| Friesen et Kingstone, 1998, [suivre le regard](https://doi.org/10.3758/BF03208827) : l'attention va là où des yeux regardent | Sans mouvement, les yeux regardent « On se voit ? » |
+| Friesen et Kingstone, 1998, [suivre le regard](https://doi.org/10.3758/BF03208827) : l'attention va là où des yeux regardent | Sans mouvement, les yeux regardent « Quelle est votre idée ? » |
 | [Effet Zeigarnik](https://lawsofux.com/zeigarnik-effect/) : ce qui est commencé veut être fini (effet discuté) | Le chemin et ses arrêts, les trois points du formulaire |
 | Coprésence | « 2 min 14 s ensemble, surtout sur Services. Rien n'est enregistré. » Le compte reste en mémoire, rien n'est envoyé |
 

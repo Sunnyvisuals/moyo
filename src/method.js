@@ -18,12 +18,13 @@ const media = document.createElement('div'); media.className = 'mth-media'; box.
 pics.forEach(f => { if (f) media.append(f); });
 films.forEach(v => { if (v) { v.controls = false; v.muted = true; v.setAttribute('aria-hidden', 'true'); } });
 
-let p = 0, on = false, cur = -2;
+let p = 0, on = false, cur = -2, dark = 0; // dark: how much of the glass of the next sheet is still over the picture
+const fit = () => { const m = next && next.querySelector('.mist'); dark = m ? m.offsetHeight * .6 : 0; };
 function read() {
   const H = innerHeight, r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, top = r.top + pad, len = r.height - pad - H;
   p = clamp(-top / Math.max(1, len)) * n;
   const e = clamp(1 - top / (H * .62)); sec.style.setProperty('--e', (1 - Math.pow(1 - e, 2)).toFixed(4)); // the scene opens as it comes
-  root.classList.toggle('on-film', top < H * .4 && (!next || next.getBoundingClientRect().top > H * .5)); // what is fixed over the picture turns white
+  root.classList.toggle('on-film', top < H * .4 && (!next || next.getBoundingClientRect().top + dark > H * .5)); // what is fixed over the picture turns white
   const k = Math.min(n - 1, Math.floor(Math.min(p, n - .001) + .16)), here = top < H * .3;
   const now = here ? k : -1;
   if (now !== cur) { cur = now;
@@ -44,7 +45,7 @@ function play() {
 new IntersectionObserver(es => { on = es[es.length - 1].isIntersecting; read(); play(); if (!on) root.classList.remove('on-film'); }, { rootMargin: '10% 0px' }).observe(sec);
 document.addEventListener('visibilitychange', () => { if (document.hidden) films.forEach(v => v && v.pause()); else play(); });
 addEventListener('scroll', () => { if (on) read(); }, { passive: true });
-addEventListener('resize', read);
+addEventListener('resize', () => { fit(); read(); });
 /* a tab goes to its step (site.js owns the smooth scroll) */
 tabs.forEach((b, i) => b.addEventListener('click', () => { const pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, y = moyoTop(sec) + pad + (sec.offsetHeight - pad - innerHeight) * (i + .3) / n; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
 read(); dispatchEvent(new Event('resize')); // the title is smaller now: its optical margin is measured again (site.js)

@@ -202,7 +202,7 @@ function optical(scope) {
 /* ---------- Leaving the tab: the dot closes its eye, and waits ---------- */
 const icon = $('link[rel=icon]'), ICON = icon && icon.href; let page = document.title;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'See you soon?' : 'On se voit ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FAFAF8'/%3E%3Crect x='8' y='15' width='16' height='3' rx='1.5' fill='%23002FA7'/%3E%3C/svg%3E"; }
+  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'And your idea?' : 'Et votre idée ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FAFAF8'/%3E%3Crect x='8' y='15' width='16' height='3' rx='1.5' fill='%23002FA7'/%3E%3C/svg%3E"; }
   else { document.title = page; if (icon) icon.href = ICON; }
 });
 
@@ -240,7 +240,7 @@ window.moyoScroll = y => { if (lenis) lenis.scrollTo(y, { duration: 1.6, easing:
 function goTo(id) {
   const el = id === 'top' || id === 'main' || !id ? null : document.getElementById(id);
   // a sheet that passes over a screen is read once its glass edge has gone up: the title sits just under the header
-  const pad = el ? parseFloat(getComputedStyle(el).paddingTop) || 0 : 0, glass = el && root.classList.contains('stack') && el.matches('.over') ? parseFloat(getComputedStyle(el, '::before').height) || 0 : 0;
+  const pad = el ? parseFloat(getComputedStyle(el).paddingTop) || 0 : 0, glass = el && root.classList.contains('stack') && el.matches('.over') ? (el.querySelector('.mist') || 0).offsetHeight || 0 : 0;
   const y = el ? Math.max(0, Math.round(moyoTop(el) + (el.matches('.mth.live') ? pad : glass ? glass - (innerWidth > 820 ? 96 : 64) : pad * .42))) : 0;
   const done = () => { if (el) { el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); } try { history.replaceState(null, '', el ? '#' + id : location.pathname + location.search); } catch (_) {} };
   if (lenis) lenis.scrollTo(y, { duration: clamp(1 + Math.abs(y - scrollY) / 3200, 1.2, 2.8), easing: t => 1 - Math.pow(1 - t, 4), force: true, onComplete: done });

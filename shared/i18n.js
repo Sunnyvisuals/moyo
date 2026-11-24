@@ -8,7 +8,7 @@ const CHROME = {
 const CHROME_ARIA = { fr: { homeAria: 'moyo, accueil', menu: 'Menu', langAria: 'Langue' }, en: { homeAria: 'moyo, home', menu: 'Menu', langAria: 'Language' } };
 const FOOT_EN = {
   contact: 'Contact', footAria: 'Site footer', langAria: 'Language', fNav: 'Site map', sProj: 'Projects', sSvc: 'Services', sMth: 'Method', sStu: 'Studio', sTeam: 'Team',
-  fBy: 'Made by', subH: 'Sign up for a little joy.', subBtn: 'Sign up', subPh: 'you@example.com', top: 'Back to top', fSee: 'See you soon', fHold: 'Hold an eye', fCalm: 'Less motion'
+  fBy: 'Made by', subH: 'Sign up for a little joy.', subBtn: 'Sign up', subPh: 'you@example.com', top: 'Back to top', fSee: 'What’s your idea', fHold: 'Hold an eye', fCalm: 'Less motion'
 };
 
 export { CHROME, CHROME_ARIA, FOOT_EN };

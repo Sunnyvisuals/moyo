@@ -84,7 +84,8 @@ html.js.calm .sec .dot b{opacity:1;translate:0 0}
 /* ---------- Grid: four axes ---------- */
 .g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut)}
 .g>*{grid-column:1/-1;min-width:0}
-.sec{padding:var(--sec) var(--edge) 0}
+/* arriving from another page, a section stops where goTo() of site.js would have stopped it */
+.sec{padding:var(--sec) var(--edge) 0;scroll-margin-top:calc(var(--sec) * -.42 - var(--hdr) - 12px)}
 .sec>.t-xl{margin-bottom:var(--gap)}
 @media (min-width:821px){
   .q1{grid-column:1/4!important}.q2{grid-column:4/7!important}.q3{grid-column:7/10!important}.q4{grid-column:10/-1!important}
@@ -96,10 +97,15 @@ html.js.calm .sec .dot b{opacity:1;translate:0 0}
    sentence, the studio over the method, the footer over the contact. Its top edge is the glass of the footer. The other sections simply follow. */
 html.stack main>*{position:relative;background:var(--bg)}
 html.stack main>.pin{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100svh - var(--h,100svh)));translate:0 calc(var(--cv,0) * -15vh)}
-html.stack main>.over{--gh:calc(var(--sec) * .9);--gp:calc(var(--gh) - 36px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;scroll-margin-top:calc(96px - var(--gh));
-  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),var(--bg) calc(var(--gh) - 1px));box-shadow:0 -2px 8px rgb(18 18 20 / calc(.05 * var(--ov,0))),0 -26px 52px -14px rgb(18 18 20 / calc(.15 * var(--ov,0)))}
-html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh + var(--sec));height:calc(460svh + var(--sec))}
+html.stack main>.over{--gh:clamp(250px,40vh,620px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;padding-top:calc(var(--gh) + clamp(8px,1vw,32px));scroll-margin-top:calc(84px - var(--gh) - var(--hdr));
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 2px),var(--bg) calc(var(--gh) - 2px));box-shadow:0 -1px 4px rgb(18 18 20 / calc(.05 * var(--ov,0))),0 -34px 80px -28px rgb(18 18 20 / calc(.13 * var(--ov,0)))}
+html.stack main>#projets.over{--kl:.26}
+/* what is under the film while it drifts up is still the film */
+.mth.live.pin::after{content:"";position:absolute;left:0;right:0;top:100%;height:16vh;background:#040405}
+@media (max-width:820px){html.stack main>.over{--gh:clamp(190px,32vh,300px);scroll-margin-top:calc(52px - var(--gh) - var(--hdr))}}
+html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - var(--hdr) - 12px);padding:var(--sec) 0 0;height:calc(460vh + var(--sec));height:calc(460svh + var(--sec))}
 .veil{position:absolute;inset:0;z-index:20;border-radius:inherit;background:var(--bg);opacity:calc(var(--cv,0) * .82);pointer-events:none}
+.mth.live>.veil{background:var(--ink);opacity:calc(var(--cv,0) * .5)}
 
 /* ---------- Links and buttons ---------- */
 .lnk{display:inline-flex;align-items:center;gap:.45em;min-height:44px;font-weight:600;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .72em)/100% 1px no-repeat;transition:color .4s,background-size .7s var(--ease)}
@@ -200,7 +206,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .la[href]::after{content:"";position:absolute;inset:0}
 .line .n{font-size:.42em;font-weight:600;letter-spacing:0;vertical-align:.95em;margin-left:.22em;color:var(--klein);line-height:0}
 /* services: the dot at work (trades.js), on the fourth axis; next to the description on small screens */
-.svc{position:relative;--sc:clamp(80px,11vw,108px)}
+.svc{position:relative;--sc:clamp(72px,9.6vw,94px)}
 .svc-c{position:absolute;right:0;top:0;width:var(--sc);aspect-ratio:1;translate:0 var(--y,0px);opacity:0;pointer-events:none;transition:translate .9s var(--ease),opacity 1s ease}
 .svc-c.on{opacity:1}
 @media (max-width:1080px){.svc .line p{padding-right:calc(var(--sc) + 20px);min-height:var(--sc);max-width:none}}
@@ -208,7 +214,7 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
   .svc{--sc:calc((100% + var(--gut)) / 4 - var(--gut))}
   .svc .rows{width:calc((100% + var(--gut)) * .75 - var(--gut))}
   .svc .line{grid-template-columns:repeat(9,minmax(0,1fr))}
-  .svc-c{pointer-events:auto}
+  .svc-c{pointer-events:auto;right:auto;left:calc(100% - var(--sc));width:calc(var(--sc) * .78)}
 }
 @media (hover:hover){
   .rows>li{transition:opacity .6s var(--ease)}

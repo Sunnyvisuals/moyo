@@ -213,34 +213,45 @@ html.calm .foot .mono-wrap{transform:none}
 @media (max-width:480px){.fcol{grid-column:1/-1!important}}
 `;
 
-/* Glass top of the footer (every page): the panel slides over the page, its top is frosted glass with a bright rim,
-   then it turns into solid paper before the text starts. To remove the effect, empty this string. */
+/* Glass top of the footer (every page), and of the sheets that pass over a screen (home): clear at the rim, then frosted, then paper.
+   What fades is not a pile of CSS gradients but one picture, computed by glass-rt.js: paper with a horizon that is not a straight line, and a light
+   behind it, Klein, where the horizon is lowest, so that the way from black to white does not go through grey. Under it what is behind is blurred
+   more and more. It slides a little with the scroll (--rise), on the compositor only. --kl: how much light.
+   To remove the effect, empty GLASS_CSS. */
+const PAPER = '250 250 248';
 const GLASS_CSS = `
-footer#foot{--gp:clamp(220px,38vh,520px);--gh:calc(var(--gp) + 40px);--gr:calc(64px - var(--fr,.75) * 32px);
-  border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:var(--gp);margin-top:0;animation:none;isolation:isolate;
-  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 1px),rgb(250 250 248) calc(var(--gh) - 1px));
-  box-shadow:0 -2px 8px rgb(18 18 20 / .06),0 -24px 48px -12px rgb(18 18 20 / .16)!important}
-/* the glass: clear, it bends what is behind it (glass.js sets --liquid where the browser can), then turns blue downwards */
-:is(footer#foot.foot,html.stack main>.over)::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
-  background:linear-gradient(to bottom in oklab,rgb(250 250 248 / 0.012) calc(var(--gp) * 0.000),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.049),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.098),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.147),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.196),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.245),rgb(250 250 248 / 0.012) calc(var(--gp) * 0.294),rgb(250 250 248 / 0.016) calc(var(--gp) * 0.343),rgb(250 250 248 / 0.037) calc(var(--gp) * 0.392),rgb(250 250 248 / 0.086) calc(var(--gp) * 0.441),rgb(250 250 248 / 0.166) calc(var(--gp) * 0.490),rgb(250 250 248 / 0.272) calc(var(--gp) * 0.539),rgb(250 250 248 / 0.398) calc(var(--gp) * 0.588),rgb(250 250 248 / 0.533) calc(var(--gp) * 0.637),rgb(250 250 248 / 0.666) calc(var(--gp) * 0.686),rgb(250 250 248 / 0.785) calc(var(--gp) * 0.735),rgb(250 250 248 / 0.882) calc(var(--gp) * 0.784),rgb(250 250 248 / 0.949) calc(var(--gp) * 0.833),rgb(250 250 248 / 0.987) calc(var(--gp) * 0.882),rgb(250 250 248 / 0.999) calc(var(--gp) * 0.931),rgb(250 250 248 / 1.000) calc(var(--gp) * 0.980)),
-    radial-gradient(700px 130px at var(--lx,50%) 0,rgb(255 255 255 / .12),#0000),
-    linear-gradient(rgb(255 255 255 / .09),#0000 130px);
+footer#foot{--gh:clamp(260px,44vh,680px);--gr:calc(64px - var(--fr,.75) * 32px);--rise:var(--fr,.5);--kl:.38;
+  border:0;border-radius:var(--gr) var(--gr) 0 0;padding-top:calc(var(--gh) * .92);margin-top:0;animation:none;isolation:isolate;
+  background:linear-gradient(to bottom,#0000 calc(var(--gh) - 2px),rgb(${PAPER}) calc(var(--gh) - 2px));
+  box-shadow:0 -1px 4px rgb(18 18 20 / .05),0 -34px 80px -28px rgb(18 18 20 / .13)!important}
+/* the glass: clear, it bends what is behind it (glass-rt.js sets --liquid where the browser can). Lower the frost takes over, so it stops there */
+:is(footer#foot.foot,html.stack main>.over)::before{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:calc(var(--gh) * .5);pointer-events:none;border-radius:inherit;opacity:1;mix-blend-mode:normal;
+  background:radial-gradient(760px 120px at var(--lx,50%) 0,rgb(255 255 255 / .075),rgb(255 255 255 / .02) 60%,#0000),linear-gradient(rgb(255 255 255 / .06),rgb(255 255 255 / .02) 40px,rgb(255 255 255 / .005) 84px,#0000 120px);
   /* bevel: a lit lip, then the shadow under it; it deepens with the scroll speed */
   box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),inset 0 calc(6px + var(--fv,0) * 8px) calc(10px + var(--fv,0) * 6px) calc(-8px - var(--fv,0) * 3px) rgb(18 18 20 / calc(.16 + var(--fv,0) * .14));
-  -webkit-backdrop-filter:blur(4px) saturate(1.08);backdrop-filter:var(--liquid,blur(4px)) saturate(1.08) brightness(1.015)}
+  -webkit-backdrop-filter:blur(4px) saturate(1.08);backdrop-filter:var(--liquid,blur(4px)) saturate(1.06)}
+/* the frost (three blurs, more and more), the light, the paper: elements added by glass-rt.js */
+.mist{position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;overflow:clip}
+.mist>*{position:absolute;inset:0}
+.mist i{bottom:auto;-webkit-backdrop-filter:blur(var(--b));backdrop-filter:blur(var(--b));-webkit-mask:linear-gradient(to bottom,#0000,rgb(0 0 0 / .16) 18%,rgb(0 0 0 / .84) 46%,#000 64%);mask:linear-gradient(to bottom,#0000,rgb(0 0 0 / .16) 18%,rgb(0 0 0 / .84) 46%,#000 64%)}
+.mist i:nth-child(1){--b:3px;top:14%;height:48%}.mist i:nth-child(2){--b:10px;top:28%;height:50%}.mist i:nth-child(3){--b:26px;top:44%;height:52%}
+.mist canvas{left:-7%;width:114%;height:100%;translate:calc((var(--rise,.5) - .5) * 11%);will-change:translate}
+.flood .mist{display:none}
 /* the edge: a fine ring, brightest where the light hits it (--lx) */
 :is(footer#foot.foot,html.stack main>.over)::after{content:"";display:block;position:absolute;z-index:-1;inset:0 0 auto;height:var(--gh);pointer-events:none;border-radius:inherit;opacity:1;padding:1px;box-shadow:none;
   background:radial-gradient(calc(380px + var(--fv,0) * 260px) 70px at var(--lx,50%) 0,#fff 10%,#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) - 12%) 0,rgb(170 225 255 / .5),#0000),
     radial-gradient(700px 110px at calc(var(--lx,50%) + 12%) 0,rgb(225 205 255 / .5),#0000),
-    linear-gradient(to bottom,rgb(255 255 255 / .55) 0,rgb(255 255 255 / .4) 24px,rgb(255 255 255 / .14) 34%,#0000 70%);
+    linear-gradient(to bottom,rgb(255 255 255 / .55) 0,rgb(255 255 255 / .4) 24px,rgb(255 255 255 / .12) 22%,#0000 44%);
   -webkit-mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){footer#foot{background:var(--bg)}}
-@media (max-width:820px){footer#foot{--gp:clamp(170px,27vh,250px);--gr:calc(40px - var(--fr,.75) * 16px)}}
+/* without JavaScript: plain paper */
+html:not(.js) footer#foot.foot{background:rgb(${PAPER})}
+@media (max-width:820px){footer#foot{--gh:clamp(200px,34vh,320px);--gr:calc(40px - var(--fr,.75) * 16px)}.mist canvas{left:-34%;width:172%}}
 /* pages other than the home: what comes before stays put while the footer slides over it (--st is set in footer.js) */
 .under{position:sticky;top:var(--st,0px);z-index:1;background:var(--chaux)}
 @media (prefers-reduced-motion:reduce){.under{position:relative;top:0}}
-html.calm .under{position:relative;top:0}
+html.calm .under,html:not(.js) .under{position:relative;top:0}
 `;
 
 /* Single source of the footer content. `home`: in-page anchors. */
@@ -284,7 +295,7 @@ const footerInner = ({ home = false, team } = {}) => {
     <a class="q4" href="${home ? '#top' : '#main'}" data-i="top">Retour en haut</a>
   </div>
   <div class="g foot-end">
-    <p><a class="t-hero foot-cta" href="${home ? '#contact' : '/#contact'}"><span data-i="fSee">On se voit</span><span class="q">&nbsp;?</span></a></p>
+    <p><a class="t-hero foot-cta" href="${home ? '#contact' : '/#contact'}"><span data-i="fSee">Quelle est votre idée</span><span class="q">&nbsp;?</span></a></p>
     <div class="foot-note q4">
       <p id="together"></p>
       <button class="hold" id="hold" type="button" data-i="fHold">Maintenez un œil</button>
