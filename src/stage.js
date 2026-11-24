@@ -18,6 +18,8 @@
 .stg.clip{opacity:1;translate:none;clip-path:inset(0 0 100% 0)}
 .stg.clip.in{clip-path:inset(0);transition:clip-path 1.15s cubic-bezier(.76,0,.24,1) var(--sd,0ms)}
 .stg.clip.out{opacity:1;translate:none;clip-path:inset(100% 0 0 0);transition:clip-path .6s cubic-bezier(.64,0,.78,0)}
+.stg.outd{opacity:0;translate:0 var(--sy,20px);transition:opacity .7s ease,translate .8s cubic-bezier(.22,1,.36,1)}
+.stg.clip.outd{opacity:1;translate:none;clip-path:inset(0 0 100% 0);transition:clip-path .9s cubic-bezier(.64,0,.78,0)}
 .stg.sc{transition:none!important}`;
   document.head.appendChild(st);
 
@@ -50,12 +52,12 @@
     arriving.forEach((en, i) => {
       const e = en.target;
       e.style.setProperty('--sd', Math.min(i * 110, 770) + 'ms');
-      e.classList.remove('out'); e.classList.add('in'); state.set(e, 'in');
+      e.classList.remove('out', 'outd'); e.classList.add('in'); state.set(e, 'in');
     });
     entries.filter(en => !en.isIntersecting && state.get(en.target) === 'in').forEach(en => {
       const e = en.target;
       if (en.boundingClientRect.top < 0) { e.style.removeProperty('--sd'); e.classList.remove('in'); e.classList.add('out'); state.set(e, 'out'); } // went up: leaves
-      else { e.style.removeProperty('--sd'); e.classList.remove('in', 'out'); state.delete(e); } // went below again: ready to play again
+      else { e.style.removeProperty('--sd'); e.classList.remove('in', 'out'); e.classList.add('outd'); state.delete(e); } // went below again: it goes back down softly, ready to play again
     });
   }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
 
