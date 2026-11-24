@@ -319,16 +319,19 @@ if (form) {
     e.preventDefault();
     const en = lang === 'en', wrong = Object.keys(OK).filter(k => { const bad = !OK[k](form.elements[k]); mark(k, bad); return bad; });
     if (wrong.length) { form.elements[wrong[0]].focus(); return say3(en ? (wrong.length > 1 ? `${wrong.length} fields to check.` : 'One field to check.') : (wrong.length > 1 ? `${wrong.length} champs à vérifier.` : 'Un champ à vérifier.'), true); }
-    const btn = $('.btn', form); btn.disabled = true; dots.classList.add('busy'); say3(en ? 'Sending…' : 'Envoi…');
+    const btn = $('.send', form), labels = $$('.send-l', btn), was = labels[0].textContent; btn.disabled = true; btn.classList.add('busy'); labels.forEach(l => { l.textContent = en ? 'Sending' : 'Envoi'; }); say3(en ? 'Sending…' : 'Envoi…');
     try {
       const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...values(), website: form.elements.website.value, lang }) });
       const r = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(r.message || '');
       try { sessionStorage.removeItem(DRAFT); } catch (_) {}
-      form.innerHTML = `<div class="f-done" tabindex="-1"><h3 class="t-m">${en ? 'Thank you. Message received.' : 'Merci. Message bien reçu.'}</h3><p>${en ? 'We will get back to you within 48 hours, at the address you gave.' : 'Nous vous répondons sous 48 heures, à l’adresse indiquée.'}</p></div>`;
+      // the blue goes back into its point, and the point becomes the one of the thanks
+      btn.classList.remove('busy'); btn.classList.add('sent'); say3(''); await new Promise(f => setTimeout(f, reduce ? 0 : 560));
+      form.innerHTML = `<div class="f-done" tabindex="-1"><h3 class="t-l">${en ? 'Thank you' : 'Merci'}<i class="dot">&#8288;<b></b></i></h3><p>${en ? 'Your message has arrived. We will get back to you within 48 hours, at the address you gave.' : 'Votre message est bien arrivé. Nous vous répondons sous 48 heures, à l’adresse indiquée.'}</p></div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => $('.f-done .dot', form)?.classList.add('in')));
       $('.f-done', form).focus({ preventScroll: true });
     } catch (err) {
-      btn.disabled = false; dots.classList.remove('busy');
+      btn.disabled = false; btn.classList.remove('busy'); labels.forEach(l => { l.textContent = was; });
       say3(err.message || (en ? 'Sending failed. Write to contact.moyostudio@gmail.com.' : 'L’envoi a échoué. Écrivez à contact.moyostudio@gmail.com.'), true);
     }
   });

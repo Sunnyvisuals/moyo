@@ -12,9 +12,9 @@
   // arriving (data-rv=in): .9s, slow and soft. Leaving (pre / post): .65s, the same curve
   st.textContent = `.rv{transition-property:var(--rvp);transition-duration:var(--rvdo);transition-timing-function:var(--rvfo);transition-delay:var(--rvl)}
 .rv[data-rv=in]{transition-duration:var(--rvd);transition-timing-function:var(--rvf)}
-.rv[data-rv=pre]{clip-path:inset(-10px 100% -10px -10px);opacity:0}
-.rv[data-rv=in]{clip-path:inset(-10px);opacity:1}
-.rv[data-rv=post]{clip-path:inset(-10px -10px -10px 100%);opacity:0}
+.rv[data-rv=pre]{clip-path:inset(-14px 100% -14px -40px);opacity:0}
+.rv[data-rv=in]{clip-path:inset(-14px -40px);opacity:1}
+.rv[data-rv=post]{clip-path:inset(-14px -40px -14px 100%);opacity:0}
 .rv[data-rv] span,.rv[data-rv]>svg{transition:opacity .6s ease .3s}.rv[data-rv=pre] span,.rv[data-rv=post] span,.rv[data-rv=pre]>svg,.rv[data-rv=post]>svg{opacity:0;transition-duration:.3s;transition-delay:0s}`;
   document.head.appendChild(st);
   const IN = 'cubic-bezier(.65,0,.35,1)', OUT = 'cubic-bezier(.65,0,.35,1)';

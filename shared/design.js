@@ -112,12 +112,46 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .lnk:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .72em)}
 .lnk i{transition:translate .6s var(--ease)}
 .lnk:hover i{translate:3px 0}.lnk:hover i.dn{translate:0 3px}.lnk:hover i.up{translate:2px -2px}
-.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:2.5em;min-height:max(60px,3em);padding:0 max(30px,1.4em);border-radius:999px;background:var(--klein);color:var(--bg);font-weight:600;transition:background .5s,gap .7s var(--ease),scale .3s var(--ease)}
-/* pressed */
-.btn:active{scale:.97}
-.lnk:active,.la:active,.nm-link:active,.dlg-actions button:active,.crumbs a:active{opacity:.6}
-.btn:hover{background:var(--ink);gap:3.25em}
+/* Buttons. A word and its final point, like a title. The point is the action: it carries the arrow. Pointed at, it stretches until it holds the word,
+   and the arrow goes round. .send is the large one, the last line of a form. */
+.btn{--d:max(44px,2.35em);--p:1.2em;--c:var(--klein);--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23000' stroke-width='2.3'%3E%3Cpath d='M15 24h17.6M25.4 16.4L33 24l-7.6 7.6'/%3E%3C/svg%3E");position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:space-between;gap:.8em;min-height:var(--d);margin-left:calc(var(--p) * -1);padding-left:var(--p);border-radius:calc(var(--d) / 2);font-weight:600;letter-spacing:-.022em;color:var(--ink);transition:color .3s ease .05s,opacity .4s}
+.btn::before{content:"";position:absolute;z-index:-1;inset:0;background:var(--c);clip-path:inset(0 0 0 calc(100% - var(--d)) round calc(var(--d) / 2));transition:clip-path .75s var(--ease)}
+.btn i.ar,.sub-btn i{flex:none;display:block;width:var(--d);height:var(--d);font-size:0}
+.btn i.ar::before,.sub-btn i::before{content:"";display:block;height:100%;background:var(--bg);-webkit-mask:var(--ar) 0 0/var(--d) var(--d) repeat-x;mask:var(--ar) 0 0/var(--d) var(--d) repeat-x;transition:mask-position .75s var(--ease-io),-webkit-mask-position .75s var(--ease-io)}
+.btn i.back{transform:scaleX(-1)}
+.btn i.add{--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23000' stroke-width='2.3'%3E%3Cpath d='M24 15v18M15 24h18'/%3E%3C/svg%3E")}
+@media (hover:hover){.btn:hover:not(:disabled){color:var(--bg)}.btn:hover:not(:disabled)::before{clip-path:inset(0 round calc(var(--d) / 2))}.btn:hover:not(:disabled) i.ar::before{-webkit-mask-position:var(--d) 0;mask-position:var(--d) 0}}
+html.kbd .btn:focus-visible{color:var(--bg);outline-offset:4px}html.kbd .btn:focus-visible::before{clip-path:inset(0 round calc(var(--d) / 2))}
+.btn:active:not(:disabled){color:var(--bg)}.btn:active:not(:disabled)::before{clip-path:inset(0 round calc(var(--d) / 2));transition-duration:.3s}
+.btn:active:not(:disabled) i.ar{scale:.86}.btn i.ar{transition:scale .3s var(--ease)}
 .btn:disabled{opacity:.5;cursor:progress}
+/* the large one: the label is there twice, in ink on the paper and in paper on the blue, so the edge of the blue cuts through the letters */
+.send{--d:clamp(58px,calc(var(--w) * .0455),108px);--p:clamp(14px,1.5vw,36px);--at:calc(100% - var(--d) / 2) 50%;display:flex;width:100%;margin:0;padding:0;border-radius:0;min-height:calc(var(--d) + clamp(18px,calc(var(--w) * .019),44px));border-bottom:1px solid rgb(18 18 20 / .3);font-size:var(--fs-m);font-weight:700;letter-spacing:-.034em;line-height:1;text-align:left}
+.send::before{display:none}
+.send .send-l{transition:translate .9s var(--ease)}
+.send-f{position:absolute;z-index:1;inset:0 0 -1px;display:flex;align-items:center;justify-content:space-between;background:var(--c);color:var(--bg);clip-path:circle(calc(var(--d) / 2) at var(--at));transition:clip-path .8s cubic-bezier(.5,0,.15,1)}
+@media (hover:hover){.send:hover:not(:disabled){color:var(--ink)}.send:hover:not(:disabled) .send-f{clip-path:circle(140% at var(--at))}.send:hover:not(:disabled) .send-l{translate:var(--p) 0}}
+html.kbd .send:focus-visible{color:var(--ink);outline-offset:4px}html.kbd .send:focus-visible .send-f,.send:active:not(:disabled) .send-f,.send.busy .send-f{clip-path:circle(140% at var(--at))}
+.send:active:not(:disabled){color:var(--ink)}
+html.kbd .send:focus-visible .send-l,.send:active:not(:disabled) .send-l,.send.busy .send-l{translate:var(--p) 0}
+.send:active:not(:disabled) .send-f{background:#00257f}
+.send:disabled{opacity:1}
+/* the three points of the form, one per field, go into the point of the button when nothing is missing */
+.send{--s:clamp(10px,calc(var(--w) * .0072),17px);--gp:clamp(7px,.55vw,12px);--g:clamp(16px,1.9vw,44px)}
+.send .f-dots{position:relative;margin:0 calc(var(--d) + var(--g)) 0 auto;gap:var(--gp)}
+.send .f-dots i{width:var(--s);height:var(--s);box-shadow:none;border:clamp(1.5px,calc(var(--w) * .00085),2px) solid rgb(18 18 20 / .45);transition:background .4s,border-color .4s,translate .8s var(--ease-io),opacity .15s ease .65s}
+.send .f-dots i.ok{background:var(--klein);border-color:var(--klein)}
+.send .f-dots.full i,.send .f-dots.full i:nth-child(1),.send .f-dots.full i:nth-child(3){scale:1;opacity:0;translate:calc(var(--d) / 2 + var(--g) + (3 - var(--n)) * (var(--s) + var(--gp)) + var(--s) / 2) 0;transition-delay:0s,0s,calc((3 - var(--n)) * 90ms),calc(.62s + (3 - var(--n)) * 90ms)}
+.send .f-dots i:nth-child(1){--n:1}.send .f-dots i:nth-child(2){--n:2}.send .f-dots i:nth-child(3){--n:3}
+.send:has(.f-dots.full) .send-f i.ar::before{animation:round .9s var(--ease-io) .7s}
+@keyframes round{to{-webkit-mask-position:var(--d) 0;mask-position:var(--d) 0}}
+.send.busy .f-dots{z-index:2;translate:calc(50% + var(--d) / 2 + var(--g)) 0}.send.busy .f-dots i{opacity:1!important;scale:1;translate:none!important;background:var(--bg);border-color:var(--bg);animation:busy 1s var(--ease-io) infinite;transition:none}
+.send.busy .f-dots i:nth-child(2){animation-delay:.12s}.send.busy .f-dots i:nth-child(3){animation-delay:.24s}
+.send.busy i.ar{opacity:0}
+.send.sent .send-f{clip-path:circle(0 at var(--at));transition-duration:.55s}.send.sent{border-color:var(--klein)}
+@media (max-width:620px){.send{--s:9px;--gp:5px;--g:14px}}
+@media (prefers-reduced-motion:reduce){.btn::before,.send-f,.send .send-l,.btn i.ar::before,.send .f-dots i{transition:none!important;animation:none!important}}
+@media (forced-colors:active){.btn{border:1px solid ButtonText;padding:0 12px}.btn::before,.send-f{display:none}.btn i.ar::before{background:ButtonText}}
 
 /* ---------- Forms ---------- */
 .f-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit;column-gap:var(--gut)}
@@ -193,8 +227,10 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 }
 @media (prefers-reduced-motion:reduce){.scale-d,.scale::after,.chips label span,.chips b,.scale b,.chips label span::before{transition:none!important}}
 @media (forced-colors:active){.chips b,.scale b{color:CanvasText;background:none}.chips label span::after,.scale label span::after{border-color:CanvasText}.chips :checked+span::before,.scale-d{background:Highlight;forced-color-adjust:none}}
-.f-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px}
-.f-foot p{max-width:26ch}
+.f-foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px var(--gut)}
+.f-foot .send{grid-column:1/-1}
+.f-foot p{margin:0;max-width:30ch}
+@media (max-width:620px){.f-foot{grid-template-columns:1fr}.f-foot p{max-width:none}}
 .f-dots{display:inline-flex;gap:7px;margin-bottom:12px}
 .f-dots i{width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgb(18 18 20 / .35);transition:background .4s,box-shadow .4s,translate .9s var(--ease),scale .9s var(--ease)}
 .f-dots i.ok{background:var(--klein);box-shadow:none}

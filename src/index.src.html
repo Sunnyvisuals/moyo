@@ -96,8 +96,8 @@ html.on-film .path::before{background:linear-gradient(to left,rgb(18 18 20 / .72
 .ct-l .lnk{font-size:var(--fs-small)}
 .ct-form{display:grid;gap:clamp(2.25rem,3.4vw,3.5rem)}
 .f-done{padding-top:8px;outline:none}
-.f-done p{margin-top:14px;color:var(--mute)}
-@media (max-width:560px){.f-two{grid-template-columns:1fr}.btn{width:100%}}
+.f-done p{margin-top:clamp(18px,1.6vw,34px);max-width:30em;color:var(--mute);text-wrap:balance}
+@media (max-width:560px){.f-two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -208,10 +208,10 @@ __CHROME_HEAD__
       <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" autocomplete="off" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="f-foot">
-        <div class="f-say"><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span><p class="t-small mute" data-i="fNote">Vos informations servent uniquement à vous répondre.</p></div>
-        <button class="btn" type="submit"><span data-i="fSend">Envoyer le message</span><i aria-hidden="true">→</i></button>
+        <button class="btn send" type="submit"><span class="send-l" data-i="fSend">Envoyer le message</span><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="send-f" aria-hidden="true"><span class="send-l" data-i="fSend">Envoyer le message</span><i class="ar"></i></span></button>
+        <p class="t-small mute" data-i="fNote">Vos informations servent uniquement à vous répondre.</p>
+        <p class="f-status" id="ctStatus" role="status" aria-live="polite"></p>
       </div>
-      <p class="f-status" id="ctStatus" role="status" aria-live="polite"></p>
     </form>
   </div>
 </section>
