@@ -226,6 +226,12 @@ const FOOTER_CSS = `
 @media (prefers-reduced-motion:reduce){.foot-grid,.foot-subwrap,.foot-base,.foot .mono-wrap{transform:none}}
 @media (max-width:900px){.fcol{grid-column:span 6}}
 @media (max-width:560px){.fcol{grid-column:1/-1}}
+/* pass 2: a quieter footer: finer labels, more air between lines, no sun line */
+#fDate{display:none}
+.fh{font-size:.8125rem;letter-spacing:.12em;font-weight:500;margin-bottom:22px;opacity:.75}
+.fcol ul{gap:6px}
+.foot-grid{row-gap:clamp(48px,8vh,88px)}
+.foot-base{margin-top:clamp(72px,12vh,140px)}
 @media (max-width:820px){.bar-mark,.fcol a,.foot-base a,.flang button{min-height:44px}.fcol ul{gap:0}}
 /* The blue panel rises over the content as it scrolls in (parallax "comes over"). */
 @media (prefers-reduced-motion:no-preference){@supports (animation-timeline:view()){

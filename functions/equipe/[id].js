@@ -50,8 +50,8 @@ main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:40px clamp(
 .who{grid-column:7/-1;padding-top:clamp(96px,26vh,300px)}
 .ttl{font-size:.8125rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:clamp(10px,1.6vh,18px)}
 h1{font-size:clamp(2.5rem,5.2vw,5.5rem);font-weight:300;letter-spacing:-.045em;line-height:1.02;text-wrap:balance}
-.bio{margin-top:clamp(20px,3vh,36px);font-size:clamp(1.125rem,1.4vw,1.375rem);line-height:1.6;max-width:44ch}
-.bio p+p{margin-top:1em}
+.bio{margin-top:clamp(20px,3vh,36px);font-size:clamp(1.0625rem,1.25vw,1.25rem);line-height:1.7;font-weight:300;max-width:42ch}
+.bio p+p{margin-top:1.4em}
 @media (prefers-reduced-motion:no-preference){
   html:active-view-transition-type(page)::view-transition-old(root){animation:pgOut 1.3s cubic-bezier(.76,0,.24,1) both}
   html:active-view-transition-type(page)::view-transition-new(root){animation:pgIn 1.3s cubic-bezier(.76,0,.24,1) both}
