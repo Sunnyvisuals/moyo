@@ -51,7 +51,8 @@ Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les 
 ```
 src/index.src.html     page d'accueil (gabarit)
 src/projets.src.html   page « Projets »
-src/admin.html         mode admin
+src/admin.html         admin : la page et son style, sur le système de design du site
+src/admin.js           admin : connexion, projets, méthode, équipe, catégories, messages, mot de passe
 src/site.js            langue, scroll, projets, fiche, formulaire (toutes les pages)
 src/*.js               un fichier par comportement : menu, pied de page, yeux, verre, passages, métiers, méthode, encre, apparitions, point lancé, sorties, curseur
 shared/design.js       système de design : couleurs, typographie, grille, composants, fiche projet
@@ -81,14 +82,20 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 
 ### Mot de passe admin
 
-Le mot de passe est un secret Cloudflare, jamais dans le code :
+Personne d'autre que le studio ne le choisit, et il n'est jamais dans le code.
+
+- **Première fois, ou mot de passe oublié** : sur `/admin`, un lien à usage unique (30 minutes) part vers la boîte mail du studio (`TO_EMAIL`, par défaut contact.moyostudio@gmail.com). Il faut le secret `RESEND_API_KEY`.
+- **Le changer** : dans l'admin, « Mot de passe ». Les autres appareils sont déconnectés.
+- **Sans mail** : définir le secret Cloudflare `ADMIN_PASSWORD`, puis redéployer. Il sert tant qu'aucun mot de passe n'a été choisi dans l'admin :
 
 ```bash
 npx wrangler pages secret put ADMIN_PASSWORD --project-name moyo
 npm run deploy
 ```
 
-Le changer déconnecte toutes les sessions. Après 10 essais ratés, une adresse IP est bloquée 15 minutes.
+- **Tout oublier** (le secret reprend la main) : `npx wrangler kv key delete auth --namespace-id de946356b5934cbfa13b6e0ac49d3052 --remote`
+
+Le mot de passe est étiré dans le navigateur (PBKDF2, 600 000 tours) : seul le résultat est envoyé, et seule une empreinte est gardée. La session dure jusqu'à la fermeture du navigateur, ou 7 jours si on le demande. Après 10 essais ratés, une adresse IP est bloquée 15 minutes.
 
 ### Déployer
 

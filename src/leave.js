@@ -45,7 +45,7 @@
   /* ----- the project sheet ----- */
   window.hbOut = (scope, done) => {
     if (reduce) return done();
-    const els = [...scope.querySelectorAll('.sheet-t,.sheet-g>*,.gallery,.next,.dlg-actions>*')].filter(e => e.offsetParent !== null);
+    const els = [...scope.querySelectorAll('.crumbs,.sheet-t,.sheet-g>*,.gallery,.next')].filter(e => e.offsetParent !== null);
     const a = els.map((el, i) => el.animate([{ opacity: 1, translate: '0 0' }, { opacity: 0, translate: '0 -14px' }], { duration: 260, delay: Math.min(i * 22, 130), easing: EASE, fill: 'forwards' }));
     const end = 260 + Math.min(els.length * 22, 130) + 20;
     setTimeout(() => { done(); a.forEach(x => { try { x.cancel(); } catch (_) {} }); }, end);

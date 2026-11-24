@@ -65,8 +65,9 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (t.closest('.eye .hit')) return { m: 'say', w: 'hold' };
     if (t.closest('.pv-frame')) return { m: 'say', w: 'go' };
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
+    const sy = t.closest('[data-say]'); if (sy) return { m: 'say', t: sy.dataset.say }; // admin: what a file zone does
     const way = t.closest('.path'); if (way) return t.closest('a') ? { m: 'dot', el: way.querySelector('.path-d') } : { m: 'free' }; // it joins the dot of the way
-    if (t.closest('.btn,.chips label,.sub-btn,#menuBtn,.menu-close')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
+    if (t.closest('.btn,.chips label,.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     if (t.closest('.foot-cta')) return { m: 'dot', el: t.closest('.foot-cta').querySelector('.qd') };
     const row = t.closest('.row'); if (row) return { m: 'dock', el: row.querySelector('.r-title') };
     const nm = t.closest('.nm-link'); if (nm) return { m: 'dock', el: nm.querySelector('.nm') };
@@ -97,7 +98,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   }
 
   let x = -100, y = -100, cx = x, cy = y, s = BASE, vx = 0, vy = 0, mode = { m: 'free' }, raf = 0, last = 0, queued = 0, downK = 1;
-  const apply = () => { c.classList.toggle('ring', mode.m === 'ring'); c.classList.toggle('say', mode.m === 'say'); if (mode.m === 'say') { const w = word(mode.w); if (say.textContent !== w) say.textContent = w; } c.classList.toggle('on', mode.m !== 'text' && x > -50); };
+  const apply = () => { c.classList.toggle('ring', mode.m === 'ring'); c.classList.toggle('say', mode.m === 'say'); if (mode.m === 'say') { const w = mode.t || word(mode.w); if (say.textContent !== w) say.textContent = w; } c.classList.toggle('on', mode.m !== 'text' && x > -50); };
   const frame = t => {
     raf = 0; const dt = Math.min(.05, (t - (last || t)) / 1000) || .016; last = t;
     let tx = x, ty = y, ts = BASE, k = 26;

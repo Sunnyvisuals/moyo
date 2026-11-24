@@ -250,20 +250,21 @@ new MutationObserver(() => {
 /* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up, and goes away by itself after a few
    seconds. It comes back on the way up, when the pointer goes to the top of the screen, on a touch, or with the keyboard. */
 if (bar) {
-  const root = document.documentElement, land = bar.hasAttribute('data-land'), REST = 2600;
-  let last = scrollY, upAt = scrollY, q = 0, t = 0;
-  const first = () => land && scrollY < innerHeight * .85;
+  const root = document.documentElement, land = bar.hasAttribute('data-land'), REST = 2600, sheet = document.getElementById('proj'), over = () => sheet && sheet.open, at = () => over() ? sheet.scrollTop : scrollY;
+  let last = at(), upAt = last, q = 0, t = 0;
+  const first = () => land && !over() && scrollY < innerHeight * .85;
   const busy = () => (root.classList.contains('kbd') && bar.contains(document.activeElement)) || menu.matches(':popover-open') || !!bar.querySelector(':hover');
   const hide = () => bar.classList.add('away');
   const rest = () => { clearTimeout(t); if (!reduce) t = setTimeout(() => busy() ? rest() : hide(), REST); };
   const show = () => { if (first()) return; bar.classList.remove('away'); rest(); };
-  const upd = () => { q = 0; const y = scrollY, dy = y - last; last = y; if (dy < -2) upAt = y;
+  const upd = () => { q = 0; const y = at(), dy = y - last; last = y; if (dy < -2) upAt = y;
     if (busy()) return;
     if (first()) return hide();
     if (reduce) return bar.classList.remove('away');
     if (dy < -2 || y <= 80 && dy) show(); else if (dy > 0 && y > 80 && y - upAt > 80) hide();
   };
-  addEventListener('scroll', () => { if (!q) q = requestAnimationFrame(upd); }, { passive: true });
+  addEventListener('scroll', () => { if (!q) q = requestAnimationFrame(upd); }, { passive: true, capture: true }); // the project sheet scrolls by itself
+  addEventListener('moyo:sheet', () => { last = upAt = at(); if (first()) hide(); else show(); }); // a project opens or closes: the header is there
   addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && e.clientY < 110 && bar.classList.contains('away')) show(); }, { passive: true });
   addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && e.clientY < innerHeight * .4) show(); }, { passive: true });
   bar.addEventListener('focusin', () => { bar.classList.remove('away'); rest(); });

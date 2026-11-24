@@ -113,6 +113,39 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 .btn:hover{background:var(--ink);gap:3.25em}
 .btn:disabled{opacity:.5;cursor:progress}
 
+/* ---------- Forms ---------- */
+.f-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit;column-gap:var(--gut)}
+.fld{display:block}
+.fl{display:block;font-size:var(--fs-small);color:var(--mute);line-height:1.3;text-box:trim-both cap alphabetic;margin-bottom:8px}
+.fld input,.fld textarea{display:block;width:100%;padding:12px 0 14px;border:0;border-bottom:1px solid rgb(18 18 20 / .3);border-radius:0;background:none;font-size:var(--fs-lead);line-height:1.4;outline:none;transition:border-color .4s,box-shadow .4s}
+.fld textarea{resize:vertical;min-height:calc(4.2em + 26px)}
+@supports (field-sizing:content){.fld textarea{field-sizing:content;resize:none;max-height:60vh}}
+.fld input:hover,.fld textarea:hover{border-color:var(--ink)}
+.fld input:focus,.fld textarea:focus{border-color:var(--klein);box-shadow:0 1px 0 var(--klein)}
+.f-err{display:block;font-size:var(--fs-small);line-height:1.35;color:#B3261E}
+.f-err:not(:empty){margin-top:10px}
+.fld [aria-invalid]{border-color:#B3261E;box-shadow:0 1px 0 #B3261E}
+.chips{display:flex;flex-wrap:wrap;gap:8px 6px}
+.chips legend{float:left;width:100%;margin-bottom:20px}
+.opt{color:var(--mute)}
+.chips label{position:relative}
+.chips input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.chips label span{display:inline-flex;align-items:center;min-height:max(44px,2.3em);padding:0 max(15px,.85em);border:1px solid rgb(18 18 20 / .22);border-radius:999px;font-size:var(--fs-small);font-weight:500;transition:background .4s,color .4s,border-color .4s,scale .3s var(--ease)}
+.chips label:hover span{border-color:var(--ink)}
+.chips input:checked+span{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chips input:focus-visible+span{outline:2px solid var(--klein);outline-offset:3px}
+.f-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px}
+.f-foot p{max-width:26ch}
+.f-dots{display:inline-flex;gap:7px;margin-bottom:12px}
+.f-dots i{width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgb(18 18 20 / .35);transition:background .4s,box-shadow .4s,translate .9s var(--ease),scale .9s var(--ease)}
+.f-dots i.ok{background:var(--klein);box-shadow:none}
+.f-dots.full i:nth-child(1){translate:18px 0}.f-dots.full i:nth-child(3){translate:-18px 0}.f-dots.full i{scale:1.5}
+.f-dots.busy i{animation:busy 1s var(--ease-io) infinite}.f-dots.busy i:nth-child(2){animation-delay:.12s}.f-dots.busy i:nth-child(3){animation-delay:.24s}
+@keyframes busy{50%{opacity:.25;scale:.6}}
+.chips label:active span{scale:.96}
+.f-status{font-size:var(--fs-small);min-height:1.5em}
+.f-status.err{color:#B3261E}
+
 /* ---------- Pictures ---------- */
 .plate{position:relative;display:block;aspect-ratio:4/5;overflow:clip;background:var(--tint)}
 .plate img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 8%;transition:scale 1.4s var(--ease)}
@@ -240,22 +273,22 @@ html.stack main>.mth.live{margin-top:0;padding:var(--sec) 0 0;height:calc(460vh 
 
 /* ---------- Project sheet and profile: title on top, picture on the first axis, words on the third ---------- */
 .sheet{padding:calc(var(--hdr) + clamp(1.5rem,4.5vw,4.5rem)) var(--edge) var(--sec)}
-.sheet-t{margin-bottom:var(--gap)}
+.sheet-t{margin-bottom:var(--gap);outline:none}
 .sheet-g{row-gap:40px;align-items:start}
 .sheet-g .t-lead{max-width:42ch;text-wrap:pretty;text-box:trim-start cap alphabetic}
 .facts{margin-top:clamp(2.5rem,5vw,5rem);border-top:1px solid var(--line)}
 .facts>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gut);padding:16px 0;border-bottom:1px solid var(--line);font-size:var(--fs-small)}
 .facts dt{color:var(--mute)}
 
-#proj{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--bg);color:var(--ink);overflow:auto;overscroll-behavior:contain;translate:0 100%;
-  transition:translate .95s var(--ease-io),overlay .95s allow-discrete,display .95s allow-discrete}
+#proj{position:fixed;z-index:80;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--bg);color:var(--ink);overflow:auto;overscroll-behavior:contain;translate:0 100%;
+  transition:translate .95s var(--ease-io),display .95s allow-discrete}
 #proj[open]{translate:0 0}
 @starting-style{#proj[open]{translate:0 100%}}
-#proj::backdrop{background:rgb(18 18 20 / 0);transition:background .9s,overlay .9s allow-discrete,display .9s allow-discrete}
-#proj[open]::backdrop{background:rgb(18 18 20 / .4)}
-@starting-style{#proj[open]::backdrop{background:rgb(18 18 20 / 0)}}
+/* the page behind: a shade. The header of the site stays above the sheet. */
+body::after{content:"";position:fixed;z-index:79;inset:0;background:rgb(18 18 20 / 0);pointer-events:none;transition:background .9s}
+html.is-dialog body::after{background:rgb(18 18 20 / .4)}
 /* where the browser can: the picture of the card becomes the picture of the sheet, the paper opens from the card (site.js) */
-html.vt-sheet #proj,html.vt-sheet #proj::backdrop{transition:none!important}
+html.vt-sheet #proj,html.vt-sheet body::after{transition:none!important}
 html.vt-sheet::view-transition-group(shot){animation-duration:.95s;animation-timing-function:var(--ease-io);z-index:3}
 html.vt-sheet::view-transition-old(shot),html.vt-sheet::view-transition-new(shot){width:100%;height:100%;object-fit:cover;object-position:var(--vp,50% 8%);overflow:clip;mix-blend-mode:normal;animation:none}
 html.vt-sheet.vt-in::view-transition-old(shot),html.vt-sheet:not(.vt-in)::view-transition-new(shot){display:none}
@@ -270,12 +303,6 @@ html.vt-sheet:not(.vt-in)::view-transition-old(root){z-index:2;animation:sheetOu
 :is(#proj,.work) .plate{aspect-ratio:auto}
 :is(#proj,.work) .plate img{position:static;width:100%;height:auto;aspect-ratio:auto 4/5}
 :is(#proj,.work) .plate--none{aspect-ratio:4/5}
-.dlg-actions{position:fixed;z-index:3;top:0;left:var(--edge);right:var(--edge);height:var(--hdr);justify-content:flex-end;display:flex;align-items:center;gap:clamp(18px,2.4vw,36px);color:#fff;background:#000;mix-blend-mode:difference;pointer-events:none}
-.dlg-actions button{pointer-events:auto}
-.dlg-actions :focus-visible{outline-color:currentColor}
-.dlg-actions button{min-height:44px;font-weight:600;font-size:var(--fs-small)}
-.dlg-pos{margin-right:auto;display:inline-flex;align-items:center;font-size:var(--fs-small);font-weight:500}
-.dlg-pos>:last-child::before{content:"";display:inline-block;width:clamp(20px,3vw,52px);height:1px;margin:0 14px;vertical-align:.3em;background:currentColor;opacity:.5}
 .gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gut);margin-top:var(--gap)}
 .gallery:empty{display:none}
 .gallery img{width:100%}
@@ -306,15 +333,10 @@ html.calm *,html.calm *::before,html.calm *::after{animation-duration:.01ms!impo
 `;
 
 /* Project sheet (home and /projets). Filled by site.js. */
-const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle">
-  <div class="dlg-actions">
-    <span class="dlg-pos" aria-hidden="true"><span data-i="sProjL">Projets</span><span id="pPos"></span></span>
-    <button type="button" id="pPrev" data-i="prev">Précédent</button>
-    <button type="button" id="pNext" data-i="next">Suivant</button>
-    <button type="button" id="pClose" data-i="close">Fermer</button>
-  </div>
+const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent>
   <div class="dlg-in sheet">
-    <h2 class="t-hero sheet-t"><span id="pTitle"></span><i class="dot">&#8288;<b></b></i></h2>
+    <nav class="crumbs" aria-label="Vous êtes ici" data-ia="here"><ol><li><a href="/" data-i="home">Accueil</a></li><li><a href="/projets" data-i="sProjL" data-close>Projets</a></li><li aria-current="page"><span id="pHere"></span></li></ol></nav>
+    <h2 class="t-hero sheet-t" tabindex="-1"><span id="pTitle"></span><i class="dot">&#8288;<b></b></i></h2>
     <div class="g sheet-g">
       <span class="plate c5" id="pPlate"></span>
       <div class="h2">

@@ -67,10 +67,11 @@ $$('.la[data-cat]').forEach(a => {
 /* ---------- Project sheet: opens from its card; previous and next stay inside the current filter. Each project has its own address (/projets/id,
    a real page for a shared link, a new tab or a reload): the Back button closes the sheet. ---------- */
 const dlg = $('#proj');
-let cur = 0, opener = null, pushed = false, openCard = null;
+let cur = 0, opener = null, pushed = false, openCard = null, plain = false;
+const PAGE = bare(location.pathname), BEHIND = '.under,#foot,#path,.skip'; // the page the sheet opens over, and what can no longer be reached while it is open
 function fill(i) {
   cur = i; const p = ALL[i], t = txt(p, lang);
-  $('#pTitle').textContent = t.title; $('#pDesc').textContent = t.desc;
+  $('#pTitle').textContent = $('#pHere').textContent = t.title; $('#pDesc').textContent = t.desc;
   $('#pTag').textContent = [catLabel(DATA, p.category, lang), t.type].filter(Boolean).join(', ');
   $('#pRole').textContent = t.role; $('#pPlace').textContent = t.place; $('#pYear').textContent = p.year;
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
@@ -78,7 +79,7 @@ function fill(i) {
   const im = $('img', pl), known = cardOf(i) && $('img', cardOf(i)); if (im) { im.loading = 'eager'; im.decoding = 'sync'; if (known && known.naturalWidth) { im.width = known.naturalWidth; im.height = known.naturalHeight; } }
   $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
   const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
-  $('#pPos').textContent = `${at + 1}/${v.length}`; $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
+  $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
   document.title = t.title + ' · Moyo Studio';
   [nx, ALL[v[(at - 1 + v.length) % v.length]]].forEach(q => { if (q.cover) new Image().src = imgURL(q.cover); }); // the next ones are ready
   dlg.scrollTop = 0; optical(dlg);
@@ -125,7 +126,7 @@ function morph(open, i, update) {
   return true;
 }
 function openSheet(i, push) {
-  const show = () => { fill(i); dlg.showModal(); optical(dlg); root.classList.add('is-dialog'); lenis?.stop(); $('#pClose').focus({ preventScroll: true }); };
+  const show = () => { fill(i); dlg.show(); optical(dlg); root.classList.add('is-dialog'); $$(BEHIND).forEach(e => { e.inert = true; }); lenis?.stop(); $('.sheet-t', dlg).focus({ preventScroll: true }); dispatchEvent(new Event('moyo:sheet')); };
   if (push) { history.pushState({ projet: ALL[i].id }, '', address(ALL[i].id)); pushed = true; }
   opener = cardOf(i) && $('.row', cardOf(i));
   if (!push || !morph(true, i, show)) show();
@@ -151,22 +152,22 @@ function hideSheet() { // really closes it: the address has already changed
   opener = (cardOf(cur) && $('.row', cardOf(cur))) || opener;
   if (openCard && wide.matches) { list.classList.add('still'); openCard(cur); list.offsetWidth; }
   const end = () => { delete dlg.dataset.leaving; dlg.close(); };
-  if (!morph(false, cur, end)) { if (!window.hbOut) end(); else { dlg.dataset.leaving = '1'; window.hbOut(dlg, end); } }
+  if (plain || !morph(false, cur, end)) { if (!window.hbOut) end(); else { dlg.dataset.leaving = '1'; window.hbOut(dlg, end); } }
   if (list) requestAnimationFrame(() => list.classList.remove('still'));
 }
 const closeSheet = () => { if (pushed) history.back(); else hideSheet(); };
+function leaveSheet(then) { plain = true; dlg.addEventListener('close', () => { plain = false; setTimeout(then, 60); }, { once: true }); closeSheet(); } // to another place of the page
 if (dlg && list) {
   list.addEventListener('click', e => { const b = e.target.closest('.row'); if (!b || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); openSheet(+b.dataset.p, true); }); // a new tab gets the page
   dlg.addEventListener('close', () => {
-    root.classList.remove('is-dialog'); lenis?.start(); document.title = TITLE[lang];
-    if (pushed && asked() >= 0) { pushed = false; history.back(); } // closed by the browser itself
+    root.classList.remove('is-dialog'); $$(BEHIND).forEach(e => { e.inert = false; }); lenis?.start(); document.title = TITLE[lang]; place(lang); dispatchEvent(new Event('moyo:sheet'));
     opener?.focus({ preventScroll: true });
   });
-  dlg.addEventListener('cancel', e => { e.preventDefault(); closeSheet(); });
-  dlg.addEventListener('keydown', e => { if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); });
-  $('#pClose').addEventListener('click', closeSheet);
-  $('#pNext').addEventListener('click', () => step(1)); $('#pNext2').addEventListener('click', () => step(1));
-  $('#pPrev').addEventListener('click', () => step(-1));
+  addEventListener('keydown', e => { // Escape closes, the arrows go from one project to the next
+    if (!dlg.open || $('#menu')?.matches(':popover-open') || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (e.key === 'Escape') closeSheet(); else if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1);
+  });
+  $('#pNext2').addEventListener('click', () => step(1));
   addEventListener('popstate', () => { const i = asked(); if (i < 0) { pushed = false; hideSheet(); } else if (!dlg.open) { pushed = true; openSheet(i, false); } else if (i !== cur) fill(i); });
 }
 
@@ -249,13 +250,15 @@ document.addEventListener('click', e => {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   const a = e.target.closest && e.target.closest('a[href]');
   if (!a || a.target === '_blank' || a.classList.contains('skip')) return;
+  const sheet = dlg && dlg.open;
+  if (sheet && a.matches('[data-close]')) { e.preventDefault(); return closeSheet(); } // back to where one comes from
   let u; try { u = new URL(a.href, location.href); } catch (_) { return; }
-  if (u.origin !== location.origin || u.pathname.replace(/\/$/, '') !== location.pathname.replace(/\/$/, '')) return;
+  if (u.origin !== location.origin || u.pathname.replace(/\/$/, '') !== (sheet ? local(PAGE) : location.pathname).replace(/\/$/, '')) return;
   const id = decodeURIComponent(u.hash.slice(1));
   if (id && !document.getElementById(id)) return;
   e.preventDefault();
-  const menu = $('#menu');
-  if (menu && menu.matches(':popover-open')) { menu.hidePopover(); setTimeout(() => goTo(id), 120); } else goTo(id);
+  const menu = $('#menu'), go = () => sheet ? leaveSheet(() => goTo(id)) : goTo(id);
+  if (menu && menu.matches(':popover-open')) { menu.hidePopover(); setTimeout(go, 120); } else go();
 });
 
 /* the menu opens on the section being read (home) */
