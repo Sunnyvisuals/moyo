@@ -281,7 +281,7 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .la[href]::after{content:"";position:absolute;inset:0}
 .line .n{font-size:.42em;font-weight:600;letter-spacing:0;vertical-align:.95em;margin-left:.22em;color:var(--klein);line-height:0}
 /* services: the dot at work (trades.js), on the fourth axis; next to the description on small screens */
-.svc{position:relative;--sc:clamp(72px,9.6vw,94px)}
+.svc{position:relative;z-index:1;--sc:clamp(72px,9.6vw,94px)} /* above the next section: the last drawing goes a little past the list */
 .svc-c{position:absolute;right:0;top:0;width:var(--sc);aspect-ratio:1;translate:0 var(--y,0px);opacity:0;pointer-events:none;transition:translate .9s var(--ease),opacity 1s ease}
 .svc-c.on{opacity:1}
 @media (max-width:1080px){.svc .line p{padding-right:calc(var(--sc) + 20px);min-height:var(--sc);max-width:none}}

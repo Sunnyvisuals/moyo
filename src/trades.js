@@ -67,9 +67,9 @@ const scene = rows.map(r => SCENES[r.querySelector('[data-i]').dataset.i] || ali
 const X = new Float32Array(N), Y = new Float32Array(N), R = new Float32Array(N), A = new Float32Array(N), B = new Float32Array(N), VX = new Float32Array(N), VY = new Float32Array(N), LX = new Float32Array(N).fill(9), LY = new Float32Array(N).fill(9);
 let W = 0, S = 1, D = 1, cur = -1, t0 = 0, since = 0, on = false, raf = 0, last = 0, ptr = null, over = -1;
 function size() { W = cv.clientWidth; D = Math.min(2, devicePixelRatio || 1); cv.width = cv.height = Math.round(W * D); S = W / 2 * .96; if (reduce) still(); place(); }
-function place() { // level with the row, or with its description
+function place() { // its middle is the middle of the row, the first and the last ones too (it goes past the list), or of its description on a small screen
   if (cur < 0) return; const r = rows[cur], p = r.querySelector('p');
-  const y = wide.matches ? clamp(r.offsetTop + r.offsetHeight / 2 - W / 2, 0, Math.max(0, svc.offsetHeight - W)) : r.offsetTop + p.offsetTop + p.offsetHeight / 2 - W / 2;
+  const y = wide.matches ? r.offsetTop + r.offsetHeight / 2 - W / 2 : r.offsetTop + p.offsetTop + p.offsetHeight / 2 - W / 2;
   cv.style.setProperty('--y', y.toFixed(1) + 'px');
 }
 function draw() {
