@@ -22,7 +22,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 
 | Section | Contenu |
 | --- | --- |
-| Ouverture | Une phrase ; en haut, le studio, l’heure sur place et ce que le soleil va y faire (`src/sky.js`, calculé dans la page), et le chemin vers les projets |
+| Ouverture | Une phrase ; en haut, le studio, le chemin vers les projets, et ce que dit la phrase, dessiné par un champ de points (`src/figure.js`) : une idée, une image, un site, un film. Le point bleu est toujours là, le reste change autour de lui ; pointer un mot de la phrase le dessine |
 | Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`/projets/<id>`, une vraie page), le bouton Retour la ferme |
 | Services | Sept services, une ligne chacun, et le point au travail sur le quatrième axe (`src/trades.js`). Une ligne qui a des projets y mène |
 | Méthode | Une scène épinglée en plein écran, quatre étapes ; pour chacune une image, une vidéo ou un GIF, choisis dans l'admin, et les mots en blanc par-dessus |
@@ -65,7 +65,7 @@ shared/render.js       rendu des projets, partagé par le build, le serveur et l
 shared/rich.js         textes mis en forme (biographies, descriptions), partagé par les pages, le serveur et l'admin
 functions/equipe/      page de profil, rendue par le serveur
 functions/projets/     page de projet, rendue par le serveur
-archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres)
+archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres, l'heure et le soleil)
 data/projects.json     projets de départ (les 5 exemples)
 functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /api/preview, /img/<id>
 build.mjs              construit dist/
