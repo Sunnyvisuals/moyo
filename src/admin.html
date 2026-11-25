@@ -46,7 +46,7 @@ body{min-height:100vh;min-height:100svh}
 .ab-st i{width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgb(18 18 20 / .35);transition:background .4s,box-shadow .4s}
 .ab-st.dirty{color:var(--ink)}.ab-st.dirty i{background:var(--klein);box-shadow:none}
 .ab-st.busy i{animation:busy 1s var(--ease-io) infinite;background:var(--klein);box-shadow:none}
-.ab .btn{font-size:var(--fs-small)}
+.ab .btn{font-size:var(--fs-body)}
 
 /* The way, always open here: a line, a dot, the names */
 .ad{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);align-items:start;padding:clamp(1rem,2.4vw,2.75rem) var(--edge) clamp(7rem,12vw,12rem)}
@@ -208,7 +208,7 @@ body{min-height:100vh;min-height:100svh}
   .ct>li{grid-template-columns:40px minmax(0,1fr) auto;row-gap:10px}.ct>li>:nth-child(3){grid-column:2}.ct .n{grid-column:2;padding:0}.ct>li>:last-child{grid-column:3;grid-row:1}
   .lg-mono{margin-top:24px}
 }
-@media (max-width:560px){.f-two{grid-template-columns:1fr}.btn{--p:14px}.lg .btn,.ask .btn{width:calc(100% + 14px)}.ab-st span{display:none}}
+@media (max-width:560px){.f-two{grid-template-columns:1fr}.ab-st span{display:none}}
 </style>
 </head>
 <body>

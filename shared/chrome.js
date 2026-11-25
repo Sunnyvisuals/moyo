@@ -164,13 +164,10 @@ const FOOTER_CSS = `
 .sub-row:focus-within{border-color:var(--klein);box-shadow:0 1px 0 var(--klein)}
 .sub-row input[type=email]{flex:1 1 0;min-width:0;min-height:44px;padding:0;color:var(--ink);background:transparent;border:0;border-radius:0;outline:none;font-weight:600}
 .sub-row input[type=email]::placeholder{color:var(--mute);opacity:1;font-weight:400}
-.sub-btn{--d:44px;--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23000' stroke-width='2.3'%3E%3Cpath d='M15 24h17.6M25.4 16.4L33 24l-7.6 7.6'/%3E%3C/svg%3E");position:relative;flex:none;width:44px;height:44px;margin-bottom:6px}
-.sub-btn::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--klein);scale:0;transition:scale .6s var(--ease)}
-.sub-btn i{position:relative}.sub-btn i::before{background:var(--ink)}
-.sub-row:has(input[type=email]:valid:not(:placeholder-shown)) .sub-btn::before,html.kbd .sub-btn:focus-visible::before,.sub-btn:active::before{scale:1}
-.sub-row:has(input[type=email]:valid:not(:placeholder-shown)) .sub-btn i::before,html.kbd .sub-btn:focus-visible i::before,.sub-btn:active i::before{background:var(--bg)}
-@media (hover:hover){.sub-btn:hover::before{scale:1}.sub-btn:hover i::before{background:var(--bg);-webkit-mask-position:44px 0;mask-position:44px 0}}
-.flood .sub-btn i::before{background:var(--bg)}
+.sub-btn{position:relative;flex:none;width:44px;height:44px;transition:color .4s}
+.sub-btn i{position:absolute;right:5px;top:50%;width:11px;height:11px;border-top:2px solid currentColor;border-right:2px solid currentColor;translate:0 -50%;rotate:45deg;transition:translate .6s var(--ease)}
+.sub-row:has(input[type=email]:valid:not(:placeholder-shown)) .sub-btn{color:var(--klein)}
+@media (hover:hover){.sub-btn:hover{color:var(--klein)}.sub-btn:hover i{translate:5px -50%}}
 .sub-btn:disabled{opacity:.5;cursor:progress}
 .sub-msg{margin-top:12px;min-height:1.4em;font-size:var(--fs-small)}
 .foot-base{margin-top:clamp(3.5rem,6vw,6rem);padding-top:20px;border-top:1px solid var(--line);font-size:var(--fs-small);row-gap:4px;align-items:center}

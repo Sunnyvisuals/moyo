@@ -96,7 +96,7 @@ html.on-film .path::before{background:linear-gradient(to left,rgb(18 18 20 / .72
 .ct-l .lnk{font-size:var(--fs-small)}
 .ct-form{display:grid;gap:clamp(2.25rem,3.4vw,3.5rem)}
 .f-done{padding-top:8px;outline:none}
-.f-done p{margin-top:clamp(18px,1.6vw,34px);max-width:30em;color:var(--mute);text-wrap:balance}
+.f-done p{margin-top:clamp(26px,2.6vw,60px);max-width:30em;color:var(--mute);text-wrap:balance}
 @media (max-width:560px){.f-two{grid-template-columns:1fr}}
 </style>
 </head>
@@ -208,7 +208,7 @@ __CHROME_HEAD__
       <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" autocomplete="off" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="f-foot">
-        <button class="btn send" type="submit"><span class="send-l" data-i="fSend">Envoyer le message</span><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="send-f" aria-hidden="true"><span class="send-l" data-i="fSend">Envoyer le message</span><i class="ar"></i></span></button>
+        <button class="nm-link send" type="submit"><span class="nm" data-i="fSend">Envoyer</span><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
         <p class="t-small mute" data-i="fNote">Vos informations servent uniquement à vous répondre.</p>
         <p class="f-status" id="ctStatus" role="status" aria-live="polite"></p>
       </div>
@@ -240,7 +240,7 @@ __SHEET__
 "enS":"We made it a rule: every project starts from a pattern, one simple idea that ties everything together, from the first page to the last pixel.",
 "ctQ":"A place, an event, a brand?","ctLead":"Tell us about the project. We reply within 48 hours.","copy":"Copy the address",
 "fName":"Name","fMail":"Email","fType":"The project","fOpt":"(optional)","fOptM":"(optional, several if you like)","tId":"Identity","tSite":"Website","tData":"Data","tMotion":"Motion","tAv":"Audiovisual","tCom":"Communication","tOther":"Other",
-"fBudget":"Your budget","b1":"Under €5,000","b2":"€5,000 to €15,000","b3":"€15,000 to €40,000","b4":"Over €40,000","bTbd":"I don’t know yet","fMsg":"Message","fNote":"Your details are only used to reply to you.","fSend":"Send the message",
+"fBudget":"Your budget","b1":"Under €5,000","b2":"€5,000 to €15,000","b3":"€15,000 to €40,000","b4":"Over €40,000","bTbd":"I don’t know yet","fMsg":"Message","fNote":"Your details are only used to reply to you.","fSend":"Send",
 "sProjL":"Projects","nextP":"Next project","fCat":"Category","fRole":"Role","fYear":"Year","fPlace":"Place","prev":"Previous","next":"Next","close":"Close"
 }</script>
 __SCRIPTS__

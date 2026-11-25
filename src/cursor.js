@@ -62,7 +62,6 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (root.classList.contains('mono') || root.classList.contains('holding')) return .2;
     for (const el of document.elementsFromPoint(mx, my)) {
       if (el.closest('.mth-media')) return .1; // the film has its own shade
-      if (el.closest('.btn:hover:not(:disabled)')) return .2; // blue under the hand
       if (el.matches('.over,#foot,.floor')) { const a = window.moyoFog ? moyoFog(el.matches('.floor') ? el.parentElement : el, mx, my) : 1; if (a !== null) { if (a > .5) return 1; continue; } } // a sheet is glass at its top, paper below
       if (el.naturalWidth || el.videoWidth) { const l = picture(el, mx, my); if (l !== null) return l; }
       if (el.matches('.plate--none')) { const r = el.getBoundingClientRect(), R = Math.min(r.width, r.height) * .13; return Math.hypot(mx - r.left - r.width / 2 - (parseFloat(el.style.getPropertyValue('--dx')) || 0), my - r.top - r.height / 2 - (parseFloat(el.style.getPropertyValue('--dy')) || 0)) < R ? .05 : .8; }
@@ -92,8 +91,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const sy = t.closest('[data-say]'); if (sy) return { m: 'say', t: sy.dataset.say }; // admin: what a file zone does
     const ch = t.closest('.chips label,.scale label'); if (ch) return { m: 'word', el: ch, at: place(ch) };
     const way = t.closest('.path'); if (way) return t.closest('a') ? { m: 'word', el: way, at: middle(way.querySelector('.path-d')) } : { m: 'free' }; // it joins the dot of the way
-    const bt = t.closest('.btn'); if (bt) { const ar = bt.querySelector('i.ar,i'); return bt.disabled ? { m: 'free' } : { m: 'word', el: bt, // the point of the button takes it in
-       at: ar && (() => { const o = middle(ar, 0)(); if (o) o.c = getComputedStyle(bt).getPropertyValue('--c').includes('red') || bt.matches('.red') ? '#B3261E' : '#002FA7'; return o; }) }; }
+    const bt = t.closest('.btn'), sd = t.closest('.send'), pt = bt ? bt.querySelector('i.ar') : sd && sd.querySelector('.f-dots i'); if (bt || sd) return { m: (bt || sd).disabled ? 'free' : 'word', el: bt || sd, at: pt && middle(pt) }; // it joins the final point
     if (t.closest('.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     const cta = t.closest('.foot-cta'); if (cta) { const q = cta.querySelector('.qd'); return { m: 'word', el: cta, at: q ? middle(q) : null }; }
     const row = t.closest('.row'), nm = t.closest('.nm-link'), a = t.closest('a,button,[role=button]');

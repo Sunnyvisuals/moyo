@@ -112,46 +112,33 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .lnk:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .72em)}
 .lnk i{transition:translate .6s var(--ease)}
 .lnk:hover i{translate:3px 0}.lnk:hover i.dn{translate:0 3px}.lnk:hover i.up{translate:2px -2px}
-/* Buttons. A word and its final point, like a title. The point is the action: it carries the arrow. Pointed at, it stretches until it holds the word,
-   and the arrow goes round. .send is the large one, the last line of a form. */
-.btn{--d:max(44px,2.35em);--p:1.2em;--c:var(--klein);--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23000' stroke-width='2.3'%3E%3Cpath d='M15 24h17.6M25.4 16.4L33 24l-7.6 7.6'/%3E%3C/svg%3E");position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:space-between;gap:.8em;min-height:var(--d);margin-left:calc(var(--p) * -1);padding-left:var(--p);border-radius:calc(var(--d) / 2);font-weight:600;letter-spacing:-.022em;color:var(--ink);transition:color .3s ease .05s,opacity .4s}
-.btn::before{content:"";position:absolute;z-index:-1;inset:0;background:var(--c);clip-path:inset(0 0 0 calc(100% - var(--d)) round calc(var(--d) / 2));transition:clip-path .75s var(--ease)}
-.btn i.ar,.sub-btn i{flex:none;display:block;width:var(--d);height:var(--d);font-size:0}
-.btn i.ar::before,.sub-btn i::before{content:"";display:block;height:100%;background:var(--bg);-webkit-mask:var(--ar) 0 0/var(--d) var(--d) repeat-x;mask:var(--ar) 0 0/var(--d) var(--d) repeat-x;transition:mask-position .75s var(--ease-io),-webkit-mask-position .75s var(--ease-io)}
-.btn i.back{transform:scaleX(-1)}
-.btn i.add{--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23000' stroke-width='2.3'%3E%3Cpath d='M24 15v18M15 24h18'/%3E%3C/svg%3E")}
-@media (hover:hover){.btn:hover:not(:disabled){color:var(--bg)}.btn:hover:not(:disabled)::before{clip-path:inset(0 round calc(var(--d) / 2))}.btn:hover:not(:disabled) i.ar::before{-webkit-mask-position:var(--d) 0;mask-position:var(--d) 0}}
-html.kbd .btn:focus-visible{color:var(--bg);outline-offset:4px}html.kbd .btn:focus-visible::before{clip-path:inset(0 round calc(var(--d) / 2))}
-.btn:active:not(:disabled){color:var(--bg)}.btn:active:not(:disabled)::before{clip-path:inset(0 round calc(var(--d) / 2));transition-duration:.3s}
-.btn:active:not(:disabled) i.ar{scale:.86}.btn i.ar{transition:scale .3s var(--ease)}
-.btn:disabled{opacity:.5;cursor:progress}
-/* the large one: the label is there twice, in ink on the paper and in paper on the blue, so the edge of the blue cuts through the letters */
-.send{--d:clamp(58px,calc(var(--w) * .0455),108px);--p:clamp(14px,1.5vw,36px);--at:calc(100% - var(--d) / 2) 50%;display:flex;width:100%;margin:0;padding:0;border-radius:0;min-height:calc(var(--d) + clamp(18px,calc(var(--w) * .019),44px));border-bottom:1px solid rgb(18 18 20 / .3);font-size:var(--fs-m);font-weight:700;letter-spacing:-.034em;line-height:1;text-align:left}
-.send::before{display:none}
-.send .send-l{transition:translate .9s var(--ease)}
-.send-f{position:absolute;z-index:1;inset:0 0 -1px;display:flex;align-items:center;justify-content:space-between;background:var(--c);color:var(--bg);clip-path:circle(calc(var(--d) / 2) at var(--at));transition:clip-path .8s cubic-bezier(.5,0,.15,1)}
-@media (hover:hover){.send:hover:not(:disabled){color:var(--ink)}.send:hover:not(:disabled) .send-f{clip-path:circle(140% at var(--at))}.send:hover:not(:disabled) .send-l{translate:var(--p) 0}}
-html.kbd .send:focus-visible{color:var(--ink);outline-offset:4px}html.kbd .send:focus-visible .send-f,.send:active:not(:disabled) .send-f,.send.busy .send-f{clip-path:circle(140% at var(--at))}
-.send:active:not(:disabled){color:var(--ink)}
-html.kbd .send:focus-visible .send-l,.send:active:not(:disabled) .send-l,.send.busy .send-l{translate:var(--p) 0}
-.send:active:not(:disabled) .send-f{background:#00257f}
-.send:disabled{opacity:1}
-/* the three points of the form, one per field, go into the point of the button when nothing is missing */
-.send{--s:clamp(10px,calc(var(--w) * .0072),17px);--gp:clamp(7px,.55vw,12px);--g:clamp(16px,1.9vw,44px)}
-.send .f-dots{position:relative;margin:0 calc(var(--d) + var(--g)) 0 auto;gap:var(--gp)}
-.send .f-dots i{width:var(--s);height:var(--s);box-shadow:none;border:clamp(1.5px,calc(var(--w) * .00085),2px) solid rgb(18 18 20 / .45);transition:background .4s,border-color .4s,translate .8s var(--ease-io),opacity .15s ease .65s}
-.send .f-dots i.ok{background:var(--klein);border-color:var(--klein)}
-.send .f-dots.full i,.send .f-dots.full i:nth-child(1),.send .f-dots.full i:nth-child(3){scale:1;opacity:0;translate:calc(var(--d) / 2 + var(--g) + (3 - var(--n)) * (var(--s) + var(--gp)) + var(--s) / 2) 0;transition-delay:0s,0s,calc((3 - var(--n)) * 90ms),calc(.62s + (3 - var(--n)) * 90ms)}
-.send .f-dots i:nth-child(1){--n:1}.send .f-dots i:nth-child(2){--n:2}.send .f-dots i:nth-child(3){--n:3}
-.send:has(.f-dots.full) .send-f i.ar::before{animation:round .9s var(--ease-io) .7s}
-@keyframes round{to{-webkit-mask-position:var(--d) 0;mask-position:var(--d) 0}}
-.send.busy .f-dots{z-index:2;translate:calc(50% + var(--d) / 2 + var(--g)) 0}.send.busy .f-dots i{opacity:1!important;scale:1;translate:none!important;background:var(--bg);border-color:var(--bg);animation:busy 1s var(--ease-io) infinite;transition:none}
-.send.busy .f-dots i:nth-child(2){animation-delay:.12s}.send.busy .f-dots i:nth-child(3){animation-delay:.24s}
-.send.busy i.ar{opacity:0}
-.send.sent .send-f{clip-path:circle(0 at var(--at));transition-duration:.55s}.send.sent{border-color:var(--klein)}
-@media (max-width:620px){.send{--s:9px;--gp:5px;--g:14px}}
-@media (prefers-reduced-motion:reduce){.btn::before,.send-f,.send .send-l,.btn i.ar::before,.send .f-dots i{transition:none!important;animation:none!important}}
-@media (forced-colors:active){.btn{border:1px solid ButtonText;padding:0 12px}.btn::before,.send-f{display:none}.btn i.ar::before{background:ButtonText}}
+/* Buttons are words, like everything here. The small one is a link in bold with its final point: the point says that it acts. The large one (.send) is a
+   row, like the names and the next stop: the word rolls and turns blue (roll.js). */
+.btn{--c:var(--klein);position:relative;display:inline-flex;align-items:baseline;min-height:44px;padding:.5em 0;font-size:var(--fs-lead);font-weight:700;letter-spacing:-.034em;line-height:1.3;color:var(--ink);background:linear-gradient(currentColor,currentColor) 0 calc(50% + .72em)/100% 2px no-repeat;transition:color .35s,background-size .7s var(--ease),opacity .4s}
+.btn i.ar{flex:none;width:.22em;height:.22em;margin-left:.1em;border-radius:50%;background:var(--c)}
+@media (hover:hover){.btn:hover:not(:disabled){color:var(--c);background-size:0 2px;background-position:100% calc(50% + .72em)}.btn:hover:not(:disabled) i.ar{animation:hop .95s var(--ease)}}
+@keyframes hop{0%{translate:0 0}28%{translate:0 -.5em;animation-timing-function:cubic-bezier(.5,0,.9,.5)}62%{translate:0 0;animation-timing-function:cubic-bezier(.1,.5,.5,1)}78%{translate:0 -.11em;animation-timing-function:cubic-bezier(.5,0,.9,.5)}100%{translate:0 0}}
+.btn:active:not(:disabled){opacity:.6}
+.btn:disabled{opacity:.4;cursor:progress}
+/* the sentence of the form: three points while something is missing, one when it is complete */
+.send{display:flex;align-items:baseline;padding-top:0;border-bottom:1px solid rgb(18 18 20 / .3);text-align:left}
+.send .nm{flex:none}
+.send .f-dots{display:inline-flex;gap:.085em;margin:0 0 0 .085em;font-size:var(--fs-xl);line-height:1}
+.send .f-dots i{width:.155em;height:.155em;border-radius:50%;box-shadow:none;background:rgb(18 18 20 / .17);translate:none;scale:1;transition:background .5s,translate .8s var(--ease-io),opacity .3s}
+.send .f-dots i.ok{background:var(--klein)}
+.send .f-dots.full i{scale:1}
+.send .f-dots.full i:nth-child(1){translate:none;animation:full .8s var(--ease) .55s}
+.send .f-dots.full i:nth-child(2){translate:-.24em 0}.send .f-dots.full i:nth-child(3){translate:-.48em 0}
+@keyframes full{30%{scale:1.34}}
+@media (hover:hover){.send:hover .f-dots i:nth-child(1){background:var(--klein)}.send:hover .f-dots:not(.full) i:nth-child(n+2){opacity:0}}
+.send.busy{color:var(--klein)}
+.send.busy .f-dots i,.send.busy .f-dots i:nth-child(n){opacity:1!important;background:var(--klein);translate:none;animation:busy 1s var(--ease-io) infinite}.send.busy .f-dots i:nth-child(2){animation-delay:.14s}.send.busy .f-dots i:nth-child(3){animation-delay:.28s}
+.send.busy::after{opacity:0}
+.send:disabled{cursor:progress}
+.send.sent>*{opacity:0;translate:0 -.18em;transition:opacity .35s,translate .5s var(--ease-io)}
+.send:active{opacity:1}.send:active .nm{opacity:.7}
+@media (prefers-reduced-motion:reduce){.btn i.ar,.send .f-dots i{animation:none!important;transition:none!important}}
+@media (forced-colors:active){.btn i.ar,.send .f-dots i{background:ButtonText;forced-color-adjust:none}}
 
 /* ---------- Forms ---------- */
 .f-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit;column-gap:var(--gut)}

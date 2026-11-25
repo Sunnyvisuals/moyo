@@ -4,11 +4,8 @@
   const names = [...document.querySelectorAll('.nm')];
   if (!names.length) return;
   const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  names.forEach(n => {
-    if (n.querySelector('.rl')) return;
-    const t = n.textContent.trim();
-    n.innerHTML = `<span class="rl"><span class="r1">${esc(t)}</span><span class="r2" aria-hidden="true">${esc(t)}</span></span>`;
-  });
+  const split = n => { if (n.querySelector('.rl')) return; const t = n.textContent.trim(); if (t) n.innerHTML = `<span class="rl"><span class="r1">${esc(t)}</span><span class="r2" aria-hidden="true">${esc(t)}</span></span>`; };
+  names.forEach(n => { split(n); new MutationObserver(() => split(n)).observe(n, { childList: true }); }); // the word changes with the language, or while a message leaves
   const st = document.createElement('style');
   st.textContent = `.nm .rl{display:block;position:relative;overflow:hidden;padding:.1em .06em .2em 0;margin:-.1em -.06em -.2em 0}
 .nm .r1,.nm .r2{display:block;transition:translate .6s cubic-bezier(.65,0,.15,1),clip-path .6s cubic-bezier(.65,0,.15,1)}
