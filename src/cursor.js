@@ -1,7 +1,8 @@
 /* The cursor is the dot, and like the pictures (divide.js) it divides. One part stays under the hand, exactly where the pointer is, always.
    The other goes to punctuate what is pointed at:
    - a word that can be clicked: it goes to sit at the end of it, as its final point,
-   - an empty place (the choices of the form), the dot of the way, the dot of a question: it goes into it.
+   - an empty place (the choices of the form), the dot of a question: it goes into it.
+   Over the way there is one dot, its own, which goes to the name that is pointed at: the cursor melts, and comes back as the hand leaves.
    Over a picture the dot opens and says what will happen; over a button, an icon or the point of a title (which can be picked up, play.js) it is a
    thin ring; over a text field it gives way to the caret of the system.
    It reads the colour that is really under it: blue on paper, paper on blue and on pictures, and it keeps a fine edge, so it is never lost.
@@ -90,7 +91,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
     const sy = t.closest('[data-say]'); if (sy) return { m: 'say', t: sy.dataset.say }; // admin: what a file zone does
     const ch = t.closest('.chips label,.scale label'); if (ch) return { m: 'word', el: ch, at: place(ch) };
-    const way = t.closest('.path'); if (way) return t.closest('a') ? { m: 'word', el: way, at: middle(way.querySelector(way.matches('.film') ? '.w .path-d' : '.path-d')) } : { m: 'free' }; // it joins the dot of the way
+    if (t.closest('.path')) return { m: 'none' }; // the dot of the way is enough
     const bt = t.closest('.btn'), sd = t.closest('.send'), pt = bt ? bt.querySelector('i.ar') : sd && sd.querySelector('.f-dots i'); if (bt || sd) return { m: (bt || sd).disabled ? 'free' : 'word', el: bt || sd, at: pt && middle(pt) }; // it joins the final point
     if (t.closest('.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     const cta = t.closest('.foot-cta'); if (cta) { const q = cta.querySelector('.qd'); return { m: 'word', el: cta, at: q ? middle(q) : null }; }
@@ -127,7 +128,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     raf = 0; const dt = clamp((t - (last || t)) / 1000 || .016, .004, .05); last = t;
     /* under the hand: exactly where it is; only its size and its shape are eased */
     let to = mode.at && known() ? mode.at() : null; if (to && (to.x < 4 || to.y < 4 || to.x > innerWidth - 4 || to.y > innerHeight - 4)) to = null;
-    const ts = (mode.m === 'say' ? 92 : mode.m === 'ring' ? 46 : to ? BASE * .62 : BASE) * downK;
+    const ts = (mode.m === 'none' ? 0 : mode.m === 'say' ? 92 : mode.m === 'ring' ? 46 : to ? BASE * .62 : BASE) * downK;
     s += (ts - s) * (reduce ? 1 : 1 - Math.exp(-16 * dt));
     vx += ((x - lx) / dt - vx) * (1 - Math.exp(-22 * dt)); vy += ((y - ly) / dt - vy) * (1 - Math.exp(-22 * dt)); lx = x; ly = y;
     const sp = Math.hypot(vx, vy), e = reduce || mode.m === 'say' || mode.m === 'ring' ? 0 : clamp((sp - 500) / 9000, 0, .32);
@@ -150,7 +151,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const t = document.elementFromPoint(x, y), now = pick(t);
     if (now.m !== mode.m || now.el !== mode.el || now.t !== mode.t || now.w !== mode.w) seen = 0;
     mode = now;
-    c.classList.toggle('ring', mode.m === 'ring'); c.classList.toggle('say', mode.m === 'say'); c.classList.toggle('on', mode.m !== 'text');
+    c.classList.toggle('ring', mode.m === 'ring'); c.classList.toggle('say', mode.m === 'say'); c.classList.toggle('on', mode.m !== 'text' && mode.m !== 'none');
     c.classList.toggle('sea', root.classList.contains('mono') || !!(t && t.closest('#menu'))); // on blue, the edge is blue
     if (mode.m === 'say') { const w = mode.t || word(mode.w); if (say.textContent !== w) say.textContent = w; }
     if (mode.blue || mode.m === 'say' && !(t && t.closest('#menu'))) c.classList.remove('inv');

@@ -175,6 +175,8 @@ const FOOTER_CSS = `
 .foot-base a,.foot-base .calm{justify-self:start}
 .calm[aria-pressed="true"]{background-size:100% 1px}
 @media (prefers-reduced-motion:reduce){.foot-base .calm{display:none}}
+.fcopy{display:inline-flex;align-items:center;gap:18px}
+.foot-base .fadm{color:var(--mute)}
 .flang{display:inline-flex;gap:18px}
 .flang button{color:var(--mute)}
 .flang button:hover{color:var(--ink)}
@@ -299,7 +301,7 @@ const footerInner = ({ home = false, team } = {}) => {
     </form>
   </div>
   <div class="g foot-base">
-    <span class="q1" translate="no">© 2026 moyo</span>
+    <span class="q1 fcopy"><span translate="no">© 2026 moyo</span><a class="fadm" href="/admin/" target="_blank" rel="nofollow noopener">Admin</a></span>
     <button type="button" class="calm q2" id="calm" aria-pressed="false" data-i="fCalm">Moins de mouvement</button>
     <span class="flang q3" role="group" aria-label="Langue" data-ia="langAria"><button type="button" data-l="fr" lang="fr" aria-pressed="true">Français</button><button type="button" data-l="en" lang="en" aria-pressed="false">English</button></span>
     <a class="q4" href="${home ? '#top' : '#main'}" data-i="top">Retour en haut</a>
