@@ -2,8 +2,7 @@
    Only a sheet of glass passes over it and covers it (the projects, the studio, the footer: stack.js); it is born again on the new one: the dot draws the
    line as it comes down. Going back up, it is found again under the sheet that leaves. Between two sheets it stays; over the film of the method, what
    is over the picture is white.
-   Pointed at, or reached with the keyboard, the line opens: the names of the sections, and the dot goes to the one you point at. With the hand on the
-   line, the dot is in the hand.
+   Pointed at, or reached with the keyboard, the line opens: the names of the sections, and the dot goes to the one you point at.
    Small screens: the dot only, under the thumb; touched, it opens the names above it. Over the footer only the dot is left: it goes into the eye of the
    wordmark (eyes.js). The other pages have a breadcrumb (.crumbs) and a next stop (.next). */
 (() => {
@@ -60,23 +59,21 @@ function settle(k) {
 function appear(anew) { nav.classList.remove('out'); nav.classList.toggle('back', !anew); nav.classList.add('on'); pos = way; kick(); }
 function move(t) {
   raf = 0; const dt = Math.min(.05, (t - (then || t)) / 1000) || .012; then = t;
-  const goal = hand >= 0 ? hand : over >= 0 ? over / last : small.matches && nav.classList.contains('open') ? cur / last : way;
-  held = hand >= 0 && (held || Math.abs(goal - pos) * navH < 7); // once it has come to the hand, it is in it
-  pos += (goal - pos) * (reduce || held ? 1 : 1 - Math.exp(-dt * (hand >= 0 ? 18 : over >= 0 ? 13 : 10))); if (Math.abs(goal - pos) < .0004) pos = goal;
+  const goal = over >= 0 ? over / last : small.matches && nav.classList.contains('open') ? cur / last : way;
+  pos += (goal - pos) * (reduce ? 1 : 1 - Math.exp(-dt * (over >= 0 ? 13 : 10))); if (Math.abs(goal - pos) < .0004) pos = goal;
   nav.style.setProperty('--p', pos.toFixed(4));
   if (pos !== goal) raf = requestAnimationFrame(move); else then = 0;
 }
-let then = 0, hand = -1, held = false;
+let then = 0;
 function kick() { if (!raf) raf = requestAnimationFrame(move); }
 
 /* open and shut */
 let openY = 0;
 function open() { clearTimeout(leave); openY = scrollY; nav.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); kick(); }
-function shut() { clearTimeout(leave); over = hand = -1; nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); kick(); }
+function shut() { clearTimeout(leave); over = -1; nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); kick(); }
 btn.addEventListener('click', () => nav.classList.contains('open') ? shut() : open());
 nav.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' && !small.matches) open(); });
-nav.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || small.matches) return; const r = nav.getBoundingClientRect(); hand = e.clientX >= r.left && e.clientX <= r.right ? clamp((e.clientY - r.top - r.height / 14) / (r.height * 6 / 7)) : -1; kick(); });
-nav.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !small.matches) { over = hand = -1; kick(); clearTimeout(leave); leave = setTimeout(shut, 160); } });
+nav.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !small.matches) { over = -1; kick(); clearTimeout(leave); leave = setTimeout(shut, 160); } });
 nav.addEventListener('pointerdown', e => { if (!small.matches && e.pointerType !== 'mouse' && !e.target.closest('a')) nav.classList.contains('open') ? shut() : open(); });
 nav.addEventListener('click', e => { if (small.matches && e.target === nav) shut(); }); // a touch beside the names closes them, and opens nothing under them
 nav.addEventListener('focusin', () => { if (root.classList.contains('kbd')) { nav.classList.add('top'); if (!small.matches) open(); } }); // reached with the keyboard, it is above everything
@@ -84,7 +81,7 @@ nav.addEventListener('focusout', e => { if (!nav.contains(e.relatedTarget)) { na
 links.forEach((a, i) => {
   a.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { over = i; kick(); } });
   a.addEventListener('focus', () => { if (root.classList.contains('kbd')) { over = i; kick(); } });
-  a.addEventListener('click', () => { over = hand = -1; if (small.matches || !nav.matches(':hover')) shut(); kick(); });
+  a.addEventListener('click', () => { over = -1; if (small.matches || !nav.matches(':hover')) shut(); kick(); });
 });
 document.addEventListener('pointerdown', e => { if (!nav.contains(e.target)) shut(); });
 addEventListener('keydown', e => { if (e.key !== 'Escape' || !nav.classList.contains('open')) return; if (small.matches && nav.contains(document.activeElement)) btn.focus(); shut(); });

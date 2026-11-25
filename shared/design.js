@@ -304,17 +304,17 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 /* ---------- The way ----------
    Home: one line and one dot in the margin, the dot travels with the scroll (path.js). Pointed at or focused, the line opens on the names.
    Other pages: the same line laid flat above the title (where you come from, where you are), and the next stop at the end.
-   --p: where the dot is (0 to 1), --k: how much the line is open, --row: the height of a name. */
-@property --in{syntax:"<number>";inherits:true;initial-value:0}
-@property --o{syntax:"<number>";inherits:true;initial-value:0}
-@property --k{syntax:"<number>";inherits:true;initial-value:.46}
-.path{--row:clamp(38px,calc(var(--w) * .0232),54px);--pw:min(var(--edge),64px);--px:calc(var(--edge) / 2);--pd:clamp(11px,calc(var(--w) * .0074),17px);--k:.46;
-  position:fixed;z-index:60;right:calc(var(--px) - var(--pw) / 2);top:50%;width:var(--pw);height:calc(var(--row) * 7);translate:0 -50%;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s,--k .8s var(--ease)}
-.path.on{--in:1;opacity:1;visibility:visible;transition:opacity .3s ease,--in 1.5s cubic-bezier(.5,0,.15,1),--k .8s var(--ease)}
-.path.back{transition:opacity .25s ease,--k .8s var(--ease)}
-.path.out{--in:1;transition:opacity .18s ease,visibility 0s .18s}
+   --p: where the dot is (0 to 1), --wk: how much the line is open, --row: the height of a name. */
+@property --wi{syntax:"<number>";inherits:true;initial-value:0}
+@property --wo{syntax:"<number>";inherits:true;initial-value:0}
+@property --wk{syntax:"<number>";inherits:true;initial-value:.46}
+.path{--row:clamp(38px,calc(var(--w) * .0232),54px);--pw:min(var(--edge),64px);--px:calc(var(--edge) / 2);--pd:clamp(11px,calc(var(--w) * .0074),17px);--wk:.46;
+  position:fixed;z-index:60;right:calc(var(--px) - var(--pw) / 2);top:50%;width:var(--pw);height:calc(var(--row) * 7);translate:0 -50%;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s,--wk .8s var(--ease)}
+.path.on{--wi:1;opacity:1;visibility:visible;transition:opacity .3s ease,--wi 1.5s cubic-bezier(.5,0,.15,1),--wk .8s var(--ease)}
+.path.back{transition:opacity .25s ease,--wk .8s var(--ease)}
+.path.out{--wi:1;transition:opacity .18s ease,visibility 0s .18s}
 .path.top{z-index:70!important}
-.path.open{--k:1}
+.path.open{--wk:1}
 .path.end{pointer-events:none}
 /* it fades as a sheet comes over it */
 html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
@@ -327,10 +327,10 @@ html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
 .path-v.w .path-l{background:rgb(250 250 248 / .5)}
 .path.film{--mute:rgb(250 250 248 / .78);--ink:#FAFAF8}
 .path.film ol{--klein:#FAFAF8}
-.path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--k);clip-path:inset(0 0 calc((1 - var(--in,1)) * 100%));pointer-events:none}
-.path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((min(var(--p,0),var(--in,1)) - .5) * var(--row) * 6 * var(--k));scale:min(1,calc(var(--in,1) * 16));pointer-events:none} /* born again, it draws the line as it comes down, and stops at its place */
+.path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--wk);clip-path:inset(0 0 calc((1 - var(--wi,1)) * 100%));pointer-events:none}
+.path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((min(var(--p,0),var(--wi,1)) - .5) * var(--row) * 6 * var(--wk));scale:min(1,calc(var(--wi,1) * 16));pointer-events:none} /* born again, it draws the line as it comes down, and stops at its place */
 .path ol{position:absolute;right:50%;top:0;pointer-events:none}
-.path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);margin-right:calc(var(--pw) / -2);padding:0 calc(28px + var(--pw) / 2) 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
+.path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);padding:0 28px 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
 .path a span{opacity:0;translate:10px 0;transition:opacity .2s ease,translate .4s ease,color .3s}
 .path a[aria-current]{color:var(--ink)}
 .path a:hover,.path a:focus-visible{color:var(--klein)}
@@ -345,20 +345,20 @@ html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
 @media (min-width:2400px){
   .path{--px:calc(var(--edge) - 72px)}
   .path ol{right:auto;left:50%}
-  .path a{justify-content:flex-start;margin:0 0 0 calc(var(--pw) / -2);padding:0 48px 0 calc(30px + var(--pw) / 2)}
+  .path a{justify-content:flex-start;padding:0 48px 0 30px}
   .path a span{translate:-10px 0}
   .path::before{display:none}
 }
 /* small screens: no line in the margin, it would be taken for a scroll bar. The dot waits under the thumb, from the projects on, above the edge where the
-   phone keeps its own gestures; touched, the paper rises, the names with it, and the dot goes to the one you are in. --o: how much it is open */
+   phone keeps its own gestures; touched, the paper rises, the names with it, and the dot goes to the one you are in. --wo: how much it is open */
 @media (max-width:820px){
-  .path{--row:min(48px,calc((100svh - 130px) / 7));--pd:13px;--k:1;--up:calc(env(safe-area-inset-bottom,0px) + 20px);right:max(0px,calc(var(--edge) - 22.5px));top:auto;bottom:var(--up);translate:none;width:58px;height:58px;transition:opacity .4s ease,visibility 0s .4s}
-  .path.on{transition:opacity .3s ease,--in .9s cubic-bezier(.3,1.5,.5,1),--o .8s var(--ease-io)}
-  .path.back{transition:opacity .25s ease,--o .8s var(--ease-io)}
-  .path.open{--o:1;z-index:70!important}
+  .path{--row:min(48px,calc((100svh - 130px) / 7));--pd:13px;--wk:1;--up:calc(env(safe-area-inset-bottom,0px) + 20px);right:max(0px,calc(var(--edge) - 22.5px));top:auto;bottom:var(--up);translate:none;width:58px;height:58px;transition:opacity .4s ease,visibility 0s .4s}
+  .path.on{transition:opacity .3s ease,--wi .9s cubic-bezier(.3,1.5,.5,1),--wo .8s var(--ease-io)}
+  .path.back{transition:opacity .25s ease,--wo .8s var(--ease-io)}
+  .path.open{--wo:1;z-index:70!important}
   .path-b{position:absolute;inset:0;display:block;border-radius:50%}
-  .path-l{top:auto;bottom:calc(100% + var(--row) / 2);translate:none;scale:none;clip-path:inset(calc((1 - var(--o,0)) * 100%) 0 0)}
-  .path-d{box-shadow:0 0 0 3px var(--bg);translate:0 calc((1 - var(--in,1)) * -26px - var(--o,0) * (29px + (6.5 - 6 * var(--p,0)) * var(--row)));scale:var(--in,1)}
+  .path-l{top:auto;bottom:calc(100% + var(--row) / 2);translate:none;scale:none;clip-path:inset(calc((1 - var(--wo,0)) * 100%) 0 0)}
+  .path-d{box-shadow:0 0 0 3px var(--bg);translate:0 calc((1 - var(--wi,1)) * -26px - var(--wo,0) * (29px + (6.5 - 6 * var(--p,0)) * var(--row)));scale:var(--wi,1)}
   .path ol{right:0;left:auto;top:auto;bottom:100%;visibility:hidden;transition:visibility 0s .3s}
   .path.open ol{visibility:visible;transition:none}
   .path a{margin:0;padding:0 58px 0 40px;font-size:clamp(19px,5.2vw,23px);font-weight:600;letter-spacing:-.025em}
@@ -368,7 +368,6 @@ html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
   .path.open::before{translate:0 0;pointer-events:auto}
   .path-v.w .path-d{box-shadow:none}
   .path.film::before{background:linear-gradient(to top,#121214 calc(var(--up) + 58px + var(--row) * 7),rgb(18 18 20 / .9) calc(var(--up) + 58px + var(--row) * 7 + 40px),rgb(18 18 20 / 0) calc(var(--up) + 58px + var(--row) * 7 + 190px))}
-}
 }
 .crumbs ol{display:flex;flex-wrap:wrap;align-items:center;font-size:var(--fs-small);font-weight:500}
 .crumbs li{display:inline-flex;align-items:center}
