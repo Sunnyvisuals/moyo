@@ -27,3 +27,4 @@ export async function onRequestGet(ctx) {
   const lost = await asset('/404');
   return english(new Response(lost.body, { status: 404, headers: lost.headers }), { head: head({ path: '/', lang: 'en', ...LOST.en, robots: 'noindex', alternates: false }) });
 }
+export const onRequestHead = onRequestGet;

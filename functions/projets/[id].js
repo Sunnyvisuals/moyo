@@ -60,3 +60,4 @@ ${scripts}
 }
 
 export const onRequestGet = async ctx => (await page(ctx)) || ctx.next(); // unknown: the 404 page
+export const onRequestHead = onRequestGet;

@@ -169,12 +169,14 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     addEventListener('pointerdown', e => { if (e.pointerType === 'touch') return hide(); downK = .8; kick(); }, { passive: true });
     ['pointerup', 'pointercancel', 'blur', 'dragend'].forEach(n => addEventListener(n, () => { downK = 1; kick(); }, { passive: true }));
     root.addEventListener('mouseleave', hide);
+    document.addEventListener('pointerover', e => { if (e.target.tagName === 'IFRAME') hide(); }); // a frame has its own
     /* whatever opens in the top layer (menu, dialogs), the cursor goes back over it */
     document.addEventListener('toggle', e => { if (e.target !== c) top(); }, true);
     new MutationObserver(m => { if (m.some(r => r.target.tagName === 'DIALOG')) top(); }).observe(document.body, { attributes: true, attributeFilter: ['open'], subtree: true });
     /* from a page to the next it does not disappear */
-    addEventListener('pagehide', () => { try { known() ? sessionStorage.setItem('moyo-cur', [x, y, Date.now()]) : sessionStorage.removeItem('moyo-cur'); } catch (_) {} });
-    try { const p = (sessionStorage.getItem('moyo-cur') || '').split(',').map(Number); if (p.length === 3 && Date.now() - p[2] < 8000 && p[0] > 0 && p[1] > 0 && p[0] < innerWidth && p[1] < innerHeight) come(p[0], p[1]); } catch (_) {}
+    const kept = 'moyo-cur' + (window.top !== window.self ? '-frame' : ''); // a frame does not take the place of the page around it
+    addEventListener('pagehide', () => { try { known() ? sessionStorage.setItem(kept, [x, y, Date.now()]) : sessionStorage.removeItem(kept); } catch (_) {} });
+    try { const p = (sessionStorage.getItem(kept) || '').split(',').map(Number); if (p.length === 3 && Date.now() - p[2] < 8000 && p[0] > 0 && p[1] > 0 && p[0] < innerWidth && p[1] < innerHeight) come(p[0], p[1]); } catch (_) {}
   }
   if (document.body) start(); else addEventListener('DOMContentLoaded', start);
 })();

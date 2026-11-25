@@ -167,7 +167,7 @@ let draftT;
 function keepDraft() { if (!data) return; if (dirty()) { store.set(DRAFT, JSON.stringify({ at: Date.now(), data })); offered = null; $('.df')?.remove(); } else if (!offered) store.set(DRAFT, null); }
 addEventListener('pagehide', keepDraft);
 function touched() { // something changed: the status, and the draft
-  const d = dirty(); $('#save').disabled = !d; $('#revert').hidden = !d; const s = $('#status'); s.classList.toggle('dirty', d); $('span', s).textContent = d ? 'Modifications à publier' : 'Tout est publié';
+  const d = dirty(); $('#save').disabled = !d; $('#revert').hidden = !d; const s = $('#status'); s.classList.toggle('dirty', d); const n = d ? changes().length : 0; $('span', s).textContent = d ? (n ? plural(n, 'modification') : 'Modifications') + ' à publier' : 'Tout est publié';
   clearTimeout(draftT); draftT = setTimeout(keepDraft, 500);
   way();
 }
@@ -182,14 +182,14 @@ function drop(id) { if (!id || id[0] === '/' || savedImages.has(id) || imagesOf(
 /* the object a field belongs to: data-o="project:<id>" | "team:<id>" | "method:<n>" | "cat:<id>" */
 function objOf(el) { const b = el.closest('[data-o]'); if (!b) return null; const [k, v] = b.dataset.o.split(/:(.*)/); return k === 'project' ? data.projects.find(p => p.id === v) : k === 'team' ? data.team.find(p => p.id === v) : k === 'method' ? data.method[+v] : k === 'cat' ? data.categories.find(c => c.id === v) : null; }
 
-async function publish() {
+async function publish() { // true when it is online, null when something is missing
   const p = data.projects.find(x => !x.fr.title.trim() && !blank(x)), m = data.method.findIndex(x => !x.fr.title.trim()), t = data.team.find(x => !(x.name || '').trim());
   data.projects = data.projects.filter(x => !blank(x) || x.fr.title.trim());
   const wrong = p ? ['projets/' + p.id, '.vt', 'Ce projet n’a pas de titre en français.'] : m >= 0 ? ['methode', `[data-o="method:${m}"] .a`, 'Chaque étape a besoin d’un titre en français.'] : t ? ['equipe/' + t.id, '[data-k="first"]', 'Ce profil n’a pas de nom.'] : null;
-  if (wrong) { lang = 'fr'; location.hash = wrong[0]; setTimeout(() => { const f = $(wrong[1]); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); f.scrollIntoView({ block: 'center' }); } }, 120); return toast(wrong[2], true); }
+  if (wrong) { shutPreview(true); lang = 'fr'; location.hash = wrong[0]; setTimeout(() => { const f = $(wrong[1]); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); f.scrollIntoView({ block: 'center' }); } }, 120); toast(wrong[2], true); return null; }
   undo = null; $('#toast').textContent = ''; const s = $('#status'); $('#save').disabled = true; s.classList.add('busy'); $('span', s).textContent = 'Publication…';
-  try { const r = await post('/api/projects', data, 'PUT'); store.set(DRAFT, null); setData(r.data); render(true); toast('Publié. Le site est à jour.'); } catch (e) { fail(e); }
-  s.classList.remove('busy'); if (data) touched();
+  let done = false; try { const r = await post('/api/projects', data, 'PUT'); store.set(DRAFT, null); setData(r.data); render(true); toast('Publié. Le site est à jour.'); done = true; } catch (e) { fail(e); }
+  s.classList.remove('busy'); if (data) touched(); return done;
 }
 $('#save').addEventListener('click', publish);
 $('#revert').addEventListener('click', async () => { if (await ask('Revenir à la version en ligne ?', 'Ce qui n’est pas publié sera perdu.', 'Revenir', 'Garder mes modifications')) { const mine = imagesOf(data); data = JSON.parse(saved); store.set(DRAFT, null); mine.forEach(drop); render(); toast('Vous êtes revenu à la version en ligne.'); } });
@@ -197,6 +197,82 @@ $('#out').addEventListener('click', async () => { if (dirty() && !(await ask('Pa
 addEventListener('beforeunload', e => { if (data && dirty()) { e.preventDefault(); e.returnValue = ''; } });
 addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && data) { e.preventDefault(); if (!$('#save').disabled) publish(); } });
 addEventListener('scroll', () => $('#ab').classList.toggle('on', scrollY > 8), { passive: true });
+
+/* =====================================================================================================
+   Preview: the real site, with what is not published yet (functions/_lib/preview.js), and what changes
+   ===================================================================================================== */
+const copy = x => JSON.parse(JSON.stringify(x)), eq = (x, y) => JSON.stringify(x ?? null) === JSON.stringify(y ?? null);
+const FIELD = { title: 'titre', desc: 'description', type: 'type de projet', role: 'rôle', place: 'lieu', text: 'texte', bio: 'biographie' };
+/* what differs from the published version, in words, and how to put it back */
+function changes() {
+  const a = JSON.parse(saved), out = [], T = (x, l, k) => (x[l] || {})[k] || '';
+  const words = (x, y, role) => { const ks = l => [...new Set([...Object.keys(x[l] || {}), ...Object.keys(y[l] || {})])]; return [...ks('fr').filter(k => T(x, 'fr', k) !== T(y, 'fr', k)).map(k => (k === 'role' && role) || FIELD[k] || k), ...(ks('en').some(k => T(x, 'en', k) !== T(y, 'en', k)) ? ['anglais'] : [])]; };
+  const list = (key, was, now, { name, diff, href, add, del, order, at }) => {
+    const A = new Map(was.map(x => [x.id, x])), B = new Map(now.map(x => [x.id, x])), L = () => data[key], i = id => L().findIndex(x => x.id === id);
+    now.forEach(y => { const x = A.get(y.id); if (!x) out.push({ t: name(y), d: add, href: href(y), back: () => L().splice(i(y.id), 1) }); else { const d = diff(x, y); if (d.length) out.push({ t: name(y), d: d.join(', '), href: href(y), back: () => { L()[i(y.id)] = copy(x); } }); } });
+    was.forEach((x, k) => { if (!B.has(x.id)) out.push({ t: name(x), d: del, href: at, back: () => L().splice(Math.min(k, L().length), 0, copy(x)) }); });
+    const oa = was.filter(x => B.has(x.id)).map(x => x.id), ob = now.filter(x => A.has(x.id)).map(x => x.id); if (!eq(oa, ob)) out.push({ t: order, d: 'ordre', href: at, back: () => { const n = new Map(was.map((x, k) => [x.id, k])); L().sort((x, y) => (n.get(x.id) ?? 1e9) - (n.get(y.id) ?? 1e9)); } });
+  };
+  list('projects', a.projects, data.projects.filter(p => !blank(p) || T(p, 'fr', 'title').trim()), { name: p => T(p, 'fr', 'title') || 'Projet sans titre', add: 'nouveau projet', del: 'retiré du site', order: 'Projets', at: '/projets', href: p => T(p, 'fr', 'title').trim() ? '/projets/' + p.id : '/projets',
+    diff: (x, y) => [...words(x, y, 'rôle du studio'), x.category !== y.category && 'catégorie', (x.year || '') !== (y.year || '') && 'année', x.cover !== y.cover && 'image principale', !eq(x.images || [], y.images || []) && 'galerie', !!x.featured !== !!y.featured && (y.featured ? 'mis sur l’accueil' : 'retiré de l’accueil')].filter(Boolean) });
+  (data.method || []).forEach((y, k) => { const x = (a.method || [])[k]; if (!x) return; const d = [...words(x, y), x.media !== y.media && (isVideo(y.media) ? 'vidéo' : 'image'), (x.fit || 'center') !== (y.fit || 'center') && 'cadrage'].filter(Boolean); if (d.length) out.push({ t: `Méthode, étape ${k + 1}`, d: d.join(', '), href: '/#methode', step: k, back: () => { data.method[k] = copy(x); } }); });
+  list('team', a.team || [], data.team || [], { name: m => m.name || 'Profil sans nom', add: 'nouveau profil', del: 'retiré de l’équipe', order: 'Équipe', at: '/#equipe', href: m => '/equipe/' + m.id, diff: (x, y) => [...words(x, y, 'titre'), (x.name || '') !== (y.name || '') && 'nom', x.photo !== y.photo && 'portrait'].filter(Boolean) });
+  list('categories', a.categories, data.categories, { name: c => c.fr || 'Catégorie sans nom', add: 'nouvelle catégorie', del: 'catégorie supprimée', order: 'Catégories', at: '/projets', href: () => '/projets', diff: (x, y) => [x.fr !== y.fr && 'nom', x.en !== y.en && 'anglais'].filter(Boolean) });
+  return out;
+}
+const P = $('#pv'), pf = $('#pvF'), pv = { w: 'full', lang: 'fr', live: false, warn: [], list: [] }, SCREENS = { tab: [820, 1180], tel: [390, 844] };
+/* where to look first: the page that is being edited */
+const placeOf = () => { const [a, b] = route, p = a === 'projets' && b && data.projects.find(x => x.id === b); return p ? (T0(p) ? '/projets/' + p.id : '/projets') : a === 'projets' || a === 'categories' ? '/projets' : a === 'methode' ? '/#methode' : a === 'equipe' ? (b ? '/equipe/' + b : '/#equipe') : '/'; }, T0 = p => (p.fr?.title || '').trim();
+function addr(path) { const u = new URL((pv.lang === 'en' ? '/en' : '') + (pv.lang === 'en' && path.startsWith('/#') ? path.slice(1) : path) || '/', location.origin); if (pv.lang === 'fr') u.searchParams.set('lang', 'fr'); if (pv.live) u.searchParams.set('en-ligne', '1'); return u.href; }
+/* the address in the frame, without the language and the version */
+function here() { try { const l = pf.contentWindow.location; if (l.protocol === 'about:') return null; return { path: (l.pathname.replace(/^\/en(?=\/|$)/, '') || '/') + l.hash, y: pf.contentWindow.scrollY }; } catch (_) { return null; } }
+let keepY = null;
+function load(path, y = null) { keepY = y; P.classList.add('wait'); const u = addr(path); try { pf.contentWindow.location.replace(u); } catch (_) { pf.src = u; } clearTimeout(load.t); load.t = setTimeout(() => P.classList.remove('wait'), 9000); }
+/* the draft goes to the server, then the page is asked again */
+async function refresh(path, y) {
+  pv.list = changes(); drawList(); P.classList.add('wait');
+  try { const r = await post('/api/preview', { ...data, projects: data.projects.filter(x => !blank(x) || T0(x)) }); pv.warn = r.errors || []; drawList(); load(path, y); } catch (e) { P.classList.remove('wait'); fail(e); }
+}
+function drawList() {
+  const n = pv.list.length, d = dirty(); $('#pvN').textContent = n ? plural(n, 'changement') : d ? 'Aucun changement visible' : 'Tout est publié'; $('#pvN').disabled = !n && !pv.warn.length; $('#pvP').disabled = !d;
+  $('#pvL').innerHTML = `<p class="pv-h">Ce qui change sur le site</p>${n ? `<ul>${pv.list.map((c, i) => `<li><button type="button" class="pv-g" data-i="${i}"><b>${esc(c.t)}</b><span>${esc(c.d)}</span></button><button type="button" class="tx" data-back="${i}" aria-label="Rétablir : ${esc(c.t)}">Rétablir</button></li>`).join('')}</ul>` : '<p>Rien pour l’instant.</p>'}${pv.warn.length ? `<p class="pv-w">${pv.warn.map(esc).join('<br>')}</p>` : ''}`;
+  if (!n && !pv.warn.length) openList(false);
+}
+function openList(v) { $('#pvL').hidden = !v; $('#pvN').setAttribute('aria-expanded', String(v)); }
+function fitFrame() { const f = $('#pvW'), s = SCREENS[pv.w], S = f.parentElement; f.dataset.w = pv.w; f.style.cssText = s ? `width:${s[0]}px;height:${s[1]}px;scale:${Math.min(1, (S.clientHeight - 40) / s[1], (S.clientWidth - 32) / s[0]).toFixed(4)}` : ''; }
+function press() { $$('[data-pv]', P).forEach(b => b.setAttribute('aria-pressed', String(String(pv[b.dataset.pv]) === b.dataset.v))); }
+const mid = e => { const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+function openPreview() {
+  if (P.open || !data) return; const from = $('#see'), [x, y] = mid(from), R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 4;
+  pv.live = false; pv.lang = lang; press(); openList(false); P.showModal(); P.append($('#toast')); fitFrame(); refresh(placeOf(), null);
+  if (!reduce) P.animate([{ clipPath: `circle(0px at ${x}px ${y}px)` }, { clipPath: `circle(${R}px at ${x}px ${y}px)` }], { duration: 760, easing: 'cubic-bezier(.7,0,.2,1)' });
+}
+function shutPreview(now) {
+  if (!P.open) return; const end = () => { P.close(); document.body.append($('#toast')); try { pf.contentWindow.location.replace('about:blank'); } catch (_) {} $('#see').focus({ preventScroll: true }); };
+  if (reduce || now === true) return end(); const [x, y] = mid($('#see')), R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 4;
+  P.animate([{ clipPath: `circle(${R}px at ${x}px ${y}px)` }, { clipPath: `circle(0px at ${x}px ${y}px)` }], { duration: 560, easing: 'cubic-bezier(.7,0,.2,1)' }).finished.then(end, end);
+}
+pf.addEventListener('load', () => {
+  let w, d; try { w = pf.contentWindow; d = w.document; if (w.location.protocol === 'about:') return; } catch (_) { return; }
+  const y = keepY; keepY = null; if (y !== null) { w.scrollTo(0, y); setTimeout(() => w.scrollTo(0, y), 320); }
+  clearTimeout(load.t); P.classList.remove('wait');
+  if (pv.live) d.addEventListener('click', e => { const a = e.target.closest?.('a[href]'); if (!a || a.origin !== location.origin || a.pathname === w.location.pathname) return; const u = new URL(a.href); u.searchParams.set('en-ligne', '1'); a.href = u.href; }, true); // the published version stays the published version
+  w.addEventListener('keydown', e => { if (e.key === 'Escape' && !d.querySelector('dialog[open],#menu:popover-open')) shutPreview(); });
+  w.addEventListener('pointerdown', () => openList(false));
+});
+$('#see').addEventListener('click', openPreview); $('#pvX').addEventListener('click', () => shutPreview());
+P.addEventListener('cancel', e => { e.preventDefault(); $('#pvL').hidden ? shutPreview() : openList(false); });
+$('#pvN').addEventListener('click', () => openList($('#pvL').hidden));
+$('#pvP').addEventListener('click', async () => { $('#pvP').disabled = true; const r = await publish(); if (r === null) return; pv.live = false; press(); const h = here(); if (r) { await refresh(h ? h.path : '/', h ? h.y : null); openList(false); } else drawList(); });
+P.addEventListener('click', e => {
+  const b = e.target.closest('[data-pv],[data-i],[data-back]'); if (!b) return; const h = here() || { path: placeOf(), y: null };
+  if (b.dataset.pv) { const k = b.dataset.pv, v = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (pv[k] === v) return; pv[k] = v; press(); if (k === 'w') fitFrame(); else load(h.path, k === 'live' ? h.y : null); }
+  else if (b.dataset.i) { pv.live = false; press(); openList(false); const c = pv.list[+b.dataset.i]; load(c.href, null); if (c.step >= 0) keepStep = c.step; }
+  else { const mine = imagesOf(data); pv.list[+b.dataset.back].back(); render(true); mine.forEach(drop); pv.live = false; press(); refresh(h.path, h.y); }
+});
+let keepStep = -1; /* a step of the method: the scroll goes to it once the page is there */
+pf.addEventListener('load', () => { if (keepStep < 0) return; const k = keepStep; keepStep = -1; setTimeout(() => { try { const t = pf.contentDocument.querySelectorAll('.tab')[k]; t && t.click(); } catch (_) {} }, 700); });
+addEventListener('resize', () => { if (P.open) fitFrame(); });
 
 /* =====================================================================================================
    What a file is: its dimensions, its proportions, its weight, its format, and what to think of it where it is shown

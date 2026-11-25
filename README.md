@@ -66,7 +66,7 @@ functions/equipe/      page de profil, rendue par le serveur
 functions/projets/     page de projet, rendue par le serveur
 archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres)
 data/projects.json     projets de départ (les 5 exemples)
-functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /img/<id>
+functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /api/preview, /img/<id>
 build.mjs              construit dist/
 wrangler.toml          configuration Cloudflare (projet « moyo », KV « MOYO »)
 ```
@@ -81,6 +81,12 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 - **Attente** : les cinq projets d'exemple et les profils encore en lorem ipsum sont visibles mais en `noindex`, hors du plan du site et de `/llms.txt`. Ils y entrent dès qu'ils sont remplacés dans l'admin.
 - **Image de partage** : `assets/partage-2.png`, dessinée par `scripts/og.mjs`. Pour en changer, donner un nouveau nom de fichier (Discord garde l'ancienne image). Icônes et aperçus des projets : `scripts/icons.mjs`.
 - **À faire avec le compte du studio** : déclarer le site et `sitemap.xml` dans Google Search Console et Bing Webmaster Tools, créer la fiche Google Business Profile. Si le site change de domaine, changer `SITE` dans `shared/seo.js`.
+
+### Aperçu avant publication
+
+- « Aperçu », en haut de l’admin, montre le vrai site avec ce qui n’est pas publié, sur la page en cours : ordinateur, tablette ou téléphone, français ou anglais, brouillon ou version en ligne.
+- La liste des changements dit ce qui va changer, y mène, et permet de rétablir un seul élément. On peut publier de là.
+- Le brouillon part au serveur (`/api/preview`, KV `preview:<hasard>`, une heure) et n’est servi qu’à l’admin connecté, dans un cadre du site (`functions/_lib/preview.js` : cookie de session, cookie `moyo_apercu`, en-tête `Sec-Fetch-Dest: iframe`). Partout ailleurs, le site reste celui qui est publié. Rien n’est envoyé depuis l’aperçu.
 
 ### Images dans l’admin
 

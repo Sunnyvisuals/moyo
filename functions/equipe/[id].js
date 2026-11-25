@@ -64,3 +64,4 @@ ${scripts}
 }
 
 export const onRequestGet = async ctx => (await page(ctx)) || Response.redirect(new URL('/#equipe', ctx.request.url).toString(), 302);
+export const onRequestHead = onRequestGet;
