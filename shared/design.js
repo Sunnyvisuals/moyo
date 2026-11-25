@@ -149,6 +149,9 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 .fld input,.fld textarea{display:block;width:100%;padding:12px 0 14px;border:0;border-bottom:1px solid rgb(18 18 20 / .3);border-radius:0;background:none;font-size:var(--fs-lead);line-height:1.4;outline:none;transition:border-color .4s,box-shadow .4s}
 .fld textarea{resize:vertical;min-height:calc(4.2em + 26px)}
 @supports (field-sizing:content){.fld textarea{field-sizing:content;resize:none;max-height:60vh}}
+/* what the browser fills in keeps the paper and the ink of the page */
+:is(input,textarea):autofill{-webkit-text-fill-color:var(--ink);caret-color:var(--ink);box-shadow:0 0 0 99px var(--bg) inset;transition:background-color 99999s}
+.fld :is(input,textarea):autofill:focus{box-shadow:0 0 0 99px var(--bg) inset,0 1px 0 var(--klein)}
 .fld input:hover,.fld textarea:hover{border-color:var(--ink)}
 .fld input:focus,.fld textarea:focus{border-color:var(--klein);box-shadow:0 1px 0 var(--klein)}
 .f-err{display:block;font-size:var(--fs-small);line-height:1.35;color:#B3261E}
@@ -313,15 +316,21 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 .path.top{z-index:70!important}
 .path.open{--k:1}
 .path.end{pointer-events:none}
-/* it fades at the edge of the next section, and as a sheet comes over it */
-html.stack .path{--msk:linear-gradient(to bottom,#000 calc(100vh + var(--cut,9999px) - 72px),#0000 calc(100vh + var(--cut,9999px) - 2px)) 0 -100vh/100% 300vh repeat-x;-webkit-mask:var(--msk);mask:var(--msk);-webkit-mask-clip:no-clip;mask-clip:no-clip}
+/* it fades as a sheet comes over it */
 html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
 .path.gone .path-d{opacity:0}
 .path-b{display:none}
+/* what is over the film is white, the rest keeps its colours. --fx, --fy: the corner of the film, from the corner of the way */
+.path{--fx:9999px;--fy:9999px}
+.path-v{position:absolute;inset:0;pointer-events:none;clip-path:polygon(-9999px -9999px,9999px -9999px,9999px 9999px,var(--fx) 9999px,var(--fx) var(--fy),-9999px var(--fy))}
+.path-v.w{--klein:#FAFAF8;clip-path:inset(var(--fy) calc(100% - var(--fx)) -9999px -9999px)}
+.path-v.w .path-l{background:rgb(250 250 248 / .5)}
+.path.film{--mute:rgb(250 250 248 / .78);--ink:#FAFAF8}
+.path.film ol{--klein:#FAFAF8}
 .path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--k);clip-path:inset(0 0 calc((1 - var(--in,1)) * 100%));pointer-events:none}
 .path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((min(var(--p,0),var(--in,1)) - .5) * var(--row) * 6 * var(--k));scale:min(1,calc(var(--in,1) * 16));pointer-events:none} /* born again, it draws the line as it comes down, and stops at its place */
 .path ol{position:absolute;right:50%;top:0;pointer-events:none}
-.path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);padding:0 28px 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
+.path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);margin-right:calc(var(--pw) / -2);padding:0 calc(28px + var(--pw) / 2) 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
 .path a span{opacity:0;translate:10px 0;transition:opacity .2s ease,translate .4s ease,color .3s}
 .path a[aria-current]{color:var(--ink)}
 .path a:hover,.path a:focus-visible{color:var(--klein)}
@@ -331,11 +340,12 @@ html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
 /* paper under the names, only while they are there */
 .path::before{content:"";position:absolute;z-index:-1;right:calc(50% - var(--px));top:-50vh;bottom:-50vh;width:calc(var(--px) + 250px);background:linear-gradient(to left,var(--bg) 58%,rgb(250 250 248 / 0));opacity:0;transition:opacity .4s ease;pointer-events:none}
 .path.open::before{opacity:1}
+.path.film::before{background:linear-gradient(to left,rgb(18 18 20 / .72),rgb(18 18 20 / 0))}
 /* very large screens: the line stays near the page, and the names have the margin for themselves */
 @media (min-width:2400px){
   .path{--px:calc(var(--edge) - 72px)}
   .path ol{right:auto;left:50%}
-  .path a{justify-content:flex-start;padding:0 48px 0 30px}
+  .path a{justify-content:flex-start;margin:0 0 0 calc(var(--pw) / -2);padding:0 48px 0 calc(30px + var(--pw) / 2)}
   .path a span{translate:-10px 0}
   .path::before{display:none}
 }
@@ -346,17 +356,18 @@ html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
   .path.on{transition:opacity .3s ease,--in .9s cubic-bezier(.3,1.5,.5,1),--o .8s var(--ease-io)}
   .path.back{transition:opacity .25s ease,--o .8s var(--ease-io)}
   .path.open{--o:1;z-index:70!important}
-  html.stack .path.open{-webkit-mask:none;mask:none}
   .path-b{position:absolute;inset:0;display:block;border-radius:50%}
   .path-l{top:auto;bottom:calc(100% + var(--row) / 2);translate:none;scale:none;clip-path:inset(calc((1 - var(--o,0)) * 100%) 0 0)}
   .path-d{box-shadow:0 0 0 3px var(--bg);translate:0 calc((1 - var(--in,1)) * -26px - var(--o,0) * (29px + (6.5 - 6 * var(--p,0)) * var(--row)));scale:var(--in,1)}
   .path ol{right:0;left:auto;top:auto;bottom:100%;visibility:hidden;transition:visibility 0s .3s}
   .path.open ol{visibility:visible;transition:none}
-  .path a{padding:0 58px 0 40px;font-size:clamp(19px,5.2vw,23px);font-weight:600;letter-spacing:-.025em}
+  .path a{margin:0;padding:0 58px 0 40px;font-size:clamp(19px,5.2vw,23px);font-weight:600;letter-spacing:-.025em}
   .path a span{translate:0 12px}
   .path.open a span{transition:opacity .4s ease calc(.12s + (6 - var(--i)) * 30ms),translate .8s var(--ease) calc(.12s + (6 - var(--i)) * 30ms),color .3s}
   .path::before{right:calc(max(0px,var(--edge) - 22.5px) * -1);top:auto;bottom:calc(var(--up) * -1);width:100vw;height:100vh;height:100lvh;background:linear-gradient(to top,var(--bg) calc(var(--up) + 58px + var(--row) * 7),rgb(250 250 248 / .93) calc(var(--up) + 58px + var(--row) * 7 + 40px),rgb(250 250 248 / 0) calc(var(--up) + 58px + var(--row) * 7 + 190px));translate:0 60px;transition:opacity .45s ease,translate .9s var(--ease)}
   .path.open::before{translate:0 0;pointer-events:auto}
+  .path-v.w .path-d{box-shadow:none}
+  .path.film::before{background:linear-gradient(to top,#121214 calc(var(--up) + 58px + var(--row) * 7),rgb(18 18 20 / .9) calc(var(--up) + 58px + var(--row) * 7 + 40px),rgb(18 18 20 / 0) calc(var(--up) + 58px + var(--row) * 7 + 190px))}
 }
 }
 .crumbs ol{display:flex;flex-wrap:wrap;align-items:center;font-size:var(--fs-small);font-weight:500}

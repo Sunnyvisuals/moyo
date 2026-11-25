@@ -90,7 +90,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
     const sy = t.closest('[data-say]'); if (sy) return { m: 'say', t: sy.dataset.say }; // admin: what a file zone does
     const ch = t.closest('.chips label,.scale label'); if (ch) return { m: 'word', el: ch, at: place(ch) };
-    const way = t.closest('.path'); if (way) return t.closest('a') ? { m: 'word', el: way, at: middle(way.querySelector('.path-d')) } : { m: 'free' }; // it joins the dot of the way
+    const way = t.closest('.path'); if (way) return t.closest('a') ? { m: 'word', el: way, one: true, at: middle(way.querySelector(way.matches('.film') ? '.w .path-d' : '.path-d')) } : { m: 'free' }; // it joins the dot of the way; on it, they are one
     const bt = t.closest('.btn'), sd = t.closest('.send'), pt = bt ? bt.querySelector('i.ar') : sd && sd.querySelector('.f-dots i'); if (bt || sd) return { m: (bt || sd).disabled ? 'free' : 'word', el: bt || sd, at: pt && middle(pt) }; // it joins the final point
     if (t.closest('.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     const cta = t.closest('.foot-cta'); if (cta) { const q = cta.querySelector('.qd'); return { m: 'word', el: cta, at: q ? middle(q) : null }; }
@@ -121,23 +121,23 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   }
 
   /* ---------- motion ---------- */
-  let x = -100, y = -100, lx = x, ly = y, s = BASE, vx = 0, vy = 0, bx = x, by = y, bs = 0, bvx = 0, bvy = 0, mode = { m: 'free' }, raf = 0, last = 0, queued = 0, downK = 1, seen = 0;
+  let x = -100, y = -100, lx = x, ly = y, s = BASE, vx = 0, vy = 0, bx = x, by = y, bs = 0, bvx = 0, bvy = 0, mode = { m: 'free' }, raf = 0, last = 0, queued = 0, downK = 1, seen = 0, stuck = false;
   const known = () => x > -50;
   function frame(t) {
     raf = 0; const dt = clamp((t - (last || t)) / 1000 || .016, .004, .05); last = t;
     /* under the hand: exactly where it is; only its size and its shape are eased */
     let to = mode.at && known() ? mode.at() : null; if (to && (to.x < 4 || to.y < 4 || to.x > innerWidth - 4 || to.y > innerHeight - 4)) to = null;
-    const ts = (mode.m === 'say' ? 92 : mode.m === 'ring' ? 46 : to ? BASE * .62 : BASE) * downK;
+    const ts = (mode.m === 'say' ? 92 : mode.m === 'ring' ? 46 : to ? BASE * .62 : BASE) * downK * (mode.one && to ? clamp((Math.hypot(to.x - x, to.y - y) - to.s / 2) / 20, 0, 1) : 1);
     s += (ts - s) * (reduce ? 1 : 1 - Math.exp(-16 * dt));
     vx += ((x - lx) / dt - vx) * (1 - Math.exp(-22 * dt)); vy += ((y - ly) / dt - vy) * (1 - Math.exp(-22 * dt)); lx = x; ly = y;
     const sp = Math.hypot(vx, vy), e = reduce || mode.m === 'say' || mode.m === 'ring' ? 0 : clamp((sp - 500) / 9000, 0, .32);
-    disc.style.width = disc.style.height = s.toFixed(2) + 'px';
+    disc.style.width = disc.style.height = s.toFixed(2) + 'px'; disc.style.opacity = clamp((s - 1) / 4, 0, 1).toFixed(2);
     disc.style.transform = `translate(${(-s / 2).toFixed(2)}px,${(-s / 2).toFixed(2)}px)` + (e > .01 ? ` rotate(${Math.atan2(vy, vx).toFixed(3)}rad) scale(${(1 + e).toFixed(3)},${(1 / (1 + e)).toFixed(3)})` : '');
     c.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0)`;
     /* the part that goes to the word, and comes back */
     const ox = bx, oy = by, gx = to ? to.x : x, gy = to ? to.y : y, gs = to ? to.s : 0;
     if (!to && bs < .6) { bx = x; by = y; bs = 0; bvx = bvy = 0; }
-    else { const f = reduce ? 1 : 1 - Math.exp(-(to ? 13 : 20) * dt); bx += (gx - bx) * f; by += (gy - by) * f; bs += (gs - bs) * (reduce ? 1 : 1 - Math.exp(-(to ? 12 : 18) * dt)); bvx += ((bx - ox) / dt - bvx) * .3; bvy += ((by - oy) / dt - bvy) * .3; }
+    else { stuck = !!(mode.one && to) && (stuck || Math.hypot(to.x - bx, to.y - by) < 8); const f = reduce || stuck ? 1 : 1 - Math.exp(-(to ? 13 : 20) * dt); bx += (gx - bx) * f; by += (gy - by) * f; bs += (gs - bs) * (reduce ? 1 : 1 - Math.exp(-(to ? 12 : 18) * dt)); bvx += ((bx - ox) / dt - bvx) * .3; bvy += ((by - oy) / dt - bvy) * .3; }
     const bv = Math.hypot(bvx, bvy), be = reduce ? 0 : clamp(bv / 4200, 0, .55);
     part.style.width = part.style.height = bs.toFixed(2) + 'px';
     part.style.transform = `translate(${(bx - x - bs / 2).toFixed(2)}px,${(by - y - bs / 2).toFixed(2)}px)` + (be > .01 ? ` rotate(${Math.atan2(bvy, bvx).toFixed(3)}rad) scale(${(1 + be).toFixed(3)},${(1 / (1 + be)).toFixed(3)})` : '');

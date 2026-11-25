@@ -202,7 +202,7 @@ function optical(scope) {
 /* ---------- Leaving the tab: the dot closes its eye, and waits ---------- */
 const icon = $('link[rel=icon]'), ICON = icon && icon.href; let page = document.title;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'And your idea?' : 'Et votre idée ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FAFAF8'/%3E%3Crect x='8' y='15' width='16' height='3' rx='1.5' fill='%23002FA7'/%3E%3C/svg%3E"; }
+  if (document.hidden) { page = document.title; document.title = lang === 'en' ? 'And your idea?' : 'Et votre idée ?'; if (icon) icon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cstyle%3E@media (prefers-color-scheme:dark)%7B.o%7Bfill:%23FAFAF8%7D.l%7Bfill:%239a9a9e%7D%7D%3C/style%3E%3Ccircle class='o' cx='16' cy='16' r='16' fill='%23121214'/%3E%3Ccircle cx='16' cy='16' r='10' fill='%23FAFAF8'/%3E%3Cpath d='M10 17a6 6 0 0 0 12 0z' fill='%23002FA7'/%3E%3Cpath class='l' d='M5.9 17a10.2 10.2 0 0 1 20.2 0z' fill='%23121214'/%3E%3C/svg%3E"; }
   else { document.title = page; if (icon) icon.href = ICON; }
 });
 
@@ -300,7 +300,7 @@ if (form) {
   const DRAFT = 'moyo-brouillon', read = () => { try { return JSON.parse(sessionStorage.getItem(DRAFT)) || {}; } catch (_) { return {}; } };
   const keepDraft = () => { try { sessionStorage.setItem(DRAFT, JSON.stringify(values())); } catch (_) {} };
   Object.entries(read()).forEach(([k, x]) => $$(`[name="${k}"]`, form).forEach(f => { if (/radio|checkbox/.test(f.type)) f.checked = [].concat(x).includes(f.value); else if (!f.value && typeof x === 'string') f.value = x; }));
-  ['input', 'change'].forEach(n => form.addEventListener(n, keepDraft)); fillDots();
+  ['input', 'change'].forEach(n => form.addEventListener(n, keepDraft)); form.addEventListener('change', fillDots); fillDots(); // what the browser fills in counts too
   // the budget: pressed again it is taken back, and the point can be dragged along its line
   const scale = $('#scale'), stops = $$('label:not(.tbd) input', scale);
   let was = null, held = null;

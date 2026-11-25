@@ -19,10 +19,14 @@ pics.forEach(f => { if (f) media.append(f); });
 films.forEach(v => { if (v) { v.controls = false; v.muted = true; v.setAttribute('aria-hidden', 'true'); } });
 
 let p = 0, on = false, cur = -2;
+const opened = top => { const e = clamp(1 - top / (innerHeight * .62)); return 1 - Math.pow(1 - e, 2); }; // the scene opens as it comes
+/* the edges of the picture on the screen: what is fixed over it (the way) is white inside them */
+const title = box.querySelector('.t-xl');
+window.moyoFilm = () => { const m = media.getBoundingClientRect(), k = 1 - opened(sec.getBoundingClientRect().top + (parseFloat(getComputedStyle(sec).paddingTop) || 0)); return { top: m.top + k * m.height * .11, right: m.right - k * title.offsetLeft }; };
 function read() {
   const H = innerHeight, r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, top = r.top + pad, len = r.height - pad - box.offsetHeight;
   p = clamp(-top / Math.max(1, len)) * n;
-  const e = clamp(1 - top / (H * .62)); sec.style.setProperty('--e', (1 - Math.pow(1 - e, 2)).toFixed(4)); // the scene opens as it comes
+  sec.style.setProperty('--e', opened(top).toFixed(4));
   const k = Math.min(n - 1, Math.floor(Math.min(p, n - .001) + .16)), here = top < H * .3;
   const now = here ? k : -1;
   if (now !== cur) { cur = now;

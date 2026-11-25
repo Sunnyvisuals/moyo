@@ -68,11 +68,6 @@ __CSS__
 .tab.now,.tab:hover{color:var(--bg)}
 .live :focus-visible{outline-color:var(--bg)}
 .live :is(.step p,.tab,.t-xl){text-shadow:0 0 22px rgb(18 18 20 / .45)}
-/* the way is white over the picture */
-.path[data-at=methode]{--mute:rgb(250 250 248 / .78);--ink:#FAFAF8;--klein:#FAFAF8}
-.path[data-at=methode] .path-l{background:rgb(250 250 248 / .5)}
-.path[data-at=methode]::before{background:linear-gradient(to left,rgb(18 18 20 / .72),rgb(18 18 20 / 0))}
-@media (max-width:820px){.path[data-at=methode] .path-d{box-shadow:none}.path[data-at=methode]::before{background:linear-gradient(to top,#121214 calc(var(--up) + 58px + var(--row) * 7),rgb(18 18 20 / .9) calc(var(--up) + 58px + var(--row) * 7 + 40px),rgb(18 18 20 / 0) calc(var(--up) + 58px + var(--row) * 7 + 190px))}}
 @media (min-width:821px) and (max-width:1180px){.mth:not(.live) .steps>.step{grid-column:span 6!important}}
 @media (max-width:820px){
   .step p{margin-top:10px;max-width:44ch}
@@ -187,8 +182,8 @@ __CHROME_HEAD__
     </div>
     <form class="ct-form h2" id="ctForm" action="/api/contact" method="post" novalidate>
       <div class="f-two">
-        <label class="fld"><span class="fl" data-i="fName">Nom</span><input name="name" autocomplete="name" required maxlength="120" aria-describedby="e-name"><small class="f-err" id="e-name"></small></label>
-        <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" required maxlength="200" aria-describedby="e-email"><small class="f-err" id="e-email"></small></label>
+        <label class="fld"><span class="fl" data-i="fName">Nom</span><input name="name" autocomplete="name" autocapitalize="words" spellcheck="false" enterkeyhint="next" required maxlength="120" aria-describedby="e-name"><small class="f-err" id="e-name"></small></label>
+        <label class="fld"><span class="fl" data-i="fMail">E-mail</span><input name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" required maxlength="200" aria-describedby="e-email"><small class="f-err" id="e-email"></small></label>
       </div>
       <fieldset class="chips">
         <legend class="fl"><span data-i="fType">Le projet</span> <span class="opt" data-i="fOptM">(facultatif, plusieurs choix possibles)</span></legend>
@@ -209,7 +204,7 @@ __CHROME_HEAD__
         <label class="tbd"><input type="radio" name="budget" value="tbd"><span><b data-i="bTbd">Je ne sais pas encore</b></span></label>
         <i class="scale-d" aria-hidden="true"></i>
       </div></fieldset>
-      <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" autocomplete="off" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
+      <label class="fld"><span class="fl" data-i="fMsg">Message</span><textarea name="message" rows="3" autocapitalize="sentences" spellcheck="true" required minlength="10" maxlength="5000" aria-describedby="e-message"></textarea><small class="f-err" id="e-message"></small></label>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="f-foot">
         <button class="nm-link send" type="submit"><span class="nm" data-i="fSend">Envoyer</span><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i></span></button>
