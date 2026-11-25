@@ -22,7 +22,7 @@ Le système est décrit et défini dans un seul fichier, `shared/design.js`, uti
 
 | Section | Contenu |
 | --- | --- |
-| Ouverture | Une phrase |
+| Ouverture | Une phrase ; en haut, le studio, l’heure sur place et ce que le soleil va y faire (`src/sky.js`, calculé dans la page), et le chemin vers les projets |
 | Projets | Un accordéon d'images, la légende sur la grille. Ouverture en fiche ; chaque fiche a son adresse (`/projets/<id>`, une vraie page), le bouton Retour la ferme |
 | Services | Sept services, une ligne chacun, et le point au travail sur le quatrième axe (`src/trades.js`). Une ligne qui a des projets y mène |
 | Méthode | Une scène épinglée en plein écran, quatre étapes ; pour chacune une image, une vidéo ou un GIF, choisis dans l'admin, et les mots en blanc par-dessus |
@@ -81,6 +81,14 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 - **Attente** : les cinq projets d'exemple et les profils encore en lorem ipsum sont visibles mais en `noindex`, hors du plan du site et de `/llms.txt`. Ils y entrent dès qu'ils sont remplacés dans l'admin.
 - **Image de partage** : `assets/partage-2.png`, dessinée par `scripts/og.mjs`. Pour en changer, donner un nouveau nom de fichier (Discord garde l'ancienne image). Icônes et aperçus des projets : `scripts/icons.mjs`.
 - **À faire avec le compte du studio** : déclarer le site et `sitemap.xml` dans Google Search Console et Bing Webmaster Tools, créer la fiche Google Business Profile. Si le site change de domaine, changer `SITE` dans `shared/seo.js`.
+
+### Images dans l’admin
+
+- **Déposer** : un fichier se dépose directement sur une image (elle est remplacée), sur les bords d’une image de la galerie (il s’ajoute avant ou après), sur une ligne de la liste des projets ou de l’équipe, sur une étape de la méthode. À côté des images, il va dans la galerie. Coller (Ctrl V) vise l’image sous la souris.
+- **Déplacer** : une image de la galerie se prend directement ; posée sur l’image principale, elle l’échange. Deux étapes de la méthode s’échangent de la même façon. Au clavier et au doigt : la poignée à six points, « Principale », « Retirer ».
+- **Annuler** : pendant huit secondes, dans le message du bas, ou Ctrl Z.
+- **Fiche technique** : dimensions, proportions, poids, format, durée d’une vidéo, temps de chargement en 4G, poids du fichier d’origine, et un avis (point plein : bon ; anneau : suffisant ou lourd ; rouge : à changer). Les seuils sont dans `NEED` (`src/admin.js`).
+- **Envoi** : les images sont réduites dans le navigateur (2800 px, 3840 px pour la méthode), en WebP, sans les données de l’appareil photo (lieu, date).
 
 ### Mot de passe admin
 

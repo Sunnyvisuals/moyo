@@ -78,6 +78,22 @@ body{min-height:100vh;min-height:100svh}
 .m9{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));column-gap:var(--gut);row-gap:clamp(2rem,4vw,4rem);align-items:start}
 .sct{margin-top:clamp(3.5rem,6vw,6.5rem);border-top:1px solid var(--line);padding-top:clamp(1.25rem,2vw,2rem)}
 .sct>h2,.sh{font-size:inherit;font-weight:600;margin-bottom:clamp(1.25rem,2vw,2rem)}
+.sum{margin-left:1em;font-weight:500;color:var(--mute);font-size:var(--fs-small)}
+/* what a file is: its state (a dot: good, enough, to change), then the facts */
+.tec{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;margin-top:10px;min-height:1.5em;font-size:var(--fs-small);line-height:1.5;color:var(--mute);font-variant-numeric:tabular-nums}
+.tec b{font-weight:600;color:var(--ink)}
+.tec i{flex:none;align-self:center;width:9px;height:9px;margin-right:-5px;border-radius:50%;border:1.5px solid var(--klein)}
+.tec i.ok{background:var(--klein)}.tec i.bad{background:var(--red);border-color:var(--red)}
+.tec em{flex-basis:100%;font-style:normal}
+.tec:has(.bad) em{color:var(--red)}
+.tec.mini{flex:none;flex-wrap:nowrap;margin:0;gap:12px}
+.tec.full{display:block;margin-top:clamp(14px,1.4vw,26px)}
+.tec dl{margin:0;border-top:1px solid var(--line)}
+.tec dl>div{display:flex;justify-content:space-between;gap:16px;padding:.5em 0;border-bottom:1px solid var(--line)}
+.tec dd{margin:0;font-weight:600;color:var(--ink);text-align:right}
+.tec.full p{display:flex;align-items:baseline;gap:10px;margin-top:12px}.tec.full p i{align-self:flex-start;margin:.48em 0 0}
+.tec.full:has(.bad) p{color:var(--red)}
+@media (max-width:1180px){.tec.mini{display:none}}
 .none{padding:clamp(3rem,7vw,7rem) 0;color:var(--mute)}
 .none b{display:block;width:72px;aspect-ratio:1;border-radius:50%;background:var(--klein);margin-bottom:28px}
 
@@ -123,19 +139,39 @@ body{min-height:100vh;min-height:100svh}
 /* Files: dropped, chosen or pasted */
 .dz{position:relative;display:block;cursor:pointer}
 .dz>input{position:absolute;inset:0;z-index:2;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
-.dz.over{outline:2px solid var(--klein);outline-offset:6px}
-.dz.plate--none:hover::after{scale:1.12}.dz.plate--none.over::after{scale:1.5}
+.dz.plate--none:hover::after{scale:1.12}
+/* a file above the page, or a picture in the hand: what can take it is ringed, what is under it turns blue and says what will happen.
+   The edges of a picture of the gallery add beside it */
+html.files [data-drop]::before,.can::before,.dz.over.in::before{content:"";position:absolute;inset:0;z-index:6;display:grid;place-items:center;text-align:center;text-wrap:balance;padding:10px;box-shadow:inset 0 0 0 2px var(--klein);color:var(--bg);font-size:clamp(1.0625rem,1.6vw,1.75rem);font-weight:700;letter-spacing:-.034em;line-height:1.08;pointer-events:none}
+html.files [data-drop].over::before,.dz.over.in::before{content:attr(data-to) ".";background:var(--klein)}
+html.files .dz.over.before::before{content:"Avant.";inset:0 60% 0 0}
+html.files .dz.over.after::before{content:"Après.";inset:0 0 0 60%}
+.dz.plate--none::after{transition:scale .5s var(--ease-io),translate .55s cubic-bezier(.22,1,.36,1)}
+html.files .dz.plate--none.over::after{scale:7}html.files .dz.plate--none.over::before{background:none}
+html.files .mt>.dz::before{z-index:3}
+html.files .rw>li[data-drop]::before{box-shadow:none;place-items:center start;text-align:left;padding:0 24px}
+html.files .rw .plate::before{content:"";position:absolute;inset:0;z-index:1;box-shadow:inset 0 0 0 2px var(--klein)}
+html.files .cur{opacity:0!important}
+html:is(.files,.carry) .ts{opacity:0;visibility:hidden}
+/* a picture carried by the hand */
+.ghost{position:fixed;left:0;top:0;z-index:120;width:min(220px,32vw);margin:18px 0 0 18px;pointer-events:none;box-shadow:0 24px 60px rgb(18 18 20 / .28)}
+.ghost :is(img,video){display:block;width:100%;height:100%;object-fit:cover}
+.lift{opacity:.35}
+html.carry,html.carry *{user-select:none;-webkit-user-select:none}
 .dz:has(input:focus-visible){outline:2px solid var(--klein);outline-offset:6px}
 .up{position:absolute;inset:0;z-index:3;display:grid;place-items:center;background:rgb(250 250 248 / .88);opacity:0;visibility:hidden;transition:opacity .3s}
-.busy>.up{opacity:1;visibility:visible}
+.busy>.up,li.busy .plate .up{opacity:1;visibility:visible}
+.rw .up i{width:34px}.rw .up i{mask:radial-gradient(closest-side,#0000 calc(100% - 4px),#000 calc(100% - 3px))}
 .up i{width:72px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--klein) calc(var(--u,0) * 1%),rgb(18 18 20 / .14) 0);mask:radial-gradient(closest-side,#0000 calc(100% - 6px),#000 calc(100% - 5px))}
 .pa{display:flex;flex-wrap:wrap;gap:0 24px;margin-top:8px}
-.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gut)}
-.gal>*{position:relative;aspect-ratio:4/3;background:var(--tint);overflow:clip}
-.gal img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.gal .grip,.gal .x{position:absolute;top:8px;width:44px;height:44px;border-radius:50%;background:var(--bg);color:var(--ink)}
-.gal .grip{left:8px}.gal .x{right:8px;display:grid;place-items:center;font-size:1.1rem;line-height:1;transition:color .3s}
-.gal .x:hover{color:var(--red)}
+.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(22px,2.4vw,40px) var(--gut);align-items:start}
+.gi{position:relative}
+.gal .dz{aspect-ratio:4/3;background:var(--tint);overflow:clip}
+.gal img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:scale .6s var(--ease)}
+.gi.drag{z-index:30}.gi.drag .dz{box-shadow:0 24px 60px rgb(18 18 20 / .26)}.gi.drag .tec{opacity:0}.gi.drag.onto{opacity:.6}
+.ga{display:flex;align-items:center;gap:0 18px}
+.ga .grip{margin-left:-14px}.ga .tx{color:var(--mute)}.ga .tx:hover{color:var(--klein)}.ga .tx.red:hover{color:var(--red)}
+.gi.drag .ga{opacity:0}
 .gal .dz::after{width:22%}
 
 /* Method: what is seen is what is edited */
@@ -155,6 +191,7 @@ body{min-height:100vh;min-height:100svh}
 .mt-w .b{margin-top:1.4cqw;font-size:max(.9375rem,1.75cqw);line-height:1.45}
 .mt .up{background:rgb(18 18 20 / .6)}.mt .up i{background:conic-gradient(var(--bg) calc(var(--u,0) * 1%),rgb(250 250 248 / .25) 0)}
 .mt-c{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 28px;margin:12px 0 clamp(3rem,5vw,5.5rem)}
+.mt-c .tec{flex-basis:100%;margin:0}
 .mt-c .chips{grid-template-columns:repeat(4,auto);column-gap:28px;font-size:var(--fs-small)}.mt-c .chips label span{min-height:44px}
 @media (max-width:620px){.mt-c .chips{grid-template-columns:repeat(2,1fr);width:100%}}
 .mt-k{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;font-weight:600}
@@ -188,6 +225,8 @@ body{min-height:100vh;min-height:100svh}
 .ts p{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 28px;border-radius:27px;background:var(--ink);color:var(--bg);font-size:var(--fs-small);font-weight:600;line-height:1.35;white-space:pre-line;animation:rise .7s var(--ease) both}
 .ts p::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--bg)}
 .ts .err{background:var(--red)}
+.ts button{margin-left:10px;min-height:44px;font-weight:700;pointer-events:auto;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .72em)/100% 1px no-repeat}
+.ts button:hover{opacity:.7}
 @keyframes rise{from{translate:0 30px;opacity:0}}
 .df{display:flex;flex-wrap:wrap;align-items:center;gap:8px 28px;margin-bottom:clamp(1.5rem,3vw,3rem);padding:16px 0;border-top:1px solid var(--klein);border-bottom:1px solid var(--klein);font-size:var(--fs-small)}
 .df p{margin-right:auto;font-weight:600}

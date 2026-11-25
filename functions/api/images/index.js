@@ -3,6 +3,19 @@ import { json, requireAdmin } from '../../_lib/auth.js';
 const TYPES = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/avif': 'avif', 'image/gif': 'gif', 'video/mp4': 'mp4', 'video/webm': 'webm' };
 const MB = 1024 * 1024; // the admin page resizes pictures before upload; these are only ceilings (KV keeps at most 25 MB per file)
 
+/* What is stored, for the admin: the weight and the type of each file. */
+export async function onRequestGet({ request, env }) {
+  const denied = await requireAdmin(request, env);
+  if (denied) return denied;
+  const images = {};
+  if (env.MOYO) for (let cursor, more = true; more;) {
+    const r = await env.MOYO.list({ prefix: 'img:', cursor });
+    for (const k of r.keys) images[k.name.slice(4)] = { size: k.metadata?.size || 0, type: k.metadata?.type || '' };
+    more = !r.list_complete; cursor = r.cursor;
+  }
+  return json({ images });
+}
+
 /* Upload one image, GIF or video as the raw request body. Returns its id; the image is kept once a saved project references it. */
 export async function onRequestPost({ request, env }) {
   const denied = await requireAdmin(request, env);

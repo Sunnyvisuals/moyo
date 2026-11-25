@@ -13,7 +13,7 @@ const HEAD = { 'X-Moyo-Admin': '1' }, DRAFT = 'moyo-admin-brouillon', SEEN = 'mo
 const store = { get: k => { try { return localStorage.getItem(k); } catch (_) { return null; } }, set: (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (_) {} } };
 const dot = '<i class="dot">⁠<b></b></i>';
 
-let me = {}, data = null, saved = '', savedImages = new Set(), msgs = null, lang = 'fr', route = [], offered = null;
+let me = {}, data = null, saved = '', savedImages = new Set(), msgs = null, lang = 'fr', route = [], offered = null, stored = null;
 
 /* ---------- server ---------- */
 async function api(path, opt = {}) {
@@ -33,8 +33,13 @@ const send = (body, type, progress) => new Promise((ok, no) => {
 });
 
 /* ---------- messages, questions ---------- */
-let toastT;
-function toast(text, bad) { const t = $('#toast'); t.innerHTML = `<p${bad ? ' class="err"' : ''}>${esc(text)}</p>`; clearTimeout(toastT); toastT = setTimeout(() => { t.textContent = ''; }, bad ? 7000 : 3400); }
+let toastT, undo = null;
+function toast(text, bad, back) {
+  const t = $('#toast'); undo = back || null; t.innerHTML = `<p${bad ? ' class="err"' : ''}><span>${esc(text)}</span>${back ? '<button type="button">Annuler</button>' : ''}</p>`; if (back) $('button', t).onclick = takeBack;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.textContent = ''; undo = null; }, back ? 8000 : bad ? 7000 : 3400);
+}
+function takeBack() { const f = undo; undo = null; if (f) { f(); toast('Annulé.'); } }
+addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z' && undo && !e.target.matches('textarea,input:not([type=file]):not([type=radio]):not([type=checkbox])')) { e.preventDefault(); takeBack(); } });
 const fail = e => { if (e.message !== '401') toast(e.message, true); };
 function ask(title, text, yes, no = 'Garder', danger = true) {
   const d = $('#ask'); $('#askT').textContent = title; $('#askP').textContent = text || ''; $('#askY span').textContent = yes; $('#askN').textContent = no; $('#askY').className = 'btn' + (danger ? ' red' : '');
@@ -142,7 +147,7 @@ $('#lgF').addEventListener('submit', async e => {
 /* ---------- from the login page to the app: the dot opens from the button and closes on the point of the title ---------- */
 async function enter(from) {
   const d = await api('/api/projects');
-  const go = () => { setData(d); $('#login').hidden = true; $('#app').hidden = false; render(); loadMsgs(); };
+  const go = () => { setData(d); $('#login').hidden = true; $('#app').hidden = false; render(); loadMsgs(); loadStored(); };
   if (reduce || !from) return go();
   const k = document.createElement('div'); k.className = 'kl'; k.style.zIndex = 200; document.body.appendChild(k);
   const q = from.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, far = (a, b) => Math.hypot(Math.max(a, innerWidth - a), Math.max(b, innerHeight - b)) + 4, c = (r, a, b) => `circle(${r.toFixed(0)}px at ${a.toFixed(0)}px ${b.toFixed(0)}px)`;
@@ -171,6 +176,8 @@ const freeId = (base, list, except) => { let id = base || 'sans-titre', n = 2; w
 const catName = id => data.categories.find(c => c.id === id)?.fr || '';
 const blank = p => !p.cover && !(p.images || []).length && !['fr', 'en'].some(l => Object.values(p[l] || {}).some(v => v && v.trim()));
 /* uploaded, then taken away before being published: removed from the storage now */
+/* a change of pictures can be taken back for eight seconds (the message, or Ctrl Z): what it took away is removed from the storage only after that */
+function changed(text, was, gone = []) { render(true); toast(text, false, () => { const now = imagesOf(data); data = JSON.parse(was); render(true); now.forEach(drop); }); const l = gone.filter(Boolean); if (l.length) setTimeout(() => data && l.forEach(drop), 9000); }
 function drop(id) { if (!id || id[0] === '/' || savedImages.has(id) || imagesOf(data).has(id)) return; api('/api/images/' + encodeURIComponent(id), { method: 'DELETE' }).catch(() => {}); }
 /* the object a field belongs to: data-o="project:<id>" | "team:<id>" | "method:<n>" | "cat:<id>" */
 function objOf(el) { const b = el.closest('[data-o]'); if (!b) return null; const [k, v] = b.dataset.o.split(/:(.*)/); return k === 'project' ? data.projects.find(p => p.id === v) : k === 'team' ? data.team.find(p => p.id === v) : k === 'method' ? data.method[+v] : k === 'cat' ? data.categories.find(c => c.id === v) : null; }
@@ -180,7 +187,7 @@ async function publish() {
   data.projects = data.projects.filter(x => !blank(x) || x.fr.title.trim());
   const wrong = p ? ['projets/' + p.id, '.vt', 'Ce projet n’a pas de titre en français.'] : m >= 0 ? ['methode', `[data-o="method:${m}"] .a`, 'Chaque étape a besoin d’un titre en français.'] : t ? ['equipe/' + t.id, '[data-k="first"]', 'Ce profil n’a pas de nom.'] : null;
   if (wrong) { lang = 'fr'; location.hash = wrong[0]; setTimeout(() => { const f = $(wrong[1]); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); f.scrollIntoView({ block: 'center' }); } }, 120); return toast(wrong[2], true); }
-  const s = $('#status'); $('#save').disabled = true; s.classList.add('busy'); $('span', s).textContent = 'Publication…';
+  undo = null; $('#toast').textContent = ''; const s = $('#status'); $('#save').disabled = true; s.classList.add('busy'); $('span', s).textContent = 'Publication…';
   try { const r = await post('/api/projects', data, 'PUT'); store.set(DRAFT, null); setData(r.data); render(true); toast('Publié. Le site est à jour.'); } catch (e) { fail(e); }
   s.classList.remove('busy'); if (data) touched();
 }
@@ -190,6 +197,50 @@ $('#out').addEventListener('click', async () => { if (dirty() && !(await ask('Pa
 addEventListener('beforeunload', e => { if (data && dirty()) { e.preventDefault(); e.returnValue = ''; } });
 addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && data) { e.preventDefault(); if (!$('#save').disabled) publish(); } });
 addEventListener('scroll', () => $('#ab').classList.toggle('on', scrollY > 8), { passive: true });
+
+/* =====================================================================================================
+   What a file is: its dimensions, its proportions, its weight, its format, and what to think of it where it is shown
+   ===================================================================================================== */
+const facts = new Map(); // id -> { w, h, size, time, from }
+async function loadStored() { try { stored = (await api('/api/images')).images || {}; } catch (_) { stored = {}; } facts.forEach(f => { if (!f.size) f.done = false; }); tell(); }
+const ko = n => n < 1048576 ? Math.max(1, Math.round(n / 1024)).toLocaleString('fr-FR') + ' Ko' : mo(n), sec = n => n < .95 ? Math.max(.1, n).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' s' : Math.round(n) + ' s';
+const FORMAT = { webp: 'WebP', jpg: 'JPEG', jpeg: 'JPEG', png: 'PNG', avif: 'AVIF', gif: 'GIF', mp4: 'MP4', webm: 'WebM' }, extOf = id => (id.match(/\.(\w+)$/) || [])[1]?.toLowerCase();
+const RATIOS = [[1, 1], [5, 4], [4, 3], [3, 2], [16, 10], [16, 9], [2, 1], [21, 9]];
+const ratio = (w, h) => { const v = Math.max(w, h) / Math.min(w, h), m = RATIOS.find(([a, b]) => Math.abs(v * b / a - 1) < .012); return m ? (w >= h ? m : [m[1], m[0]]).join(':') : w >= h ? v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ':1' : '1:' + v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }); };
+/* where it is shown, how many pixels it takes on the long side (on the width for a full screen), and from what weight it is slow */
+const NEED = { cover: { min: 1200, good: 2000, heavy: .9, in: 'l’image principale' }, gallery: { min: 1200, good: 2000, heavy: .9, in: 'la galerie' }, photo: { min: 900, good: 1600, heavy: .7, in: 'un portrait' }, media: { min: 1920, good: 2560, heavy: 1.6, in: 'le plein écran' } };
+function about(id) {
+  let f = facts.get(id); if (!f) facts.set(id, f = {}); if (f.done) return f; if (f.wait) return f.wait;
+  return f.wait = (async () => {
+    const u = imgURL(id);
+    if (!f.w) await new Promise(ok => {
+      if (isVideo(id)) { const v = document.createElement('video'), end = () => { v.removeAttribute('src'); v.load(); ok(); }; v.preload = 'metadata'; v.muted = true; v.onloadedmetadata = () => { f.w = v.videoWidth; f.h = v.videoHeight; f.time = isFinite(v.duration) ? v.duration : 0; end(); }; v.onerror = end; v.src = u; }
+      else { const i = new Image(); i.onload = () => { f.w = i.naturalWidth; f.h = i.naturalHeight; ok(); }; i.onerror = ok; i.src = u; }
+    });
+    if (!f.size && stored?.[id]?.size) f.size = stored[id].size;
+    if (!f.size && id[0] === '/') try { const r = await fetch(u, { method: 'HEAD' }); f.size = r.ok ? +r.headers.get('Content-Length') || 0 : 0; } catch (_) {}
+    if (!f.size) f.size = performance.getEntriesByName(new URL(u, location.href).href).reduce((m, e) => Math.max(m, e.encodedBodySize || 0), 0);
+    f.done = !!f.size || !!stored; f.wait = null; return f;
+  })();
+}
+function opinion(id, kind, f) {
+  const n = NEED[kind], film = isVideo(id), gif = isGif(id), L = kind === 'media' ? f.w : Math.max(f.w, f.h), m = f.size / 1048576, say = [];
+  if (L < n.min) say.push(`Petite pour ${n.in} : ${n.min} px au moins, ${n.good} px conseillés.`);
+  if (kind === 'media' && f.h > f.w) say.push('En hauteur : elle sera recadrée sur un grand écran.');
+  if (gif && m > 3) say.push('GIF lourd : en vidéo MP4, il pèserait environ dix fois moins.'); else if (film && m > 10) say.push('Vidéo lourde : visez moins de 10 Mo.'); else if (!film && !gif && m > n.heavy) say.push(`Lourde : visez moins de ${n.heavy < 1 ? n.heavy * 1000 + ' Ko' : mo(n.heavy * 1048576)}.`);
+  return { state: L < n.min * .72 || m > (film ? 18 : gif ? 8 : n.heavy * 2.2) ? 'bad' : say.length || L < n.good ? 'mid' : 'ok', say: say.join(' ') || (L < n.good ? `Suffisante, ${n.good} px serait idéal.` : 'Bonne taille, bon poids.') };
+}
+const tec = (id, kind, mode = '') => id ? `<div class="tec ${mode}" data-tec="${esc(id)}" data-kind="${kind}"></div>` : '';
+const total = ids => Promise.all(ids.map(about)).then(l => ko(l.reduce((s, f) => s + (f.size || 0), 0)));
+function tell() {
+  $$('#view [data-tec]').forEach(async p => { const id = p.dataset.tec, f = await about(id); if (!p.isConnected) return; const mini = p.classList.contains('mini'); if (!f.w) { p.textContent = mini ? '' : 'Fichier introuvable.'; return; }
+    const o = opinion(id, p.dataset.kind, f), size = f.size ? ko(f.size) : '', dot = `<i class="${o.state}"></i>`, kind = FORMAT[extOf(id)] || '', t = f.size ? sec(f.size / 1250000) : ''; // 4G: about ten megabits per second
+    const rows = [['Dimensions', `${f.w} × ${f.h} px`], ['Proportions', ratio(f.w, f.h)], ['Poids', size], ['Format', kind], ['Durée', f.time ? sec(f.time) : ''], ['Chargement en 4G', t], ['Fichier d’origine', f.from ? ko(f.from) : '']].filter(r => r[1]);
+    p.innerHTML = mini ? `${dot}${f.w} × ${f.h}<span>${size}</span>` : p.classList.contains('full') ? `<dl>${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl><p>${dot}${o.say}</p>` : `${dot}<b>${f.w} × ${f.h} px</b>${[rows[1][1], size, kind, f.time ? sec(f.time) : '', ...(p.dataset.kind === 'media' ? [t ? t + ' en 4G' : '', f.from ? ko(f.from) + ' à l’origine' : ''] : [])].filter(Boolean).map(x => `<span>${x}</span>`).join('')}${o.state === 'ok' ? '' : `<em>${o.say}</em>`}`;
+    p.title = o.say; });
+  const put = (sel, ids) => { const e = $(sel); if (e) total(ids).then(x => { if (e.isConnected) e.textContent = ids.length ? `${plural(ids.length, 'fichier')}, ${x}` : 'aucun fichier'; }); }, g = $('#galSum');
+  if (g) put('#galSum', objOf(g)?.images || []); put('#mthSum', data.method.map(m => m.media).filter(Boolean)); put('#allSum', [...imagesOf(data)]);
+}
 
 /* =====================================================================================================
    Places
@@ -215,8 +266,8 @@ function render(keep) {
   route = parse(); const V = $('#view'), y = scrollY;
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
   if (route[0] === 'projets' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.projects, a, b)); if (route[0] === 'equipe' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.team, a, b));
-  if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b)); const g = $('.gal', V); if (g) { const p = objOf(g); sortable(g, (a, b) => moved(p.images, a, b)); }
-  grow(V); touched(); if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+  if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b)); const g = $('.gal', V); if (g) { const p = objOf(g); sortable(g, (a, b) => moved(p.images, a, b), { sel: '.ed-p [data-drop="cover"]', put: i => toCover(p, i) }); }
+  grow(V); touched(); tell(); if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
 }
 const when = t => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(t));
 /* a field as tall as its text, where the browser does not do it by itself */
@@ -225,23 +276,23 @@ const head = (title, act = '') => `<div class="vh"><h1 class="t-xl" tabindex="-1
 const langs = () => `<div class="seg" role="group" aria-label="Langue des textes"><button type="button" data-act="lang" data-l="fr" aria-pressed="${lang === 'fr'}">Français</button><button type="button" data-act="lang" data-l="en" aria-pressed="${lang === 'en'}">English</button></div>`;
 const crumbs = (href, name, here) => `<nav class="crumbs" aria-label="Vous êtes ici"><ol><li><a href="#${href}">${name}</a></li><li aria-current="page"><span>${esc(here)}</span></li></ol></nav>`;
 const field = (label, k, v, { area, ph, w2, max = 200 } = {}) => `<label class="fld${w2 ? ' w2' : ''}"><span class="fl">${label}</span>${area ? `<textarea data-k="${k}" maxlength="${max}" placeholder="${esc(ph)}">${esc(v)}</textarea>` : `<input type="text" data-k="${k}" value="${esc(v)}" maxlength="${max}" placeholder="${esc(ph)}" autocomplete="off">`}</label>`;
-const thumb = (id, v) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt="">`) : '';
+const thumb = (id, v) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt="" draggable="false">`) : '';
 const ring = '<span class="up"><i></i></span>';
-const zone = (act, id, label, accept = 'image/*', cls = 'plate') => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${id ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}"${act === 'gallery' ? ' multiple' : ''}>${ring}</label>`;
+const zone = (act, id, label, accept = 'image/*', cls = 'plate', has = id) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${has ? 'Remplacer' : 'Ajouter'}" data-to="${act === 'gallery' ? 'Ajouter à la galerie' : has ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}"${act === 'gallery' ? ' multiple' : ''}>${ring}</label>`;
 
 /* ---------- projects ---------- */
 function projectsView() {
-  return head('Projets', '<button type="button" class="btn" data-act="newProject"><span>Nouveau projet</span><i class="ar add" aria-hidden="true"></i></button>') + (data.projects.length ? `<ul class="rw">${data.projects.map(p => `<li data-s data-o="project:${esc(p.id)}">
+  return head('Projets', '<button type="button" class="btn" data-act="newProject"><span>Nouveau projet</span><i class="ar add" aria-hidden="true"></i></button>') + (data.projects.length ? `<ul class="rw">${data.projects.map(p => `<li data-s data-o="project:${esc(p.id)}" data-drop="cover" data-to="${p.cover ? 'Changer l’image' : 'Ajouter une image'} de ${esc(p.fr.title || 'ce projet')}">
     <button type="button" class="grip" aria-label="Déplacer ${esc(p.fr.title || 'ce projet')}. Flèches haut et bas."></button>
-    <a class="rw-o" href="#projets/${esc(p.id)}"><span class="plate${p.cover ? '' : ' plate--none'}">${thumb(p.cover)}</span><span style="flex:1;min-width:0"><span class="rw-t">${esc(p.fr.title || 'Sans titre')}</span><span class="rw-s">${esc([catName(p.category), p.year].filter(Boolean).join(', '))}</span></span></a>
-    <label class="tg"><input type="checkbox" data-k="featured"${p.featured ? ' checked' : ''}><i aria-hidden="true"></i><span>Accueil</span></label><a class="rw-o" style="flex:none;padding:14px 6px" href="#projets/${esc(p.id)}" tabindex="-1" aria-hidden="true"><i class="rw-a"></i></a></li>`).join('')}</ul><p class="hint" style="margin-top:18px">L’ordre de la liste est celui du site. Le point bleu : le projet est sur l’accueil.</p>` : '<div class="none"><b></b><p>Aucun projet pour l’instant.</p></div>');
+    <a class="rw-o" href="#projets/${esc(p.id)}"><span class="plate${p.cover ? '' : ' plate--none'}">${thumb(p.cover)}${ring}</span><span style="flex:1;min-width:0"><span class="rw-t">${esc(p.fr.title || 'Sans titre')}</span><span class="rw-s">${esc([catName(p.category), p.year].filter(Boolean).join(', '))}</span></span></a>${tec(p.cover, 'cover', 'mini')}
+    <label class="tg"><input type="checkbox" data-k="featured"${p.featured ? ' checked' : ''}><i aria-hidden="true"></i><span>Accueil</span></label><a class="rw-o" style="flex:none;padding:14px 6px" href="#projets/${esc(p.id)}" tabindex="-1" aria-hidden="true"><i class="rw-a"></i></a></li>`).join('')}</ul><p class="hint" style="margin-top:18px">L’ordre de la liste est celui du site. Le point bleu : le projet est sur l’accueil. Une image se dépose directement sur une ligne. En tout : <span id="allSum"></span>.</p>` : '<div class="none"><b></b><p>Aucun projet pour l’instant.</p></div>');
 }
 function projectView(p) {
   const L = lang, t = p[L] || (p[L] = {}), f = p.fr, ph = k => L === 'en' ? f[k] || '' : '', en = L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : '';
   const live = JSON.parse(saved).projects.some(x => x.id === p.id);
   return `<div class="vb">${crumbs('projets', 'Projets', f.title || 'Nouveau projet')}${langs()}</div><div data-o="project:${esc(p.id)}"><h1 class="sr" tabindex="-1">${esc(f.title || 'Nouveau projet')}</h1>
   <textarea class="vt" rows="1" data-k="${L}.title" maxlength="200" aria-label="Titre du projet" placeholder="${esc(L === 'en' ? f.title || 'Title' : 'Titre du projet')}">${esc(t.title)}</textarea>
-  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div><p class="hint">Choisie, glissée ou collée. Sans image, le point est affiché.</p></div>
+  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${tec(p.cover, 'cover', 'full')}<p class="hint">${p.cover ? 'Déposez un fichier dessus pour la remplacer. Glissez-la sur une image de la galerie pour les échanger.' : 'Choisie, déposée ou collée. Sans image, le point est affiché.'}</p></div>
   <div class="ed-f ef">
     ${field('Description' + en, L + '.desc', t.desc, { area: 1, w2: 1, ph: ph('desc'), max: 6000 })}
     <fieldset class="chips w2"><legend class="fl">Catégorie</legend>${data.categories.map(c => `<label><input type="radio" name="cat" data-k="category" value="${esc(c.id)}"${c.id === p.category ? ' checked' : ''}><span><b>${esc(c.fr)}</b></span></label>`).join('')}</fieldset>
@@ -249,7 +300,7 @@ function projectView(p) {
     ${field('Lieu', L + '.place', t.place, { ph: ph('place') })}${field('Année', 'year', p.year, { max: 12 })}
     <label class="tg w2"><input type="checkbox" data-k="featured"${p.featured ? ' checked' : ''}><i aria-hidden="true"></i><span>Sur la page d’accueil</span></label>
   </div></div>
-  <section class="sct"><h2>Galerie</h2><div class="gal">${(p.images || []).map((id, i) => `<div data-s data-img="${i}"><img src="${imgURL(id)}" alt="Image ${i + 1}" loading="lazy"><button type="button" class="grip" aria-label="Déplacer l’image ${i + 1}. Flèches."></button><button type="button" class="x" data-act="rmImg" aria-label="Retirer l’image ${i + 1}">×</button></div>`).join('')}${zone('gallery', '', 'Ajouter des images à la galerie')}</div><p class="hint">Plusieurs images à la fois. Elles sont réduites à 2400 px.</p></section>
+  <section class="sct"><h2>Galerie<span class="sum" id="galSum"></span></h2><div class="gal">${(p.images || []).map((id, i) => `<div class="gi" data-s data-img="${i}"><label class="dz" data-drop="img" data-say="Remplacer" data-to="Remplacer"><img src="${imgURL(id)}" alt="Image ${i + 1}" loading="lazy" draggable="false"><input type="file" accept="image/*" data-file="img" aria-label="Remplacer l’image ${i + 1}">${ring}</label>${tec(id, 'gallery')}<div class="ga"><button type="button" class="grip" aria-label="Déplacer l’image ${i + 1}. Flèches."></button><button type="button" class="tx" data-act="toCover" aria-label="Mettre l’image ${i + 1} en image principale">Principale</button><button type="button" class="tx red" data-act="rmImg" aria-label="Retirer l’image ${i + 1}">Retirer</button></div></div>`).join('')}${zone('gallery', '', 'Ajouter des images à la galerie')}</div><p class="hint">Glissez une image pour la déplacer, ou sur l’image principale pour les échanger. Un fichier se dépose sur une image pour la remplacer, sur ses bords pour s’ajouter avant ou après.</p></section>
   <section class="sct"><h2>Adresse</h2><div class="ef">${field('moyo-d0n.pages.dev/projets/', 'id', p.id, { max: 60 })}</div><div class="pa" style="margin-top:22px;justify-content:space-between">${live ? `<a class="tx" href="/projets/${esc(p.id)}" target="_blank" rel="noopener">Voir la page en ligne ↗</a>` : '<span></span>'}<button type="button" class="tx red" data-act="rmProject">Supprimer ce projet</button></div></section></div>`;
 }
 
@@ -257,20 +308,20 @@ function projectView(p) {
 const FITS = [['center', 'Au centre'], ['top', 'En haut'], ['bottom', 'En bas'], ['contain', 'En entier']];
 function methodView() {
   const L = lang;
-  return head('Méthode', langs()) + `<p class="vn">Quatre étapes en plein écran sur l’accueil. Écrivez directement sur l’image. Une vidéo est jouée sans son, en boucle. Un format paysage d’au moins 1920 px convient le mieux.</p>` + data.method.map((m, i) => { const t = m[L] || (m[L] = {}); return `<section data-o="method:${i}"><p class="mt-k">Étape ${i + 1}<span>${!m.media ? 'sans image : fond bleu et point' : isVideo(m.media) ? 'vidéo' : isGif(m.media) ? 'GIF' : 'image'}</span></p>
-  <div class="mt${m.media ? ' has' : ''}" data-fit="${esc(m.fit || 'center')}">${zone('media', '', 'Image, vidéo ou GIF de l’étape ' + (i + 1), 'image/*,video/mp4,video/webm', '').replace('<input', thumb(m.media, m.poster) + '<input')}
+  return head('Méthode', langs()) + `<p class="vn">Quatre étapes en plein écran sur l’accueil. Écrivez directement sur l’image. Une vidéo est jouée sans son, en boucle. Un format paysage d’au moins 2560 px convient le mieux. En tout : <span id="mthSum"></span>.</p>` + data.method.map((m, i) => { const t = m[L] || (m[L] = {}); return `<section data-o="method:${i}"><p class="mt-k">Étape ${i + 1}<span>${!m.media ? 'sans image : fond bleu et point' : isVideo(m.media) ? 'vidéo' : isGif(m.media) ? 'GIF' : 'image'}</span></p>
+  <div class="mt${m.media ? ' has' : ''}" data-fit="${esc(m.fit || 'center')}">${zone('media', '', 'Image, vidéo ou GIF de l’étape ' + (i + 1), 'image/*,video/mp4,video/webm', '', m.media).replace('<input', thumb(m.media, m.poster) + '<input')}
   <div class="mt-w"><textarea class="a" rows="1" data-k="${L}.title" maxlength="60" aria-label="Titre de l’étape ${i + 1}" placeholder="${esc(L === 'en' ? m.fr.title || 'Title' : 'Titre')}">${esc(t.title)}</textarea><textarea class="b" rows="2" data-k="${L}.text" maxlength="400" aria-label="Texte de l’étape ${i + 1}" placeholder="${esc(L === 'en' ? m.fr.text || 'Text' : 'Texte')}">${esc(t.text)}</textarea></div></div>
-  <div class="mt-c"><div class="pa" style="margin:0"><button type="button" class="tx" data-act="pick">${m.media ? 'Remplacer' : 'Choisir une image, une vidéo ou un GIF'}</button>${m.media ? '<button type="button" class="tx red" data-act="rmMedia">Retirer</button>' : ''}</div><fieldset class="chips" aria-label="Cadrage">${FITS.map(([v, n]) => `<label><input type="radio" name="fit${i}" data-k="fit" value="${v}"${(m.fit || 'center') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset></div></section>`; }).join('') + '<p class="hint">Image : réduite à 2400 px. GIF : 20 Mo au plus. Vidéo MP4 (H.264) ou WebM : 24 Mo au plus, quelques secondes suffisent.</p>';
+  <div class="mt-c">${tec(m.media, 'media')}<div class="pa" style="margin:0"><button type="button" class="tx" data-act="pick">${m.media ? 'Remplacer' : 'Choisir une image, une vidéo ou un GIF'}</button>${m.media ? '<button type="button" class="tx red" data-act="rmMedia">Retirer</button>' : ''}</div><fieldset class="chips" aria-label="Cadrage">${FITS.map(([v, n]) => `<label><input type="radio" name="fit${i}" data-k="fit" value="${v}"${(m.fit || 'center') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset></div></section>`; }).join('') + '<p class="hint">Un fichier se dépose directement sur une étape. Une image se glisse sur une autre étape pour les échanger. Image : réduite à 3840 px. GIF : 20 Mo au plus. Vidéo MP4 (H.264) ou WebM : 24 Mo au plus, quelques secondes suffisent.</p>';
 }
 
 /* ---------- team ---------- */
 function teamView() {
-  return head('Équipe', '<button type="button" class="btn" data-act="newPerson"><span>Ajouter une personne</span><i class="ar add" aria-hidden="true"></i></button>') + `<ul class="rw">${data.team.map(m => `<li data-s data-o="team:${esc(m.id)}"><button type="button" class="grip" aria-label="Déplacer ${esc(m.name || 'ce profil')}. Flèches haut et bas."></button><a class="rw-o" href="#equipe/${esc(m.id)}"><span class="plate${m.photo ? '' : ' plate--none'}">${thumb(m.photo)}</span><span style="flex:1;min-width:0"><span class="rw-t">${esc(m.name || 'Sans nom')}</span><span class="rw-s">${esc(m.fr?.role)}</span></span><i class="rw-a" aria-hidden="true"></i></a></li>`).join('')}</ul>`;
+  return head('Équipe', '<button type="button" class="btn" data-act="newPerson"><span>Ajouter une personne</span><i class="ar add" aria-hidden="true"></i></button>') + `<ul class="rw">${data.team.map(m => `<li data-s data-o="team:${esc(m.id)}" data-drop="photo" data-to="${m.photo ? 'Changer le portrait' : 'Ajouter un portrait'} de ${esc(m.name || 'ce profil')}"><button type="button" class="grip" aria-label="Déplacer ${esc(m.name || 'ce profil')}. Flèches haut et bas."></button><a class="rw-o" href="#equipe/${esc(m.id)}"><span class="plate${m.photo ? '' : ' plate--none'}">${thumb(m.photo)}${ring}</span><span style="flex:1;min-width:0"><span class="rw-t">${esc(m.name || 'Sans nom')}</span><span class="rw-s">${esc(m.fr?.role)}</span></span>${tec(m.photo, 'photo', 'mini')}<i class="rw-a" aria-hidden="true"></i></a></li>`).join('')}</ul>`;
 }
 function personView(m) {
   const L = lang, t = m[L] || (m[L] = {}), f = m.fr || (m.fr = {}), ph = k => L === 'en' ? f[k] || '' : '', live = JSON.parse(saved).team?.some(x => x.id === m.id);
   return `<div class="vb">${crumbs('equipe', 'Équipe', m.name || 'Nouveau profil')}${langs()}</div><div data-o="team:${esc(m.id)}"><div class="vh"><h1 class="t-xl" tabindex="-1"><span id="who">${esc(m.name || 'Nouveau profil')}</span>${dot}</h1></div>
-  <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait')}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div></div>
+  <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait')}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div>${tec(m.photo, 'photo', 'full')}</div>
   <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${field('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { area: 1, w2: 1, ph: ph('bio'), max: 4000 })}</div></div>
   <section class="sct"><h2>Adresse</h2><div class="ef">${field('moyo-d0n.pages.dev/equipe/', 'id', m.id, { max: 60 })}</div><div class="pa" style="margin-top:22px;justify-content:space-between">${live ? `<a class="tx" href="/equipe/${esc(m.id)}" target="_blank" rel="noopener">Voir la page en ligne ↗</a>` : '<span></span>'}<button type="button" class="tx red" data-act="rmPerson">Retirer de l’équipe</button></div></section></div>`;
 }
@@ -333,10 +384,10 @@ V.addEventListener('click', async e => {
   else if (act === 'draftNo') { offered = null; store.set(DRAFT, null); render(true); }
   else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, tone: 'klein', cover: null, images: [], plate: '', fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
   else if (act === 'newPerson') { const id = freeId('profil', data.team); data.team.push({ id, name: '', first: '', last: '', photo: null, fr: { role: '', bio: '', phrase: '' }, en: { role: '', bio: '', phrase: '' }, links: [] }); lang = 'fr'; location.hash = 'equipe/' + id; }
-  else if (act === 'rmCover') { const x = o.cover; o.cover = null; drop(x); render(true); }
-  else if (act === 'rmPhoto') { const x = o.photo; o.photo = null; drop(x); render(true); }
-  else if (act === 'rmMedia') { const x = [o.media, o.poster]; o.media = o.poster = null; x.forEach(drop); render(true); }
-  else if (act === 'rmImg') { const [x] = o.images.splice(+b.closest('[data-img]').dataset.img, 1); drop(x); render(true); }
+  else if (act === 'toCover') toCover(o, +b.closest('[data-img]').dataset.img);
+  else if (act === 'rmCover' || act === 'rmPhoto') { const was = JSON.stringify(data), k = act === 'rmCover' ? 'cover' : 'photo', x = o[k]; o[k] = null; changed(k === 'cover' ? 'Image principale retirée.' : 'Portrait retiré.', was, [x]); }
+  else if (act === 'rmMedia') { const was = JSON.stringify(data), x = [o.media, o.poster]; o.media = o.poster = null; changed('Étape sans image.', was, x); }
+  else if (act === 'rmImg') { const was = JSON.stringify(data), x = o.images.splice(+b.closest('[data-img]').dataset.img, 1); changed('Image retirée de la galerie.', was, x); }
   else if (act === 'rmProject') { if (await ask(`Supprimer « ${o.fr.title || 'Sans titre'} » ?`, 'Le projet quittera le site à la prochaine publication.', 'Supprimer')) { data.projects.splice(data.projects.indexOf(o), 1); [o.cover, ...(o.images || [])].forEach(drop); location.hash = 'projets'; } }
   else if (act === 'rmPerson') { if (await ask(`Retirer ${o.name || 'ce profil'} de l’équipe ?`, 'Sa page quittera le site à la prochaine publication.', 'Retirer')) { data.team.splice(data.team.indexOf(o), 1); drop(o.photo); location.hash = 'equipe'; } }
   else if (act === 'rmCat') { data.categories.splice(data.categories.indexOf(o), 1); render(true); }
@@ -344,54 +395,104 @@ V.addEventListener('click', async e => {
 });
 
 /* ---------- order: with the pointer or the arrows ---------- */
+/* an image of the gallery and the main one change places (or the gallery gives it, when there was none) */
+function toCover(o, i) { const was = JSON.stringify(data), x = o.images[i], y = o.cover; o.cover = x; if (y) o.images[i] = y; else o.images.splice(i, 1); changed(y ? 'Les deux images ont échangé leur place.' : 'C’est l’image principale.', was); }
+const noClick = () => { const f = e => { e.preventDefault(); e.stopPropagation(); }; addEventListener('click', f, true); setTimeout(() => removeEventListener('click', f, true), 60); }; // the end of a move is not a click
 function moved(list, a, b) { list.splice(b, 0, list.splice(a, 1)[0]); render(true); $$('#view [data-s] .grip')[b]?.focus({ preventScroll: true }); }
-function sortable(box, done) {
+function sortable(box, done, onto) {
   if (!box) return; const items = () => [...box.children].filter(c => c.hasAttribute('data-s'));
   box.addEventListener('keydown', e => { const g = e.target.closest('.grip'), d = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key]; if (!g || !d) return; e.preventDefault(); const l = items(), a = l.indexOf(g.closest('[data-s]')), b = clamp(a + d, 0, l.length - 1); if (a !== b) done(a, b); });
   box.addEventListener('pointerdown', e => {
-    const g = e.target.closest('.grip'); if (!g || e.button) return; e.preventDefault();
+    const grip = e.target.closest('.grip'), g = grip || (onto && e.pointerType !== 'touch' && !e.target.closest('button') && e.target.closest('[data-img] .dz')); if (!g || e.button) return; if (grip) e.preventDefault(); // by its handle, or directly by the picture
     const l = items(), from = l.indexOf(g.closest('[data-s]')), me = l[from], S = l.map(i => { const r = i.getBoundingClientRect(); return { x: r.left, y: r.top + scrollY, w: r.width, h: r.height }; }), col = S.every(s => Math.abs(s.x - S[0].x) < 4), gap = col && S[1] ? S[1].y - S[0].y - S[0].h : 0;
-    const sx = e.clientX, sy = e.clientY + scrollY; let to = from, px = e.clientX, py = e.clientY, raf = 0; me.classList.add('drag'); box.classList.add('sorting'); try { g.setPointerCapture(e.pointerId); } catch (_) {}
+    const sx = e.clientX, sy = e.clientY + scrollY; let to = from, px = e.clientX, py = e.clientY, raf = 0, on = false, main = null; const begin = () => { on = true; me.classList.add('drag'); box.classList.add('sorting'); root.classList.add('carry'); getSelection()?.removeAllRanges(); raf = requestAnimationFrame(edge); }; if (grip) try { g.setPointerCapture(e.pointerId); } catch (_) {}
     const place = () => { const o = l.map((_, i) => i).filter(i => i !== from); o.splice(to, 0, from); let y = S[0].y; o.forEach((i, k) => { const ty = col ? y : S[k].y, tx = col ? S[i].x : S[k].x; y += S[i].h + gap; if (i !== from) l[i].style.translate = `${tx - S[i].x}px ${ty - S[i].y}px`; }); };
-    const step = () => { me.style.translate = `${col ? 0 : px - sx}px ${py + scrollY - sy}px`; const cx = S[from].x + S[from].w / 2 + (col ? 0 : px - sx), cy = S[from].y + S[from].h / 2 + py + scrollY - sy; let best = to, d = 1e9; S.forEach((s, k) => { const q = Math.hypot(s.x + s.w / 2 - cx, s.y + s.h / 2 - cy); if (q < d) { d = q; best = k; } }); if (best !== to) { to = best; place(); } };
+    const step = () => { me.style.translate = `${col ? 0 : px - sx}px ${py + scrollY - sy}px`; const cx = S[from].x + S[from].w / 2 + (col ? 0 : px - sx), cy = S[from].y + S[from].h / 2 + py + scrollY - sy; let best = to, d = 1e9; S.forEach((s, k) => { const q = Math.hypot(s.x + s.w / 2 - cx, s.y + s.h / 2 - cy); if (q < d) { d = q; best = k; } }); const c = onto && document.elementFromPoint(px, py)?.closest(onto.sel); if (c !== main) { main?.classList.remove('over', 'in'); main = c || null; main?.classList.add('over', 'in'); me.classList.toggle('onto', !!main); } if (main) best = from; if (best !== to) { to = best; place(); } };
     const edge = () => { const v = py < 120 ? (py - 120) / 7 : py > innerHeight - 90 ? (py - innerHeight + 90) / 7 : 0; if (v) { scrollBy(0, v); step(); } raf = requestAnimationFrame(edge); };
-    const mv = q => { px = q.clientX; py = q.clientY; step(); };
-    const end = () => { cancelAnimationFrame(raf); removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); l.forEach(i => { i.style.translate = ''; i.style.transition = 'none'; }); me.classList.remove('drag'); box.classList.remove('sorting'); requestAnimationFrame(() => l.forEach(i => { i.style.transition = ''; })); if (to !== from) done(from, to); };
-    addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end); raf = requestAnimationFrame(edge);
+    const mv = q => { px = q.clientX; py = q.clientY; if (!on) { if (Math.hypot(px - sx, py + scrollY - sy) < 7) return; begin(); } step(); };
+    const end = () => { cancelAnimationFrame(raf); removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); if (!on) return; if (!grip) noClick(); root.classList.remove('carry'); main?.classList.remove('over', 'in'); me.classList.remove('onto'); l.forEach(i => { i.style.translate = ''; i.style.transition = 'none'; }); me.classList.remove('drag'); box.classList.remove('sorting'); requestAnimationFrame(() => l.forEach(i => { i.style.transition = ''; })); if (main) onto.put(from); else if (to !== from) done(from, to); };
+    addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end); if (grip) begin();
   });
 }
 
-/* ---------- files: chosen, dropped or pasted ---------- */
-const dzOf = e => e.target.closest?.('[data-drop]');
-V.addEventListener('dragover', e => { const d = dzOf(e); if (d) { e.preventDefault(); d.classList.add('over'); } });
-V.addEventListener('dragleave', e => { const d = dzOf(e); if (d && !d.contains(e.relatedTarget)) d.classList.remove('over'); });
-V.addEventListener('drop', e => { const d = dzOf(e); if (!d) return; e.preventDefault(); d.classList.remove('over'); take(d.dataset.drop, e.dataTransfer.files, d, objOf(d)); });
-addEventListener('dragover', e => e.preventDefault()); addEventListener('drop', e => e.preventDefault()); // a file dropped beside does not replace the page
-addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])].filter(x => x.type.startsWith('image/')); if (!f.length || !data || !route[1]) return; const z = route[0] === 'projets' ? $(objOf($('#view [data-drop]')).cover ? '[data-drop="gallery"]' : '[data-drop="cover"]') : route[0] === 'equipe' ? $('[data-drop="photo"]') : null; if (z) { e.preventDefault(); take(z.dataset.drop, f, z, objOf(z)); } });
-async function take(what, files, z, o) {
+/* ---------- a picture is taken directly, and exchanged with the one it is put on: main image and gallery, steps of the method ---------- */
+V.addEventListener('mousedown', e => { if (!e.button && e.target.closest('.dz')) e.preventDefault(); }); // no text is selected on the way
+V.addEventListener('pointerdown', e => {
+  const z = e.target.closest('.ed-p .dz[data-drop="cover"],.mt .dz[data-drop="media"]'), o = z && objOf(z), what = z?.dataset.drop; if (!z || e.button || e.pointerType === 'touch' || !o[what] || z.classList.contains('busy')) return;
+  const sel = what === 'cover' ? '.gal .dz[data-drop="img"]' : '.mt .dz[data-drop="media"]', x0 = e.clientX, y0 = e.clientY; let g = null, at = null, px = x0, py = y0, raf = 0;
+  const look = () => { g.style.translate = `${px}px ${py}px`; const d = document.elementFromPoint(px, py)?.closest(sel), t = d && d !== z ? d : null; if (t !== at) { at?.classList.remove('over', 'in'); at = t; at?.classList.add('over', 'in'); } };
+  const edge = () => { const v = py < 110 ? (py - 110) / 7 : py > innerHeight - 90 ? (py - innerHeight + 90) / 7 : 0; if (v) { scrollBy(0, v); look(); } raf = requestAnimationFrame(edge); };
+  const mv = q => {
+    px = q.clientX; py = q.clientY;
+    if (!g) { if (Math.hypot(px - x0, py - y0) < 7) return; const p = z.querySelector('img,video'), r = p.getBoundingClientRect(), c = p.cloneNode(); g = document.createElement('div'); g.className = 'ghost'; g.style.aspectRatio = `${r.width}/${r.height}`; c.removeAttribute('autoplay'); g.append(c); document.body.append(g); z.classList.add('lift'); root.classList.add('carry'); $$(sel).forEach(d => { if (d !== z) { d.classList.add('can'); d.dataset.was = d.dataset.to; d.dataset.to = 'Échanger'; } }); raf = requestAnimationFrame(edge); }
+    look();
+  };
+  const end = q => {
+    removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); if (!g) return; cancelAnimationFrame(raf); noClick(); g.remove(); z.classList.remove('lift'); root.classList.remove('carry'); $$('.can').forEach(d => { d.classList.remove('can', 'over', 'in'); d.dataset.to = d.dataset.was; });
+    if (!at || q.type === 'pointercancel') return;
+    if (what === 'cover') toCover(o, +at.closest('[data-img]').dataset.img);
+    else { const was = JSON.stringify(data), b = objOf(at); ['media', 'poster', 'fit'].forEach(k => { [o[k], b[k]] = [b[k] ?? null, o[k] ?? null]; }); [o, b].forEach(m => { m.fit ||= 'center'; }); changed('Les deux étapes ont échangé leur image.', was); }
+  };
+  addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end);
+});
+addEventListener('dragstart', e => { if (e.target.closest?.('#view') && !e.target.matches('input,textarea')) e.preventDefault(); }); // the browser does not take the pictures away
+
+/* ---------- files: chosen, dropped directly on the pictures, or pasted ---------- */
+const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+let aim = null; // the picture under the file, and which part of it: the middle replaces, the edges add before or after
+function aimAt(d, e) {
+  let side = 'in'; if (d?.dataset.drop === 'img') { const r = d.getBoundingClientRect(), k = (e.clientX - r.left) / r.width, many = e.dataTransfer.items?.length > 1; side = k < (many ? .5 : .26) ? 'before' : k > (many ? .5 : .74) ? 'after' : 'in'; }
+  if (aim && (aim.d !== d || aim.side !== side)) aim.d.classList.remove('over', 'before', 'after', 'in');
+  aim = d ? { d, side } : null; if (d) d.classList.add('over', side);
+}
+/* beside the pictures, a file still has a place: the main image of the project if it has none, its gallery, the portrait */
+const spare = () => $('#view [data-drop]:hover') || (!data || !route[1] ? null : route[0] === 'projets' && $('#view .gal') ? $(objOf($('#view .gal')).cover ? '#view [data-drop="gallery"]' : '#view [data-drop="cover"]') : route[0] === 'equipe' ? $('#view [data-drop="photo"]') : null);
+let awayT; const away = () => { clearTimeout(awayT); root.classList.remove('files'); aimAt(null); };
+addEventListener('dragover', e => { e.preventDefault(); if (!data || !hasFiles(e)) return; clearTimeout(awayT); root.classList.add('files'); const d = V.contains(e.target) ? e.target.closest('[data-drop]') : null; aimAt(d, e); e.dataTransfer.dropEffect = d || spare() ? 'copy' : 'none'; });
+addEventListener('dragleave', e => { if (!e.relatedTarget) { clearTimeout(awayT); awayT = setTimeout(away, 120); } }); addEventListener('dragend', away);
+addEventListener('drop', e => {
+  e.preventDefault(); const at = aim, f = e.dataTransfer?.files, t = [...(e.dataTransfer?.types || [])]; away(); if (!data) return;
+  if (!f?.length) { if (t.includes('text/uri-list') || t.includes('text/html')) toast('Cette image vient d’une page web. Enregistrez-la d’abord sur l’ordinateur, puis déposez le fichier.', true); return; }
+  const z = at?.d || spare(); if (!z) return toast('Déposez le fichier sur une image.', true);
+  take(z.dataset.drop, f, z, objOf(z), at?.side);
+});
+addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])].filter(x => x.type.startsWith('image/')), z = f.length && spare(); if (z) { e.preventDefault(); take(z.dataset.drop, f, z, objOf(z)); } });
+/* what was sent, in one line */
+const gain = ids => { const l = ids.map(i => facts.get(i)).filter(Boolean), now = l.reduce((s, f) => s + (f.size || 0), 0), was = l.reduce((s, f) => s + (f.from || f.size || 0), 0); return `${l.length === 1 && l[0].w ? `${l[0].w} × ${l[0].h} px, ` : ''}${ko(now)}${was > now * 1.08 ? ` (${ko(was)} au départ)` : ''}`; };
+async function take(what, files, z, o, side = 'in') {
   const list = [...files]; if (!list.length || !o) return; const say = p => z.style.setProperty('--u', p); z.classList.add('busy'); say(4);
-  const here = route.join('/');
+  const here = route.join('/'), was = JSON.stringify(data), end = (text, gone) => { if (route.join('/') === here) changed(text, was, gone); else { touched(); toast(text); } };
+  const many = async l => { const got = []; for (let n = 0; n < l.length; n++) got.push(await picture(l[n], p => say(Math.round((n + p / 100) / l.length * 100)))); return got; };
   try {
-    if (what === 'gallery') { let n = 0; for (const f of list) { if (!f.type.startsWith('image/')) continue; say(Math.round(n / list.length * 100)); (o.images ||= []).push(await picture(f)); n++; } if (!n) throw new Error('Choisissez des images.'); toast(n > 1 ? `${n} images ajoutées.` : 'Image ajoutée.'); }
-    else if (what === 'media') { const r = await film(list[0], say), x = [o.media, o.poster]; o.media = r.id; o.poster = r.poster; x.forEach(drop); }
-    else { const id = await picture(list[0], say), x = o[what]; o[what] = id; drop(x); }
-    if (route.join('/') === here) render(true); else touched();
+    if (what === 'gallery' || what === 'img') {
+      const l = list.filter(f => f.type.startsWith('image/')); if (!l.length) throw new Error('Choisissez des images.'); o.images ||= [];
+      const i = what === 'img' ? +z.closest('[data-img]').dataset.img : 0, swap = what === 'img' && side === 'in' && l.length === 1;
+      if (!swap && o.images.length + l.length > 40) throw new Error('40 images au plus par projet.');
+      const got = await many(l); const x = swap ? o.images.splice(i, 1, got[0]) : []; if (!swap) o.images.splice(what === 'img' ? i + (side === 'before' ? 0 : 1) : o.images.length, 0, ...got);
+      end(`${swap ? 'Image remplacée' : got.length > 1 ? got.length + ' images ajoutées' : 'Image ajoutée'} : ${gain(got)}.`, x);
+    }
+    else if (what === 'media') { const r = await film(list[0], say), x = [o.media, o.poster]; o.media = r.id; o.poster = r.poster; await about(r.id); end(`${isVideo(r.id) ? 'Vidéo' : isGif(r.id) ? 'GIF' : 'Image'} : ${gain([r.id])}.`, x); }
+    else { const id = await picture(list[0], say), x = o[what]; o[what] = id; const more = what === 'cover' ? list.slice(1).filter(f => f.type.startsWith('image/')) : []; if (more.length) (o.images ||= []).push(...await many(more.slice(0, 40 - (o.images || []).length))); end(`${what === 'photo' ? 'Portrait' : 'Image principale'} : ${gain([id])}.${more.length ? ' Les autres sont dans la galerie.' : ''}`, [x]); }
   } catch (e) { z.classList.remove('busy'); fail(e); }
 }
-/* reduced in the browser before it is sent: 2400 px on the long side, WebP (JPEG where WebP is not available). A GIF is sent as it is. */
-async function picture(f, say) {
+/* reduced in the browser before it is sent: 2800 px on the long side (3840 for a full screen), WebP (JPEG where WebP is not available). A GIF is sent as it is. */
+const WEB = ['image/webp', 'image/jpeg', 'image/png', 'image/avif', 'image/gif'];
+async function picture(f, say, max = 2800) {
   if (!f.type.startsWith('image/')) throw new Error('Choisissez une image.');
-  let blob = f;
-  if (f.type !== 'image/gif') try { const b = await createImageBitmap(f), s = Math.min(1, 2400 / Math.max(b.width, b.height)), c = document.createElement('canvas'); c.width = Math.round(b.width * s); c.height = Math.round(b.height * s); c.getContext('2d').drawImage(b, 0, 0, c.width, c.height); blob = await new Promise(r => c.toBlob(r, 'image/webp', .86)); if (!blob || blob.type !== 'image/webp') blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .88)); } catch (_) { blob = f; }
-  const max = blob.type === 'image/gif' ? 20 : 10; if (blob.size > max * 1048576) throw new Error(`${blob.type === 'image/gif' ? 'GIF trop lourd' : 'Image trop lourde'} (${mo(blob.size)}, ${max} Mo au plus).`);
-  return send(blob, blob.type, say);
+  let blob = f, w = 0, h = 0;
+  try { const b = await createImageBitmap(f); w = b.width; h = b.height;
+    if (f.type !== 'image/gif') { const s = Math.min(1, max / Math.max(w, h)), c = document.createElement('canvas'); c.width = w = Math.round(w * s); c.height = h = Math.round(h * s); const k = c.getContext('2d'); k.imageSmoothingQuality = 'high'; k.drawImage(b, 0, 0, w, h); const goal = (max > 3000 ? 1.4 : .8) * 1048576; for (const q of [.86, .8, .74]) { const to = t => new Promise(r => c.toBlob(r, t, q)); blob = await to('image/webp'); if (!blob || blob.type !== 'image/webp') blob = await to('image/jpeg'); if (blob.size <= goal) break; } } // as fine as it can be under that weight
+    b.close?.();
+  } catch (_) { if (!WEB.includes(f.type)) throw new Error(`Le format ${(f.type.split('/')[1] || '').replace('svg+xml', 'SVG').toUpperCase() || 'de ce fichier'} n’est pas lu par les navigateurs. Exportez l’image en JPEG, PNG ou WebP.`); blob = f; }
+  const top = blob.type === 'image/gif' ? 20 : 10; if (blob.size > top * 1048576) throw new Error(`${blob.type === 'image/gif' ? 'GIF trop lourd' : 'Image trop lourde'} (${mo(blob.size)}, ${top} Mo au plus).`);
+  const id = await send(blob, blob.type, say); facts.set(id, { w, h, size: blob.size, from: blob === f ? 0 : f.size, done: !!w }); return id;
 }
 async function film(f, say) {
-  if (f.type.startsWith('image/')) { if (f.type === 'image/gif' && f.size > 20 * 1048576) throw new Error(`GIF trop lourd (${mo(f.size)}, 20 Mo au plus). Une vidéo MP4 serait dix fois plus légère.`); return { id: await picture(f, say), poster: null }; }
+  if (f.type.startsWith('image/')) { if (f.type === 'image/gif' && f.size > 20 * 1048576) throw new Error(`GIF trop lourd (${mo(f.size)}, 20 Mo au plus). Une vidéo MP4 serait dix fois plus légère.`); return { id: await picture(f, say, 3840), poster: null }; }
   if (!f.type.startsWith('video/')) throw new Error('Choisissez une image, une vidéo MP4 ou WebM, ou un GIF.');
   if (!['video/mp4', 'video/webm'].includes(f.type)) throw new Error('Ce format de vidéo n’est pas lu par tous les navigateurs. Exportez-la en MP4 (H.264).');
   if (f.size > 24 * 1048576) throw new Error(`Vidéo trop lourde (${mo(f.size)}, 24 Mo au plus). Raccourcissez-la ou baissez sa qualité.`);
-  const poster = await first(f); return { id: await send(f, f.type, say), poster };
+  const poster = await first(f), id = await send(f, f.type, say); facts.set(id, { size: f.size }); return { id, poster };
 }
 /* the first picture of a video, shown while it loads */
 const first = f => new Promise(done => {

@@ -82,7 +82,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   const place = l => () => { const p = l.querySelector('span'), a = getComputedStyle(p, '::after'), r = l.getBoundingClientRect(), w = parseFloat(a.width); return w ? { x: r.left + parseFloat(a.left) + w / 2, y: r.top + parseFloat(a.top) + w / 2, s: w * .5, c: '#002FA7' } : null; }; // the empty place of a choice: a pupil in its ring
 
   function pick(t) {
-    if (!t || root.classList.contains('holding')) return { m: 'free' };
+    if (!t || root.matches('.holding,.carry')) return { m: 'free' };
     if (t.closest(TEXT)) return { m: 'text' };
     if (t.closest('h1 .dot b,.ball')) return { m: 'ring', blue: true };
     if (t.closest('.eye .hit')) return { m: 'say', w: 'hold' };
