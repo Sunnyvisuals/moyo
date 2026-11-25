@@ -176,6 +176,9 @@ function drop(id) { if (!id || id[0] === '/' || savedImages.has(id) || imagesOf(
 function objOf(el) { const b = el.closest('[data-o]'); if (!b) return null; const [k, v] = b.dataset.o.split(/:(.*)/); return k === 'project' ? data.projects.find(p => p.id === v) : k === 'team' ? data.team.find(p => p.id === v) : k === 'method' ? data.method[+v] : k === 'cat' ? data.categories.find(c => c.id === v) : null; }
 
 async function publish() {
+  for (const x of data.team) x.links = (x.links || []).filter(l => (l.url || '').trim()).map(l => ({ url: l.url.trim(), label: (l.label || '').trim() || labelOf(l.url.trim()) })); // an empty line is nothing
+  const bad = data.team.find(x => x.links.some(l => !linkOK(l.url)));
+  if (bad) { lang = 'fr'; location.hash = 'equipe/' + bad.id; setTimeout(() => { const f = $$('#view [data-link="url"]').find(i => !linkOK(i.value)); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); f.scrollIntoView({ block: 'center' }); } }, 120); return toast(`Un lien de ${bad.name || 'ce profil'} n’est pas valide.`, true); }
   const p = data.projects.find(x => !x.fr.title.trim() && !blank(x)), m = data.method.findIndex(x => !x.fr.title.trim()), t = data.team.find(x => !(x.name || '').trim());
   data.projects = data.projects.filter(x => !blank(x) || x.fr.title.trim());
   const wrong = p ? ['projets/' + p.id, '.vt', 'Ce projet n’a pas de titre en français.'] : m >= 0 ? ['methode', `[data-o="method:${m}"] .a`, 'Chaque étape a besoin d’un titre en français.'] : t ? ['equipe/' + t.id, '[data-k="first"]', 'Ce profil n’a pas de nom.'] : null;
@@ -225,9 +228,18 @@ const head = (title, act = '') => `<div class="vh"><h1 class="t-xl" tabindex="-1
 const langs = () => `<div class="seg" role="group" aria-label="Langue des textes"><button type="button" data-act="lang" data-l="fr" aria-pressed="${lang === 'fr'}">Français</button><button type="button" data-act="lang" data-l="en" aria-pressed="${lang === 'en'}">English</button></div>`;
 const crumbs = (href, name, here) => `<nav class="crumbs" aria-label="Vous êtes ici"><ol><li><a href="#${href}">${name}</a></li><li aria-current="page"><span>${esc(here)}</span></li></ol></nav>`;
 const field = (label, k, v, { area, ph, w2, max = 200 } = {}) => `<label class="fld${w2 ? ' w2' : ''}"><span class="fl">${label}</span>${area ? `<textarea data-k="${k}" maxlength="${max}" placeholder="${esc(ph)}">${esc(v)}</textarea>` : `<input type="text" data-k="${k}" value="${esc(v)}" maxlength="${max}" placeholder="${esc(ph)}" autocomplete="off">`}</label>`;
-const thumb = (id, v) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt="">`) : '';
+const POS = { top: '50% 15%', bottom: '50% 85%', left: '20% 50%', right: '80% 50%' }; // as shared/render.js FOCUS
+const thumb = (id, v, f) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt=""${POS[f] ? ` style="object-position:${POS[f]}"` : ''}>`) : '';
+/* framing of a cover or a portrait: which part stays in sight when the frame of the site cuts it */
+const FOCI = [['', 'Centre'], ['top', 'Haut'], ['bottom', 'Bas'], ['left', 'Gauche'], ['right', 'Droite']];
+const framing = o => o.cover || o.photo ? `<fieldset class="chips fr5"><legend class="fl">Cadrage : la partie de l’image qui reste visible</legend>${FOCI.map(([v, n]) => `<label><input type="radio" name="focus" data-k="focus" value="${v}"${(o.focus || '') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset>` : '';
+/* links of a profile: the label is guessed from the address */
+const KNOWN = [[/linkedin\./, 'LinkedIn'], [/instagram\./, 'Instagram'], [/behance\./, 'Behance'], [/dribbble\./, 'Dribbble'], [/(^|\.)(x|twitter)\.com$/, 'X'], [/github\./, 'GitHub'], [/vimeo\./, 'Vimeo'], [/youtube\.|youtu\.be/, 'YouTube'], [/tiktok\./, 'TikTok'], [/facebook\./, 'Facebook'], [/threads\./, 'Threads'], [/bsky\./, 'Bluesky']];
+const fixURL = u => { u = String(u || '').trim(); if (!u) return ''; if (/^[^\s@\/]+@[^\s@\/]+\.[a-z]{2,}$/i.test(u)) return 'mailto:' + u; if (/^(https?:\/\/|mailto:)/i.test(u)) return u; if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(u)) return 'https://' + u; return u; };
+const labelOf = u => { if (/^mailto:/i.test(u)) return 'E-mail'; let h = ''; try { h = new URL(u).hostname.replace(/^www\./, ''); } catch (_) { return ''; } const k = KNOWN.find(([r]) => r.test(h)); return k ? k[1] : h; };
+const linkOK = u => /^(https?:\/\/[^\s\/]+\.[^\s\/]+\S*|mailto:[^\s@]+@[^\s@]+\.[a-z]{2,})$/i.test(u);
 const ring = '<span class="up"><i></i></span>';
-const zone = (act, id, label, accept = 'image/*', cls = 'plate') => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${id ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}"${act === 'gallery' ? ' multiple' : ''}>${ring}</label>`;
+const zone = (act, id, label, accept = 'image/*', cls = 'plate', f) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${id ? 'Remplacer' : 'Ajouter'}">${thumb(id, null, f)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}"${act === 'gallery' ? ' multiple' : ''}>${ring}</label>`;
 
 /* ---------- projects ---------- */
 function projectsView() {
@@ -241,7 +253,7 @@ function projectView(p) {
   const live = JSON.parse(saved).projects.some(x => x.id === p.id);
   return `<div class="vb">${crumbs('projets', 'Projets', f.title || 'Nouveau projet')}${langs()}</div><div data-o="project:${esc(p.id)}"><h1 class="sr" tabindex="-1">${esc(f.title || 'Nouveau projet')}</h1>
   <textarea class="vt" rows="1" data-k="${L}.title" maxlength="200" aria-label="Titre du projet" placeholder="${esc(L === 'en' ? f.title || 'Title' : 'Titre du projet')}">${esc(t.title)}</textarea>
-  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div><p class="hint">Choisie, glissée ou collée. Sans image, le point est affiché.</p></div>
+  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale', 'image/*', 'plate', p.focus)}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${framing(p)}<p class="hint">Choisie, glissée ou collée. JPG, PNG ou WebP, réduite à 2400 px. Sans image, le point est affiché.</p></div>
   <div class="ed-f ef">
     ${field('Description' + en, L + '.desc', t.desc, { area: 1, w2: 1, ph: ph('desc'), max: 6000 })}
     <fieldset class="chips w2"><legend class="fl">Catégorie</legend>${data.categories.map(c => `<label><input type="radio" name="cat" data-k="category" value="${esc(c.id)}"${c.id === p.category ? ' checked' : ''}><span><b>${esc(c.fr)}</b></span></label>`).join('')}</fieldset>
@@ -270,8 +282,9 @@ function teamView() {
 function personView(m) {
   const L = lang, t = m[L] || (m[L] = {}), f = m.fr || (m.fr = {}), ph = k => L === 'en' ? f[k] || '' : '', live = JSON.parse(saved).team?.some(x => x.id === m.id);
   return `<div class="vb">${crumbs('equipe', 'Équipe', m.name || 'Nouveau profil')}${langs()}</div><div data-o="team:${esc(m.id)}"><div class="vh"><h1 class="t-xl" tabindex="-1"><span id="who">${esc(m.name || 'Nouveau profil')}</span>${dot}</h1></div>
-  <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait')}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div></div>
-  <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${field('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { area: 1, w2: 1, ph: ph('bio'), max: 4000 })}</div></div>
+  <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait', 'image/*', 'plate', m.focus)}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div>${framing(m)}<p class="hint">Choisi, glissé ou collé. Un portrait vertical convient le mieux.</p></div>
+  <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${field('Sous-titre <span class="opt">(une phrase courte, sous le titre)</span>', L + '.phrase', t.phrase, { ph: ph('phrase') || 'imaginer ensemble', w2: 1, max: 80 })}${field('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { area: 1, w2: 1, ph: ph('bio'), max: 4000 })}</div></div>
+  <section class="sct"><h2>Liens</h2><p class="vn">LinkedIn, Instagram, portfolio, e-mail… Collez l’adresse : le nom se remplit tout seul. Ils sont affichés sous la biographie et aident les moteurs de recherche à reconnaître la personne.</p><ul class="lk">${(m.links || []).map((l, i) => `<li data-li="${i}"><label class="fld"><span class="fl">Adresse</span><input type="text" inputmode="url" data-link="url" value="${esc(l.url)}" maxlength="300" placeholder="linkedin.com/in/…" autocomplete="off"${l.url && !linkOK(l.url) ? ' aria-invalid="true"' : ''}></label><label class="fld"><span class="fl">Nom affiché</span><input type="text" data-link="label" value="${esc(l.label)}" maxlength="40" placeholder="LinkedIn" autocomplete="off"></label><button type="button" class="tx red" data-act="rmLink" aria-label="Retirer le lien ${i + 1}">Retirer</button></li>`).join('')}</ul>${(m.links || []).length < 6 ? '<div class="pa"><button type="button" class="tx" data-act="addLink">Ajouter un lien</button></div>' : ''}</section>
   <section class="sct"><h2>Adresse</h2><div class="ef">${field('moyo-d0n.pages.dev/equipe/', 'id', m.id, { max: 60 })}</div><div class="pa" style="margin-top:22px;justify-content:space-between">${live ? `<a class="tx" href="/equipe/${esc(m.id)}" target="_blank" rel="noopener">Voir la page en ligne ↗</a>` : '<span></span>'}<button type="button" class="tx red" data-act="rmPerson">Retirer de l’équipe</button></div></section></div>`;
 }
 
@@ -305,6 +318,7 @@ async function changePass(F) {
    ===================================================================================================== */
 const V = $('#view');
 V.addEventListener('input', e => {
+  const lk = e.target.dataset.link; if (lk) { const o = objOf(e.target), l = o?.links?.[+e.target.closest('[data-li]').dataset.li]; if (!l) return; l[lk] = e.target.value; e.target.removeAttribute('aria-invalid'); return touched(); }
   const k = e.target.dataset.k, o = k && objOf(e.target); if (!o) return; e.target.removeAttribute('aria-invalid');
   const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
   if (k === 'id') return; // on change
@@ -312,11 +326,13 @@ V.addEventListener('input', e => {
   if (k === 'first' || k === 'last') { o.first ??= ''; o.last ??= ''; o.name = `${o.first} ${o.last}`.trim(); $('#who').textContent = o.name || 'Nouveau profil'; $('.crumbs [aria-current] span').textContent = o.name || 'Nouveau profil'; }
   if (k === 'fr.title' && e.target.matches('.vt')) $('.crumbs [aria-current] span').textContent = v || 'Nouveau projet';
   if (k === 'fit') e.target.closest('section').querySelector('.mt').dataset.fit = v;
+  if (k === 'focus') { const i = $('.ed-p .dz img', V); if (i) i.style.objectPosition = POS[v] || ''; }
   touched();
 });
 V.addEventListener('change', e => {
   const t = e.target, o = objOf(t); if (!o) return;
   if (t.dataset.file) { take(t.dataset.file, t.files, t.closest('.dz'), o); t.value = ''; return; }
+  if (t.dataset.link === 'url') { const l = o.links[+t.closest('[data-li]').dataset.li], u = fixURL(t.value), n = t.closest('li').querySelector('[data-link="label"]'); l.url = t.value = u; if (u && !(l.label || '').trim()) l.label = n.value = labelOf(u); if (u && !linkOK(u)) { t.setAttribute('aria-invalid', 'true'); toast('Cette adresse ne semble pas valide. Exemple : linkedin.com/in/prenom-nom', true); } touched(); return; }
   if (t.dataset.k === 'id') { const list = route[0] === 'equipe' ? data.team : data.projects, id = freeId(slug(t.value) || o.id, list, o); o.id = id; t.value = id; history.replaceState(null, '', `#${route[0]}/${id}`); route[1] = id; t.closest('[data-o]').dataset.o = (route[0] === 'equipe' ? 'team:' : 'project:') + id; touched(); }
   if (t.matches('.vt') && t.dataset.k === 'fr.title' && /^nouveau-projet/.test(o.id) && t.value.trim()) { const id = freeId(slug(t.value), data.projects, o); o.id = id; history.replaceState(null, '', '#projets/' + id); route[1] = id; t.closest('[data-o]').dataset.o = 'project:' + id; const f = $('[data-k="id"]'); if (f) f.value = id; touched(); } // the address follows the title, once
 });
@@ -333,8 +349,10 @@ V.addEventListener('click', async e => {
   else if (act === 'draftNo') { offered = null; store.set(DRAFT, null); render(true); }
   else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, tone: 'klein', cover: null, images: [], plate: '', fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
   else if (act === 'newPerson') { const id = freeId('profil', data.team); data.team.push({ id, name: '', first: '', last: '', photo: null, fr: { role: '', bio: '', phrase: '' }, en: { role: '', bio: '', phrase: '' }, links: [] }); lang = 'fr'; location.hash = 'equipe/' + id; }
-  else if (act === 'rmCover') { const x = o.cover; o.cover = null; drop(x); render(true); }
-  else if (act === 'rmPhoto') { const x = o.photo; o.photo = null; drop(x); render(true); }
+  else if (act === 'addLink') { (o.links ||= []).push({ label: '', url: '' }); render(true); $$('#view .lk [data-link="url"]').pop()?.focus(); }
+  else if (act === 'rmLink') { o.links.splice(+b.closest('[data-li]').dataset.li, 1); render(true); }
+  else if (act === 'rmCover') { const x = o.cover; o.cover = null; o.focus = ''; drop(x); render(true); }
+  else if (act === 'rmPhoto') { const x = o.photo; o.photo = null; o.focus = ''; drop(x); render(true); }
   else if (act === 'rmMedia') { const x = [o.media, o.poster]; o.media = o.poster = null; x.forEach(drop); render(true); }
   else if (act === 'rmImg') { const [x] = o.images.splice(+b.closest('[data-img]').dataset.img, 1); drop(x); render(true); }
   else if (act === 'rmProject') { if (await ask(`Supprimer « ${o.fr.title || 'Sans titre'} » ?`, 'Le projet quittera le site à la prochaine publication.', 'Supprimer')) { data.projects.splice(data.projects.indexOf(o), 1); [o.cover, ...(o.images || [])].forEach(drop); location.hash = 'projets'; } }

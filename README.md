@@ -44,7 +44,7 @@ Site : https://moyo-d0n.pages.dev
 | `/equipe/<id>` | Un profil |
 | `/en`, `/en/projets`… | Les mêmes pages en anglais, rendues par le serveur (`functions/en`) |
 | `/sitemap.xml`, `/llms.txt`, `/robots.txt` | Pour les moteurs de recherche et les moteurs de réponse (IA) |
-| `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie ; la méthode (image, vidéo ou GIF, titre et texte de chaque étape) ; l'équipe ; les messages |
+| `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie ; la méthode (image, vidéo ou GIF, titre et texte de chaque étape) ; l'équipe (portrait, nom, titre, sous-titre, biographie, liens) ; le cadrage des couvertures et des portraits ; les messages |
 
 Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les pages sont rendues côté serveur avec les données à jour (`functions/_middleware.js`), donc elles restent complètes sans JavaScript et lisibles par les moteurs de recherche. Tant que rien n'a été publié depuis l'admin, c'est `data/projects.json` qui sert.
 

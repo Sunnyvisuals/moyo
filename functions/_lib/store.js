@@ -4,6 +4,7 @@ import seed from '../../data/projects.json';
 export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif|mp4|webm)$/; // anything uploaded: pictures, GIFs, videos
 // an uploaded picture, or one of the pictures that come with the site (/proj/…)
 const MEDIA = /^([a-f0-9-]{36}\.(webp|jpg|png|avif|gif|mp4|webm)|\/proj\/[\w-]{1,60}\.(webp|jpg|jpeg|png|avif))$/; // … or a video
+const FOCI = ['top', 'bottom', 'left', 'right']; // the framing of a cover or a portrait: what stays in sight (shared/render.js)
 const PICTURE = /^([a-f0-9-]{36}\.(webp|jpg|png|avif|gif)|\/proj\/[\w-]{1,60}\.(webp|jpg|jpeg|png|avif))$/;
 
 export async function getData(env) {
@@ -87,6 +88,7 @@ export function validate(input) {
       featured: !!p.featured,
       tone: p.tone === 'wash' ? 'wash' : 'klein',
       cover,
+      focus: FOCI.includes(p.focus) ? p.focus : '',
       images,
       plate,
       fr,
@@ -107,6 +109,7 @@ export function validate(input) {
     team.push({
       id, name, first, last,
       photo: typeof m.photo === 'string' && PICTURE.test(m.photo) ? m.photo : null,
+      focus: FOCI.includes(m.focus) ? m.focus : '',
       fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000), phrase: str(m.fr?.phrase, 80) },
       en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000), phrase: str(m.en?.phrase, 80) },
       links

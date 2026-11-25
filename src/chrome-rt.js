@@ -248,14 +248,14 @@ new MutationObserver(() => {
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
 /* header: away on the first screen of the home (data-land), hides while reading down, returns on the way up, and goes away by itself after a few
-   seconds. It comes back on the way up, when the pointer goes to the top of the screen, on a touch, or with the keyboard. */
+   seconds once the page is scrolled (never at the top of a page). It comes back on the way up, when the pointer goes to the top of the screen, on a touch, or with the keyboard. */
 if (bar) {
   const root = document.documentElement, land = bar.hasAttribute('data-land'), REST = 2600, sheet = document.getElementById('proj'), over = () => sheet && sheet.open, at = () => over() ? sheet.scrollTop : scrollY;
   let last = at(), upAt = last, q = 0, t = 0;
   const first = () => land && !over() && scrollY < innerHeight * .85;
   const busy = () => (root.classList.contains('kbd') && bar.contains(document.activeElement)) || menu.matches(':popover-open') || !!bar.querySelector(':hover');
   const hide = () => bar.classList.add('away');
-  const rest = () => { clearTimeout(t); if (!reduce) t = setTimeout(() => busy() ? rest() : hide(), REST); };
+  const rest = () => { clearTimeout(t); if (!reduce) t = setTimeout(() => busy() || at() <= 80 ? rest() : hide(), REST); }; // at the top of a page, the logo and the menu stay
   const show = () => { if (first()) return; bar.classList.remove('away'); rest(); };
   const upd = () => { q = 0; const y = at(), dy = y - last; last = y; if (dy < -2) upAt = y;
     if (busy()) return;

@@ -77,7 +77,7 @@ function fill(i) {
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
   const pl = $('#pPlate'); pl.className = 'plate c5' + (p.cover ? '' : ' plate--none'); pl.style.removeProperty('--dx'); pl.style.removeProperty('--dy'); pl.innerHTML = plateInner(p, t.title);
   const im = $('img', pl), known = cardOf(i) && $('img', cardOf(i)); if (im) { im.loading = 'eager'; im.decoding = 'sync'; if (known && known.naturalWidth) { im.width = known.naturalWidth; im.height = known.naturalHeight; } }
-  $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
+  $('#pGallery').innerHTML = galleryHTML(p, t.title);
   const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
   $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
   document.title = t.title + ' · Moyo Studio';

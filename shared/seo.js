@@ -32,7 +32,8 @@ const full = (path, lang) => SITE + local(path, lang);
 
 /* ---------- structured data: one graph, the same identifiers on every page ---------- */
 const ORG = SITE + '/#studio', WEB = SITE + '/#site';
-const person = (m, lang) => ({ '@type': 'Person', '@id': `${SITE}/equipe/${m.id}#personne`, name: m.name, jobTitle: (m[lang] && m[lang].role) || (m.fr && m.fr.role) || undefined, url: full('/equipe/' + m.id, lang), worksFor: { '@id': ORG } });
+const sameAs = m => { const l = (m.links || []).map(x => x.url).filter(u => /^https?:\/\//i.test(u)); return l.length ? l : undefined; }; // the profiles elsewhere: the same person for the engines
+const person = (m, lang) => ({ '@type': 'Person', '@id': `${SITE}/equipe/${m.id}#personne`, name: m.name, givenName: m.first || undefined, familyName: m.last || undefined, jobTitle: (m[lang] && m[lang].role) || (m.fr && m.fr.role) || undefined, url: full('/equipe/' + m.id, lang), sameAs: sameAs(m), worksFor: { '@id': ORG } });
 const studio = (team, lang) => ({
   '@type': ['Organization', 'ProfessionalService'], '@id': ORG, name: 'Moyo Studio', alternateName: ['moyo', 'Moyo'], url: SITE + '/', email: MAIL,
   description: HOME[lang].desc, slogan: lang === 'en' ? 'Images, websites and films from a single idea' : 'Des images, des sites et des films à partir d’une seule idée',
@@ -52,13 +53,16 @@ const ldList = (projects, lang = 'fr') => ({ '@context': 'https://schema.org', '
   { '@type': 'CollectionPage', '@id': full('/projets', lang) + '#page', url: full('/projets', lang), name: LIST[lang].title, description: LIST[lang].desc, inLanguage: lang, isPartOf: { '@id': WEB }, about: { '@id': ORG },
     ...((projects || []).length ? { mainEntity: { '@type': 'ItemList', itemListElement: projects.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: (p[lang] && p[lang].title) || p.fr.title, url: full('/projets/' + p.id, lang) })) } } : {}) }] });
 const ldWork = (p, t, image, lang = 'fr') => ({ '@context': 'https://schema.org', '@graph': [website, trail(lang, [lang === 'en' ? 'Projects' : 'Projets', '/projets'], [t.title, '/projets/' + p.id]),
-  { '@type': 'CreativeWork', '@id': `${SITE}/projets/${p.id}#projet`, url: full('/projets/' + p.id, lang), name: t.title, description: t.desc, genre: t.type || undefined, dateCreated: p.year || undefined, locationCreated: t.place ? { '@type': 'Place', name: t.place } : undefined, image: image || undefined, inLanguage: lang, creator: { '@type': 'Organization', '@id': ORG, name: 'Moyo Studio', url: SITE + '/' }, isPartOf: { '@id': WEB } }] });
+  { '@type': 'CreativeWork', '@id': `${SITE}/projets/${p.id}#projet`, url: full('/projets/' + p.id, lang), name: t.title, description: t.desc, genre: t.type || undefined, dateCreated: p.year || undefined, locationCreated: t.place ? { '@type': 'Place', name: t.place } : undefined, image: image && image.length ? (image.length > 1 ? image : image[0]) : undefined, inLanguage: lang, creator: { '@type': 'Organization', '@id': ORG, name: 'Moyo Studio', url: SITE + '/' }, isPartOf: { '@id': WEB } }] });
 const ldPerson = (m, lang = 'fr', image) => ({ '@context': 'https://schema.org', '@graph': [website, trail(lang, [m.name, '/equipe/' + m.id]),
   { '@type': 'ProfilePage', '@id': full('/equipe/' + m.id, lang) + '#page', url: full('/equipe/' + m.id, lang), inLanguage: lang, isPartOf: { '@id': WEB }, mainEntity: { ...person(m, lang), image: image || undefined, worksFor: { '@type': 'Organization', '@id': ORG, name: 'Moyo Studio', url: SITE + '/' } } }] });
 
 /* ---------- the <head> of a page: title, description, languages, preview, place, structured data ---------- */
 const ROBOTS = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+/* a description as the engines show it: one line of about 160 characters, cut between two words */
+const clip = (s, n = 160) => { s = String(s || '').replace(/\s+/g, ' ').trim(); if (s.length <= n) return s; const c = s.slice(0, n - 1), w = c.lastIndexOf(' '); return (w > n * .6 ? c.slice(0, w) : c).replace(/[\s,;:.!?…–—-]+$/, '') + '…'; };
 function head({ path, lang = 'fr', title, desc, og, ogTitle, type = 'website', image, robots, ld, alternates = true }) {
+  desc = desc && clip(desc); og = og && clip(og, 200);
   const im = image || { ...SHARE, alt: SHARE.alt[lang] }, url = full(path, lang), T = ogTitle || title, D = og || desc;
   return [
     `<title>${at(title)}</title>`,
@@ -87,4 +91,4 @@ function head({ path, lang = 'fr', title, desc, og, ogTitle, type = 'website', i
 const sample = (p, seed) => { const s = ((seed && seed.projects) || []).find(x => x.id === p.id); return !!s && s.fr.title === (p.fr && p.fr.title) && s.fr.desc === (p.fr && p.fr.desc); };
 const waiting = m => /lorem ipsum/i.test((m.fr && m.fr.bio) || '') || /lorem ipsum/i.test((m.en && m.en.bio) || '');
 
-export { SITE, MAIL, SHARE, REGION, HOME, LIST, LOST, SERVICES, ROBOTS, local, full, ldHome, ldList, ldWork, ldPerson, head, sample, waiting };
+export { clip, SITE, MAIL, SHARE, REGION, HOME, LIST, LOST, SERVICES, ROBOTS, local, full, ldHome, ldList, ldWork, ldPerson, head, sample, waiting };

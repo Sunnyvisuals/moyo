@@ -174,6 +174,11 @@ body{min-height:100vh;min-height:100svh}
 .ct{border-top:1px solid var(--line)}
 .ct .grip{margin:0 0 4px -12px}
 .ct .n{font-size:var(--fs-small);color:var(--mute);padding-bottom:16px}
+.ed-p .fr5{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px;font-size:var(--fs-small);margin-top:22px}.ed-p .fr5 label span{min-height:40px}
+.lk{border-top:1px solid var(--line);margin-top:18px}
+.lk>li{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto;align-items:end;gap:0 var(--gut);padding:10px 0 16px;border-bottom:1px solid var(--line)}
+.lk .tx{padding-bottom:12px}
+@media (max-width:620px){.lk>li{grid-template-columns:minmax(0,1fr) auto}.lk>li>:nth-child(2){grid-column:1}.lk>li>:last-child{grid-column:2;grid-row:1}}
 
 /* Question, message, draft */
 .ask{position:fixed;inset:auto 0 0;width:100%;max-width:none;margin:0;border:0;padding:clamp(2rem,4vw,4rem) var(--edge);background:var(--bg);color:var(--ink);translate:0 100%;transition:translate .7s var(--ease-io),overlay .7s allow-discrete,display .7s allow-discrete}

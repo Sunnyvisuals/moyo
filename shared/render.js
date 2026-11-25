@@ -19,9 +19,14 @@ function txt(p, lang) {
   return lang === 'fr' ? Object.fromEntries(Object.entries(t).map(([k, v]) => [k, typeof v === 'string' ? v.replace(/ ([:;?!])/g, '\u00a0$1') : v])) : t;
 }
 
+/* framing of a picture, chosen in the admin: which part stays in sight when the frame cuts it */
+const FOCUS = { top: '50% 15%', bottom: '50% 85%', left: '20% 50%', right: '80% 50%' };
+const focusStyle = f => FOCUS[f] ? ` style="object-position:${FOCUS[f]}"` : '';
 function plateInner(p, alt) {
-  return p.cover ? `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}" loading="lazy" decoding="async">` : ''; // no cover: the plate draws the dot
+  return p.cover ? `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}"${focusStyle(p.focus)} loading="lazy" decoding="async">` : ''; // no cover: the plate draws the dot
 }
+/* the gallery of a project: each picture says what it shows, for those who do not see it and for image search */
+const galleryHTML = (p, title) => (p.images || []).map((id, i) => `<img src="${imgURL(id)}" alt="${escHTML(title || '')}${title ? ', ' : ''}${i + 1}/${p.images.length}" loading="lazy" decoding="async">`).join('');
 
 const metaText = (p, t) => [t.place, p.year].filter(Boolean).join(', ');
 
@@ -64,4 +69,4 @@ function dataJSON(data) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
-export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON };
+export { escHTML, imgURL, catLabel, txt, FOCUS, focusStyle, plateInner, galleryHTML, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON };

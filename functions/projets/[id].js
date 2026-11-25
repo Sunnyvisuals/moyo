@@ -2,7 +2,7 @@
    a search engine, or a browser without JavaScript. Same template as the sheet and the profiles. French and English are both in the page. */
 import seed from '../../data/projects.json';
 import { getData } from '../_lib/store.js';
-import { escHTML as e, imgURL, catLabel, txt, plateInner } from '../../shared/render.js';
+import { escHTML as e, imgURL, catLabel, txt, plateInner, galleryHTML } from '../../shared/render.js';
 import { DESIGN_CSS, headCommon, scripts } from '../../shared/design.js';
 import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
 import { head, ldWork, sample, SITE } from '../../shared/seo.js';
@@ -19,7 +19,7 @@ export async function page({ params, env, request }, lang = 'fr') {
   const fact = (k, label, f, g) => f ? `<div><dt data-i="${k}">${label}</dt><dd ${two(f, g)}</dd></div>` : '';
   const L = lang === 'en' ? en : fr, pic = p.cover && new URL(imgURL(p.cover), origin).href, cut = /^\/proj\/(\w+)\.jpg$/.exec(p.cover || ''); // the pictures of the start exist cut for a preview
   const meta = head({ path: '/projets/' + encodeURIComponent(p.id), lang, title: [L.title, L.type].filter(Boolean).join(', ') + ' · Moyo Studio', ogTitle: L.title + ' · Moyo Studio', desc: L.desc, type: 'article',
-    image: cut ? { url: `${SITE}/og/${cut[1]}.jpg`, w: 1200, h: 630, alt: L.title } : pic ? { url: pic, alt: L.title } : undefined, robots: sample(p, seed) ? 'noindex,follow' : '', ld: ldWork(p, L, pic, lang) });
+    image: cut ? { url: `${SITE}/og/${cut[1]}.jpg`, w: 1200, h: 630, alt: L.title } : pic ? { url: pic, alt: L.title } : undefined, robots: sample(p, seed) ? 'noindex,follow' : '', ld: ldWork(p, L, [pic, ...(p.images || []).map(id => new URL(imgURL(id), origin).href)].filter(Boolean).slice(0, 10), lang) });
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -48,7 +48,7 @@ ${chromeHead(1)}
       <dl class="facts">${fact('fCat', 'Catégorie', kind('fr'), kind('en'))}${fact('fRole', 'Rôle', fr.role, en.role)}${fact('fPlace', 'Lieu', fr.place, en.place)}${fact('fYear', 'Année', p.year, p.year)}</dl>
     </div>
   </div>
-  <div class="gallery">${(p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('')}</div>
+  <div class="gallery">${galleryHTML(p, fr.title)}</div>
   ${nx ? `<a class="nm-link g next" href="/projets/${e(nx.id)}"><span class="nm" ${two(txt(nx, 'fr').title, txt(nx, 'en').title)}</span><span class="nm-role q4" data-i="nextP">Projet suivant</span></a>` : ''}
 </main></div>
 ${footerHTML(data.team)}
