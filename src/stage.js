@@ -3,7 +3,7 @@
    Titles (h1, h2) never move. Nothing changes the layout (opacity, translate, clip-path). Skipped with reduced motion. */
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return document.querySelectorAll('.sec .dot').forEach(d => d.classList.add('in'));
-  const TARGETS = '.hero-top>*,.case .plate,.case .cap>*,.line>*,.mth:not(.live) .step,.defs>*,.names>li,.next,.crumbs,.ct-l>:not([data-ink]),.ct-form>*,.filters,main .sheet-g>*,.fcol,.foot-base>*,.foot-note';
+  const TARGETS = '.hero-top>*,.sec-h>.all,.all-m,.case .plate,.case .cap>*,.line>*,.mth:not(.live) .step,.defs>*,.names>li,.next,.crumbs,.ct-l>:not([data-ink]),.ct-form>*,.filters,main .sheet-g>*,.fcol,.foot-base>*,.foot-note';
   const EASE = 'cubic-bezier(.16,1,.3,1)', TOP = .03, BOTTOM = .09; // margins of the stage, in screens
   const st = document.createElement('style');
   st.textContent = `.stg{opacity:0;translate:0 26px;transition:opacity .5s ease,translate .6s ease}

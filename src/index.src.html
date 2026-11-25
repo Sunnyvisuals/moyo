@@ -36,7 +36,11 @@ html:not(.js) .fig{display:none}
 
 /* Method: a list of four steps on the four axes, each with its picture. Live: one step at a time, its picture, video or GIF on the whole screen,
    the words in white over it. --e: how far the scene has opened (0 to 1). */
-#projets .t-xl{margin-bottom:clamp(2rem,3.8vw,4.25rem)}
+/* the projects: their title, and on the fourth axis the way to all of them; on a small screen it comes after the last one, as a row */
+.sec-h{align-items:last baseline;margin-bottom:clamp(2rem,3.8vw,4.25rem)}
+.sec-h .btn{min-height:0;padding:0 0 .28em}
+.all-m{display:none}
+@media (max-width:820px){.sec-h .all{display:none}.all-m{display:grid;margin-top:clamp(2.5rem,9vw,4rem);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}}
 .mth .t-xl{margin-bottom:var(--gap)}
 .tabs{display:none}
 .steps{row-gap:56px}
@@ -134,8 +138,12 @@ __CHROME_HEAD__
 
 <!-- Projects -->
 <section class="sec over" id="projets" aria-labelledby="projT">
-  <h2 class="t-xl" id="projT"><span data-i="projT">Projets</span><i class="dot">&#8288;<b></b></i></h2>
+  <div class="g sec-h">
+    <h2 class="t-xl h1" id="projT"><span data-i="projT">Projets</span><i class="dot">&#8288;<b></b></i></h2>
+    <p class="q4 all"><a class="btn" href="/projets"><span data-i="allP">Tous les projets</span><i class="ar" aria-hidden="true"></i></a></p>
+  </div>
   <ol class="cases" id="projects">__ROWS__</ol>
+  <a class="nm-link g all-m" href="/projets"><span class="nm" data-i="allP">Tous les projets</span></a>
   <script type="application/json" id="moyo-data">__DATA__</script>
 </section>
 
@@ -241,7 +249,7 @@ __SHEET__
 <script type="application/json" id="en">{
 "_title":"Moyo Studio · Creative studio on the French Riviera",
 "skip":"Skip to content","here":"You are here","home":"Home",
-"heroWhat":"Independent creative studio","heroWhere":"French Riviera","heroCta":"See the projects","fig0":"An idea","fig1":"an image","fig2":"a website","fig3":"a film",
+"heroWhat":"Independent creative studio","heroWhere":"French Riviera","heroCta":"See the projects","allP":"All the projects","fig0":"An idea","fig1":"an image","fig2":"a website","fig3":"a film",
 "h1a":"Moyo designs images, websites and films from ","h1b":"a single idea",
 "projT":"Projects","svcT":"Services","mthT":"Method","stuT":"Studio","teamT":"Team","teamAria":"Team","ctT":"Contact",
 "s1t":"Art direction","s1p":"One idea, a type system, a palette. Everything is decided before the first pixel.",
