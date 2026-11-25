@@ -19,7 +19,7 @@ export async function english(res, { head, rows } = {}) {
     .on('[data-ia]', { element: e => { const v = aria[e.getAttribute('data-ia')]; if (v != null) e.setAttribute('aria-label', v); } })
     .on('[data-ph]', { element: e => { const v = D[e.getAttribute('data-ph')]; if (v != null) e.setAttribute('placeholder', v); } })
     .on('[data-fr][data-en]', { element: e => { e.setInnerContent(e.getAttribute('data-en') || e.getAttribute('data-fr'), { html: true }); } }) // already escaped in the attribute
-    .on('span[data-l="fr"]', { element: e => { e.remove(); } }).on('div[data-l="fr"]', { element: e => { e.remove(); } }) // a profile has both biographies
+    .on('span[data-l="fr"],small[data-l="fr"]', { element: e => { e.remove(); } }).on('div[data-l="fr"]', { element: e => { e.remove(); } }) // a profile has both biographies
     .on('.foot-cta .q', { element: e => { e.setInnerContent('?'); } })
     .on('.flang button', { element: e => { e.setAttribute('aria-pressed', String(e.getAttribute('data-l') === 'en')); } })
     .on('a[href^="/"]', { element: e => { e.setAttribute('href', enLink(e.getAttribute('href'))); } });

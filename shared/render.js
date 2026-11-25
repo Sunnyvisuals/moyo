@@ -62,7 +62,7 @@ const tabsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<button type=
 
 /* JSON that can sit inside <script type="application/json"> without closing it. */
 function dataJSON(data) {
-  return JSON.stringify(data).replace(/</g, '\\u003c');
+  return JSON.stringify(data, (k, v) => k === 'blocks' ? undefined : v).replace(/</g, '\\u003c');
 }
 
 export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON };

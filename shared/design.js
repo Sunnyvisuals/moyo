@@ -165,8 +165,8 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 .rt :is([style*=center],[style*=right],[align=center],[align=right]):is(li,ul li,ul) li::before,.rt ul:is([style*=center],[style*=right]) li::before,.rt li:is([style*=center],[style*=right],[align=center],[align=right])::before{position:static;display:inline-block;margin-right:.5em;vertical-align:.1em}
 .rt ul:is([style*=center],[style*=right]) li,.rt li:is([style*=center],[style*=right],[align=center],[align=right]){padding-left:0}
 .rt [style*=justify]{hyphens:auto}
-[data-l]:is(span,div){display:none}
-html[lang=fr] [data-l=fr]:is(span,div),html[lang=en] [data-l=en]:is(span,div){display:revert}
+[data-l]:is(span,div,small){display:none}
+html[lang=fr] [data-l=fr]:is(span,div,small),html[lang=en] [data-l=en]:is(span,div,small){display:revert}
 /* what the browser fills in keeps the paper and the ink of the page */
 :is(input,textarea):autofill{-webkit-text-fill-color:var(--ink);caret-color:var(--ink);box-shadow:0 0 0 99px var(--bg) inset;transition:background-color 99999s}
 .fld :is(input,textarea):autofill:focus{box-shadow:0 0 0 99px var(--bg) inset,0 1px 0 var(--klein)}
@@ -439,6 +439,44 @@ html.vt-sheet:not(.vt-in)::view-transition-old(root){z-index:2;animation:sheetOu
 :is(#proj,.work) .plate{aspect-ratio:auto}
 :is(#proj,.work) .plate img{position:static;width:100%;height:auto;aspect-ratio:auto 4/5}
 :is(#proj,.work) .plate--none{aspect-ratio:4/5}
+/* ---------- The layout of a project (shared/blocks.js): blocks on the four axes, rows one under the other ---------- */
+.bk{margin-top:var(--gap)}.bk:empty{display:none}
+.bk-r{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gut);align-items:start;margin-top:var(--gut)}
+.bk-r.r-words{margin-top:clamp(2.5rem,5vw,6rem)}
+.bk-r.r-tight{margin-top:0}.bk-r.r-words.r-tight{margin-top:var(--gut)}
+.bk-r.r-large{margin-top:calc(var(--sec) * .72)}
+.bk-r:first-child{margin-top:0}
+.b{min-width:0;margin:0}
+.b .fr{position:relative;overflow:clip;background:var(--tint)}
+.b .fr>:is(img,video){display:block;width:100%;height:100%;object-fit:cover}
+.b .fr:not([style])>:is(img,video){height:auto}
+.b .f-top>:is(img,video){object-position:50% 8%}.b .f-bottom>:is(img,video){object-position:50% 92%}
+.b .f-contain{background:none}.b .f-contain>:is(img,video){object-fit:contain}
+.b-full,.b-screen{margin:0 calc(var(--edge) * -1)}
+.b-screen .fr{aspect-ratio:auto!important;height:100vh;height:100svh}
+.b figcaption{margin-top:12px;max-width:62ch;font-size:var(--fs-small);line-height:1.45;color:var(--mute)}
+.b-full figcaption,.b-screen figcaption{padding:0 var(--edge)}
+.b-txt .rt{max-width:46ch;font-size:var(--fs-lead);line-height:1.5;letter-spacing:-.014em;text-wrap:pretty}
+.b-txt.z-large .rt{max-width:25em;font-size:var(--fs-m);font-weight:600;line-height:1.22;letter-spacing:-.03em}
+.b-txt.z-title .rt{max-width:none;font-size:var(--fs-xl);font-weight:700;line-height:1.06;letter-spacing:-.048em;text-wrap:balance}
+.b-txt .rt:has(>[style*=center]){margin-left:auto;margin-right:auto}.b-txt .rt:has(>[style*=right]){margin-left:auto}
+.b-inf .facts{margin:0}
+.figs{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:clamp(1.75rem,3vw,3.25rem) var(--gut);margin:0}
+.figs>div{display:flex;flex-direction:column}
+.figs dd{margin:0;font-size:var(--fs-xl);font-weight:700;line-height:1;letter-spacing:-.048em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.figs dt{margin-top:.7em;padding-top:.7em;border-top:1px solid var(--line);font-size:var(--fs-small);color:var(--mute)}
+.emb{display:grid}
+.emb>img{position:absolute;inset:0}
+.emb-b{position:relative;z-index:1;display:grid;place-content:center;justify-items:center;gap:6px;padding:20px;text-align:center}
+.emb-b small{max-width:34ch;font-size:var(--fs-small);line-height:1.4;color:var(--mute)}
+.emb:has(>img) .emb-b{color:var(--bg);background:rgb(18 18 20 / .52)}.emb:has(>img) .emb-b small{color:rgb(250 250 248 / .82)}.emb:has(>img) .btn{color:var(--bg);--c:var(--bg)}
+.emb>i.kl2{position:absolute;inset:0;z-index:2;background:var(--klein);pointer-events:none}
+.emb iframe{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0;background:var(--tint)}
+@media (max-width:820px){
+  .bk-r>.b{grid-column:1/-1!important}.bk-r>.b.q{grid-column:span 6!important}
+  .figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .b .emb:not([style*=height]){min-height:220px}
+}
 .gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gut);margin-top:var(--gap)}
 .gallery:empty{display:none}
 .gallery img{width:100%}
@@ -486,6 +524,7 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent
         <p class="share"><button type="button" class="btn" data-share><span data-i="share">Partager</span><i class="ar" aria-hidden="true"></i></button><span class="sr" role="status"></span></p>
       </div>
     </div>
+    <div id="pBlocks"></div>
     <div class="gallery" id="pGallery"></div>
     <button type="button" class="nm-link g next" id="pNext2"><span class="nm" id="pNextT"></span><span class="nm-role q4" data-i="nextP">Projet suivant</span></button>
   </div>
@@ -526,6 +565,7 @@ const scripts = `<script src="/lenis.js" defer></script>
 <script src="/reveal.js" defer></script>
 <script src="/roll.js" defer></script>
 <script src="/weight.js" defer></script>
+<script src="/blocks.js" defer></script>
 <script src="/play.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>`;

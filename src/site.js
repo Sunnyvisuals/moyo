@@ -69,6 +69,13 @@ $$('.la[data-cat]').forEach(a => {
 const dlg = $('#proj');
 let cur = 0, opener = null, pushed = false, openCard = null, plain = false;
 const PAGE = bare(location.pathname), BEHIND = '.under,#foot,#path,.skip'; // the page the sheet opens over, and what can no longer be reached while it is open
+/* the layout of a project is drawn by the server (shared/blocks.js): the sheet takes it from the page of the project */
+const layouts = new Map();
+async function layout(id, i) {
+  const box = $('#pBlocks'), url = local('/projets/' + encodeURIComponent(id)), draft = root.dataset.apercu !== undefined; box.replaceChildren();
+  if (!layouts.has(url)) layouts.set(url, fetch(url, draft ? { headers: { 'X-Moyo-Apercu': '1' } } : {}).then(r => r.ok ? r.text() : '').then(t => (/<!--blocks-->([^]*?)<!--\/blocks-->/.exec(t) || [, ''])[1], () => ''));
+  const html = await layouts.get(url); if (cur !== i || !html) return; box.innerHTML = html; window.moyoBlocks && moyoBlocks(box);
+}
 function fill(i) {
   cur = i; const p = ALL[i], t = txt(p, lang);
   $('#pTitle').textContent = $('#pHere').textContent = t.title; $('#pDesc').innerHTML = richHTML(t.desc);
@@ -78,6 +85,7 @@ function fill(i) {
   const pl = $('#pPlate'); pl.className = 'plate c5' + (p.cover ? '' : ' plate--none'); pl.style.removeProperty('--dx'); pl.style.removeProperty('--dy'); pl.innerHTML = plateInner(p, t.title);
   const im = $('img', pl), known = cardOf(i) && $('img', cardOf(i)); if (im) { im.loading = 'eager'; im.decoding = 'sync'; if (known && known.naturalWidth) { im.width = known.naturalWidth; im.height = known.naturalHeight; } }
   $('#pGallery').innerHTML = (p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('');
+  layout(p.id, i);
   const v = visible(), at = v.indexOf(i), nx = ALL[v[(at + 1) % v.length]];
   $('#pNextT').textContent = txt(nx, lang).title; $('#pNext2').hidden = v.length < 2;
   document.title = t.title + ' · Moyo Studio';

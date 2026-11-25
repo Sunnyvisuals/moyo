@@ -18,7 +18,7 @@ export async function keep(env, data) {
 }
 
 export async function draftOf(request, env, url) {
-  if (request.method !== 'GET' || request.headers.get('Sec-Fetch-Dest') !== 'iframe' || url.searchParams.has('en-ligne') || !env.MOYO || /^\/(admin|api|img|proj|fonts|og)(\/|$)/.test(url.pathname)) return null;
+  if (request.method !== 'GET' || request.headers.get('Sec-Fetch-Dest') !== 'iframe' && request.headers.get('X-Moyo-Apercu') !== '1' || url.searchParams.has('en-ligne') || !env.MOYO || /^\/(admin|api|img|proj|fonts|og)(\/|$)/.test(url.pathname)) return null;
   const m = (request.headers.get('Cookie') || '').match(new RegExp(`(?:^|;\\s*)${COOKIE}=([\\w-]{32})(?:;|$)`));
   return m && (await isAdmin(request, env)) ? env.MOYO.get('preview:' + m[1], 'json') : null;
 }

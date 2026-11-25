@@ -4,6 +4,7 @@ import seed from '../../data/projects.json';
 import { getData } from '../_lib/store.js';
 import { escHTML as e, imgURL, catLabel, txt, plateInner } from '../../shared/render.js';
 import { richHTML, richWords, richShort } from '../../shared/rich.js';
+import { bkHTML } from '../../shared/blocks.js';
 import { DESIGN_CSS, headCommon, scripts } from '../../shared/design.js';
 import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
 import { head, ldWork, sample, SITE } from '../../shared/seo.js';
@@ -50,6 +51,7 @@ ${chromeHead(1)}
       <p class="share"><button type="button" class="btn" data-share><span data-i="share">Partager</span><i class="ar" aria-hidden="true"></i></button><span class="sr" role="status"></span></p>
     </div>
   </div>
+  <!--blocks-->${bkHTML(p.blocks, fr.title)}<!--/blocks-->
   <div class="gallery">${(p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('')}</div>
   ${nx ? `<a class="nm-link g next" href="/projets/${e(nx.id)}"><span class="nm" ${two(txt(nx, 'fr').title, txt(nx, 'en').title)}</span><span class="nm-role q4" data-i="nextP">Projet suivant</span></a>` : ''}
 </main></div>

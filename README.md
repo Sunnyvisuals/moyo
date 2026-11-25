@@ -62,6 +62,7 @@ shared/chrome.js       en-tête, menu, pied de page
 shared/i18n.js         mots de l'en-tête, du menu et du pied de page, en deux langues
 shared/seo.js          titres, descriptions, aperçus de lien, données structurées
 shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
+shared/blocks.js       mise en page des projets : blocs, intégrations, rendu
 shared/rich.js         textes mis en forme (biographies, descriptions), partagé par les pages, le serveur et l'admin
 functions/equipe/      page de profil, rendue par le serveur
 functions/projets/     page de projet, rendue par le serveur
@@ -87,6 +88,7 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 ### Aperçu avant publication
 
 - **Textes** : la biographie et la description d'un projet se mettent en forme dans l'admin (intertitre, liste, gras, bleu, lien ; gauche, centre, droite, justifié), tels qu'ils seront vus. Ils sont gardés en mots simples (`{c}`, `{r}`, `{j}`, `# `, `- `, `**gras**`, `==bleu==`, `[mots](adresse)`, voir `shared/rich.js`) : jamais de HTML, et les cartes, les moteurs et les aperçus de lien n'en prennent que les mots. Dans la méthode, les mots de chaque étape se mettent à gauche, au centre ou à droite de l'image.
+- **Mise en page d'un projet** : dans l'admin, la page du projet se compose de blocs (image, vidéo, texte, infos, chiffres, intégration) posés sur les quatre axes, bord à bord ou en plein écran. On part d'une maquette (étude de cas, galerie, film, site, récit, affiche) ou de la page blanche ; plusieurs images déposées ensemble prennent leur place selon leur forme (`arrange`), un bloc se porte à côté d'un autre (ils partagent la rangée) ou entre deux rangées, la réglette dit où il commence et finit. Une image est envoyée deux fois (grande, et 1200 px). `shared/blocks.js` contrôle et dessine les blocs côté serveur ; la fiche les prend de la page du projet ; `src/blocks-rt.js` joue les films à l'écran. Une intégration (YouTube, Vimeo, Figma, Spotify, SoundCloud, CodePen, Sketchfab, Instagram, TikTok, Behance, Google Maps, ou n'importe quelle page) n'est demandée qu'au clic du visiteur.
 - **Ce que le navigateur fait déjà** : langue du visiteur par défaut, noms et adresses enregistrés proposés, bon clavier, orthographe dans la langue du texte, partage du système pour les projets, et un e-mail prêt à partir si le formulaire ne passe pas.
 - « Aperçu », en haut de l’admin, montre le vrai site avec ce qui n’est pas publié, sur la page en cours : ordinateur, tablette ou téléphone, français ou anglais, brouillon ou version en ligne.
 - La liste des changements dit ce qui va changer, y mène, et permet de rétablir un seul élément. On peut publier de là.

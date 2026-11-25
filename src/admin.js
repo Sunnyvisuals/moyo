@@ -160,8 +160,8 @@ async function enter(from) {
 /* =====================================================================================================
    Data
    ===================================================================================================== */
-const imagesOf = d => { const s = new Set(); for (const p of d.projects) { if (p.cover) s.add(p.cover); (p.images || []).forEach(i => s.add(i)); } for (const m of d.team || []) if (m.photo) s.add(m.photo); for (const m of d.method || []) { if (m.media) s.add(m.media); if (m.poster) s.add(m.poster); } return s; };
-function setData(d) { data = d; saved = JSON.stringify(d); savedImages = imagesOf(d); offered = null; const f = store.get(DRAFT); if (f) try { const x = JSON.parse(f); if (x && x.data && JSON.stringify(x.data) !== saved) offered = x; else store.set(DRAFT, null); } catch (_) { store.set(DRAFT, null); } }
+const imagesOf = d => { const s = new Set(); for (const p of d.projects) { if (p.cover) s.add(p.cover); (p.images || []).forEach(i => s.add(i)); bkFiles(p.blocks).forEach(i => s.add(i)); } for (const m of d.team || []) if (m.photo) s.add(m.photo); for (const m of d.method || []) { if (m.media) s.add(m.media); if (m.poster) s.add(m.poster); } return s; };
+function setData(d) { data = bkAdopt(d); saved = JSON.stringify(d); savedImages = imagesOf(d); offered = null; const f = store.get(DRAFT); if (f) try { const x = JSON.parse(f); if (x && x.data && JSON.stringify(x.data) !== saved) offered = x; else store.set(DRAFT, null); } catch (_) { store.set(DRAFT, null); } }
 const dirty = () => !!data && JSON.stringify(data) !== saved;
 let draftT;
 function keepDraft() { if (!data) return; if (dirty()) { store.set(DRAFT, JSON.stringify({ at: Date.now(), data })); offered = null; $('.df')?.remove(); } else if (!offered) store.set(DRAFT, null); }
@@ -174,13 +174,13 @@ function touched() { // something changed: the status, and the draft
 const slug = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
 const freeId = (base, list, except) => { let id = base || 'sans-titre', n = 2; while (list.some(x => x.id === id && x !== except)) id = base.slice(0, 56) + '-' + n++; return id; };
 const catName = id => data.categories.find(c => c.id === id)?.fr || '';
-const blank = p => !p.cover && !(p.images || []).length && !['fr', 'en'].some(l => Object.values(p[l] || {}).some(v => v && v.trim()));
+const blank = p => !p.cover && !(p.images || []).length && !(p.blocks || []).length && !['fr', 'en'].some(l => Object.values(p[l] || {}).some(v => v && v.trim()));
 /* uploaded, then taken away before being published: removed from the storage now */
 /* a change of pictures can be taken back for eight seconds (the message, or Ctrl Z): what it took away is removed from the storage only after that */
 function changed(text, was, gone = []) { render(true); toast(text, false, () => { const now = imagesOf(data); data = JSON.parse(was); render(true); now.forEach(drop); }); const l = gone.filter(Boolean); if (l.length) setTimeout(() => data && l.forEach(drop), 9000); }
 function drop(id) { if (!id || id[0] === '/' || savedImages.has(id) || imagesOf(data).has(id)) return; api('/api/images/' + encodeURIComponent(id), { method: 'DELETE' }).catch(() => {}); }
 /* the object a field belongs to: data-o="project:<id>" | "team:<id>" | "method:<n>" | "cat:<id>" */
-function objOf(el) { const b = el.closest('[data-o]'); if (!b) return null; const [k, v] = b.dataset.o.split(/:(.*)/); return k === 'project' ? data.projects.find(p => p.id === v) : k === 'team' ? data.team.find(p => p.id === v) : k === 'method' ? data.method[+v] : k === 'cat' ? data.categories.find(c => c.id === v) : null; }
+function objOf(el) { const b = el.closest('[data-o]'); if (!b) return null; const [k, v] = b.dataset.o.split(/:(.*)/); return k === 'block' ? bkAt(v)[1] : k === 'project' ? data.projects.find(p => p.id === v) : k === 'team' ? data.team.find(p => p.id === v) : k === 'method' ? data.method[+v] : k === 'cat' ? data.categories.find(c => c.id === v) : null; }
 
 async function publish() { // true when it is online, null when something is missing
   const p = data.projects.find(x => !x.fr.title.trim() && !blank(x)), m = data.method.findIndex(x => !x.fr.title.trim()), t = data.team.find(x => !(x.name || '').trim());
@@ -214,7 +214,7 @@ function changes() {
     const oa = was.filter(x => B.has(x.id)).map(x => x.id), ob = now.filter(x => A.has(x.id)).map(x => x.id); if (!eq(oa, ob)) out.push({ t: order, d: 'ordre', href: at, back: () => { const n = new Map(was.map((x, k) => [x.id, k])); L().sort((x, y) => (n.get(x.id) ?? 1e9) - (n.get(y.id) ?? 1e9)); } });
   };
   list('projects', a.projects, data.projects.filter(p => !blank(p) || T(p, 'fr', 'title').trim()), { name: p => T(p, 'fr', 'title') || 'Projet sans titre', add: 'nouveau projet', del: 'retiré du site', order: 'Projets', at: '/projets', href: p => T(p, 'fr', 'title').trim() ? '/projets/' + p.id : '/projets',
-    diff: (x, y) => [...words(x, y, 'rôle du studio'), x.category !== y.category && 'catégorie', (x.year || '') !== (y.year || '') && 'année', x.cover !== y.cover && 'image principale', !eq(x.images || [], y.images || []) && 'galerie', !!x.featured !== !!y.featured && (y.featured ? 'mis sur l’accueil' : 'retiré de l’accueil')].filter(Boolean) });
+    diff: (x, y) => [...words(x, y, 'rôle du studio'), x.category !== y.category && 'catégorie', (x.year || '') !== (y.year || '') && 'année', x.cover !== y.cover && 'image principale', !eq(x.images || [], y.images || []) && 'galerie', !eq(x.blocks || [], y.blocks || []) && 'mise en page', !!x.featured !== !!y.featured && (y.featured ? 'mis sur l’accueil' : 'retiré de l’accueil')].filter(Boolean) });
   (data.method || []).forEach((y, k) => { const x = (a.method || [])[k]; if (!x) return; const d = [...words(x, y), x.media !== y.media && (isVideo(y.media) ? 'vidéo' : 'image'), (x.fit || 'center') !== (y.fit || 'center') && 'cadrage', (x.align || 'left') !== (y.align || 'left') && 'alignement'].filter(Boolean); if (d.length) out.push({ t: `Méthode, étape ${k + 1}`, d: d.join(', '), href: '/#methode', step: k, back: () => { data.method[k] = copy(x); } }); });
   list('team', a.team || [], data.team || [], { name: m => m.name || 'Profil sans nom', add: 'nouveau profil', del: 'retiré de l’équipe', order: 'Équipe', at: '/#equipe', href: m => '/equipe/' + m.id, diff: (x, y) => [...words(x, y, 'titre'), (x.name || '') !== (y.name || '') && 'nom', x.photo !== y.photo && 'portrait'].filter(Boolean) });
   list('categories', a.categories, data.categories, { name: c => c.fr || 'Catégorie sans nom', add: 'nouvelle catégorie', del: 'catégorie supprimée', order: 'Catégories', at: '/projets', href: () => '/projets', diff: (x, y) => [x.fr !== y.fr && 'nom', x.en !== y.en && 'anglais'].filter(Boolean) });
@@ -284,7 +284,7 @@ const FORMAT = { webp: 'WebP', jpg: 'JPEG', jpeg: 'JPEG', png: 'PNG', avif: 'AVI
 const RATIOS = [[1, 1], [5, 4], [4, 3], [3, 2], [16, 10], [16, 9], [2, 1], [21, 9]];
 const ratio = (w, h) => { const v = Math.max(w, h) / Math.min(w, h), m = RATIOS.find(([a, b]) => Math.abs(v * b / a - 1) < .012); return m ? (w >= h ? m : [m[1], m[0]]).join(':') : w >= h ? v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ':1' : '1:' + v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }); };
 /* where it is shown, how many pixels it takes on the long side (on the width for a full screen), and from what weight it is slow */
-const NEED = { cover: { min: 1200, good: 2000, heavy: .9, in: 'l’image principale' }, gallery: { min: 1200, good: 2000, heavy: .9, in: 'la galerie' }, photo: { min: 900, good: 1600, heavy: .7, in: 'un portrait' }, media: { min: 1920, good: 2560, heavy: 1.6, in: 'le plein écran' } };
+const NEED = { cover: { min: 1200, good: 2000, heavy: .9, in: 'l’image principale' }, gallery: { min: 1200, good: 2000, heavy: .9, in: 'la galerie' }, bk: { min: 1200, good: 2000, heavy: 1.2, in: 'la mise en page' }, photo: { min: 900, good: 1600, heavy: .7, in: 'un portrait' }, media: { min: 1920, good: 2560, heavy: 1.6, in: 'le plein écran' } };
 function about(id) {
   let f = facts.get(id); if (!f) facts.set(id, f = {}); if (f.done) return f; if (f.wait) return f.wait;
   return f.wait = (async () => {
@@ -335,7 +335,7 @@ addEventListener('hashchange', () => {
   if (/^#creer=/.test(location.hash)) return start(); if (!data) return;
   const was = route; if (was[0] === 'projets' && was[1]) { const p = data.projects.find(x => x.id === was[1]); if (p && blank(p)) { data.projects.splice(data.projects.indexOf(p), 1); } } // left empty: it never existed
   if (was[0] === 'messages' && msgs?.length) store.set(SEEN, msgs[0].id);
-  render(); scrollTo(0, 0); const p = route[0] === 'projets' && data.projects.find(x => x.id === route[1]); $(p && blank(p) ? '#view .vt' : '#view h1')?.focus({ preventScroll: true });
+  picked = ''; adding = -1; addingMaq = false; render(); scrollTo(0, 0); const p = route[0] === 'projets' && data.projects.find(x => x.id === route[1]); $(p && blank(p) ? '#view .vt' : '#view h1')?.focus({ preventScroll: true });
 });
 const VIEWS = { projets: () => { const p = route[1] && data.projects.find(x => x.id === route[1]); return p ? projectView(p) : projectsView(); }, methode: methodView, equipe: () => { const m = route[1] && data.team.find(x => x.id === route[1]); return m ? personView(m) : teamView(); }, categories: catsView, messages: msgsView, 'mot-de-passe': passView };
 function render(keep) {
@@ -343,7 +343,7 @@ function render(keep) {
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
   if (route[0] === 'projets' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.projects, a, b)); if (route[0] === 'equipe' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.team, a, b));
   if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b)); const g = $('.gal', V); if (g) { const p = objOf(g); sortable(g, (a, b) => moved(p.images, a, b), { sel: '.ed-p [data-drop="cover"]', put: i => toCover(p, i) }); }
-  grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+  grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); { const p = bkProject(); if (p) bkSum(p); } if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
 }
 const when = t => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(t));
 /* a field as tall as its text, where the browser does not do it by itself */
@@ -366,16 +366,17 @@ const KLEIN = 'rgb(0, 47, 167)', JUSTIFY = { left: 'justifyLeft', center: 'justi
 const sign = d => `<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`, rows = L => sign(`<path d="${L.map(([x, w], i) => `M${x} ${3.5 + i * 4.35}h${w}`).join('')}"/>`);
 const TOOLS = [['h', 'Intertitre', '', '<b>T</b>'], ['b', 'Gras', 'Ctrl B', '<b>B</b>'], ['k', 'Bleu', '', sign('<circle cx="10" cy="10" r="5.5" fill="#002FA7" stroke="none"/><circle class="o" cx="10" cy="10" r="9" stroke="#002FA7"/>')], ['a', 'Lien', 'Ctrl K', sign('<path d="M8.4 11.6l3.2-3.2M9.2 6.3l1.9-1.9a3.2 3.2 0 0 1 4.5 4.5l-1.9 1.9M10.8 13.7l-1.9 1.9a3.2 3.2 0 0 1-4.5-4.5l1.9-1.9"/>')], ['ul', 'Liste', '', sign('<path d="M8 4h10M8 10h10M8 16h10"/><g fill="currentColor" stroke="none"><circle cx="3" cy="4" r="1.7"/><circle cx="3" cy="10" r="1.7"/><circle cx="3" cy="16" r="1.7"/></g>')],
   ['left', 'À gauche', '', rows([[2, 16], [2, 9], [2, 14], [2, 7]])], ['center', 'Au centre', '', rows([[2, 16], [5.5, 9], [3, 14], [6.5, 7]])], ['right', 'À droite', '', rows([[2, 16], [9, 9], [4, 14], [11, 7]])], ['justify', 'Justifié', '', rows([[2, 16], [2, 16], [2, 16], [2, 16]])]];
-const richField = (label, k, v, { ph, max }) => `<div class="fld rich w2"><div class="rt-h"><span class="fl" id="rt-${k}">${label}</span><div class="rt-b">${[['Mise en forme', TOOLS.slice(0, 5)], ['Alignement', TOOLS.slice(5)]].map(([g, l]) => `<div role="group" aria-label="${g}">${l.map(([t, n, key, d]) => `<button type="button" data-rt="${t}" aria-pressed="false" aria-label="${n}" title="${n}${key ? ` (${key})` : ''}">${d}</button>`).join('')}</div>`).join('')}</div></div>
+let richN = 0;
+const richField = (label, k, v, { ph, max }, u = 'rt' + ++richN) => `<div class="fld rich w2"><div class="rt-h"><span class="fl" id="${u}">${label}</span><div class="rt-b">${[['Mise en forme', TOOLS.slice(0, 5)], ['Alignement', TOOLS.slice(5)]].map(([g, l]) => `<div role="group" aria-label="${g}">${l.map(([t, n, key, d]) => `<button type="button" data-rt="${t}" aria-pressed="false" aria-label="${n}" title="${n}${key ? ` (${key})` : ''}">${d}</button>`).join('')}</div>`).join('')}</div></div>
   <div class="rt-l" hidden><input type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" aria-label="Adresse du lien" placeholder="https:// ou une adresse e-mail"><button type="button" class="tx" data-ln="ok">Poser le lien</button><button type="button" class="tx red" data-ln="no">Retirer</button></div>
-  <div class="rt" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="rt-${k}" data-k="${k}" data-max="${max}" data-ph="${esc(ph)}" lang="${lang}" spellcheck="true">${richHTML(v) || '<p><br></p>'}</div><small class="f-err"></small></div>`;
+  <div class="rt" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="${u}" data-k="${k}" data-max="${max}" data-ph="${esc(ph)}" lang="${lang}" spellcheck="true">${richHTML(v) || '<p><br></p>'}</div><small class="f-err"></small></div>`;
 const edOf = el => el?.closest?.('.rich')?.querySelector('.rt'), BLOCK = /^(P|DIV|H[1-6]|UL|OL|LI|BLOCKQUOTE|SECTION|ARTICLE|PRE|TABLE|TBODY|TR|TD|FIGURE)$/;
 const joiner = '⁠', plainly = t => t.replace(/[​﻿⁠]/g, '').replace(/ /g, ' ').replace(/\*(?=\*)/g, '*' + joiner).replace(/=(?==)/g, '=' + joiner).replace(/\](?=\()/g, ']' + joiner); // what could be read as a form stays text
 /* from what is seen to what is kept */
 function richText(ed) {
-  const out = [], kinds = [], mark = el => ({ center: '{c} ', right: '{r} ', end: '{r} ', justify: '{j} ' }[getComputedStyle(el).textAlign.replace(/^-(webkit|moz)-/, '')] || '');
+  const base = +getComputedStyle(ed).fontWeight, out = [], kinds = [], mark = el => ({ center: '{c} ', right: '{r} ', end: '{r} ', justify: '{j} ' }[getComputedStyle(el).textAlign.replace(/^-(webkit|moz)-/, '')] || '');
   const words = (nodes, head) => { // the words of a block, with what they look like
-    const R = []; (function walk(list, href) { for (const n of list) { if (n.nodeType === 3) { const c = getComputedStyle(n.parentElement); R.push({ t: n.data.replace(/[\n\t]/g, ' '), b: !head && +c.fontWeight >= 600, k: c.color === KLEIN, href }); } else if (n.nodeName === 'BR') R.push({ t: '\n', b: false, k: false, href: '' }); else if (n.nodeType === 1) walk(n.childNodes, n.nodeName === 'A' ? n.getAttribute('href') || '' : href); } })(nodes, '');
+    const R = []; (function walk(list, href) { for (const n of list) { if (n.nodeType === 3) { const c = getComputedStyle(n.parentElement); R.push({ t: n.data.replace(/[\n\t]/g, ' '), b: !head && +c.fontWeight >= 600 && +c.fontWeight > base, k: c.color === KLEIN, href }); } else if (n.nodeName === 'BR') R.push({ t: '\n', b: false, k: false, href: '' }); else if (n.nodeType === 1) walk(n.childNodes, n.nodeName === 'A' ? n.getAttribute('href') || '' : href); } })(nodes, '');
     const L = []; R.forEach(r => { const p = L[L.length - 1]; if (p && (r.t === '\n' || p.b === r.b && p.k === r.k && p.href === r.href)) p.t += r.t; else L.push({ ...r }); });
     return L.map(r => { const [, a, m, z] = /^(\s*)([^]*?)(\s*)$/.exec(plainly(r.t)); if (!m) return a + z; let x = m; if (r.k) x = `==${x}==`; if (r.b) x = `**${x}**`; if (r.href && richURL(r.href)) x = `[${x.replace(/\n/g, ' ').replace(/[[\]]/g, '')}](${r.href.replace(/[()\s]/g, c => '%' + c.charCodeAt(0).toString(16))})`; return a + x + z; }).join('').replace(/[ ]*\n[ ]*/g, '\n').replace(/[ ]{2,}/g, ' ').trim();
   };
@@ -394,11 +395,11 @@ function richText(ed) {
 function richState(ed) {
   const s = getSelection(), n = s.rangeCount && ed.contains(s.focusNode) ? s.focusNode : null, el = n && (n.nodeType === 1 ? n.childNodes[Math.min(s.focusOffset, n.childNodes.length - 1)]?.nodeType === 1 ? n.childNodes[Math.min(s.focusOffset, n.childNodes.length - 1)] : n : n.parentElement);
   if (!el) return null; const up = q => { const e = el.closest(q); return e && ed.contains(e) && e !== ed ? e : null; }, bl = up('li,h1,h2,h3,h4,p,div') || ed, al = getComputedStyle(bl).textAlign, q = (f, c) => { try { return document[f](c); } catch (_) { return ''; } }, col = String(q('queryCommandValue', 'foreColor'));
-  const h = !!up('h1,h2,h3,h4'); return { h, ul: !!up('ul,ol'), b: !h && !!q('queryCommandState', 'bold'), k: /^(#002fa7|rgb\(0, ?47, ?167\)|10956544)$/i.test(col), a: up('a'), at: /right|end/.test(al) ? 'right' : /center/.test(al) ? 'center' : al === 'justify' ? 'justify' : 'left' };
+  const h = !!up('h1,h2,h3,h4'), strong = +getComputedStyle(ed).fontWeight >= 600; return { h, strong, ul: !!up('ul,ol'), b: !h && !strong && !!q('queryCommandState', 'bold'), k: /^(#002fa7|rgb\(0, ?47, ?167\)|10956544)$/i.test(col), a: up('a'), at: /right|end/.test(al) ? 'right' : /center/.test(al) ? 'center' : al === 'justify' ? 'justify' : 'left' };
 }
 function richShow(ed) {
   const st = document.activeElement === ed || ed.parentElement.contains(document.activeElement) ? richState(ed) : null, t = ed.textContent.trim();
-  ed.classList.toggle('empty', !t && !ed.querySelector('li')); $$('[data-rt]', ed.parentElement).forEach(b => { const k = b.dataset.rt; b.setAttribute('aria-pressed', String(!!st && (k in JUSTIFY ? st.at === k : !!st[k]))); b.disabled = !!st && st.h && k === 'b'; });
+  ed.classList.toggle('empty', !t && !ed.querySelector('li')); $$('[data-rt]', ed.parentElement).forEach(b => { const k = b.dataset.rt; b.setAttribute('aria-pressed', String(!!st && (k in JUSTIFY ? st.at === k : !!st[k]))); b.disabled = !!st && (st.h || st.strong) && k === 'b'; });
   const n = richText(ed).length - +ed.dataset.max, e = ed.nextElementSibling; e.textContent = n > 0 ? plural(n, 'caractère') + ' de trop.' : ''; n > 0 ? ed.setAttribute('aria-invalid', 'true') : ed.removeAttribute('aria-invalid');
 }
 const run = (c, v) => document.execCommand(c, false, v);
@@ -429,7 +430,7 @@ $('#view').addEventListener('focusout', e => { const ed = e.target.closest?.('.r
 $('#view').addEventListener('keydown', e => {
   if (e.target.closest('.rt-l')) { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); linkDo(e.target.closest('.rt-l'), 'ok'); } else if (e.key === 'Escape') { e.preventDefault(); linkDo(e.target.closest('.rt-l'), 'stop'); } return; }
   const ed = e.target.closest?.('.rt[contenteditable]'); if (!ed || !(e.ctrlKey || e.metaKey) || e.altKey) return; const k = e.key.toLowerCase();
-  if (k === 'k') { e.preventDefault(); richDo(ed, 'a'); } else if (k === 'b') { e.preventDefault(); if (!richState(ed)?.h) richDo(ed, 'b'); } else if (k === 'i' || k === 'u') e.preventDefault(); // neither slanted nor underlined letters here
+  if (k === 'k') { e.preventDefault(); richDo(ed, 'a'); } else if (k === 'b') { e.preventDefault(); { const st = richState(ed); if (!st?.h && !st?.strong) richDo(ed, 'b'); } } else if (k === 'i' || k === 'u') e.preventDefault(); // neither slanted nor underlined letters here
 });
 $('#view').addEventListener('beforeinput', e => { if (e.target.closest?.('.rt[contenteditable]') && /^format(Italic|Underline|Strike|Super|Sub|FontName|Back|Indent|Outdent)/.test(e.inputType)) e.preventDefault(); });
 /* what is pasted or dropped comes as words */
@@ -437,6 +438,180 @@ const words2html = t => t.replace(/\r\n?/g, '\n').trim().split(/\n{2,}/).map(p =
 const putWords = t => /\n/.test(t.trim()) ? run('insertHTML', words2html(t)) : run('insertText', t.replace(/[\r\n]+/g, ' '));
 $('#view').addEventListener('paste', e => { if (!e.target.closest?.('.rt[contenteditable]') || !e.clipboardData) return; const t = e.clipboardData.getData('text/plain'); if (!t && e.clipboardData.files.length) return; e.preventDefault(); putWords(t); });
 $('#view').addEventListener('drop', e => { const ed = e.target.closest?.('.rt[contenteditable]'); if (!ed || !e.dataTransfer || e.dataTransfer.files.length) return; const t = e.dataTransfer.getData('text/plain'); if (!t) return; e.preventDefault(); const p = document.caretPositionFromPoint?.(e.clientX, e.clientY), r = p ? null : document.caretRangeFromPoint?.(e.clientX, e.clientY), s = getSelection(); ed.focus(); if (p) s.collapse(p.offsetNode, p.offset); else if (r) { s.removeAllRanges(); s.addRange(r); } putWords(t); });
+
+/* =====================================================================================================
+   The layout of a project (shared/blocks.js). What is seen is the page: its margins, its four axes, its rows. A block is chosen, its settings are in the
+   bar under the page; it is carried anywhere: beside another one they share the row, above or under it gets its own
+   ===================================================================================================== */
+__BLOCKS__
+let picked = '', adding = -1; // the block that is chosen, and where something is being added
+const bkId = () => 'b' + Math.random().toString(36).slice(2, 9), rowsOf3 = () => Array.from({ length: 3 }, () => ({ k: '', v: '' }));
+const bkNew = (t, x = {}) => { const w = () => t === 'text' ? { text: '' } : t === 'info' ? { rows: rowsOf3() } : { cap: '' }; return { id: bkId(), t, at: [0, 4], gap: '', br: false, fr: w(), en: w(), ...(t === 'text' ? { size: '' } : t === 'info' ? { look: 'list' } : { wide: '', ratio: '', ...(t === 'embed' ? { url: '', poster: null } : { src: null, iw: 0, ih: 0, fit: '', ...(t === 'video' ? { poster: null, mode: 'loop' } : { sm: null }) }) }), ...x }; };
+const BK_NAME = { image: 'Image', video: 'Vidéo', text: 'Texte', info: 'Infos', embed: 'Intégration' };
+const bkOf = p => (p.blocks ||= []), bkAt = id => { const p = route[0] === 'projets' && data.projects.find(x => x.id === route[1]); return p ? [p, bkOf(p).find(b => b.id === id)] : []; };
+/* a gallery of before the layouts becomes one */
+function bkAdopt(d) { d.projects.forEach(p => { if (!Array.isArray(p.blocks)) p.blocks = []; if ((p.images || []).length) { p.blocks.push(...p.images.map((src, i) => bkNew('image', { id: 'g' + String(src).replace(/[^a-z0-9]/g, '').slice(0, 10) + i, src, at: [i % 2 * 2, 2] }))); p.images = []; } }); return d; }
+
+/* ---------- layouts that are ready. I: image, V: film, T: text, N: infos, E: another service. [type, axes, more] ---------- */
+const I = (at, x) => ['image', at, x], V_ = (at, x) => ['video', at, x], T = (at, x) => ['text', at, x], N = (at, x) => ['info', at, x], E = (at, x) => ['embed', at, x];
+const MAQ = [
+  { n: 'Étude de cas', d: 'Le contexte, l’idée, le résultat. Pour une identité, une campagne.', b: [I([0, 4], { wide: 'screen' }), T([0, 2], { size: 'title' }), T([2, 2]), I([0, 2], { ratio: '4:5' }), I([2, 2], { ratio: '4:5' }), T([0, 4], { size: 'large', gap: 'large' }), I([0, 4], { wide: 'full' }), N([0, 4], { look: 'figures', gap: 'large' }), I([0, 3], { ratio: '3:2' }), I([3, 1], { ratio: '1:1' })] },
+  { n: 'Galerie', d: 'Beaucoup d’images, un rythme qui varie.', b: [I([0, 4], { wide: 'full' }), I([0, 2], { ratio: '4:5' }), I([2, 2], { ratio: '4:5' }), I([0, 4], { ratio: '16:9' }), I([0, 1], { ratio: '3:4' }), I([1, 1], { ratio: '3:4' }), I([2, 1], { ratio: '3:4' }), I([3, 1], { ratio: '3:4' }), I([0, 2], { ratio: '3:2' }), I([2, 1], { ratio: '3:4' }), I([3, 1], { ratio: '3:4' }), I([0, 4], { wide: 'full' })] },
+  { n: 'Film', d: 'Le film d’abord, puis ses images et ses infos.', b: [V_([0, 4], { wide: 'full', ratio: '16:9' }), T([0, 2], { size: 'large' }), N([2, 2]), I([0, 1], { ratio: '4:3' }), I([1, 1], { ratio: '4:3' }), I([2, 1], { ratio: '4:3' }), I([3, 1], { ratio: '4:3' }), E([0, 4], { ratio: '16:9', gap: 'large' })] },
+  { n: 'Site', d: 'Une capture, le site à essayer, les écrans de téléphone.', b: [I([0, 4], { ratio: '16:9' }), T([0, 1], { size: '' }), T([2, 2]), E([0, 4], { wide: 'full', ratio: '16:9', gap: 'large' }), I([0, 1], { ratio: '9:16', gap: 'large' }), I([1, 1], { ratio: '9:16' }), I([2, 1], { ratio: '9:16' }), I([3, 1], { ratio: '9:16' }), N([0, 4], { look: 'figures' })] },
+  { n: 'Récit', d: 'Le texte mène, les images répondent.', b: [T([0, 3], { size: 'large' }), I([0, 4], { wide: 'full', gap: 'large' }), T([2, 2]), I([0, 2], { ratio: '4:5', br: true }), T([2, 2]), I([1, 3], { ratio: '3:2', gap: 'large' }), T([0, 2]), I([2, 2], { ratio: '4:5' })] },
+  { n: 'Affiche', d: 'Une seule image, très grande, et quelques mots.', b: [I([1, 2], { ratio: '3:4' }), T([1, 2]), N([1, 2])] }
+];
+const bkFrom = m => m.b.map(([t, at, x]) => bkNew(t, { at, ...(x || {}) }));
+const mini = list => `<span class="mq" aria-hidden="true"><span class="mq-in">${bkRows(list).map(r => `<span class="mq-r">${r.map(b => `<i class="m-${b.t}${b.wide ? ' w' : ''}${b.look === 'figures' ? ' f' : ''}${b.size ? ' z' : ''}" style="grid-column:${b.wide ? '1/-1' : `${b.at[0] + 1}/span ${b.at[1]}`}${/image|video|embed/.test(b.t) ? `;aspect-ratio:${b.wide === 'screen' ? '16/10' : (b.ratio || (b.wide ? '21:9' : '3:2')).replace(':', '/')}` : ''}"></i>`).join('')}</span>`).join('')}</span></span>`;
+const chooser = () => `<div class="mqs">${MAQ.map((m, i) => `<button type="button" class="mq-b" data-maq="${i}">${mini(bkFrom(m))}<b>${m.n}</b><span>${m.d}</span></button>`).join('')}<button type="button" class="mq-b" data-add-at="0"><span class="mq mq-0" aria-hidden="true"><i></i></span><b>Page blanche</b><span>Vous posez tout vous-même.</span></button></div>`;
+/* images that arrive together take their places by themselves: what they are (in height, in width) makes the rhythm */
+function arrange(list) {
+  const tall = b => b.iw && b.ih && b.iw / b.ih < .95, wide = b => !b.iw || b.iw / b.ih > 1.15; let i = 0, k = 0;
+  const put = (n, f) => { for (let j = 0; j < n; j++) Object.assign(list[i + j], { wide: '', ratio: '', br: j === 0 }, f(j)); i += n; k++; };
+  while (i < list.length) {
+    const left = list.length - i, t = n => list.slice(i, i + n).length === n && list.slice(i, i + n).every(tall);
+    if (left >= 4 && t(4) && k % 2) put(4, j => ({ at: [j, 1], ratio: '3:4' }));
+    else if (left >= 3 && wide(list[i]) && tall(list[i + 1]) && tall(list[i + 2])) put(3, j => ({ at: [[0, 2], [2, 1], [3, 1]][j], ratio: j ? '3:4' : '3:2' }));
+    else if (left >= 3 && tall(list[i]) && tall(list[i + 1]) && wide(list[i + 2])) put(3, j => ({ at: [[0, 1], [1, 1], [2, 2]][j], ratio: j === 2 ? '3:2' : '3:4' }));
+    else if (t(2)) put(2, j => ({ at: [j * 2, 2], ratio: '4:5' }));
+    else if (tall(list[i])) put(1, () => ({ at: [k % 2 ? 2 : 0, 2] }));
+    else if (left >= 2 && wide(list[i]) && wide(list[i + 1]) && k % 3 === 1) put(2, j => ({ at: [j * 2, 2], ratio: '3:2' }));
+    else put(1, () => ({ at: [0, 4], wide: k % 3 === 0 ? 'full' : '' }));
+  }
+  return list;
+}
+
+/* ---------- the page ---------- */
+const colOf = b => b.wide ? '1/-1' : `${b.at[0] * 3 + 1}/span ${b.at[1] * 3}`, ratioOf = b => b.wide === 'screen' ? '16/9' : b.ratio ? b.ratio.replace(':', '/') : b.iw && b.ih ? `${b.iw}/${b.ih}` : '';
+function bkBlock(b) {
+  const L = lang, t = b[L] || (b[L] = {}), f = b.fr || {}, r = ratioOf(b), st = r ? ` style="aspect-ratio:${r}"` : '', cls = `bk-p${b.fit ? ' f-' + b.fit : ''}${r ? ' cut' : ''}`, media = b.t === 'image' || b.t === 'video';
+  const empty = (what, accept) => `<label class="bk-0"${st || ' style="aspect-ratio:3/2"'}><span>${what}</span><input type="file" accept="${accept}" data-file="bk" aria-label="${what}" multiple>${ring}</label>`;
+  const cap = /image|video|embed/.test(b.t) ? `<input class="bk-cap" type="text" data-k="${L}.cap" maxlength="300" value="${esc(t.cap)}" placeholder="${esc(L === 'en' && f.cap || 'Légende')}" aria-label="Légende" autocomplete="off">` : '';
+  let v = '';
+  if (b.t === 'image') v = b.src ? `<div class="${cls}"${st}><img src="${imgURL(b.sm || b.src)}" alt="" draggable="false">${ring}</div>` : empty('Choisir ou déposer une image', 'image/*');
+  else if (b.t === 'video') v = b.src ? `<div class="${cls}"${st}><video src="${imgURL(b.src)}"${b.poster ? ` poster="${imgURL(b.poster)}"` : ''} muted loop playsinline autoplay></video>${ring}</div>` : empty('Choisir ou déposer une vidéo', 'video/mp4,video/webm');
+  else if (b.t === 'text') v = richField('Texte', L + '.text', t.text, { ph: L === 'en' ? richWords(f.text || '') : 'Écrivez ici.', max: 6000 });
+  else if (b.t === 'info') { const rows = t.rows || (t.rows = []), fr = f.rows || []; if (L === 'en') while (rows.length < fr.length) rows.push({ k: '', v: '' }); v = `<div class="bk-i${b.look === 'figures' ? ' fig' : ''}">${rows.map((q, i) => `<div class="bk-ir"><input type="text" data-k="${L}.rows.${i}.${b.look === 'figures' ? 'v' : 'k'}" value="${esc(b.look === 'figures' ? q.v : q.k)}" maxlength="${b.look === 'figures' ? 240 : 120}" placeholder="${esc(L === 'en' && fr[i] && (b.look === 'figures' ? fr[i].v : fr[i].k) || (b.look === 'figures' ? '120' : 'Client'))}" aria-label="${b.look === 'figures' ? 'Chiffre' : 'Nom'} ${i + 1}"><input type="text" data-k="${L}.rows.${i}.${b.look === 'figures' ? 'k' : 'v'}" value="${esc(b.look === 'figures' ? q.k : q.v)}" maxlength="${b.look === 'figures' ? 120 : 240}" placeholder="${esc(L === 'en' && fr[i] && (b.look === 'figures' ? fr[i].k : fr[i].v) || (b.look === 'figures' ? 'ce qu’il compte' : 'Ville de Nice'))}" aria-label="${b.look === 'figures' ? 'Légende' : 'Valeur'} ${i + 1}"><button type="button" class="tx red" data-row="${i}" aria-label="Retirer la ligne ${i + 1}">×</button></div>`).join('')}<button type="button" class="tx" data-row="+">Ajouter une ligne</button></div>`; }
+  else { const m = bkEmbed(b.url), q = (b.ratio || m?.ratio || '16:9').replace(':', '/'); v = `<div class="bk-e" style="${m?.height && !b.ratio ? 'min-height:' + m.height + 'px' : 'aspect-ratio:' + q}">${b.poster ? `<img src="${imgURL(b.poster)}" alt="" draggable="false">` : ''}<div><b class="bk-en">${m ? esc(m.name) : 'Intégration'}</b><input type="text" inputmode="url" data-k="url" value="${esc(b.url)}" maxlength="2000" placeholder="Collez un lien : YouTube, Vimeo, Figma, Spotify, Google Maps…" aria-label="Adresse à intégrer" spellcheck="false" autocapitalize="none" autocomplete="url"><small>${m ? (m.other ? 'Page affichée telle quelle : certains sites le refusent, vérifiez dans l’aperçu.' : 'Rien ne lui est demandé avant le clic du visiteur.') : b.url ? 'Ce lien n’est pas reconnu.' : 'Un lien, ou le code <iframe> donné par le service.'.replace('<', '&lt;').replace('>', '&gt;')}</small></div></div>`; }
+  return `<div class="bk1 t-${b.t}${b.wide ? ' w' : ''}${b.size ? ' z-' + b.size : ''}${picked === b.id ? ' sel' : ''}" data-b="${esc(b.id)}" data-o="block:${esc(b.id)}" data-drop="bk" data-to="${media && b.src ? 'Remplacer' : 'Ajouter'}" style="grid-column:${colOf(b)}" tabindex="0" role="group" aria-label="${BK_NAME[b.t]}${b.wide === 'full' ? ', bord à bord' : b.wide === 'screen' ? ', plein écran' : `, ${b.at[1]} sur 4 axes`}">${v}${cap}<button type="button" class="grip" aria-label="Déplacer ce bloc" tabindex="-1"></button></div>`;
+}
+const ADD = [['image', 'Image'], ['video', 'Vidéo'], ['text', 'Texte'], ['info', 'Infos'], ['figures', 'Chiffres'], ['embed', 'Intégration'], ['maq', 'Maquette']];
+const addRow = at => `<div class="bk-menu" data-menu="${at}">${ADD.map(([k, n]) => `<button type="button" class="btn" data-new="${k}"><span>${n}</span><i class="ar" aria-hidden="true"></i></button>`).join('')}</div>`;
+function bkInner(p) {
+  const L = bkOf(p); if (!L.length && adding < 0) return `<p class="vn bk-n">Choisissez une maquette, ou déposez vos images ici : elles prennent leur place toutes seules. Tout se change ensuite.</p>${chooser()}`;
+  let n = 0; const between = at => at === adding ? (adding >= 0 && addingMaq ? chooser() : addRow(at)) : `<button type="button" class="bk-add" data-add-at="${at}" aria-label="Ajouter ici"><i></i></button>`;
+  const rows = bkRows(L).map(r => { const g = (r.find(b => b.gap) || {}).gap, h = between(n) + `<div class="bkc-r${g ? ' r-' + g : ''}">${r.map(bkBlock).join('')}</div>`; n += r.length; return h; }).join('');
+  return `<div class="bkc" id="bkc">${rows}${adding === L.length || !L.length ? (addingMaq ? chooser() : addRow(L.length)) : addRow(L.length)}</div>${bkBar(p)}`;
+}
+let addingMaq = false;
+const SEL = (k, name, v, list) => `<label class="bk-s"><span>${name}</span><select data-set="${k}">${list.map(([a, b]) => `<option value="${a}"${a === v ? ' selected' : ''}>${b}</option>`).join('')}</select></label>`;
+const WIDE = { full: ['Bord à bord', sign('<path d="M1 4v12M19 4v12M5 10h10M7.5 7.5L5 10l2.5 2.5M12.5 7.5L15 10l-2.5 2.5"/>')], screen: ['Plein écran', sign('<path d="M2 7V2h5M13 2h5v5M18 13v5h-5M7 18H2v-5"/>')] };
+/* the settings of the block that is chosen */
+function bkBar(p) {
+  const b = bkOf(p).find(x => x.id === picked); if (!b) return '';
+  const media = b.t === 'image' || b.t === 'video', on = k => k >= b.at[0] && k < b.at[0] + b.at[1];
+  const place = `<div class="rgl${b.wide ? ' off' : ''}" role="slider" tabindex="0" aria-label="Place sur les quatre axes" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${b.at[0] + 1}" aria-valuetext="axes ${b.at[0] + 1} à ${b.at[0] + b.at[1]}" title="Glissez : où le bloc commence et finit">${[0, 1, 2, 3].map(k => `<i class="${!b.wide && on(k) ? 'on' : ''}" data-k4="${k}"></i>`).join('')}</div>`;
+  const wide = b.t === 'text' || b.t === 'info' ? '' : Object.entries(WIDE).filter(([k]) => b.t !== 'embed' || k === 'full').map(([k, [n, d]]) => `<button type="button" class="bk-w" data-wide="${k}" aria-pressed="${b.wide === k}" aria-label="${n}" title="${n}">${d}</button>`).join('');
+  const s = [];
+  if (b.t !== 'text' && b.t !== 'info' && b.wide !== 'screen') s.push(SEL('ratio', 'Format', b.ratio, [['', media ? 'D’origine' : 'Automatique'], ...BK_RATIOS.map(r => [r, r])]));
+  if (media && b.src && (b.ratio || b.wide === 'screen')) s.push(SEL('fit', 'Cadrage', b.fit, [['', 'Au centre'], ['top', 'En haut'], ['bottom', 'En bas'], ['contain', 'En entier']]));
+  if (b.t === 'video') s.push(SEL('mode', 'Lecture', b.mode, [['loop', 'En boucle, muette'], ['player', 'Lecteur, avec le son']]));
+  if (b.t === 'text') s.push(SEL('size', 'Taille', b.size, [['', 'Texte'], ['large', 'Grand'], ['title', 'Titre']]));
+  if (b.t === 'info') s.push(SEL('look', 'Dessin', b.look, [['list', 'Liste'], ['figures', 'Chiffres']]));
+  s.push(SEL('gap', 'Espace au-dessus', b.gap, [['', 'Normal'], ['tight', 'Serré'], ['large', 'Grand']]));
+  const acts = [media && b.src && ['swap', 'Remplacer'], b.t === 'image' && b.src && ['cover', 'En image principale'], b.t === 'embed' && ['poster', b.poster ? 'Changer l’image d’attente' : 'Image d’attente'], b.t === 'embed' && b.poster && ['noposter', 'Retirer l’image'], ['up', 'Monter'], ['down', 'Descendre'], ['copy', 'Dupliquer'], ['rm', 'Supprimer', 'red']].filter(Boolean);
+  return `<div class="bk-bar" role="toolbar" aria-label="Réglages du bloc"><b>${b.t === 'info' && b.look === 'figures' ? 'Chiffres' : BK_NAME[b.t]}</b>${place}${wide}${s.join('')}<span class="bk-acts">${acts.map(([k, n, c]) => `<button type="button" class="tx${c ? ' ' + c : ''}" data-bk="${k}">${n}</button>`).join('')}</span><input type="file" id="bkFile" hidden>${media && b.src ? tec(b.src, 'bk', '') : ''}</div>`;
+}
+function bkDraw(p, keep) {
+  const box = $('#bk'); if (!box) return; const y = scrollY; box.innerHTML = bkInner(p); $$('.rt[contenteditable]', box).forEach(richShow); touched(); tell(); bkSum(p); scrollTo(0, y);
+  if (keep) { const e = $(`[data-b="${picked}"]`, box); e && e.focus({ preventScroll: true }); }
+}
+function bkSum(p) { const e = $('#bkSum'); if (!e) return; const L = bkOf(p), f = bkFiles(L.map(b => ({ src: b.src, poster: b.poster }))); e.textContent = L.length ? `${plural(L.length, 'bloc')}${f.length ? ', ' + plural(f.length, 'fichier') : ''}` : ''; if (f.length) total([...new Set(f)]).then(x => { if (e.isConnected) e.textContent += ', ' + x; }); }
+const bkSection = p => `<section class="sct"><h2>Mise en page<span class="sum" id="bkSum"></span><button type="button" class="tx bk-auto" data-bk="auto">Disposer les images</button></h2><div id="bk" data-drop="bkend" data-to="Ajouter">${bkInner(p)}</div><p class="hint" style="margin-top:14px">Un fichier se dépose sur un bloc pour le remplacer, sur ses bords pour venir avant ou après, sur la page pour venir à la fin. Un bloc se porte par son image ou par sa poignée : à côté d’un autre, ils partagent la rangée. Vidéo : 24 Mo au plus ; au-delà, « Intégration » avec un lien Vimeo ou YouTube.</p></section>`;
+function pick(id, p) { if (picked === id) return; picked = id; const box = $('#bk'); $$('.bk1', box).forEach(e => e.classList.toggle('sel', e.dataset.b === id)); $('.bk-bar', box)?.remove(); if (id) { box.insertAdjacentHTML('beforeend', bkBar(p)); tell(); } }
+
+/* ---------- what is done to it ---------- */
+const bkProject = () => { const b = $('#bk'); return b ? objOf(b) : null; };
+function bkPut(p, at, list) { const L = bkOf(p), nx = L[at]; if (L.length + list.length > BK_MAX) throw new Error(`${BK_MAX} blocs au plus par projet.`); if (list.length) list[0].br = true; if (nx) nx.br = true; L.splice(at, 0, ...list); picked = list[0]?.id || picked; adding = -1; addingMaq = false; }
+/* carried: beside another one they share the row and its four axes; above or under it has its own */
+const SHARE = { 1: [4], 2: [2, 2], 3: [2, 1, 1], 4: [1, 1, 1, 1] };
+function bkMove(p, id, target, side) {
+  const L = bkOf(p), was = JSON.stringify(data), B = L.splice(L.findIndex(b => b.id === id), 1)[0], row = bkRows(L).find(r => r.some(b => b.id === target)); if (!row) return; const t = row.findIndex(b => b.id === target), first = L.indexOf(row[0]);
+  if (side === 'left' || side === 'right') { const r = [...row]; r.splice(side === 'left' ? t : t + 1, 0, B); L.splice(first, row.length, ...r); const n = SHARE[r.length]; let s = 0; r.forEach((b, i) => { if ('wide' in b) b.wide = ''; b.br = i === 0; b.at = [s, n[i]]; s += n[i]; }); }
+  else { const at = side === 'top' ? first : first + row.length, nx = L[at]; B.br = true; if (nx) nx.br = true; L.splice(at, 0, B); }
+  picked = id; bkDraw(p, true); toast('Bloc déplacé.', false, () => { data = JSON.parse(was); render(true); });
+}
+const ratioTxt = b => b.iw && b.ih ? b.iw / b.ih : 0;
+/* a picture is sent twice: as it is seen on a large screen, and smaller */
+async function bkPicture(f, say) { const src = await picture(f, x => say(x * .7), 2800), k = facts.get(src) || {}; let sm = null; if (f.type !== 'image/gif' && Math.max(k.w || 0, k.h || 0) > 1500) sm = await picture(f, x => say(70 + x * .3), k.w >= k.h ? 1200 : Math.round(1200 * k.h / k.w)); return { src, sm, iw: k.w || 0, ih: k.h || 0 }; }
+async function bkFilm(f, say) { const r = await film(f, say); const k = await about(r.id); return { src: r.id, poster: r.poster, iw: k.w || 0, ih: k.h || 0 }; }
+/* files: in the block (and the empty ones after it), beside it, or where it is asked */
+async function bkTake(files, z, p, { block = null, side = 'in', at = null, kind = '' } = {}) {
+  const list = [...files].filter(f => /^(image|video)\//.test(f.type)); if (!list.length) throw new Error('Choisissez des images ou des vidéos.');
+  const was = JSON.stringify(data), gone = [], made = [], say = x => z.style.setProperty('--u', x), here = route.join('/'); z.classList.add('busy'); say(3); let n = 0; const step = x => say(Math.round((n + x / 100) / list.length * 100)), L = bkOf(p), ids = [];
+  const send1 = async f => { const film = f.type.startsWith('video/'), r = film ? await bkFilm(f, step) : await bkPicture(f, step); n++; ids.push(r.src); return [film ? 'video' : 'image', r]; };
+  let hole = block && side === 'in' ? L.findIndex(b => b.id === block) : -1, put = at ?? (block ? L.findIndex(b => b.id === block) + (side === 'before' ? 0 : 1) : L.length);
+  for (const f of list) {
+    const [t, r] = await send1(f); let b = hole >= 0 ? L[hole] : null;
+    if (b && (b.t === 'image' || b.t === 'video') && (!b.src || list.length === 1)) { gone.push(b.src, b.sm, b.poster); if (b.t !== t) { b.t = t; if (t === 'video') { b.mode = 'loop'; b.poster = null; delete b.sm; } else { b.sm = null; delete b.mode; delete b.poster; } } Object.assign(b, r); hole = L.findIndex((x, i) => i > hole && (x.t === 'image' || x.t === 'video') && !x.src); put = L.indexOf(b) + 1; }
+    else made.push(bkNew(t, r));
+  }
+  if (made.length) { const pics = made.filter(b => b.t === 'image'); if (pics.length > 1) arrange(pics); made.filter(b => b.t === 'video').forEach(b => { b.br = true; if (ratioTxt(b) > 1.4) b.wide = 'full'; }); bkPut(p, Math.min(put, L.length), made); }
+  const text = `${ids.length > 1 ? ids.length + ' fichiers' : list[0].type.startsWith('video/') ? 'Vidéo' : 'Image'} : ${gain(ids)}.`;
+  if (route.join('/') === here) changed(text, was, gone.filter(Boolean)); else { touched(); toast(text); }
+}
+$('#view').addEventListener('focusin', e => { const b = e.target.closest?.('.bk1'); if (b) { const p = bkProject(); if (p) pick(b.dataset.b, p); } });
+$('#view').addEventListener('pointerdown', e => { const b = e.target.closest?.('.bk1'); if (b && !e.target.closest('input,button,.rt,label')) { const p = bkProject(); if (p) pick(b.dataset.b, p); } });
+$('#view').addEventListener('click', async e => {
+  const p = bkProject(); if (!p) return; const L = bkOf(p), q = s => e.target.closest(s); let t;
+  if (t = q('[data-maq]')) { const was = JSON.stringify(data), at = adding >= 0 ? adding : L.length; try { bkPut(p, at, bkFrom(MAQ[+t.dataset.maq])); } catch (x) { return fail(x); } bkDraw(p); toast(`Maquette « ${MAQ[+t.dataset.maq].n} » posée. Déposez vos images : elles la remplissent.`, false, () => { data = JSON.parse(was); picked = ''; render(true); }); }
+  else if (t = q('[data-add-at]')) { adding = +t.dataset.addAt; addingMaq = false; bkDraw(p); $(`[data-menu="${adding}"] .btn`)?.focus({ preventScroll: true }); }
+  else if (t = q('[data-new]')) {
+    const at = +t.closest('[data-menu]').dataset.menu, k = t.dataset.new; if (k === 'maq') { adding = at; addingMaq = true; return bkDraw(p); }
+    if (k === 'image' || k === 'video') { const f = document.createElement('input'); f.type = 'file'; f.multiple = k === 'image'; f.accept = k === 'image' ? 'image/*' : 'video/mp4,video/webm'; f.onchange = () => bkTake(f.files, $('#bk'), p, { at }).catch(x => { $('#bk')?.classList.remove('busy'); fail(x); }); f.click(); return; }
+    try { bkPut(p, at, [k === 'figures' ? bkNew('info', { look: 'figures' }) : bkNew(k, k === 'text' ? { at: [0, 2] } : k === 'embed' ? { at: [0, 4] } : { at: [0, 2] })]); } catch (x) { return fail(x); }
+    bkDraw(p); $(`[data-b="${picked}"] :is(.rt,input)`)?.focus();
+  }
+  else if (t = q('[data-row]')) { const [, b] = bkAt(t.closest('.bk1').dataset.b); ['fr', 'en'].forEach(l => { const r = (b[l] ||= {}).rows ||= []; if (t.dataset.row === '+') r.push({ k: '', v: '' }); else r.splice(+t.dataset.row, 1); }); bkDraw(p); if (t.dataset.row === '+') $$(`[data-b="${b.id}"] .bk-ir`).at(-1)?.querySelector('input').focus(); }
+  else if (t = q('[data-wide]')) { const [, b] = bkAt(picked); b.wide = b.wide === t.dataset.wide ? '' : t.dataset.wide; if (b.wide) b.br = true; bkDraw(p); $(`[data-wide="${t.dataset.wide}"]`)?.focus({ preventScroll: true }); }
+  else if (t = q('[data-bk]')) {
+    const k = t.dataset.bk, was = JSON.stringify(data), back = () => { data = JSON.parse(was); render(true); }, i = L.findIndex(b => b.id === picked), b = L[i];
+    if (k === 'auto') { const pics = L.filter(x => x.t === 'image' && x.src); if (pics.length < 2) return toast('Il faut au moins deux images.'); arrange(pics); L.forEach((x, j) => { if (j && L[j - 1].t === 'image' && x.t !== 'image') x.br = true; }); bkDraw(p); return toast('Images disposées.', false, back); }
+    if (!b) return;
+    if (k === 'rm') { L.splice(i, 1); if (L[i]) L[i].br = L[i].br || b.br; picked = ''; changed('Bloc supprimé.', was, [b.src, b.sm, b.poster].filter(Boolean)); }
+    else if (k === 'copy') { const c = { ...JSON.parse(JSON.stringify(b)), id: bkId(), br: true }; if (L[i + 1]) L[i + 1].br = true; L.splice(i + 1, 0, c); picked = c.id; bkDraw(p, true); }
+    else if (k === 'up' || k === 'down') { const R = bkRows(L), r = R.findIndex(x => x.includes(b)), o = R[r + (k === 'up' ? -1 : 1)]; if (!o) return; const [x, y] = k === 'up' ? [o, R[r]] : [R[r], o], from = L.indexOf(x[0]); x[0].br = y[0].br = true; L.splice(from, x.length + y.length, ...y, ...x); bkDraw(p); $(`[data-bk="${k}"]`)?.focus({ preventScroll: true }); $(`[data-b="${picked}"]`)?.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' }); }
+    else if (k === 'cover') { const x = p.cover; p.cover = b.src; if (x) Object.assign(b, { src: x, sm: null, iw: 0, ih: 0 }); else L.splice(i, 1); changed(x ? 'Elle a échangé sa place avec l’image principale.' : 'C’est l’image principale.', was); }
+    else if (k === 'noposter') { const x = b.poster; b.poster = null; changed('Image d’attente retirée.', was, [x]); }
+    else if (k === 'swap' || k === 'poster') { const f = $('#bkFile'); f.value = ''; f.accept = k === 'poster' ? 'image/*' : 'image/*,video/mp4,video/webm'; f.onchange = async () => { const z = $(`[data-b="${b.id}"]`); try { if (k === 'swap') await bkTake(f.files, z, p, { block: b.id }); else { z.classList.add('busy'); const id = await picture(f.files[0], x => z.style.setProperty('--u', x)), x = b.poster; b.poster = id; changed(`Image d’attente : ${gain([id])}.`, was, [x]); } } catch (x) { z.classList.remove('busy'); fail(x); } }; f.click(); }
+  }
+});
+$('#view').addEventListener('change', e => { const k = e.target.dataset?.set, p = k && bkProject(); if (!p) return; const [, b] = bkAt(picked); if (!b) return; b[k] = e.target.value; bkDraw(p); $(`[data-set="${k}"]`)?.focus({ preventScroll: true }); });
+/* the ruler: pressed and dragged, where the block begins and ends */
+function ruler(b, a, z, p) { const s = Math.min(a, z), n = Math.abs(a - z) + 1; if ('wide' in b) b.wide = ''; if (b.at[0] === s && b.at[1] === n) return false; b.at = [s, n]; return true; }
+$('#view').addEventListener('pointerdown', e => {
+  const r = e.target.closest('.rgl'); if (!r || e.button) return; e.preventDefault(); const p = bkProject(), [, b] = bkAt(picked); if (!b) return; const cell = x => { const q = r.getBoundingClientRect(); return clamp(Math.floor((x - q.left) / q.width * 4), 0, 3); }, a = cell(e.clientX); let z = a;
+  const show = () => $$('i', r).forEach((c, k) => c.classList.toggle('on', k >= Math.min(a, z) && k <= Math.max(a, z))); r.classList.remove('off'); show();
+  const mv = q => { const n = cell(q.clientX); if (n !== z) { z = n; show(); } }, end = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); ruler(b, a, z, p); bkDraw(p); $('.rgl')?.focus({ preventScroll: true }); };
+  addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end);
+});
+$('#view').addEventListener('keydown', e => {
+  const p = bkProject(); if (!p) return; const [, b] = bkAt(picked), on = e.target.matches?.('.bk1,.rgl'); if (!b || !on) return; const [s, n] = b.at, go = (a, z) => { e.preventDefault(); if (a >= 0 && z <= 3 && z >= a) { ruler(b, a, z, p); bkDraw(p); $(e.target.matches('.rgl') ? '.rgl' : `[data-b="${b.id}"]`)?.focus({ preventScroll: true }); } };
+  if (e.key === 'ArrowRight') e.shiftKey ? go(s, s + n) : go(s + 1, s + n); else if (e.key === 'ArrowLeft') e.shiftKey ? go(s, s + n - 2) : go(s - 1, s + n - 2); else if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && e.target.matches('.bk1')) { e.preventDefault(); $(`[data-bk="${e.key === 'ArrowUp' ? 'up' : 'down'}"]`)?.click(); setTimeout(() => $(`[data-b="${b.id}"]`)?.focus({ preventScroll: true })); } else if ((e.key === 'Delete' || e.key === 'Backspace') && e.target.matches('.bk1')) { e.preventDefault(); $('[data-bk="rm"]')?.click(); } else if (e.key === 'Escape') { pick('', p); e.target.blur(); }
+});
+/* carried by its handle, or directly by its picture */
+$('#view').addEventListener('pointerdown', e => {
+  const g = e.target.closest('.bk1>.grip'), v = g || (e.pointerType === 'mouse' && e.target.closest('.bk-p')); if (!v || e.button) return; const el = v.closest('.bk1'), p = bkProject(), id = el.dataset.b; if (!p) return; if (g) e.preventDefault(); pick(id, p); if (g) try { g.setPointerCapture(e.pointerId); } catch (_) {}
+  const x0 = e.clientX, y0 = e.clientY; let gh = null, mk = null, at = null, px = x0, py = y0, raf = 0;
+  const find = () => { let best = null, d = 1e9; $$('#bkc .bk1').forEach(q => { if (q === el) return; const r = q.getBoundingClientRect(), n = Math.hypot(Math.max(r.left - px, 0, px - r.right), Math.max(r.top - py, 0, py - r.bottom)); if (n < d) { d = n; best = q; } }); if (!best) return null;
+    const r = best.getBoundingClientRect(), fx = (px - r.left) / r.width, fy = (py - r.top) / r.height, row = [...best.parentElement.children].filter(q => q !== el).length, lr = Math.min(fx, 1 - fx) * r.width < Math.min(Math.max(fy, 0), 1 - Math.min(fy, 1)) * r.height * 1.1 || fx < 0 || fx > 1; return { q: best, r, side: lr && row < 4 && fy > -.05 && fy < 1.05 ? (fx < .5 ? 'left' : 'right') : fy < .5 ? 'top' : 'bottom' }; };
+  const look = () => { gh.style.translate = `${px}px ${py}px`; at = find(); if (!at) return mk.hidden = true; mk.hidden = false; const c = $('#bkc').getBoundingClientRect(), r = at.r, R = at.q.parentElement.getBoundingClientRect(); mk.style.cssText = at.side === 'left' || at.side === 'right' ? `left:${(at.side === 'left' ? r.left - 9 : r.right + 6) - c.left}px;top:${r.top - c.top}px;width:3px;height:${r.height}px` : `left:${R.left - c.left}px;top:${(at.side === 'top' ? R.top - 14 : R.bottom + 11) - c.top}px;width:${R.width}px;height:3px`; };
+  const edge = () => { const w = py < 120 ? (py - 120) / 6 : py > innerHeight - 130 ? (py - innerHeight + 130) / 6 : 0; if (w) { scrollBy(0, w); look(); } raf = requestAnimationFrame(edge); };
+  const mv = q => { px = q.clientX; py = q.clientY; if (!gh) { if (Math.hypot(px - x0, py - y0) < 7) return; const m = el.querySelector('.bk-p>:is(img,video)'); gh = document.createElement('div'); gh.className = 'ghost' + (m ? '' : ' word'); if (m) { const r = m.getBoundingClientRect(), k = m.cloneNode(); k.removeAttribute('autoplay'); gh.style.aspectRatio = `${r.width}/${r.height}`; gh.append(k); } else gh.textContent = BK_NAME[el.className.match(/t-(\w+)/)[1]] + '.'; document.body.append(gh); mk = document.createElement('i'); mk.className = 'bk-mk'; $('#bkc').append(mk); el.classList.add('lift'); root.classList.add('carry'); getSelection()?.removeAllRanges(); raf = requestAnimationFrame(edge); } look(); };
+  const end = q => { removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); if (!gh) return; cancelAnimationFrame(raf); noClick(); gh.remove(); mk.remove(); el.classList.remove('lift'); root.classList.remove('carry'); if (at && q.type !== 'pointercancel') bkMove(p, id, at.q.dataset.b, at.side); };
+  addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end);
+});
 
 /* ---------- projects ---------- */
 function projectsView() {
@@ -450,7 +625,7 @@ function projectView(p) {
   const live = JSON.parse(saved).projects.some(x => x.id === p.id);
   return `<div class="vb">${crumbs('projets', 'Projets', f.title || 'Nouveau projet')}${langs()}</div><div data-o="project:${esc(p.id)}"><h1 class="sr" tabindex="-1">${esc(f.title || 'Nouveau projet')}</h1>
   <textarea class="vt" rows="1" data-k="${L}.title" maxlength="200" aria-label="Titre du projet" placeholder="${esc(L === 'en' ? f.title || 'Title' : 'Titre du projet')}">${esc(t.title)}</textarea>
-  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${tec(p.cover, 'cover', 'full')}<p class="hint">${p.cover ? 'Déposez un fichier dessus pour la remplacer. Glissez-la sur une image de la galerie pour les échanger.' : 'Choisie, déposée ou collée. Sans image, le point est affiché.'}</p></div>
+  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${tec(p.cover, 'cover', 'full')}<p class="hint">${p.cover ? 'Déposez un fichier dessus pour la remplacer.' : 'Choisie, déposée ou collée. Sans image, le point est affiché.'}</p></div>
   <div class="ed-f ef">
     ${richField('Description' + en, L + '.desc', t.desc, { ph: richWords(ph('desc')), max: 6000 })}
     <fieldset class="chips w2"><legend class="fl">Catégorie</legend>${data.categories.map(c => `<label><input type="radio" name="cat" data-k="category" value="${esc(c.id)}"${c.id === p.category ? ' checked' : ''}><span><b>${esc(c.fr)}</b></span></label>`).join('')}</fieldset>
@@ -458,7 +633,7 @@ function projectView(p) {
     ${field('Lieu', L + '.place', t.place, { ph: ph('place') })}${field('Année', 'year', p.year, { max: 12 })}
     <label class="tg w2"><input type="checkbox" data-k="featured"${p.featured ? ' checked' : ''}><i aria-hidden="true"></i><span>Sur la page d’accueil</span></label>
   </div></div>
-  <section class="sct"><h2>Galerie<span class="sum" id="galSum"></span></h2><div class="gal">${(p.images || []).map((id, i) => `<div class="gi" data-s data-img="${i}"><label class="dz" data-drop="img" data-say="Remplacer" data-to="Remplacer"><img src="${imgURL(id)}" alt="Image ${i + 1}" loading="lazy" draggable="false"><input type="file" accept="image/*" data-file="img" aria-label="Remplacer l’image ${i + 1}">${ring}</label>${tec(id, 'gallery')}<div class="ga"><button type="button" class="grip" aria-label="Déplacer l’image ${i + 1}. Flèches."></button><button type="button" class="tx" data-act="toCover" aria-label="Mettre l’image ${i + 1} en image principale">Principale</button><button type="button" class="tx red" data-act="rmImg" aria-label="Retirer l’image ${i + 1}">Retirer</button></div></div>`).join('')}${zone('gallery', '', 'Ajouter des images à la galerie')}</div><p class="hint">Glissez une image pour la déplacer, ou sur l’image principale pour les échanger. Un fichier se dépose sur une image pour la remplacer, sur ses bords pour s’ajouter avant ou après.</p></section>
+  ${bkSection(p)}
   <section class="sct"><h2>Adresse</h2><div class="ef">${field('moyo-d0n.pages.dev/projets/', 'id', p.id, { max: 60 })}</div><div class="pa" style="margin-top:22px;justify-content:space-between">${live ? `<a class="tx" href="/projets/${esc(p.id)}" target="_blank" rel="noopener">Voir la page en ligne ↗</a>` : '<span></span>'}<button type="button" class="tx red" data-act="rmProject">Supprimer ce projet</button></div></section></div>`;
 }
 
@@ -518,7 +693,8 @@ V.addEventListener('input', e => {
   const rich = e.target.isContentEditable, v = rich ? richText(e.target) : e.target.type === 'checkbox' ? e.target.checked : e.target.value;
   if (rich) richShow(e.target);
   if (k === 'id') return; // on change
-  const path = k.split('.'); if (path.length === 2) (o[path[0]] ||= {})[path[1]] = v; else o[k] = v;
+  const path = k.split('.'); let at = o; path.slice(0, -1).forEach((x, i) => { at = at[x] ||= isNaN(path[i + 1]) ? {} : []; }); at[path.at(-1)] = v;
+  if (k === 'url') { const m = bkEmbed(v), c = e.target.closest('.bk-e'); $('.bk-en', c).textContent = m ? m.name : 'Intégration'; $('small', c).textContent = m ? (m.other ? 'Page affichée telle quelle : certains sites le refusent, vérifiez dans l’aperçu.' : 'Rien ne lui est demandé avant le clic du visiteur.') : v.trim() ? 'Ce lien n’est pas reconnu.' : 'Un lien, ou le code <iframe> donné par le service.'; }
   if (k === 'first' || k === 'last') { o.first ??= ''; o.last ??= ''; o.name = `${o.first} ${o.last}`.trim(); $('#who').textContent = o.name || 'Nouveau profil'; $('.crumbs [aria-current] span').textContent = o.name || 'Nouveau profil'; }
   if (k === 'fr.title' && e.target.matches('.vt')) $('.crumbs [aria-current] span').textContent = v || 'Nouveau projet';
   if (k === 'fit' || k === 'align') e.target.closest('section').querySelector('.mt').dataset[k === 'fit' ? 'fit' : 'al'] = v;
@@ -526,7 +702,8 @@ V.addEventListener('input', e => {
 });
 V.addEventListener('change', e => {
   const t = e.target, o = objOf(t); if (!o) return;
-  if (t.dataset.file) { take(t.dataset.file, t.files, t.closest('.dz'), o); t.value = ''; return; }
+  if (t.dataset.file) { take(t.dataset.file, t.files, t.closest('.dz,.bk1'), o); t.value = ''; return; }
+  if (t.dataset.k === 'url') return bkDraw(bkProject());
   if (t.dataset.k === 'id') { const list = route[0] === 'equipe' ? data.team : data.projects, id = freeId(slug(t.value) || o.id, list, o); o.id = id; t.value = id; history.replaceState(null, '', `#${route[0]}/${id}`); route[1] = id; t.closest('[data-o]').dataset.o = (route[0] === 'equipe' ? 'team:' : 'project:') + id; touched(); }
   if (t.matches('.vt') && t.dataset.k === 'fr.title' && /^nouveau-projet/.test(o.id) && t.value.trim()) { const id = freeId(slug(t.value), data.projects, o); o.id = id; history.replaceState(null, '', '#projets/' + id); route[1] = id; t.closest('[data-o]').dataset.o = 'project:' + id; const f = $('[data-k="id"]'); if (f) f.value = id; touched(); } // the address follows the title, once
 });
@@ -539,9 +716,9 @@ V.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act, o = objOf(b);
   if (act === 'lang') { lang = b.dataset.l; render(true); $(`[data-act="lang"][data-l="${lang}"]`)?.focus(); }
   else if (act === 'pick') (b.closest('section,[class^="ed-p"]') || V).querySelector('.dz input').click();
-  else if (act === 'draftYes') { data = offered.data; offered = null; data.method ||= JSON.parse(saved).method; render(); toast('Brouillon repris.'); }
+  else if (act === 'draftYes') { data = bkAdopt(offered.data); offered = null; data.method ||= JSON.parse(saved).method; render(); toast('Brouillon repris.'); }
   else if (act === 'draftNo') { offered = null; store.set(DRAFT, null); render(true); }
-  else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, tone: 'klein', cover: null, images: [], plate: '', fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
+  else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, tone: 'klein', cover: null, images: [], blocks: [], plate: '', fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
   else if (act === 'newPerson') { const id = freeId('profil', data.team); data.team.push({ id, name: '', first: '', last: '', photo: null, fr: { role: '', bio: '', phrase: '' }, en: { role: '', bio: '', phrase: '' }, links: [] }); lang = 'fr'; location.hash = 'equipe/' + id; }
   else if (act === 'toCover') toCover(o, +b.closest('[data-img]').dataset.img);
   else if (act === 'rmCover' || act === 'rmPhoto') { const was = JSON.stringify(data), k = act === 'rmCover' ? 'cover' : 'photo', x = o[k]; o[k] = null; changed(k === 'cover' ? 'Image principale retirée.' : 'Portrait retiré.', was, [x]); }
@@ -600,12 +777,13 @@ addEventListener('dragstart', e => { if (e.target.closest?.('#view') && !e.targe
 const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
 let aim = null; // the picture under the file, and which part of it: the middle replaces, the edges add before or after
 function aimAt(d, e) {
-  let side = 'in'; if (d?.dataset.drop === 'img') { const r = d.getBoundingClientRect(), k = (e.clientX - r.left) / r.width, many = e.dataTransfer.items?.length > 1; side = k < (many ? .5 : .26) ? 'before' : k > (many ? .5 : .74) ? 'after' : 'in'; }
+  let side = 'in'; if (d?.dataset.drop === 'bk') { const r = d.getBoundingClientRect(), m = d.querySelector('.bk-p,.bk-0'), k = (e.clientX - r.left) / r.width, empty = d.querySelector('.bk-0'); side = empty ? 'in' : m ? (k < .22 ? 'before' : k > .78 ? 'after' : e.dataTransfer.items?.length > 1 ? (k < .5 ? 'before' : 'after') : 'in') : (e.clientY - r.top) / r.height < .5 ? 'before' : 'after'; }
+  if (d?.dataset.drop === 'img') { const r = d.getBoundingClientRect(), k = (e.clientX - r.left) / r.width, many = e.dataTransfer.items?.length > 1; side = k < (many ? .5 : .26) ? 'before' : k > (many ? .5 : .74) ? 'after' : 'in'; }
   if (aim && (aim.d !== d || aim.side !== side)) aim.d.classList.remove('over', 'before', 'after', 'in');
   aim = d ? { d, side } : null; if (d) d.classList.add('over', side);
 }
 /* beside the pictures, a file still has a place: the main image of the project if it has none, its gallery, the portrait */
-const spare = () => $('#view [data-drop]:hover') || (!data || !route[1] ? null : route[0] === 'projets' && $('#view .gal') ? $(objOf($('#view .gal')).cover ? '#view [data-drop="gallery"]' : '#view [data-drop="cover"]') : route[0] === 'equipe' ? $('#view [data-drop="photo"]') : null);
+const spare = () => $('#view [data-drop]:hover') || (!data || !route[1] ? null : route[0] === 'projets' && $('#bk') ? $(objOf($('#bk')).cover ? '#bk' : '#view [data-drop="cover"]') : route[0] === 'equipe' ? $('#view [data-drop="photo"]') : null);
 let awayT; const away = () => { clearTimeout(awayT); root.classList.remove('files'); aimAt(null); };
 addEventListener('dragover', e => { e.preventDefault(); if (!data || !hasFiles(e)) return; clearTimeout(awayT); root.classList.add('files'); const d = V.contains(e.target) ? e.target.closest('[data-drop]') : null; aimAt(d, e); e.dataTransfer.dropEffect = d || spare() ? 'copy' : 'none'; });
 addEventListener('dragleave', e => { if (!e.relatedTarget) { clearTimeout(awayT); awayT = setTimeout(away, 120); } }); addEventListener('dragend', away);
@@ -619,7 +797,9 @@ addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])].f
 /* what was sent, in one line */
 const gain = ids => { const l = ids.map(i => facts.get(i)).filter(Boolean), now = l.reduce((s, f) => s + (f.size || 0), 0), was = l.reduce((s, f) => s + (f.from || f.size || 0), 0); return `${l.length === 1 && l[0].w ? `${l[0].w} × ${l[0].h} px, ` : ''}${ko(now)}${was > now * 1.08 ? ` (${ko(was)} au départ)` : ''}`; };
 async function take(what, files, z, o, side = 'in') {
-  const list = [...files]; if (!list.length || !o) return; const say = p => z.style.setProperty('--u', p); z.classList.add('busy'); say(4);
+  const list = [...files]; if (!list.length || !o) return;
+  if (what === 'bk' || what === 'bkend') { const p = bkProject(); return bkTake(list, z, p, what === 'bk' ? { block: o.id, side } : {}).catch(e => { z.classList.remove('busy'); fail(e); }); }
+  const say = p => z.style.setProperty('--u', p); z.classList.add('busy'); say(4);
   const here = route.join('/'), was = JSON.stringify(data), end = (text, gone) => { if (route.join('/') === here) changed(text, was, gone); else { touched(); toast(text); } };
   const many = async l => { const got = []; for (let n = 0; n < l.length; n++) got.push(await picture(l[n], p => say(Math.round((n + p / 100) / l.length * 100)))); return got; };
   try {
@@ -631,7 +811,7 @@ async function take(what, files, z, o, side = 'in') {
       end(`${swap ? 'Image remplacée' : got.length > 1 ? got.length + ' images ajoutées' : 'Image ajoutée'} : ${gain(got)}.`, x);
     }
     else if (what === 'media') { const r = await film(list[0], say), x = [o.media, o.poster]; o.media = r.id; o.poster = r.poster; await about(r.id); end(`${isVideo(r.id) ? 'Vidéo' : isGif(r.id) ? 'GIF' : 'Image'} : ${gain([r.id])}.`, x); }
-    else { const id = await picture(list[0], say), x = o[what]; o[what] = id; const more = what === 'cover' ? list.slice(1).filter(f => f.type.startsWith('image/')) : []; if (more.length) (o.images ||= []).push(...await many(more.slice(0, 40 - (o.images || []).length))); end(`${what === 'photo' ? 'Portrait' : 'Image principale'} : ${gain([id])}.${more.length ? ' Les autres sont dans la galerie.' : ''}`, [x]); }
+    else { const id = await picture(list[0], say), x = o[what]; o[what] = id; const more = what === 'cover' ? list.slice(1) : []; if (more.length) setTimeout(() => $('#bk') && bkTake(more, $('#bk'), o, {}).catch(fail), 60); end(`${what === 'photo' ? 'Portrait' : 'Image principale'} : ${gain([id])}.${more.length ? ' Les autres vont dans la mise en page.' : ''}`, [x]); }
   } catch (e) { z.classList.remove('busy'); fail(e); }
 }
 /* reduced in the browser before it is sent: 2800 px on the long side (3840 for a full screen), WebP (JPEG where WebP is not available). A GIF is sent as it is. */

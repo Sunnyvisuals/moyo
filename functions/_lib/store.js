@@ -1,5 +1,6 @@
 /* Projects live in KV (binding MOYO) under the key "projects". Until the admin saves once, the seed file is served. */
 import seed from '../../data/projects.json';
+import { bkClean, bkFiles } from '../../shared/blocks.js';
 
 export const IMAGE_ID = /^[a-f0-9-]{36}\.(webp|jpg|png|avif|gif|mp4|webm)$/; // anything uploaded: pictures, GIFs, videos
 // an uploaded picture, or one of the pictures that come with the site (/proj/…)
@@ -28,6 +29,7 @@ export function imagesOf(data) {
   for (const p of data.projects || []) {
     if (p.cover) s.add(p.cover);
     for (const i of p.images || []) s.add(i);
+    for (const i of bkFiles(p.blocks)) s.add(i);
   }
   for (const m of data.team || []) if (m.photo) s.add(m.photo);
   for (const m of data.method || []) { if (m.media) s.add(m.media); if (m.poster) s.add(m.poster); }
@@ -88,6 +90,7 @@ export function validate(input) {
       tone: p.tone === 'wash' ? 'wash' : 'klein',
       cover,
       images,
+      blocks: bkClean(p.blocks, v => typeof v === 'string' && PICTURE.test(v), v => typeof v === 'string' && /\.(mp4|webm)$/.test(v) && MEDIA.test(v)),
       plate,
       fr,
       en
