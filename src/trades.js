@@ -1,6 +1,6 @@
 /* Services: the dot practises every trade. One field of dots, one of them blue, takes the shape of the service being read:
    it aligns (art direction), runs along a mark (identity), opens a depth (websites), counts (data), plays (audiovisual),
-   spreads (communication), prints a halftone (publishing). From one service to the next the same dots move: one idea, seven forms.
+   spreads (communication), turns the page of a catalogue (publishing). From one service to the next the same dots move: one idea, seven forms.
    The service being read is the one under the pointer or the focus, otherwise the one in the middle of the screen.
    Large screens: on the fourth axis, level with the row. Small screens: next to its description.
    With reduced motion: one still image per service. */
@@ -10,7 +10,7 @@ const svc = document.querySelector('.svc'), cv = svc && svc.querySelector('.svc-
 if (!cv) return;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, wide = matchMedia('(min-width:1081px)');
 const rows = [...svc.querySelectorAll('.line')], g = cv.getContext('2d');
-const N = 121, TAU = Math.PI * 2;
+const N = 184, TAU = Math.PI * 2;
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), mix = (a, b, t) => a + (b - a) * t, fract = v => v - Math.floor(v), smooth = t => t * t * t * (t * (t * 6 - 15) + 10);
 /* a rhythm: every `s` seconds, from one step to the next; the move takes the first part of the beat, the rest is a pause */
 const beat = (t, s, n, part) => { const k = Math.floor(t / s); return [k % n, (k + 1) % n, clamp((t / s - k) / part)]; };
@@ -34,7 +34,7 @@ const mark = (i, t) => { // a mark that changes shape, and the dot that runs on 
 };
 const depth = (i, t) => { // a depth to go into
   if (!i) return [0, 0, .062 + .007 * Math.sin(t * 2), 1, 1];
-  const n = i - 1, ring = n % 8, a = Math.floor(n / 8) / 15 * TAU + ring * .21 + t * .06, z = fract(ring / 8 + t * .11), R = .1 * Math.pow(9.4, z);
+  const n = i - 1; if (n > 119) return [0, 0, 0, 0, 0]; const ring = n % 8, a = Math.floor(n / 8) / 15 * TAU + ring * .21 + t * .06, z = fract(ring / 8 + t * .11), R = .1 * Math.pow(9.4, z);
   return [Math.cos(a) * R, Math.sin(a) * R, .005 + .027 * z * z, Math.min(1, z * 6) * Math.min(1, (1 - z) * 4), 0];
 };
 const height = (c, t) => 1.4 + 6.4 * (.5 + .5 * Math.sin(t * .6 + c * 1.7) * Math.cos(t * .37 + c * .9));
@@ -45,7 +45,7 @@ const count = (i, t) => { // values, and the highest one
 };
 const play = (i, t) => { // a film being played
   const X = -.92 + 1.84 * fract(t / 5.2); if (!i) return [X, 0, .075, 1, 1];
-  const n = i - 1, c = n % 24, k = Math.floor(n / 24) - 2, x = (c - 11.5) * .08, a = Math.abs(Math.sin(c * .58 + t * 1.5)) * (.25 + .75 * Math.abs(Math.sin(c * .23 - t * .6)));
+  const n = i - 1; if (n > 119) return [X, 0, 0, 0, 0]; const c = n % 24, k = Math.floor(n / 24) - 2, x = (c - 11.5) * .08, a = Math.abs(Math.sin(c * .58 + t * 1.5)) * (.25 + .75 * Math.abs(Math.sin(c * .23 - t * .6)));
   return [x, k * (.03 + .24 * a), .021, x < X ? 1 : .26, 0];
 };
 const HEX = (() => { const a = []; for (let q = -5; q <= 5; q++) for (let r = Math.max(-5, -q - 5); r <= Math.min(5, -q + 5); r++) if (q || r) a.push([(q + r / 2) * .166, r * .166 * .866]); return a.sort((p, q) => Math.hypot(...p) - Math.hypot(...q)); })();
@@ -54,13 +54,19 @@ const spread = (i, t) => { // a message, heard further and further
   const p = HEX[i - 1]; if (!p) return [0, 0, 0, 0, 0];
   const w = Math.exp(-(((Math.hypot(p[0], p[1]) - front) / .12) ** 2)) * (1 - s * .55); return [p[0], p[1], .014 + .034 * w, .26 + .74 * w, w];
 };
-const DOTS = (() => { const a = []; for (let r = -8; r <= 8; r++) for (let c = -8; c <= 8; c++) { const x = (c + r) * .1115, y = (c - r) * .1115; if (Math.hypot(x, y) < .88) a.push([x, y]); } return a; })();
-const print = (i, t) => { // a halftone, and the light on it
-  const X = Math.cos(t * .7 - 2.2) * .5, Y = Math.sin(t * .7 - 2.2) * .5; if (!i) return [X, Y, .088, 1, 1];
-  const p = DOTS[i - 1]; if (!p) return [X, Y, 0, 0, 0];
-  return [p[0], p[1], .008 + .074 * Math.pow(clamp(Math.hypot(p[0] - X, p[1] - Y) / 1.3), 1.25), 1, 0];
+/* an open book, seen from the front: its pages bend towards the spine (u: how far from it), and come nearer as they turn (a: 0 on the right, half a turn on the left) */
+const bend = u => .16 * Math.pow(1 - u / .92, 2) - .08, leaf = (u, v, a) => { const z = Math.sin(a) * u / .92, p = 1 + .2 * z; return [u * Math.cos(a), (v + bend(u)) * p - .1 * z]; };
+const edge = (k, a) => k < 11 ? leaf(.02 + .9 * k / 11, -.62, a) : k < 25 ? leaf(.92, -.62 + 1.24 * (k - 11) / 14, a) : leaf(.92 - .9 * (k - 25) / 11, .62, a); // the three sides of a page, in 36 dots
+const WORDS = [[-.74, -.38, 5, .028], [-.74, -.14, 6, .015], [-.74, .06, 6, .015], [-.74, .26, 6, .015], [-.74, .46, 4, .015], [.22, .3, 6, .015], [.22, .48, 4, .015]].flatMap(([x, y, m, r]) => Array.from({ length: m }, (_, k) => [x + k * .104, y, r]));
+for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) WORDS.push([.22 + c * .104, -.42 + r * .155, .018 + .03 * clamp((c + r) / 8)]); // a picture, on the right page
+const book = (i, t) => { // a page turns, the dot at its corner; then the dot rolls back along the foot of the book
+  const s = fract(t / 3.6), a = Math.PI * smooth(clamp(s / .54));
+  if (!i) { if (s < .57) { const q = leaf(.92, .62, a); return [q[0], q[1], .085, 1, 1]; } const x = mix(-.92, .92, smooth(clamp((s - .6) / .32))); return [x, .62 + bend(Math.abs(x)), .085, 1, 1]; }
+  let n = i - 1; if (n < 108) { const p = edge(n % 36, [0, Math.PI, a][Math.floor(n / 36)]); return [p[0], p[1], .026, 1, 0]; } n -= 108;
+  if (n < 13) return [0, -.54 + 1.24 * n / 12, .026, 1, 0]; n -= 13; // the spine
+  const w = WORDS[n]; return w ? [w[0], w[1] + bend(Math.abs(w[0])), w[2], .85, 0] : [0, 0, 0, 0, 0];
 };
-const SCENES = { s1t: align, s4t: mark, s2t: depth, s3t: count, s5t: play, s6t: spread, s7t: print };
+const SCENES = { s1t: align, s4t: mark, s2t: depth, s3t: count, s5t: play, s6t: spread, s7t: book };
 const scene = rows.map(r => SCENES[r.querySelector('[data-i]').dataset.i] || align);
 
 /* ---------- the dots ---------- */

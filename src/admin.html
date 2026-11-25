@@ -136,16 +136,18 @@ body{min-height:100vh;min-height:100svh}
 .ed-p .plate:not(.plate--none){aspect-ratio:auto}
 .hint{font-size:var(--fs-small);color:var(--mute);margin-top:8px}
 
-/* Texts with a form: what is seen is what is written. The tools are words; their point says they are on */
+/* Texts with a form: what is seen is what is written. The tools are signs; their point says they are on */
 .fld textarea{max-height:none}
-.rt-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0 32px}
+.rt-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 32px}
 .rt-h .fl{margin:0}
-.rt-b{display:flex;flex-wrap:wrap;gap:0 clamp(26px,2.4vw,48px);margin-right:-.4em}
-.rt-b>div{display:flex;flex-wrap:wrap;gap:0 clamp(14px,1.15vw,24px)}
-.rt-b button{display:inline-flex;align-items:baseline;min-height:40px;padding:.7em 0;font-size:var(--fs-small);font-weight:600;line-height:1.3;color:var(--mute);transition:color .3s,opacity .3s}
-.rt-b button::after{content:"";width:.3em;height:.3em;margin-left:.12em;border-radius:50%;background:var(--klein);scale:0;transition:scale .5s var(--ease)}
-.rt-b [aria-pressed=true]{color:var(--ink)}.rt-b [aria-pressed=true]::after{scale:1}
-.rt-b button:hover{color:var(--klein)}.rt-b button:disabled{opacity:.35;pointer-events:none}
+.rt-b{display:flex;flex-wrap:wrap;gap:0 clamp(14px,1.6vw,32px);margin:0 -10px}
+.rt-b>div{display:flex}
+.rt-b button{position:relative;display:grid;place-items:center;width:40px;height:44px;color:var(--ink);transition:color .3s,opacity .3s}
+.rt-b b{font-size:20px;font-weight:700;line-height:1;letter-spacing:0}
+.rt-b button::after{content:"";position:absolute;left:50%;bottom:2px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--klein);scale:0;transition:scale .5s var(--ease)}
+.rt-b [aria-pressed=true]{color:var(--klein)}.rt-b [aria-pressed=true]::after{scale:1}
+.rt-b .o{opacity:0;transition:opacity .3s}.rt-b [aria-pressed=true] .o{opacity:1}
+.rt-b button:hover{color:var(--klein)}.rt-b button:disabled{opacity:.25;pointer-events:none}
 .rt-l{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 24px;padding-bottom:6px}
 .rt-l[hidden]{display:none}
 .rt-l input{flex:1;min-width:12em;padding:8px 0 9px!important;font-size:var(--fs-body)!important}
