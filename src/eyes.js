@@ -20,7 +20,7 @@ const en = () => document.documentElement.lang === 'en';
 const eyes = $$('.eye', mono).map((el, i) => ({ el, i, pu: $('.pu', el), hit: $('.hit', el), gx: 0, gy: 0, lid: 1, pd: 1, x: 0, y: 0 }));
 const cta = $('.foot-cta', foot), mail = $('#subMail', foot), way = document.getElementById('path'), wayDot = way && $('.path-d', way);
 const blind = document.documentElement.classList.contains('blind'), night = () => { const h = new Date().getHours(); return h >= 23 || h < 6; };
-const io = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, GO = 1050, JUMP = 780;
+const io = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, GO = 1050, JUMP = 780, UP = 420;
 
 /* ---------- geometry, measured on the font itself ---------- */
 let RX = 0, RY = 0, PR = 0, R = 100, FS = 100; // inner radii of the eye, radius of the pupil and of the whole letter, in px
@@ -118,7 +118,7 @@ function frame(t) {
     // arrival: the dots fall into the letters
     let ox = 0, oy = 0, sc = 1, here = 1;
     if (!from) { const u = clamp((t - dropT - i * 150) / 1150); if (u < 1) { oy = (1 - bounce(u)) * -1.5 * FS; here = 0; } }
-    else if (i) { const u = clamp((t - dropT) / GO), k = io(u); if (u < 1) { ox = (from[0] - e.x) * (1 - k); oy = (from[1] - e.y) * (1 - k) - Math.sin(k * Math.PI) * FS * .2; sc = from[2] / (2 * PR) * (1 - k) + k; here = k * k; } }
+    else if (i) { const u = clamp((t - dropT) / GO), k = io(u); if (u < 1) { ox = (from[0] - e.x) * (1 - k); oy = (from[1] - e.y) * (1 - k) - Math.sin(k * Math.PI) * FS * .2; sc = (from[2] / (2 * PR) * (1 - k) + k) * (1 - Math.pow(1 - clamp((t - dropT + UP) / 340), 3)); here = k * k; } }
     else { const u = clamp((t - dropT - GO - 60) / JUMP); if (u < 1) { ox = (eyes[1].x - e.x) * (1 - u); oy = -4 * u * (1 - u) * FS * .42; sc = u > 0 ? 1 : 0; here = u * u; } }
     e.el.style.setProperty('--lid', (from && t < dropT + GO + JUMP + 60 ? 1 : e.lid).toFixed(3));
     e.pu.style.setProperty('--gx', (e.gx * here + ox).toFixed(2) + 'px'); e.pu.style.setProperty('--gy', (e.gy * here + oy).toFixed(2) + 'px'); e.pu.style.setProperty('--pd', (e.pd * sc).toFixed(3));
@@ -131,8 +131,8 @@ if (!reduce) {
   away();
   new IntersectionObserver(es => es.forEach(x => {
     if (!seen && x.intersectionRatio > .34) { seen = true; const t = performance.now(); dropT = t; act = t; asleep = false; wanderT = 0; nextBlink = t + 5200; from = null;
-      if (wayDot && way.classList.contains('end') && wayDot.offsetParent !== null) { const r = wayDot.getBoundingClientRect(); from = [r.left + r.width / 2, r.top + r.height / 2, r.width]; way.classList.add('gone'); }
-      const done = from ? GO + JUMP + 160 : 1750; blink = t + done; setTimeout(() => { blink = performance.now(); }, done + 400); start(); }
+      if (wayDot && way.classList.contains('end') && wayDot.offsetParent !== null) { const r = wayDot.getBoundingClientRect(); from = [r.left + r.width / 2, r.top + r.height / 2, wayDot.offsetWidth]; way.classList.add('gone'); dropT += UP; } // it went under the footer with its line: it comes up again, then goes
+      const done = from ? UP + GO + JUMP + 160 : 1750; blink = t + done; setTimeout(() => { blink = performance.now(); }, done + 400); start(); }
     else if (seen && x.intersectionRatio < .04) { seen = false; if (way) way.classList.remove('gone'); away(); }
   }), { threshold: [0, .04, .34, .6] }).observe(mono.parentElement);
 }

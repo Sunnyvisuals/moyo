@@ -96,14 +96,16 @@ html.js.calm .sec .dot b{opacity:1;translate:0 0}
 /* ---------- Home: three times, and no more, a sheet of paper passes over the screen before it (stack.js): the projects over the first
    sentence, the studio over the method, the footer over the contact. Its top edge is the glass of the footer. The other sections simply follow. */
 html.stack main>*{position:relative;background:var(--bg)}
-html.stack main>.pin{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100svh - var(--h,100svh)));translate:0 calc(var(--cv,0) * -15vh)}
+html.stack main>.pin{position:sticky;top:min(0px,calc(100vh - var(--h,100vh)));top:min(0px,calc(100lvh - var(--h,100lvh)));translate:0 calc(var(--cv,0) * -15vh)}
 html.stack main>.over{--gh:clamp(250px,40vh,620px);--gr:clamp(26px,3.2vw,52px);--liquid:var(--liquid-s);isolation:isolate;border-radius:var(--gr) var(--gr) 0 0;padding-top:calc(var(--gh) + clamp(8px,1vw,32px));scroll-margin-top:calc(84px - var(--gh) - var(--hdr));
   background:linear-gradient(to bottom,#0000 calc(var(--gh) - 2px),var(--bg) calc(var(--gh) - 2px));box-shadow:0 -1px 4px rgb(18 18 20 / calc(.05 * var(--ov,0))),0 -34px 80px -28px rgb(18 18 20 / calc(.13 * var(--ov,0)))}
 html.stack main>#projets.over{--kl:.26}
 /* what is under the film while it drifts up is still the film */
 .mth.live.pin::after{content:"";position:absolute;left:0;right:0;top:100%;height:16vh;background:#040405}
 @media (max-width:820px){html.stack main>.over{--gh:clamp(190px,32vh,300px);scroll-margin-top:calc(52px - var(--gh) - var(--hdr))}}
-html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - var(--hdr) - 12px);padding:var(--sec) 0 0;height:calc(460vh + var(--sec));height:calc(460svh + var(--sec))}
+/* room for the last drawing of the services, which goes a little past its list: taken from the top of the method */
+@media (min-width:1081px){:root{--svo:calc(((var(--w) + var(--gut)) / 4 - var(--gut)) * .39)}#services{padding-bottom:var(--svo)}#methode{padding-top:calc(var(--sec) - var(--svo))}}
+html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;scroll-margin-top:calc(var(--pt) * -1 - var(--hdr) - 12px);padding:var(--pt) 0 0;height:calc(460vh + var(--pt));height:calc(360svh + 100lvh + var(--pt))}
 .veil{position:absolute;inset:0;z-index:20;border-radius:inherit;background:var(--bg);opacity:calc(var(--cv,0) * .82);pointer-events:none}
 .mth.live>.veil{background:var(--ink);opacity:calc(var(--cv,0) * .5)}
 
@@ -281,7 +283,7 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
 .la[href]::after{content:"";position:absolute;inset:0}
 .line .n{font-size:.42em;font-weight:600;letter-spacing:0;vertical-align:.95em;margin-left:.22em;color:var(--klein);line-height:0}
 /* services: the dot at work (trades.js), on the fourth axis; next to the description on small screens */
-.svc{position:relative;z-index:1;--sc:clamp(72px,9.6vw,94px)} /* above the next section: the last drawing goes a little past the list */
+.svc{position:relative;--sc:clamp(72px,9.6vw,94px)}
 .svc-c{position:absolute;right:0;top:0;width:var(--sc);aspect-ratio:1;translate:0 var(--y,0px);opacity:0;pointer-events:none;transition:translate .9s var(--ease),opacity 1s ease}
 .svc-c.on{opacity:1}
 @media (max-width:1080px){.svc .line p{padding-right:calc(var(--sc) + 20px);min-height:var(--sc);max-width:none}}
@@ -300,16 +302,24 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
    Home: one line and one dot in the margin, the dot travels with the scroll (path.js). Pointed at or focused, the line opens on the names.
    Other pages: the same line laid flat above the title (where you come from, where you are), and the next stop at the end.
    --p: where the dot is (0 to 1), --k: how much the line is open, --row: the height of a name. */
+@property --in{syntax:"<number>";inherits:true;initial-value:0}
+@property --o{syntax:"<number>";inherits:true;initial-value:0}
 @property --k{syntax:"<number>";inherits:true;initial-value:.46}
 .path{--row:clamp(38px,calc(var(--w) * .0232),54px);--pw:min(var(--edge),64px);--px:calc(var(--edge) / 2);--pd:clamp(11px,calc(var(--w) * .0074),17px);--k:.46;
   position:fixed;z-index:60;right:calc(var(--px) - var(--pw) / 2);top:50%;width:var(--pw);height:calc(var(--row) * 7);translate:0 -50%;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s,--k .8s var(--ease)}
-.path.on{opacity:1;visibility:visible;transition:opacity .6s ease,--k .8s var(--ease)}
+.path.on{--in:1;opacity:1;visibility:visible;transition:opacity .3s ease,--in 1.5s cubic-bezier(.5,0,.15,1),--k .8s var(--ease)}
+.path.back{transition:opacity .25s ease,--k .8s var(--ease)}
+.path.out{--in:1;transition:opacity .18s ease,visibility 0s .18s}
+.path.top{z-index:70!important}
 .path.open{--k:1}
-.path.end{opacity:1;visibility:visible;pointer-events:none}
-.path.end>:not(.path-d){opacity:0;visibility:hidden;transition:opacity .4s}
+.path.end{pointer-events:none}
+/* it fades at the edge of the next section, and as a sheet comes over it */
+html.stack .path{--msk:linear-gradient(to bottom,#000 calc(100vh + var(--cut,9999px) - 72px),#0000 calc(100vh + var(--cut,9999px) - 2px)) 0 -100vh/100% 300vh repeat-x;-webkit-mask:var(--msk);mask:var(--msk);-webkit-mask-clip:no-clip;mask-clip:no-clip}
+html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
 .path.gone .path-d{opacity:0}
-.path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--k);pointer-events:none}
-.path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((var(--p,0) - .5) * var(--row) * 6 * var(--k));pointer-events:none}
+.path-b{display:none}
+.path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--k);clip-path:inset(0 0 calc((1 - var(--in,1)) * 100%));pointer-events:none}
+.path-d{position:absolute;left:50%;top:50%;width:var(--pd);height:var(--pd);margin:calc(var(--pd) / -2) 0 0 calc(var(--pd) / -2);border-radius:50%;background:var(--klein);translate:0 calc((min(var(--p,0),var(--in,1)) - .5) * var(--row) * 6 * var(--k));scale:min(1,calc(var(--in,1) * 16));pointer-events:none} /* born again, it draws the line as it comes down, and stops at its place */
 .path ol{position:absolute;right:50%;top:0;pointer-events:none}
 .path a{display:flex;align-items:center;justify-content:flex-end;height:var(--row);padding:0 28px 0 48px;font-size:var(--fs-small);font-weight:500;color:var(--mute);white-space:nowrap;pointer-events:none}
 .path a span{opacity:0;translate:10px 0;transition:opacity .2s ease,translate .4s ease,color .3s}
@@ -329,9 +339,25 @@ html.stack main>.mth.live{margin-top:0;scroll-margin-top:calc(var(--sec) * -1 - 
   .path a span{translate:-10px 0}
   .path::before{display:none}
 }
+/* small screens: no line in the margin, it would be taken for a scroll bar. The dot waits under the thumb, from the projects on, above the edge where the
+   phone keeps its own gestures; touched, the paper rises, the names with it, and the dot goes to the one you are in. --o: how much it is open */
 @media (max-width:820px){
-  .path{--row:16px;--pd:9px;--k:1;pointer-events:none}
-  .path ol,.path::before{display:none}
+  .path{--row:min(48px,calc((100svh - 130px) / 7));--pd:13px;--k:1;--up:calc(env(safe-area-inset-bottom,0px) + 20px);right:max(0px,calc(var(--edge) - 22.5px));top:auto;bottom:var(--up);translate:none;width:58px;height:58px;transition:opacity .4s ease,visibility 0s .4s}
+  .path.on{transition:opacity .3s ease,--in .9s cubic-bezier(.3,1.5,.5,1),--o .8s var(--ease-io)}
+  .path.back{transition:opacity .25s ease,--o .8s var(--ease-io)}
+  .path.open{--o:1;z-index:70!important}
+  html.stack .path.open{-webkit-mask:none;mask:none}
+  .path-b{position:absolute;inset:0;display:block;border-radius:50%}
+  .path-l{top:auto;bottom:calc(100% + var(--row) / 2);translate:none;scale:none;clip-path:inset(calc((1 - var(--o,0)) * 100%) 0 0)}
+  .path-d{box-shadow:0 0 0 3px var(--bg);translate:0 calc((1 - var(--in,1)) * -26px - var(--o,0) * (29px + (6.5 - 6 * var(--p,0)) * var(--row)));scale:var(--in,1)}
+  .path ol{right:0;left:auto;top:auto;bottom:100%;visibility:hidden;transition:visibility 0s .3s}
+  .path.open ol{visibility:visible;transition:none}
+  .path a{padding:0 58px 0 40px;font-size:clamp(19px,5.2vw,23px);font-weight:600;letter-spacing:-.025em}
+  .path a span{translate:0 12px}
+  .path.open a span{transition:opacity .4s ease calc(.12s + (6 - var(--i)) * 30ms),translate .8s var(--ease) calc(.12s + (6 - var(--i)) * 30ms),color .3s}
+  .path::before{right:calc(max(0px,var(--edge) - 22.5px) * -1);top:auto;bottom:calc(var(--up) * -1);width:100vw;height:100vh;height:100lvh;background:linear-gradient(to top,var(--bg) calc(var(--up) + 58px + var(--row) * 7),rgb(250 250 248 / .93) calc(var(--up) + 58px + var(--row) * 7 + 40px),rgb(250 250 248 / 0) calc(var(--up) + 58px + var(--row) * 7 + 190px));translate:0 60px;transition:opacity .45s ease,translate .9s var(--ease)}
+  .path.open::before{translate:0 0;pointer-events:auto}
+}
 }
 .crumbs ol{display:flex;flex-wrap:wrap;align-items:center;font-size:var(--fs-small);font-weight:500}
 .crumbs li{display:inline-flex;align-items:center}
@@ -436,10 +462,11 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent
 </dialog>`;
 
 /* What every <head> needs, besides its own title and description. */
-const headCommon = `<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
+const iconLinks = `<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico?v=2" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
+<link rel="manifest" href="/site.webmanifest?v=2">`; // the eye (scripts/icons.mjs). A new drawing takes a new number: the browsers keep the old one for weeks
+const headCommon = `${iconLinks}
 <link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <script>/* before anything is drawn: the language, and less motion if it was asked for in the footer */
 try{var D=document.documentElement,S=localStorage,q=new URLSearchParams(location.search).get('lang'),l='en';D.dataset.served=D.lang; /* /en is always in English; elsewhere: ?lang=, the choice made on the site, the language of the visitor. Robots read the page as it is. */
@@ -473,4 +500,4 @@ const scripts = `<script src="/lenis.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>`;
 
-export { DESIGN_CSS, sheetHTML, headCommon, scripts };
+export { DESIGN_CSS, sheetHTML, headCommon, iconLinks, scripts };

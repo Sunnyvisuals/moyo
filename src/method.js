@@ -12,19 +12,17 @@ new IntersectionObserver((es, io) => { if (es.some(e => e.isIntersecting)) { io.
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
 const says = steps.map(s => s.querySelector('p')), tabs = [...sec.querySelectorAll('.tab')], pics = steps.map(s => s.querySelector('.mth-m'));
-const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), n = steps.length, next = sec.nextElementSibling;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), n = steps.length;
 sec.classList.add('live');
 const media = document.createElement('div'); media.className = 'mth-media'; box.prepend(media);
 pics.forEach(f => { if (f) media.append(f); });
 films.forEach(v => { if (v) { v.controls = false; v.muted = true; v.setAttribute('aria-hidden', 'true'); } });
 
-let p = 0, on = false, cur = -2, dark = 0; // dark: how much of the glass of the next sheet is still over the picture
-const fit = () => { const m = next && next.querySelector('.mist'); dark = m ? m.offsetHeight * .6 : 0; };
+let p = 0, on = false, cur = -2;
 function read() {
-  const H = innerHeight, r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, top = r.top + pad, len = r.height - pad - H;
+  const H = innerHeight, r = sec.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, top = r.top + pad, len = r.height - pad - box.offsetHeight;
   p = clamp(-top / Math.max(1, len)) * n;
   const e = clamp(1 - top / (H * .62)); sec.style.setProperty('--e', (1 - Math.pow(1 - e, 2)).toFixed(4)); // the scene opens as it comes
-  root.classList.toggle('on-film', top < H * .4 && (!next || next.getBoundingClientRect().top + dark > H * .5)); // what is fixed over the picture turns white
   const k = Math.min(n - 1, Math.floor(Math.min(p, n - .001) + .16)), here = top < H * .3;
   const now = here ? k : -1;
   if (now !== cur) { cur = now;
@@ -42,11 +40,11 @@ function play() {
     if (on && i === at) { fetchFilms(); v.preload = 'auto'; v.play().catch(() => {}); }
     else if (!on || Math.abs(i - at) > 1) v.pause(); else { if (i === at + 1) v.preload = 'auto'; setTimeout(() => { if (i !== Math.max(0, cur)) v.pause(); }, 1700); } });
 }
-new IntersectionObserver(es => { on = es[es.length - 1].isIntersecting; read(); play(); if (!on) root.classList.remove('on-film'); }, { rootMargin: '10% 0px' }).observe(sec);
+new IntersectionObserver(es => { on = es[es.length - 1].isIntersecting; read(); play(); }, { rootMargin: '10% 0px' }).observe(sec);
 document.addEventListener('visibilitychange', () => { if (document.hidden) films.forEach(v => v && v.pause()); else play(); });
 addEventListener('scroll', () => { if (on) read(); }, { passive: true });
-addEventListener('resize', () => { fit(); read(); });
+addEventListener('resize', read);
 /* a tab goes to its step (site.js owns the smooth scroll) */
-tabs.forEach((b, i) => b.addEventListener('click', () => { const pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, y = moyoTop(sec) + pad + (sec.offsetHeight - pad - innerHeight) * (i + .3) / n; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
+tabs.forEach((b, i) => b.addEventListener('click', () => { const pad = parseFloat(getComputedStyle(sec).paddingTop) || 0, y = moyoTop(sec) + pad + (sec.offsetHeight - pad - box.offsetHeight) * (i + .3) / n; (window.moyoScroll || (v => scrollTo(0, v)))(y); }));
 read(); dispatchEvent(new Event('resize')); // the title is smaller now: its optical margin is measured again (site.js)
 })();

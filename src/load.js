@@ -22,6 +22,7 @@ function end() {
 }
 const skip = () => { hurry = true; };
 ['wheel', 'touchmove', 'keydown', 'pointerdown'].forEach(n => addEventListener(n, skip, { once: true, passive: true }));
+addEventListener('scroll', function f() { if (scrollY < 24) return; removeEventListener('scroll', f); skip(); }, { passive: true }); // the scroll bar, a script
 
 /* the final point of the title on screen: the one of the h1, or of the section the link leads to */
 const onScreen = r => r.bottom > 0 && r.top < innerHeight;

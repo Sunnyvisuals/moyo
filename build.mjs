@@ -17,7 +17,7 @@ const out = (p, s) => { fs.mkdirSync(path.dirname(r(p)), { recursive: true }); f
 const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k).join(v), s);
 
 const { rowsHTML, featuredOf, stepsHTML, tabsHTML, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
-const { DESIGN_CSS, sheetHTML, headCommon, scripts } = await import(pathToFileURL(r('shared/design.js')).href);
+const { DESIGN_CSS, sheetHTML, headCommon, iconLinks, scripts } = await import(pathToFileURL(r('shared/design.js')).href);
 const { SITE, HOME, LIST, LOST, SERVICES, head, ldHome, ldList, sample } = await import(pathToFileURL(r('shared/seo.js')).href);
 const { CHROME, CHROME_ARIA, FOOT_EN } = await import(pathToFileURL(r('shared/i18n.js')).href);
 const { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML, teamRows } = await import(pathToFileURL(r('shared/chrome.js')).href);
@@ -58,11 +58,11 @@ const sizes = {
     __FOOTER__: footerHTML(seed.team)
   })),
   '404.html': out('dist/404.html', fill(read('src/404.src.html'), { ...common, __META__: head({ path: '/', ...LOST.fr, robots: 'noindex', alternates: false }), __CHROME_HEAD__: chromeHead(0), __FOOTER__: footerHTML(seed.team) })),
-  'admin/index.html': out('dist/admin/index.html', fill(read('src/admin.html'), { __CSS__: DESIGN_CSS + FOOTER_CSS })),
+  'admin/index.html': out('dist/admin/index.html', fill(read('src/admin.html'), { __ICONS__: iconLinks, __CSS__: DESIGN_CSS + FOOTER_CSS })),
   'admin/admin.js': out('dist/admin/admin.js', read('src/admin.js')),
   // search engines, and the engines that answer (AI): same rules for all
   'robots.txt': out('dist/robots.txt', `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\n# Moteurs de réponse\n${['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot', 'Applebot-Extended', 'Bingbot', 'DuckAssistBot', 'MistralAI-User', 'Amazonbot', 'CCBot', 'meta-externalagent'].map(b => 'User-agent: ' + b).join('\n')}\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`),
-  'site.webmanifest': out('dist/site.webmanifest', JSON.stringify({ name: 'Moyo Studio', short_name: 'moyo', description: HOME.fr.desc, lang: 'fr', start_url: '/', scope: '/', display: 'browser', background_color: '#FAFAF8', theme_color: '#FAFAF8', icons: [192, 512].map(n => ({ src: `/icon-${n}.png`, sizes: `${n}x${n}`, type: 'image/png', purpose: 'any' })).concat({ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' }) }, null, 1)),
+  'site.webmanifest': out('dist/site.webmanifest', JSON.stringify({ name: 'Moyo Studio', short_name: 'moyo', description: HOME.fr.desc, lang: 'fr', start_url: '/', scope: '/', display: 'browser', background_color: '#FAFAF8', theme_color: '#FAFAF8', icons: ['any', 'maskable'].flatMap(purpose => [192, 512].map(n => ({ src: `/icon-${n}.png?v=2`, sizes: `${n}x${n}`, type: 'image/png', purpose }))).concat({ src: '/favicon.svg?v=2', sizes: 'any', type: 'image/svg+xml' }) }, null, 1)),
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
