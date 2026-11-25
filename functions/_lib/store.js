@@ -117,7 +117,7 @@ export function validate(input) {
     const m = (Array.isArray(input.method) ? input.method[i] : null) || d, fr = { title: str(m.fr?.title, 60), text: str(m.fr?.text, 400) };
     if (!fr.title) errors.push(`Méthode, étape ${i + 1} : titre français manquant.`);
     return { id: d.id, media: typeof m.media === 'string' && MEDIA.test(m.media) ? m.media : null, poster: typeof m.poster === 'string' && PICTURE.test(m.poster) ? m.poster : null,
-      fit: ['center', 'top', 'bottom', 'contain'].includes(m.fit) ? m.fit : 'center', fr, en: { title: str(m.en?.title, 60), text: str(m.en?.text, 400) } };
+      fit: ['center', 'top', 'bottom', 'contain'].includes(m.fit) ? m.fit : 'center', align: ['center', 'right'].includes(m.align) ? m.align : 'left', fr, en: { title: str(m.en?.title, 60), text: str(m.en?.text, 400) } };
   });
   return { errors, data: { version: 1, categories, projects, team, method } };
 }

@@ -31,6 +31,7 @@ function read() {
   const now = here ? k : -1;
   if (now !== cur) { cur = now;
     steps.forEach((s, i) => { s.classList.toggle('now', i === now); s.classList.toggle('was', i < now); });
+    media.dataset.al = steps[Math.max(0, now)].dataset.al || ''; // the shade is where the words are
     tabs.forEach((s, i) => s.classList.toggle('now', i === now));
     pics.forEach((f, i) => { if (f) { f.classList.toggle('in', i <= Math.max(0, now)); f.classList.toggle('was', i < now); } }); // the first one is there from the start
     play(); }

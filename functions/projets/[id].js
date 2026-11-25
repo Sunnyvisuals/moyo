@@ -3,6 +3,7 @@
 import seed from '../../data/projects.json';
 import { getData } from '../_lib/store.js';
 import { escHTML as e, imgURL, catLabel, txt, plateInner } from '../../shared/render.js';
+import { richHTML, richWords, richShort } from '../../shared/rich.js';
 import { DESIGN_CSS, headCommon, scripts } from '../../shared/design.js';
 import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
 import { head, ldWork, sample, SITE } from '../../shared/seo.js';
@@ -18,8 +19,8 @@ export async function page({ params, env, request }, lang = 'fr') {
   const fr = txt(p, 'fr'), en = txt(p, 'en'), kind = l => [catLabel(data, p.category, l), (l === 'en' ? en : fr).type].filter(Boolean).join(', ');
   const fact = (k, label, f, g) => f ? `<div><dt data-i="${k}">${label}</dt><dd ${two(f, g)}</dd></div>` : '';
   const L = lang === 'en' ? en : fr, pic = p.cover && new URL(imgURL(p.cover), origin).href, cut = /^\/proj\/(\w+)\.jpg$/.exec(p.cover || ''); // the pictures of the start exist cut for a preview
-  const meta = head({ path: '/projets/' + encodeURIComponent(p.id), lang, title: [L.title, L.type].filter(Boolean).join(', ') + ' · Moyo Studio', ogTitle: L.title + ' · Moyo Studio', desc: L.desc, type: 'article',
-    image: cut ? { url: `${SITE}/og/${cut[1]}.jpg`, w: 1200, h: 630, alt: L.title } : pic ? { url: pic, alt: L.title } : undefined, robots: sample(p, seed) ? 'noindex,follow' : '', ld: ldWork(p, L, pic, lang) });
+  const meta = head({ path: '/projets/' + encodeURIComponent(p.id), lang, title: [L.title, L.type].filter(Boolean).join(', ') + ' · Moyo Studio', ogTitle: L.title + ' · Moyo Studio', desc: richShort(L.desc), type: 'article',
+    image: cut ? { url: `${SITE}/og/${cut[1]}.jpg`, w: 1200, h: 630, alt: L.title } : pic ? { url: pic, alt: L.title } : undefined, robots: sample(p, seed) ? 'noindex,follow' : '', ld: ldWork(p, { ...L, desc: richWords(L.desc) }, pic, lang) });
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -44,15 +45,16 @@ ${chromeHead(1)}
   <div class="g sheet-g">
     <div class="plate c5${p.cover ? '' : ' plate--none'}"${p.cover ? '' : ' aria-hidden="true"'}>${plateInner(p, fr.title).replace('loading="lazy"', 'fetchpriority="high"')}</div>
     <div class="h2">
-      <p class="t-lead" ${two(fr.desc, en.desc)}</p>
+      <div class="t-lead"><div class="rt" data-l="fr">${richHTML(fr.desc)}</div><div class="rt" data-l="en">${richHTML(en.desc)}</div></div>
       <dl class="facts">${fact('fCat', 'Catégorie', kind('fr'), kind('en'))}${fact('fRole', 'Rôle', fr.role, en.role)}${fact('fPlace', 'Lieu', fr.place, en.place)}${fact('fYear', 'Année', p.year, p.year)}</dl>
+      <p class="share"><button type="button" class="btn" data-share><span data-i="share">Partager</span><i class="ar" aria-hidden="true"></i></button><span class="sr" role="status"></span></p>
     </div>
   </div>
   <div class="gallery">${(p.images || []).map(id => `<img src="${imgURL(id)}" alt="" loading="lazy" decoding="async">`).join('')}</div>
   ${nx ? `<a class="nm-link g next" href="/projets/${e(nx.id)}"><span class="nm" ${two(txt(nx, 'fr').title, txt(nx, 'en').title)}</span><span class="nm-role q4" data-i="nextP">Projet suivant</span></a>` : ''}
 </main></div>
 ${footerHTML(data.team)}
-<script type="application/json" id="en">{"_title":"${e([en.title, en.type].filter(Boolean).join(', '))} · Moyo Studio","skip":"Skip to content","here":"You are here","home":"Home","proj":"Projects","fCat":"Category","fRole":"Role","fPlace":"Place","fYear":"Year","nextP":"Next project"}</script>
+<script type="application/json" id="en">{"_title":"${e([en.title, en.type].filter(Boolean).join(', '))} · Moyo Studio","skip":"Skip to content","here":"You are here","home":"Home","proj":"Projects","fCat":"Category","fRole":"Role","fPlace":"Place","fYear":"Year","share":"Share","nextP":"Next project"}</script>
 ${scripts}
 </body>
 </html>`;

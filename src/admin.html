@@ -136,6 +136,25 @@ body{min-height:100vh;min-height:100svh}
 .ed-p .plate:not(.plate--none){aspect-ratio:auto}
 .hint{font-size:var(--fs-small);color:var(--mute);margin-top:8px}
 
+/* Texts with a form: what is seen is what is written. The tools are words; their point says they are on */
+.fld textarea{max-height:none}
+.rt-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0 32px}
+.rt-h .fl{margin:0}
+.rt-b{display:flex;flex-wrap:wrap;gap:0 clamp(26px,2.4vw,48px);margin-right:-.4em}
+.rt-b>div{display:flex;flex-wrap:wrap;gap:0 clamp(14px,1.15vw,24px)}
+.rt-b button{display:inline-flex;align-items:baseline;min-height:40px;padding:.7em 0;font-size:var(--fs-small);font-weight:600;line-height:1.3;color:var(--mute);transition:color .3s,opacity .3s}
+.rt-b button::after{content:"";width:.3em;height:.3em;margin-left:.12em;border-radius:50%;background:var(--klein);scale:0;transition:scale .5s var(--ease)}
+.rt-b [aria-pressed=true]{color:var(--ink)}.rt-b [aria-pressed=true]::after{scale:1}
+.rt-b button:hover{color:var(--klein)}.rt-b button:disabled{opacity:.35;pointer-events:none}
+.rt-l{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 24px;padding-bottom:6px}
+.rt-l[hidden]{display:none}
+.rt-l input{flex:1;min-width:12em;padding:8px 0 9px!important;font-size:var(--fs-body)!important}
+.rt[contenteditable]{min-height:calc(4.2em + 26px);padding:12px 0 14px;border-bottom:1px solid rgb(18 18 20 / .3);font-size:var(--fs-lead);line-height:1.5;letter-spacing:-.014em;outline:none;overflow-wrap:anywhere;transition:border-color .4s,box-shadow .4s}
+.rt[contenteditable]:hover{border-color:var(--ink)}
+.rt[contenteditable]:focus{border-color:var(--klein);box-shadow:0 1px 0 var(--klein)}
+.rt.empty::before{content:attr(data-ph);float:left;height:0;color:rgb(18 18 20 / .34);pointer-events:none}
+.rt[contenteditable] a{color:inherit;cursor:text}
+
 /* Files: dropped, chosen or pasted */
 .dz{position:relative;display:block;cursor:pointer}
 .dz>input{position:absolute;inset:0;z-index:2;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
@@ -192,7 +211,9 @@ html.carry,html.carry *{user-select:none;-webkit-user-select:none}
 .mt .up{background:rgb(18 18 20 / .6)}.mt .up i{background:conic-gradient(var(--bg) calc(var(--u,0) * 1%),rgb(250 250 248 / .25) 0)}
 .mt-c{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 28px;margin:12px 0 clamp(3rem,5vw,5.5rem)}
 .mt-c .tec{flex-basis:100%;margin:0}
+.mt-o{display:flex;flex-wrap:wrap;gap:14px clamp(28px,4vw,72px);width:100%}
 .mt-c .chips{grid-template-columns:repeat(4,auto);column-gap:28px;font-size:var(--fs-small)}.mt-c .chips label span{min-height:44px}
+.mt[data-al=center] textarea{text-align:center;margin-left:auto;margin-right:auto}.mt[data-al=right] textarea{text-align:right;margin-left:auto}
 @media (max-width:620px){.mt-c .chips{grid-template-columns:repeat(2,1fr);width:100%}}
 .mt-k{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;font-weight:600}
 .mt-k span{color:var(--mute);font-weight:500}

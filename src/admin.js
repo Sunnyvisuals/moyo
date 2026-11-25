@@ -39,7 +39,7 @@ function toast(text, bad, back) {
   clearTimeout(toastT); toastT = setTimeout(() => { t.textContent = ''; undo = null; }, back ? 8000 : bad ? 7000 : 3400);
 }
 function takeBack() { const f = undo; undo = null; if (f) { f(); toast('Annulé.'); } }
-addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z' && undo && !e.target.matches('textarea,input:not([type=file]):not([type=radio]):not([type=checkbox])')) { e.preventDefault(); takeBack(); } });
+addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z' && undo && !e.target.matches('textarea,[contenteditable],input:not([type=file]):not([type=radio]):not([type=checkbox])')) { e.preventDefault(); takeBack(); } });
 const fail = e => { if (e.message !== '401') toast(e.message, true); };
 function ask(title, text, yes, no = 'Garder', danger = true) {
   const d = $('#ask'); $('#askT').textContent = title; $('#askP').textContent = text || ''; $('#askY span').textContent = yes; $('#askN').textContent = no; $('#askY').className = 'btn' + (danger ? ' red' : '');
@@ -215,7 +215,7 @@ function changes() {
   };
   list('projects', a.projects, data.projects.filter(p => !blank(p) || T(p, 'fr', 'title').trim()), { name: p => T(p, 'fr', 'title') || 'Projet sans titre', add: 'nouveau projet', del: 'retiré du site', order: 'Projets', at: '/projets', href: p => T(p, 'fr', 'title').trim() ? '/projets/' + p.id : '/projets',
     diff: (x, y) => [...words(x, y, 'rôle du studio'), x.category !== y.category && 'catégorie', (x.year || '') !== (y.year || '') && 'année', x.cover !== y.cover && 'image principale', !eq(x.images || [], y.images || []) && 'galerie', !!x.featured !== !!y.featured && (y.featured ? 'mis sur l’accueil' : 'retiré de l’accueil')].filter(Boolean) });
-  (data.method || []).forEach((y, k) => { const x = (a.method || [])[k]; if (!x) return; const d = [...words(x, y), x.media !== y.media && (isVideo(y.media) ? 'vidéo' : 'image'), (x.fit || 'center') !== (y.fit || 'center') && 'cadrage'].filter(Boolean); if (d.length) out.push({ t: `Méthode, étape ${k + 1}`, d: d.join(', '), href: '/#methode', step: k, back: () => { data.method[k] = copy(x); } }); });
+  (data.method || []).forEach((y, k) => { const x = (a.method || [])[k]; if (!x) return; const d = [...words(x, y), x.media !== y.media && (isVideo(y.media) ? 'vidéo' : 'image'), (x.fit || 'center') !== (y.fit || 'center') && 'cadrage', (x.align || 'left') !== (y.align || 'left') && 'alignement'].filter(Boolean); if (d.length) out.push({ t: `Méthode, étape ${k + 1}`, d: d.join(', '), href: '/#methode', step: k, back: () => { data.method[k] = copy(x); } }); });
   list('team', a.team || [], data.team || [], { name: m => m.name || 'Profil sans nom', add: 'nouveau profil', del: 'retiré de l’équipe', order: 'Équipe', at: '/#equipe', href: m => '/equipe/' + m.id, diff: (x, y) => [...words(x, y, 'titre'), (x.name || '') !== (y.name || '') && 'nom', x.photo !== y.photo && 'portrait'].filter(Boolean) });
   list('categories', a.categories, data.categories, { name: c => c.fr || 'Catégorie sans nom', add: 'nouvelle catégorie', del: 'catégorie supprimée', order: 'Catégories', at: '/projets', href: () => '/projets', diff: (x, y) => [x.fr !== y.fr && 'nom', x.en !== y.en && 'anglais'].filter(Boolean) });
   return out;
@@ -343,7 +343,7 @@ function render(keep) {
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
   if (route[0] === 'projets' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.projects, a, b)); if (route[0] === 'equipe' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.team, a, b));
   if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b)); const g = $('.gal', V); if (g) { const p = objOf(g); sortable(g, (a, b) => moved(p.images, a, b), { sel: '.ed-p [data-drop="cover"]', put: i => toCover(p, i) }); }
-  grow(V); touched(); tell(); if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+  grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
 }
 const when = t => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(t));
 /* a field as tall as its text, where the browser does not do it by itself */
@@ -355,6 +355,85 @@ const field = (label, k, v, { area, ph, w2, max = 200 } = {}) => `<label class="
 const thumb = (id, v) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt="" draggable="false">`) : '';
 const ring = '<span class="up"><i></i></span>';
 const zone = (act, id, label, accept = 'image/*', cls = 'plate', has = id) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${has ? 'Remplacer' : 'Ajouter'}" data-to="${act === 'gallery' ? 'Ajouter à la galerie' : has ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}"${act === 'gallery' ? ' multiple' : ''}>${ring}</label>`;
+
+/* =====================================================================================================
+   Texts with a form: written as they are seen, kept as plain words (shared/rich.js). The browser does the work (execCommand): its shortcuts, its undo,
+   its spelling in the language of the text, its dictation
+   ===================================================================================================== */
+__RICH__
+const KLEIN = 'rgb(0, 47, 167)', JUSTIFY = { left: 'justifyLeft', center: 'justifyCenter', right: 'justifyRight', justify: 'justifyFull' };
+const TOOLS = [['h', 'Intertitre'], ['ul', 'Liste'], ['b', 'Gras', 'Ctrl B'], ['k', 'Bleu'], ['a', 'Lien', 'Ctrl K'], ['left', 'Gauche'], ['center', 'Centre'], ['right', 'Droite'], ['justify', 'Justifié']];
+const richField = (label, k, v, { ph, max }) => `<div class="fld rich w2"><div class="rt-h"><span class="fl" id="rt-${k}">${label}</span><div class="rt-b">${[['Mise en forme', TOOLS.slice(0, 5)], ['Alignement', TOOLS.slice(5)]].map(([g, l]) => `<div role="group" aria-label="${g}">${l.map(([t, n, key]) => `<button type="button" data-rt="${t}" aria-pressed="false"${key ? ` title="${key}"` : ''}>${n}</button>`).join('')}</div>`).join('')}</div></div>
+  <div class="rt-l" hidden><input type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" aria-label="Adresse du lien" placeholder="https:// ou une adresse e-mail"><button type="button" class="tx" data-ln="ok">Poser le lien</button><button type="button" class="tx red" data-ln="no">Retirer</button></div>
+  <div class="rt" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="rt-${k}" data-k="${k}" data-max="${max}" data-ph="${esc(ph)}" lang="${lang}" spellcheck="true">${richHTML(v) || '<p><br></p>'}</div><small class="f-err"></small></div>`;
+const edOf = el => el?.closest?.('.rich')?.querySelector('.rt'), BLOCK = /^(P|DIV|H[1-6]|UL|OL|LI|BLOCKQUOTE|SECTION|ARTICLE|PRE|TABLE|TBODY|TR|TD|FIGURE)$/;
+const joiner = '⁠', plainly = t => t.replace(/[​﻿⁠]/g, '').replace(/ /g, ' ').replace(/\*(?=\*)/g, '*' + joiner).replace(/=(?==)/g, '=' + joiner).replace(/\](?=\()/g, ']' + joiner); // what could be read as a form stays text
+/* from what is seen to what is kept */
+function richText(ed) {
+  const out = [], kinds = [], mark = el => ({ center: '{c} ', right: '{r} ', end: '{r} ', justify: '{j} ' }[getComputedStyle(el).textAlign.replace(/^-(webkit|moz)-/, '')] || '');
+  const words = (nodes, head) => { // the words of a block, with what they look like
+    const R = []; (function walk(list, href) { for (const n of list) { if (n.nodeType === 3) { const c = getComputedStyle(n.parentElement); R.push({ t: n.data.replace(/[\n\t]/g, ' '), b: !head && +c.fontWeight >= 600, k: c.color === KLEIN, href }); } else if (n.nodeName === 'BR') R.push({ t: '\n', b: false, k: false, href: '' }); else if (n.nodeType === 1) walk(n.childNodes, n.nodeName === 'A' ? n.getAttribute('href') || '' : href); } })(nodes, '');
+    const L = []; R.forEach(r => { const p = L[L.length - 1]; if (p && (r.t === '\n' || p.b === r.b && p.k === r.k && p.href === r.href)) p.t += r.t; else L.push({ ...r }); });
+    return L.map(r => { const [, a, m, z] = /^(\s*)([^]*?)(\s*)$/.exec(plainly(r.t)); if (!m) return a + z; let x = m; if (r.k) x = `==${x}==`; if (r.b) x = `**${x}**`; if (r.href && richURL(r.href)) x = `[${x.replace(/\n/g, ' ').replace(/[[\]]/g, '')}](${r.href.replace(/[()\s]/g, c => '%' + c.charCodeAt(0).toString(16))})`; return a + x + z; }).join('').replace(/[ ]*\n[ ]*/g, '\n').replace(/[ ]{2,}/g, ' ').trim();
+  };
+  const add = (t, el, kind) => { if (!t) return; const a = mark(el); if (kind === 'ul' && kinds[out.length - 1] === 'ul' + a) return void (out[out.length - 1] += '\n' + t); (kind === 'ul' ? [t] : t.split(/\n{2,}/)).map(x => x.trim()).filter(Boolean).forEach(x => { if (kind === 'h') x = '# ' + x.replace(/\n/g, ' '); else if (kind === 'p' && (/^(# |\{[crj]\})/.test(x) || x.split('\n').every(l => /^- /.test(l)))) x = joiner + x; kinds[out.length] = kind + a; out.push(a + x); }); };
+  (function block(el) {
+    let run = []; const flush = () => { if (run.length) { const h = /^H[1-6]$/.test(el.nodeName); add(words(run, h), el, h ? 'h' : 'p'); run = []; } };
+    for (const n of el.childNodes) {
+      if (n.nodeType !== 1 || !BLOCK.test(n.nodeName) && !n.querySelector?.('p,div,ul,ol,h1,h2,h3')) { if (n.nodeType === 1 || n.nodeType === 3) run.push(n); continue; }
+      flush(); if (/^(UL|OL)$/.test(n.nodeName)) { const li = [...n.querySelectorAll('li')]; add(li.map(l => words(l.childNodes).replace(/\n+/g, ' ').trim()).filter(Boolean).map(t => '- ' + t).join('\n'), li[0] || n, 'ul'); } else block(n);
+    }
+    flush();
+  })(ed);
+  return out.join('\n\n');
+}
+/* what the caret is in */
+function richState(ed) {
+  const s = getSelection(), n = s.rangeCount && ed.contains(s.focusNode) ? s.focusNode : null, el = n && (n.nodeType === 1 ? n.childNodes[Math.min(s.focusOffset, n.childNodes.length - 1)]?.nodeType === 1 ? n.childNodes[Math.min(s.focusOffset, n.childNodes.length - 1)] : n : n.parentElement);
+  if (!el) return null; const up = q => { const e = el.closest(q); return e && ed.contains(e) && e !== ed ? e : null; }, bl = up('li,h1,h2,h3,h4,p,div') || ed, al = getComputedStyle(bl).textAlign, q = (f, c) => { try { return document[f](c); } catch (_) { return ''; } }, col = String(q('queryCommandValue', 'foreColor'));
+  const h = !!up('h1,h2,h3,h4'); return { h, ul: !!up('ul,ol'), b: !h && !!q('queryCommandState', 'bold'), k: /^(#002fa7|rgb\(0, ?47, ?167\)|10956544)$/i.test(col), a: up('a'), at: /right|end/.test(al) ? 'right' : /center/.test(al) ? 'center' : al === 'justify' ? 'justify' : 'left' };
+}
+function richShow(ed) {
+  const st = document.activeElement === ed || ed.parentElement.contains(document.activeElement) ? richState(ed) : null, t = ed.textContent.trim();
+  ed.classList.toggle('empty', !t && !ed.querySelector('li')); $$('[data-rt]', ed.parentElement).forEach(b => { const k = b.dataset.rt; b.setAttribute('aria-pressed', String(!!st && (k in JUSTIFY ? st.at === k : !!st[k]))); b.disabled = !!st && st.h && k === 'b'; });
+  const n = richText(ed).length - +ed.dataset.max, e = ed.nextElementSibling; e.textContent = n > 0 ? plural(n, 'caractère') + ' de trop.' : ''; n > 0 ? ed.setAttribute('aria-invalid', 'true') : ed.removeAttribute('aria-invalid');
+}
+const run = (c, v) => document.execCommand(c, false, v);
+function richDo(ed, t) {
+  if (document.activeElement !== ed) ed.focus(); run('styleWithCSS', false); const st = richState(ed) || {};
+  if (t === 'a') return linkRow(ed, st.a);
+  if (t === 'b') run('bold'); else if (t === 'k') run('foreColor', st.k ? '#121214' : '#002FA7'); else if (t === 'ul') run('insertUnorderedList'); else if (t === 'h') run('formatBlock', st.h ? 'p' : 'h2'); else run(JUSTIFY[t]);
+  richShow(ed);
+}
+/* a link: its address, asked under the tools */
+let kept = null;
+function linkRow(ed, a) {
+  const s = getSelection(), row = $('.rt-l', ed.parentElement), f = $('input', row); if (a) s.selectAllChildren(a); kept = s.rangeCount ? s.getRangeAt(0).cloneRange() : null;
+  row.hidden = false; $('[data-ln=no]', row).hidden = !a; f.value = a ? a.getAttribute('href').replace(/^mailto:/, '') : ''; f.removeAttribute('aria-invalid'); f.focus(); f.select();
+}
+function linkDo(row, what) {
+  const ed = edOf(row), f = $('input', row); let u = f.value.trim();
+  if (what === 'ok') { if (!u) return f.focus(); if (/^[^\s@/]+@[^\s@/]+\.[a-z]{2,}$/i.test(u)) u = 'mailto:' + u; else if (!richURL(u)) u = 'https://' + u.replace(/^\/+/, ''); if (/^https?:/i.test(u) && !URL.canParse?.(u) || /\s/.test(u)) { f.setAttribute('aria-invalid', 'true'); return f.focus(); } }
+  row.hidden = true; ed.focus(); const s = getSelection(); if (kept) { s.removeAllRanges(); s.addRange(kept); }
+  if (what === 'ok') { if (s.isCollapsed) run('insertHTML', `<a href="${esc(u)}">${esc(u.replace(/^(mailto:|https?:\/\/(www\.)?)/, '').replace(/\/$/, ''))}</a>`); else run('createLink', u); s.collapseToEnd(); } else if (what === 'no') run('unlink');
+  richShow(ed);
+}
+run('defaultParagraphSeparator', 'p');
+document.addEventListener('selectionchange', () => { const ed = document.activeElement?.closest?.('.rt[contenteditable]'); if (ed) richShow(ed); });
+$('#view').addEventListener('mousedown', e => { if (e.target.closest('[data-rt]')) e.preventDefault(); }); // the selection stays in the text
+$('#view').addEventListener('click', e => { const b = e.target.closest('[data-rt]'), l = e.target.closest('[data-ln]'); if (b) richDo(edOf(b), b.dataset.rt); else if (l) linkDo(l.closest('.rt-l'), l.dataset.ln); });
+$('#view').addEventListener('focusout', e => { const ed = e.target.closest?.('.rt[contenteditable]'); if (ed) setTimeout(() => ed.isConnected && richShow(ed)); });
+$('#view').addEventListener('keydown', e => {
+  if (e.target.closest('.rt-l')) { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); linkDo(e.target.closest('.rt-l'), 'ok'); } else if (e.key === 'Escape') { e.preventDefault(); linkDo(e.target.closest('.rt-l'), 'stop'); } return; }
+  const ed = e.target.closest?.('.rt[contenteditable]'); if (!ed || !(e.ctrlKey || e.metaKey) || e.altKey) return; const k = e.key.toLowerCase();
+  if (k === 'k') { e.preventDefault(); richDo(ed, 'a'); } else if (k === 'b') { e.preventDefault(); if (!richState(ed)?.h) richDo(ed, 'b'); } else if (k === 'i' || k === 'u') e.preventDefault(); // neither slanted nor underlined letters here
+});
+$('#view').addEventListener('beforeinput', e => { if (e.target.closest?.('.rt[contenteditable]') && /^format(Italic|Underline|Strike|Super|Sub|FontName|Back|Indent|Outdent)/.test(e.inputType)) e.preventDefault(); });
+/* what is pasted or dropped comes as words */
+const words2html = t => t.replace(/\r\n?/g, '\n').trim().split(/\n{2,}/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
+const putWords = t => /\n/.test(t.trim()) ? run('insertHTML', words2html(t)) : run('insertText', t.replace(/[\r\n]+/g, ' '));
+$('#view').addEventListener('paste', e => { if (!e.target.closest?.('.rt[contenteditable]') || !e.clipboardData) return; const t = e.clipboardData.getData('text/plain'); if (!t && e.clipboardData.files.length) return; e.preventDefault(); putWords(t); });
+$('#view').addEventListener('drop', e => { const ed = e.target.closest?.('.rt[contenteditable]'); if (!ed || !e.dataTransfer || e.dataTransfer.files.length) return; const t = e.dataTransfer.getData('text/plain'); if (!t) return; e.preventDefault(); const p = document.caretPositionFromPoint?.(e.clientX, e.clientY), r = p ? null : document.caretRangeFromPoint?.(e.clientX, e.clientY), s = getSelection(); ed.focus(); if (p) s.collapse(p.offsetNode, p.offset); else if (r) { s.removeAllRanges(); s.addRange(r); } putWords(t); });
 
 /* ---------- projects ---------- */
 function projectsView() {
@@ -370,7 +449,7 @@ function projectView(p) {
   <textarea class="vt" rows="1" data-k="${L}.title" maxlength="200" aria-label="Titre du projet" placeholder="${esc(L === 'en' ? f.title || 'Title' : 'Titre du projet')}">${esc(t.title)}</textarea>
   <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${tec(p.cover, 'cover', 'full')}<p class="hint">${p.cover ? 'Déposez un fichier dessus pour la remplacer. Glissez-la sur une image de la galerie pour les échanger.' : 'Choisie, déposée ou collée. Sans image, le point est affiché.'}</p></div>
   <div class="ed-f ef">
-    ${field('Description' + en, L + '.desc', t.desc, { area: 1, w2: 1, ph: ph('desc'), max: 6000 })}
+    ${richField('Description' + en, L + '.desc', t.desc, { ph: richWords(ph('desc')), max: 6000 })}
     <fieldset class="chips w2"><legend class="fl">Catégorie</legend>${data.categories.map(c => `<label><input type="radio" name="cat" data-k="category" value="${esc(c.id)}"${c.id === p.category ? ' checked' : ''}><span><b>${esc(c.fr)}</b></span></label>`).join('')}</fieldset>
     ${field('Type de projet', L + '.type', t.type, { ph: ph('type') || 'Identité et site' })}${field('Rôle du studio', L + '.role', t.role, { ph: ph('role') })}
     ${field('Lieu', L + '.place', t.place, { ph: ph('place') })}${field('Année', 'year', p.year, { max: 12 })}
@@ -381,13 +460,13 @@ function projectView(p) {
 }
 
 /* ---------- method ---------- */
-const FITS = [['center', 'Au centre'], ['top', 'En haut'], ['bottom', 'En bas'], ['contain', 'En entier']];
+const FITS = [['center', 'Au centre'], ['top', 'En haut'], ['bottom', 'En bas'], ['contain', 'En entier']], SIDES = [['left', 'À gauche'], ['center', 'Au centre'], ['right', 'À droite']];
 function methodView() {
   const L = lang;
   return head('Méthode', langs()) + `<p class="vn">Quatre étapes en plein écran sur l’accueil. Écrivez directement sur l’image. Une vidéo est jouée sans son, en boucle. Un format paysage d’au moins 2560 px convient le mieux. En tout : <span id="mthSum"></span>.</p>` + data.method.map((m, i) => { const t = m[L] || (m[L] = {}); return `<section data-o="method:${i}"><p class="mt-k">Étape ${i + 1}<span>${!m.media ? 'sans image : fond bleu et point' : isVideo(m.media) ? 'vidéo' : isGif(m.media) ? 'GIF' : 'image'}</span></p>
-  <div class="mt${m.media ? ' has' : ''}" data-fit="${esc(m.fit || 'center')}">${zone('media', '', 'Image, vidéo ou GIF de l’étape ' + (i + 1), 'image/*,video/mp4,video/webm', '', m.media).replace('<input', thumb(m.media, m.poster) + '<input')}
+  <div class="mt${m.media ? ' has' : ''}" data-fit="${esc(m.fit || 'center')}" data-al="${esc(m.align || 'left')}">${zone('media', '', 'Image, vidéo ou GIF de l’étape ' + (i + 1), 'image/*,video/mp4,video/webm', '', m.media).replace('<input', thumb(m.media, m.poster) + '<input')}
   <div class="mt-w"><textarea class="a" rows="1" data-k="${L}.title" maxlength="60" aria-label="Titre de l’étape ${i + 1}" placeholder="${esc(L === 'en' ? m.fr.title || 'Title' : 'Titre')}">${esc(t.title)}</textarea><textarea class="b" rows="2" data-k="${L}.text" maxlength="400" aria-label="Texte de l’étape ${i + 1}" placeholder="${esc(L === 'en' ? m.fr.text || 'Text' : 'Texte')}">${esc(t.text)}</textarea></div></div>
-  <div class="mt-c">${tec(m.media, 'media')}<div class="pa" style="margin:0"><button type="button" class="tx" data-act="pick">${m.media ? 'Remplacer' : 'Choisir une image, une vidéo ou un GIF'}</button>${m.media ? '<button type="button" class="tx red" data-act="rmMedia">Retirer</button>' : ''}</div><fieldset class="chips" aria-label="Cadrage">${FITS.map(([v, n]) => `<label><input type="radio" name="fit${i}" data-k="fit" value="${v}"${(m.fit || 'center') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset></div></section>`; }).join('') + '<p class="hint">Un fichier se dépose directement sur une étape. Une image se glisse sur une autre étape pour les échanger. Image : réduite à 3840 px. GIF : 20 Mo au plus. Vidéo MP4 (H.264) ou WebM : 24 Mo au plus, quelques secondes suffisent.</p>';
+  <div class="mt-c">${tec(m.media, 'media')}<div class="pa" style="margin:0"><button type="button" class="tx" data-act="pick">${m.media ? 'Remplacer' : 'Choisir une image, une vidéo ou un GIF'}</button>${m.media ? '<button type="button" class="tx red" data-act="rmMedia">Retirer</button>' : ''}</div><div class="mt-o"><fieldset class="chips"><legend class="fl">Image</legend>${FITS.map(([v, n]) => `<label><input type="radio" name="fit${i}" data-k="fit" value="${v}"${(m.fit || 'center') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset><fieldset class="chips"><legend class="fl">Mots</legend>${SIDES.map(([v, n]) => `<label><input type="radio" name="al${i}" data-k="align" value="${v}"${(m.align || 'left') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset></div></div></section>`; }).join('') + '<p class="hint">Un fichier se dépose directement sur une étape. Une image se glisse sur une autre étape pour les échanger. Image : réduite à 3840 px. GIF : 20 Mo au plus. Vidéo MP4 (H.264) ou WebM : 24 Mo au plus, quelques secondes suffisent.</p>';
 }
 
 /* ---------- team ---------- */
@@ -398,7 +477,7 @@ function personView(m) {
   const L = lang, t = m[L] || (m[L] = {}), f = m.fr || (m.fr = {}), ph = k => L === 'en' ? f[k] || '' : '', live = JSON.parse(saved).team?.some(x => x.id === m.id);
   return `<div class="vb">${crumbs('equipe', 'Équipe', m.name || 'Nouveau profil')}${langs()}</div><div data-o="team:${esc(m.id)}"><div class="vh"><h1 class="t-xl" tabindex="-1"><span id="who">${esc(m.name || 'Nouveau profil')}</span>${dot}</h1></div>
   <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait')}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div>${tec(m.photo, 'photo', 'full')}</div>
-  <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${field('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { area: 1, w2: 1, ph: ph('bio'), max: 4000 })}</div></div>
+  <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${richField('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { ph: richWords(ph('bio')), max: 4000 })}</div></div>
   <section class="sct"><h2>Adresse</h2><div class="ef">${field('moyo-d0n.pages.dev/equipe/', 'id', m.id, { max: 60 })}</div><div class="pa" style="margin-top:22px;justify-content:space-between">${live ? `<a class="tx" href="/equipe/${esc(m.id)}" target="_blank" rel="noopener">Voir la page en ligne ↗</a>` : '<span></span>'}<button type="button" class="tx red" data-act="rmPerson">Retirer de l’équipe</button></div></section></div>`;
 }
 
@@ -433,12 +512,13 @@ async function changePass(F) {
 const V = $('#view');
 V.addEventListener('input', e => {
   const k = e.target.dataset.k, o = k && objOf(e.target); if (!o) return; e.target.removeAttribute('aria-invalid');
-  const v = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  const rich = e.target.isContentEditable, v = rich ? richText(e.target) : e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  if (rich) richShow(e.target);
   if (k === 'id') return; // on change
   const path = k.split('.'); if (path.length === 2) (o[path[0]] ||= {})[path[1]] = v; else o[k] = v;
   if (k === 'first' || k === 'last') { o.first ??= ''; o.last ??= ''; o.name = `${o.first} ${o.last}`.trim(); $('#who').textContent = o.name || 'Nouveau profil'; $('.crumbs [aria-current] span').textContent = o.name || 'Nouveau profil'; }
   if (k === 'fr.title' && e.target.matches('.vt')) $('.crumbs [aria-current] span').textContent = v || 'Nouveau projet';
-  if (k === 'fit') e.target.closest('section').querySelector('.mt').dataset.fit = v;
+  if (k === 'fit' || k === 'align') e.target.closest('section').querySelector('.mt').dataset[k === 'fit' ? 'fit' : 'al'] = v;
   touched();
 });
 V.addEventListener('change', e => {

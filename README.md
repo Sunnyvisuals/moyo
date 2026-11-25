@@ -62,6 +62,7 @@ shared/chrome.js       en-tête, menu, pied de page
 shared/i18n.js         mots de l'en-tête, du menu et du pied de page, en deux langues
 shared/seo.js          titres, descriptions, aperçus de lien, données structurées
 shared/render.js       rendu des projets, partagé par le build, le serveur et les pages
+shared/rich.js         textes mis en forme (biographies, descriptions), partagé par les pages, le serveur et l'admin
 functions/equipe/      page de profil, rendue par le serveur
 functions/projets/     page de projet, rendue par le serveur
 archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres)
@@ -85,6 +86,8 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 
 ### Aperçu avant publication
 
+- **Textes** : la biographie et la description d'un projet se mettent en forme dans l'admin (intertitre, liste, gras, bleu, lien ; gauche, centre, droite, justifié), tels qu'ils seront vus. Ils sont gardés en mots simples (`{c}`, `{r}`, `{j}`, `# `, `- `, `**gras**`, `==bleu==`, `[mots](adresse)`, voir `shared/rich.js`) : jamais de HTML, et les cartes, les moteurs et les aperçus de lien n'en prennent que les mots. Dans la méthode, les mots de chaque étape se mettent à gauche, au centre ou à droite de l'image.
+- **Ce que le navigateur fait déjà** : langue du visiteur par défaut, noms et adresses enregistrés proposés, bon clavier, orthographe dans la langue du texte, partage du système pour les projets, et un e-mail prêt à partir si le formulaire ne passe pas.
 - « Aperçu », en haut de l’admin, montre le vrai site avec ce qui n’est pas publié, sur la page en cours : ordinateur, tablette ou téléphone, français ou anglais, brouillon ou version en ligne.
 - La liste des changements dit ce qui va changer, y mène, et permet de rétablir un seul élément. On peut publier de là.
 - Le brouillon part au serveur (`/api/preview`, KV `preview:<hasard>`, une heure) et n’est servi qu’à l’admin connecté, dans un cadre du site (`functions/_lib/preview.js` : cookie de session, cookie `moyo_apercu`, en-tête `Sec-Fetch-Dest: iframe`). Partout ailleurs, le site reste celui qui est publié. Rien n’est envoyé depuis l’aperçu.

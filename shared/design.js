@@ -149,6 +149,24 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 .fld input,.fld textarea{display:block;width:100%;padding:12px 0 14px;border:0;border-bottom:1px solid rgb(18 18 20 / .3);border-radius:0;background:none;font-size:var(--fs-lead);line-height:1.4;outline:none;transition:border-color .4s,box-shadow .4s}
 .fld textarea{resize:vertical;min-height:calc(4.2em + 26px)}
 @supports (field-sizing:content){.fld textarea{field-sizing:content;resize:none;max-height:60vh}}
+.share{margin-top:clamp(1.25rem,2vw,2rem)}.share .btn{font-size:var(--fs-body)}
+/* Texts written in the admin (shared/rich.js): paragraphs, titles, lists whose point is the dot, bold, Klein, links */
+.rt>*+*{margin-top:1.1em}
+.rt :is(h2,h3){font-size:1.22em;font-weight:700;letter-spacing:-.034em;line-height:1.2}
+.rt>*+:is(h2,h3){margin-top:1.8em}
+.rt>:is(h2,h3)+*{margin-top:.6em}
+.rt :is(b,strong){font-weight:700}
+.rt em{font-style:normal;color:var(--klein)}
+.rt a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.2em}
+.rt ul{list-style:none;margin-left:0;padding:0}
+.rt li{position:relative;padding-left:1.05em}
+.rt li+li{margin-top:.35em}
+.rt li::before{content:"";position:absolute;left:0;top:.58em;width:.32em;height:.32em;border-radius:50%;background:var(--klein)}
+.rt :is([style*=center],[style*=right],[align=center],[align=right]):is(li,ul li,ul) li::before,.rt ul:is([style*=center],[style*=right]) li::before,.rt li:is([style*=center],[style*=right],[align=center],[align=right])::before{position:static;display:inline-block;margin-right:.5em;vertical-align:.1em}
+.rt ul:is([style*=center],[style*=right]) li,.rt li:is([style*=center],[style*=right],[align=center],[align=right]){padding-left:0}
+.rt [style*=justify]{hyphens:auto}
+[data-l]:is(span,div){display:none}
+html[lang=fr] [data-l=fr]:is(span,div),html[lang=en] [data-l=en]:is(span,div){display:revert}
 /* what the browser fills in keeps the paper and the ink of the page */
 :is(input,textarea):autofill{-webkit-text-fill-color:var(--ink);caret-color:var(--ink);box-shadow:0 0 0 99px var(--bg) inset;transition:background-color 99999s}
 .fld :is(input,textarea):autofill:focus{box-shadow:0 0 0 99px var(--bg) inset,0 1px 0 var(--klein)}
@@ -201,7 +219,7 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 .scale label:not(.tbd):has(~ label:not(.tbd) :checked) span::after{border-color:var(--klein)}
 .scale:has([value="tbd"]:checked) .scale-d{left:calc((100% + var(--gut)) / 2);top:calc(var(--h1) / 2);--dd:calc(var(--r) * 1.312)}
 @supports not selector(:has(a)){.scale :checked+span::after{background:var(--klein)!important;-webkit-mask:none!important;mask:none!important}}
-@media (max-width:1239px){.chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1359px){.chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){
   .chips{column-gap:20px}
   .scale{--h1:34px;--rh:48px;grid-template:var(--h1) repeat(4,var(--rh)) calc(var(--rh) + 6px)/minmax(0,1fr)}
@@ -231,6 +249,7 @@ html.stack main>.mth.live{--pt:calc(var(--sec) - var(--svo,0px));margin-top:0;sc
 @keyframes busy{50%{opacity:.25;scale:.6}}
 .f-status{font-size:var(--fs-small);min-height:1.5em}
 .f-status.err{color:#B3261E}
+.f-status a{color:var(--ink)}.f-status a:hover{color:var(--klein)}
 
 /* ---------- Pictures ---------- */
 .plate{position:relative;display:block;aspect-ratio:4/5;overflow:clip;background:var(--tint)}
@@ -457,13 +476,14 @@ const sheetHTML = `<dialog id="proj" aria-labelledby="pTitle" data-lenis-prevent
     <div class="g sheet-g">
       <span class="plate c5" id="pPlate"></span>
       <div class="h2">
-        <p class="t-lead" id="pDesc"></p>
+        <div class="t-lead rt" id="pDesc"></div>
         <dl class="facts">
           <div><dt data-i="fCat">Catégorie</dt><dd id="pTag"></dd></div>
           <div><dt data-i="fRole">Rôle</dt><dd id="pRole"></dd></div>
           <div><dt data-i="fPlace">Lieu</dt><dd id="pPlace"></dd></div>
           <div><dt data-i="fYear">Année</dt><dd id="pYear"></dd></div>
         </dl>
+        <p class="share"><button type="button" class="btn" data-share><span data-i="share">Partager</span><i class="ar" aria-hidden="true"></i></button><span class="sr" role="status"></span></p>
       </div>
     </div>
     <div class="gallery" id="pGallery"></div>

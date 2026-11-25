@@ -2,7 +2,8 @@
    - build.mjs renders the seed (data/projects.json) into the static pages,
    - functions/_middleware.js re-renders them from KV on every request,
    - the pages' own script (src/site.js) updates them on language change and fills the project sheet.
-   Keep it dependency-free, and keep `export` on the last line only: build.mjs strips that line to inline the file. */
+   Only shared/rich.js is imported, and `export` stays on the last line: build.mjs strips both lines to inline the files. */
+import { richWords } from './rich.js';
 
 const escHTML = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -30,7 +31,7 @@ function rowHTML(p, i, lang) {
   const t = txt(p, lang);
   return `<li class="case" data-cat="${escHTML(p.category)}"><a class="row" href="${lang === 'en' ? '/en' : ''}/projets/${encodeURIComponent(p.id)}" data-p="${i}" data-id="${escHTML(p.id)}">` +
     `<span class="plate${p.cover ? '' : ' plate--none'}" aria-hidden="true">${plateInner(p, [t.title, t.type].filter(Boolean).join(', '))}</span>` +
-    `<span class="cap"><span class="r-title">${escHTML(t.title)}</span><span class="r-desc">${escHTML(t.desc)}</span>` +
+    `<span class="cap"><span class="r-title">${escHTML(t.title)}</span><span class="r-desc">${escHTML(richWords(t.desc))}</span>` +
     `<span class="r-type">${escHTML(t.type)}</span><span class="r-meta">${escHTML(metaText(p, t))}</span></span></a></li>`;
 }
 
@@ -56,7 +57,7 @@ function mediaHTML(s) {
     : `<img src="${imgURL(s.media)}" alt="${t}" loading="lazy" decoding="async">`;
   return `<figure class="mth-m${s.media ? '' : ' plate--none'}" data-fit="${fit}">${inner}</figure>`;
 }
-const stepsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<li class="step q${i + 1}">${mediaHTML(s)}<h3 class="t-m" ${bi(s.fr.title, s.en && s.en.title)}</h3><p class="mute" data-ink="step" ${bi(s.fr.text, s.en && s.en.text)}</p></li>`).join('');
+const stepsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<li class="step q${i + 1}"${['center', 'right'].includes(s.align) ? ` data-al="${s.align}"` : ''}>${mediaHTML(s)}<h3 class="t-m" ${bi(s.fr.title, s.en && s.en.title)}</h3><p class="mute" data-ink="step" ${bi(s.fr.text, s.en && s.en.text)}</p></li>`).join('');
 const tabsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<button type="button" tabindex="-1" class="tab q${i + 1}"><span ${bi(s.fr.title, s.en && s.en.title)}</span></button>`).join('');
 
 /* JSON that can sit inside <script type="application/json"> without closing it. */

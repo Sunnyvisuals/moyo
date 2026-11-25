@@ -1,12 +1,13 @@
 /* /llms.txt: the studio in plain facts, for answer engines (the convention of llmstxt.org). French first, then English. Always from the data of the moment. */
 import seed from '../data/projects.json';
 import { getData } from './_lib/store.js';
+import { richWords } from '../shared/rich.js';
 import { SITE, MAIL, HOME, SERVICES, sample, waiting } from '../shared/seo.js';
 
 export async function onRequestGet({ env }) {
   const d = await getData(env), team = d.team || [], real = (d.projects || []).filter(p => !sample(p, seed));
   const cat = (id, l) => { const c = (d.categories || []).find(x => x.id === id); return c ? c[l] || c.fr : ''; };
-  const works = l => real.length ? `\n## ${l === 'en' ? 'Projects' : 'Projets'}\n\n` + real.map(p => { const t = { ...p.fr, ...(l === 'en' ? Object.fromEntries(Object.entries(p.en || {}).filter(([, v]) => v)) : {}) }; return `- [${t.title}](${SITE}${l === 'en' ? '/en' : ''}/projets/${p.id}) : ${[cat(p.category, l), t.type, t.place, p.year].filter(Boolean).join(', ')}. ${t.desc || ''}`; }).join('\n') + '\n' : '';
+  const works = l => real.length ? `\n## ${l === 'en' ? 'Projects' : 'Projets'}\n\n` + real.map(p => { const t = { ...p.fr, ...(l === 'en' ? Object.fromEntries(Object.entries(p.en || {}).filter(([, v]) => v)) : {}) }; return `- [${t.title}](${SITE}${l === 'en' ? '/en' : ''}/projets/${p.id}) : ${[cat(p.category, l), t.type, t.place, p.year].filter(Boolean).join(', ')}. ${richWords(t.desc) || ''}`; }).join('\n') + '\n' : '';
   const people = l => team.map(m => `- ${m.name}, ${((m[l] && m[l].role) || m.fr.role || '').toLowerCase()}${waiting(m) ? '' : ` (${SITE}${l === 'en' ? '/en' : ''}/equipe/${m.id})`}`).join('\n');
   const text = `# Moyo Studio
 

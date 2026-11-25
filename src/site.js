@@ -71,7 +71,7 @@ let cur = 0, opener = null, pushed = false, openCard = null, plain = false;
 const PAGE = bare(location.pathname), BEHIND = '.under,#foot,#path,.skip'; // the page the sheet opens over, and what can no longer be reached while it is open
 function fill(i) {
   cur = i; const p = ALL[i], t = txt(p, lang);
-  $('#pTitle').textContent = $('#pHere').textContent = t.title; $('#pDesc').textContent = t.desc;
+  $('#pTitle').textContent = $('#pHere').textContent = t.title; $('#pDesc').innerHTML = richHTML(t.desc);
   $('#pTag').textContent = [catLabel(DATA, p.category, lang), t.type].filter(Boolean).join(', ');
   $('#pRole').textContent = t.role; $('#pPlace').textContent = t.place; $('#pYear').textContent = p.year;
   $$('.facts > div', dlg).forEach(d => { d.hidden = !$('dd', d).textContent.trim(); });
@@ -192,6 +192,7 @@ const inkBox = window.moyoInk = (() => {
 })();
 function optical(scope) {
   $$('.t-hero,.t-xl,.t-l,.t-m,.nm,.r-title,.bn,.fh2', scope || document).forEach(el => {
+    if (el.closest('[data-al]')) { el.style.marginLeft = ''; return; } // centred or on the right: no axis
     const ch = (el.textContent.trim().match(/\S/) || [''])[0]; if (!ch) return;
     const c = getComputedStyle(el), size = parseFloat(c.fontSize); if (size < 20) return;
     const bear = inkBox(ch, c.fontWeight, c.fontFamily)[0] * size;
@@ -216,7 +217,7 @@ function applyLang(l) {
   $$('[data-ia]').filter(own).forEach(el => { const fr = keep(el, () => el.getAttribute('aria-label')), k = el.dataset.ia; el.setAttribute('aria-label', l === 'en' && EN[k] ? EN[k] : fr); });
   $$('[data-fr][data-en]').forEach(el => { el.textContent = el.dataset[l] || el.dataset.fr; });
   if (list) $$('#projects > li').forEach((li, i) => { const p = ALL[i]; if (!p) return; const t = txt(p, l);
-    $('.r-title', li).textContent = t.title; $('.r-desc', li).textContent = t.desc || ''; $('.r-type', li).textContent = t.type || ''; $('.r-meta', li).textContent = metaText(p, t); });
+    $('.r-title', li).textContent = t.title; $('.r-desc', li).textContent = richWords(t.desc); $('.r-type', li).textContent = t.type || ''; $('.r-meta', li).textContent = metaText(p, t); });
   if (filters) { renderFilters(); applyFilter(); }
   document.title = TITLE[l];
   if (dlg && dlg.open) fill(cur); else place(l); // the sheet has its own address
@@ -270,6 +271,15 @@ if (menuEl && $('#services')) menuEl.addEventListener('beforetoggle', e => {
   menuEl.dataset.start = k;
 });
 
+/* ---------- A project is shared with the sheet of the system; where there is none, its address is copied ---------- */
+document.addEventListener('click', async e => {
+  const b = e.target.closest && e.target.closest('[data-share]'); if (!b) return;
+  const w = $('span', b), was = w.textContent, en = lang === 'en', url = location.origin + location.pathname, title = document.title.replace(' · Moyo Studio', '');
+  const say = t => { w.textContent = t; b.nextElementSibling.textContent = t; setTimeout(() => { w.textContent = was; }, 2200); };
+  try { if (navigator.share) await navigator.share({ title, url }); else { await navigator.clipboard.writeText(url); say(en ? 'Link copied' : 'Lien copié'); } }
+  catch (x) { if (x.name !== 'AbortError') say(en ? 'The address is in the bar above' : 'L’adresse est dans la barre du navigateur'); }
+});
+
 /* ---------- Contact ---------- */
 const copy = $('#copy');
 if (copy) copy.addEventListener('click', async () => {
@@ -282,6 +292,8 @@ if (copy) copy.addEventListener('click', async () => {
 const form = $('#ctForm');
 if (form) {
   const st = $('#ctStatus'), say3 = (t, err) => { st.textContent = t; st.classList.toggle('err', !!err); };
+  /* when it cannot be sent: the same message, in the mail program of the visitor */
+  const byMail = () => { const v = values(), en = lang === 'en', a = document.createElement('a'), l = [...(v.type || []).map(x => $(`[name=type][value="${x}"]`, form)), v.budget && $(`[name=budget][value="${v.budget}"]`, form)].filter(Boolean).map(f => f.parentElement.textContent.trim()); a.href = `mailto:contact.moyostudio@gmail.com?subject=${encodeURIComponent((en ? 'A project, ' : 'Un projet, ') + (v.name || ''))}&body=${encodeURIComponent([v.message, l.join(', '), v.name].filter(Boolean).join('\n\n'))}`; a.textContent = en ? 'Send it by e-mail' : 'L’envoyer par e-mail'; a.className = 'lnk'; st.append(' ', a); };
   const q = new URLSearchParams(location.search);
   if (q.has('envoye')) say3(lang === 'en' ? 'Message sent. Thank you!' : 'Message envoyé. Merci !');
   if (q.has('erreur')) say3(lang === 'en' ? 'The message could not be sent. Check the fields and try again.' : 'Le message n’a pas pu partir. Vérifiez les champs et réessayez.', true);
@@ -315,6 +327,7 @@ if (form) {
     set(near); near.focus({ preventScroll: true });
   }, { passive: true });
   ['pointerup', 'pointercancel'].forEach(n => addEventListener(n, () => { held = null; }));
+  form.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); form.requestSubmit(); } });
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const en = lang === 'en', wrong = Object.keys(OK).filter(k => { const bad = !OK[k](form.elements[k]); mark(k, bad); return bad; });
@@ -332,7 +345,7 @@ if (form) {
       $('.f-done', form).focus({ preventScroll: true });
     } catch (err) {
       btn.disabled = false; btn.classList.remove('busy'); label.textContent = was;
-      say3(err.message || (en ? 'Sending failed. Write to contact.moyostudio@gmail.com.' : 'L’envoi a échoué. Écrivez à contact.moyostudio@gmail.com.'), true);
+      say3(err.message && !/fetch|network|load/i.test(err.message) ? err.message : en ? 'Sending failed.' : 'L’envoi a échoué.', true); byMail();
     }
   });
 }
