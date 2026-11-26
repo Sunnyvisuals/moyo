@@ -82,6 +82,7 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 - **Moteurs de réponse** : `robots.txt` les accueille, `/llms.txt` donne les faits en clair, toujours à jour avec l'admin.
 - **Attente** : les cinq projets d'exemple et les profils encore en lorem ipsum sont visibles mais en `noindex`, hors du plan du site et de `/llms.txt`. Ils y entrent dès qu'ils sont remplacés dans l'admin.
 - **Image de partage** : `assets/partage-2.png`, dessinée par `scripts/og.mjs`. Pour en changer, donner un nouveau nom de fichier (Discord garde l'ancienne image). Icônes et aperçus des projets : `scripts/icons.mjs`.
+- **Marque** : logo, photos de profil, bannières (LinkedIn, X, Facebook, YouTube) et modèles Instagram dans `marque/`, avec leur planche (`marque/planche.png`). Ils sont dessinés depuis la police, les couleurs et l'œil du site par `scripts/marque.mjs` (Playwright). Le site ne les sert pas.
 - **Icône** : l'œil, le « o » de moyo avec le point pour pupille, qui regarde la page ; tous ses bords tombent sur les pixels d'un onglet de 16 px, et dans un onglet sombre l'anneau devient le blanc de l'œil. Pour en changer, changer le numéro de `iconLinks` (`shared/design.js`) : les navigateurs gardent l'ancienne pendant des semaines.
 - **À faire avec le compte du studio** : déclarer le site et `sitemap.xml` dans Google Search Console et Bing Webmaster Tools, créer la fiche Google Business Profile. Si le site change de domaine, changer `SITE` dans `shared/seo.js`.
 
