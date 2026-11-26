@@ -61,7 +61,6 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   }
   function under(mx, my) {
     if (root.classList.contains('mono') || root.classList.contains('holding')) return .2;
-    const eye = window.moyoEye && moyoEye(); if (eye && (eye.back || Math.hypot(mx - eye.x, my - eye.y) < eye.r) && document.elementFromPoint(mx, my)?.closest('.hero')) return .1; // the eye of the first screen
     for (const el of document.elementsFromPoint(mx, my)) {
       if (el.closest('.mth-media')) return .1; // the film has its own shade
       if (el.matches('.over,#foot,.floor')) { const a = window.moyoFog ? moyoFog(el.matches('.floor') ? el.parentElement : el, mx, my) : 1; if (a !== null) { if (a > .5) return 1; continue; } } // a sheet is glass at its top, paper below

@@ -43,13 +43,6 @@ function read() {
 }
 /* the film goes under it: inside its edges, the way is white */
 function tint() {
-  const e = at === 0 && window.moyoEye ? moyoEye() : null; nav.classList.toggle('eyed', !!e);
-  if (e) { // the eye of the first screen: white inside its circle, or everywhere when a picture is all around it
-    const x = (e.x - navLeft).toFixed(1), y = (e.y - navTop).toFixed(1), r = e.r.toFixed(1), d = (e.r * 2).toFixed(1);
-    nav.style.setProperty('--wc', e.back ? 'inset(-9999px)' : `circle(${r}px at ${x}px ${y}px)`);
-    nav.style.setProperty('--ic', e.back ? 'inset(50%)' : `path(evenodd,"M-9999 -9999H9999V9999H-9999ZM${(e.x - navLeft - e.r).toFixed(1)} ${y}a${r} ${r} 0 1 0 ${d} 0a${r} ${r} 0 1 0 -${d} 0Z")`);
-    return nav.classList.toggle('film', e.back || Math.hypot(e.x - navLeft - navW / 2, e.y - navTop - navH / 2) < e.r);
-  }
   const f = at === FILM && window.moyoFilm ? moyoFilm() : null, y = f ? Math.round(f.top - navTop) : 9999, x = f ? Math.round(f.right - navLeft) : 9999;
   nav.style.setProperty('--fy', Math.min(9999, y) + 'px'); nav.style.setProperty('--fx', x + 'px'); nav.classList.toggle('film', y < navH / 2 && x > navW / 2);
 }
@@ -103,7 +96,6 @@ function measure() {
 (window.moyoReady || Promise.resolve()).then(() => { ready = true; measure(); });
 addEventListener('load', measure);
 addEventListener('scroll', read, { passive: true });
-addEventListener('moyo:eye', () => { if (ready && at === 0) tint(); });
 addEventListener('resize', measure);
 new ResizeObserver(measure).observe(under);
 new MutationObserver(label).observe(root, { attributes: true, attributeFilter: ['lang'] });

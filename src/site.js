@@ -204,7 +204,7 @@ function optical(scope) {
     const ch = (el.textContent.trim().match(/\S/) || [''])[0]; if (!ch) return;
     const c = getComputedStyle(el), size = parseFloat(c.fontSize); if (size < 20) return;
     const bear = inkBox(ch, c.fontWeight, c.fontFamily)[0] * size;
-    el.style.marginLeft = bear > .2 ? (-bear).toFixed(2) + 'px' : '';
+    el.style.marginLeft = bear > .2 ? el.closest('#top') ? (-bear / size).toFixed(4) + 'em' : (-bear).toFixed(2) + 'px' : ''; // the first sentence changes size with the screen (hero.js): in em, it stays right
   });
 }
 

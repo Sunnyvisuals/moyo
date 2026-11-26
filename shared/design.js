@@ -344,7 +344,6 @@ html.stack .path>*{opacity:calc(1 - var(--cv,0) * .5)}
 .path-v{position:absolute;inset:0;pointer-events:none;clip-path:polygon(-9999px -9999px,9999px -9999px,9999px 9999px,var(--fx) 9999px,var(--fx) var(--fy),-9999px var(--fy))}
 .path-v.w{--klein:#FAFAF8;clip-path:inset(var(--fy) calc(100% - var(--fx)) -9999px -9999px)}
 .path-v.w .path-l{background:rgb(250 250 248 / .5)}
-.path.eyed .path-v{clip-path:var(--ic)}.path.eyed .path-v.w{clip-path:var(--wc)}
 .path.film{--mute:rgb(250 250 248 / .78);--ink:#FAFAF8}
 .path.film ol{--klein:#FAFAF8}
 .path-l{position:absolute;left:50%;top:50%;width:1px;height:calc(var(--row) * 6);margin-left:-.5px;background:rgb(18 18 20 / .2);translate:0 -50%;scale:1 var(--wk);clip-path:inset(0 0 calc((1 - var(--wi,1)) * 100%));pointer-events:none}

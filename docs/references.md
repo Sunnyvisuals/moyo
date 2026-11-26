@@ -45,12 +45,12 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 - [Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) : relues une à une. Elles ont donné les pages projet, le bouton « Moins de mouvement », le brouillon gardé, les messages d'erreur qui disent quoi faire, le retour au toucher, les marges des écrans à encoche.
 
-## L'ouverture : l'œil
+## L'ouverture : sortir du point
 
-Le point qui a écrit la phrase devient un œil de verre qui regarde le travail du studio, puis redevient le point. Regardé pour y arriver, sans rien en reprendre :
-- [Framer, composants](https://www.framer.com/marketplace/components/) : ce qui revient en 2026, des loupes et des lentilles sur des images (Lens Strip, Scroll Zoom, Inverted Lens Media), du texte qui se courbe sous une bulle (Lumo Bubble Type), des trames et des points (Halftone, Dithering, Dotmark).
-- [Awwwards 2026, la 3D](https://svilenkovic.com/3d/awwwards-2026-3d) : une seule idée forte, racontée au scroll, plutôt qu'un catalogue d'effets.
-Ce qui a été gardé : un seul objet (le point), le noir et blanc des projets, une seule couleur (le Klein, pour les paupières et la lumière du verre), le texte qui reste du texte, et la feuille des projets qui passe ensuite comme avant.
+La phrase en affiche, à la taille de l'écran, et un seul mouvement : la caméra sort du point final. C'est le langage du passage d'une page à l'autre (le point s'ouvre au clic, l'écran est bleu, il se referme sur le titre suivant), poussé jusqu'au bout : on est dans l'idée, on recule, la phrase apparaît autour d'elle.
+- *Powers of Ten* (Charles et Ray Eames, 1977) : un seul plan continu qui recule.
+- Les ouvertures des keynotes d'Apple : un seul geste, rapide au départ, lent à l'atterrissage, rien d'autre autour.
+Essai abandonné : un œil de verre qui regardait les projets, puis prenait l'écran au scroll (`archive/hero-oeil.js`). Jugé pas assez fort.
 
 ## Techniques
 

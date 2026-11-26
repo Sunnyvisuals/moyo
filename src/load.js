@@ -2,6 +2,8 @@
    - html.load: first visit or reload. A number counts up where the title will be, followed by the dot. At 100 the number leaves and the dot
      draws the title, line after line, then stays as its final point ("Moyo dessine…").
    - html.enter: coming from a link of the site. The screen is blue (the dot opened on the click, see leave.js) and closes on the final point of the title.
+   - On the home, the camera comes out of the point instead (pullBack()): the point of the counter opens until the screen is blue, or the blue of the link is
+     there, then the camera pulls back from inside the final point of the sentence, and the sentence, enormous at first, lands around it.
    window.moyoReady resolves when the stage is free (stage.js waits for it), window.moyoDrawn when the title is there. Any key, click or scroll jumps to the end. Nothing with reduced motion. */
 (() => {
 'use strict';
@@ -30,6 +32,7 @@ function findMark() { return [...document.querySelectorAll('h1 .dot b,main h2 .d
 
 async function enter() {
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  if (home() && scrollY < 20 && location.hash.length < 2) return pullBack();
   mark = findMark();
   const r = mark && mark.getBoundingClientRect(), x = r ? r.left + r.width / 2 : innerWidth / 2, y = r ? r.top + r.height / 2 : innerHeight / 2, r1 = r ? r.width / 2 : 0;
   layer = document.createElement('div'); layer.className = 'kl'; document.body.appendChild(layer);
@@ -41,13 +44,14 @@ async function enter() {
 }
 
 async function load() {
+  if (window.moyoFit) moyoFit(); // the first sentence takes its size before it is measured (hero.js)
   title = document.querySelector('h1.t-hero'); mark = title && title.querySelector('.dot b');
   if (!mark || location.hash.length > 1 || scrollY > 20) return end();
   const C = getComputedStyle(title), fs = parseFloat(C.fontSize), g = document.createElement('canvas').getContext('2d');
   g.font = `${C.fontWeight} 100px ${C.fontFamily}`; const fm = g.measureText('M'), A = fm.fontBoundingBoxAscent / 100, D = fm.fontBoundingBoxDescent / 100;
   // the lines of the title as they are laid out
   const box = title.getBoundingClientRect(), rg = document.createRange(), rows = [], tw = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
-  for (let n; (n = tw.nextNode());) { if (!n.textContent.replace(/[\s⁠]/g, '')) continue; rg.selectNodeContents(n);
+  for (let n; (n = tw.nextNode());) { if (!n.textContent.replace(/[\s\u2060]/g, '')) continue; rg.selectNodeContents(n);
     for (const q of rg.getClientRects()) { if (q.width < 2) continue; const row = rows.find(o => Math.abs(o.top - q.top) < fs * .4); if (row) { row.l = Math.min(row.l, q.left); row.r = Math.max(row.r, q.right); } else rows.push({ top: q.top, l: q.left, r: q.right }); } }
   rows.sort((a, b) => a.top - b.top); rows.forEach(o => { o.base = o.top + A * fs; });
   const m = mark.getBoundingClientRect(), d = m.width, lastRow = rows[rows.length - 1]; lastRow.r = m.left;
@@ -70,6 +74,7 @@ async function load() {
   const t0 = performance.now();
   await new Promise(done => { let v = 0; const f = t => { const e = (t - t0) / 1250, goal = full || t - t0 > 3200 ? out(Math.min(1, e)) : Math.min(.9, out(Math.min(1, e)) * .9); v = hurry ? 1 : Math.max(v, goal);
     dig.textContent = String(Math.round(v * 100)); px = after(); put(px, py); (v >= .999 || hurry) ? done() : requestAnimationFrame(f); }; requestAnimationFrame(f); });
+  if (home()) { dig.animate([{ translate: '0 0' }, { translate: '0 -125%' }], { duration: hurry ? 1 : 760, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' }); return pullBack(px + d / 2, py + d / 2, d / 2, dot); }
   // the number leaves, the dot goes to the first line
   dig.animate([{ translate: '0 0' }, { translate: '0 -125%' }], { duration: hurry ? 1 : 760, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' });
   const x0 = px, y0 = py, sx = rows[0].l, sy = rows[0].base - d;
@@ -83,6 +88,36 @@ async function load() {
   }
   put(m.left, m.top);
   const b = mark; end(); b.animate([{ scale: 1.9 }, { scale: 1 }], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)' });
+}
+
+/* ---------- the home: out of the point ----------
+   Drawn on a canvas for the time of the move, so that the letters stay sharp at any size: each letter where the page puts it, seen from closer.
+   The camera is first inside the final point (the screen is blue), then it pulls back; the page takes over at the end, exactly in place. */
+const home = () => !!(title || (title = document.querySelector('h1.t-hero'))) && !!title.closest('#top');
+async function pullBack(fx, fy, fr, from) {
+  if (window.moyoFit) moyoFit();
+  title = document.querySelector('#top h1.t-hero'); mark = title && title.querySelector('.dot b'); if (!mark) return end();
+  const W = innerWidth, H = innerHeight, D = Math.min(2, devicePixelRatio || 1), m = mark.getBoundingClientRect(), P = [m.left + m.width / 2, m.top + m.height / 2], r0 = m.width / 2;
+  const C = getComputedStyle(title), fs = parseFloat(C.fontSize), font = `${C.fontWeight} ${fs}px ${C.fontFamily}`, g0 = document.createElement('canvas').getContext('2d');
+  g0.font = `${C.fontWeight} 100px ${C.fontFamily}`; const A = g0.measureText('M').fontBoundingBoxAscent / 100;
+  const list = [], rg = document.createRange(), tw = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+  for (let n; (n = tw.nextNode());) { const col = getComputedStyle(n.parentElement).color;
+    for (let i = 0; i < n.length; i++) { const ch = n.data[i]; if (/[\s\u2060]/.test(ch)) continue; rg.setStart(n, i); rg.setEnd(n, i + 1); const r = rg.getClientRects()[0]; if (r) list.push([ch, r.left, r.top + A * fs, r.width, col]); } }
+  if (!title.style.clipPath) title.style.clipPath = 'inset(0 0 100% 0)'; mark.style.visibility = 'hidden';
+  if (!layer) { layer = document.createElement('div'); layer.className = 'ld'; layer.setAttribute('aria-hidden', 'true'); document.body.appendChild(layer); }
+  const cv = document.createElement('canvas'); cv.width = Math.round(W * D); cv.height = Math.round(H * D); cv.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%'; layer.prepend(cv);
+  const g = cv.getContext('2d'), KL = getComputedStyle(root).getPropertyValue('--klein').trim() || '#002FA7';
+  const far = (x, y) => Math.hypot(Math.max(x, W - x), Math.max(y, H - y)) + 2;
+  const disc = (x, y, r) => { g.setTransform(D, 0, 0, D, 0, 0); g.fillStyle = KL; g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill(); };
+  const clear = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); };
+  const seen = s => { clear(); disc(P[0], P[1], r0 * s); g.font = font; // the sentence, s times larger, around its point
+    for (const [ch, x, y, w, col] of list) { const X = P[0] + (x - P[0]) * s, Y = P[1] + (y - P[1]) * s; if (X > W || X + w * s < 0 || Y - fs * s > H || Y + fs * s * .35 < 0) continue; g.fillStyle = col; g.setTransform(D * s, 0, 0, D * s, X * D, Y * D); g.fillText(ch, 0, 0); } };
+  const S0 = far(P[0], P[1]) / r0, L0 = Math.log(S0);
+  if (fr == null) { seen(S0); root.classList.remove('enter'); } // the blue of the link is already there
+  else { if (from) from.style.visibility = 'hidden'; const R = far(fx, fy); await tween(hurry ? 1 : 640, t => t * t * t, u => { clear(); disc(fx, fy, fr + (R - fr) * u); }); } // the point of the counter opens
+  let freed = false;
+  await tween(2100, t => 1 - Math.pow(1 - t, 4), u => { seen(Math.exp(L0 * (1 - u))); if (!freed && u > .72) { freed = true; free(); } }); // the camera pulls back
+  const b = mark; end(); b.animate([{ scale: 1.32 }, { scale: 1 }], { duration: 620, easing: 'cubic-bezier(.16,1,.3,1)' });
 }
 
 const dcl = document.readyState === 'loading' ? new Promise(r => addEventListener('DOMContentLoaded', r, { once: true })) : Promise.resolve();
