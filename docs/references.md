@@ -45,6 +45,13 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 - [Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) : relues une à une. Elles ont donné les pages projet, le bouton « Moins de mouvement », le brouillon gardé, les messages d'erreur qui disent quoi faire, le retour au toucher, les marges des écrans à encoche.
 
+## L'ouverture : l'œil
+
+Le point qui a écrit la phrase devient un œil de verre qui regarde le travail du studio, puis redevient le point. Regardé pour y arriver, sans rien en reprendre :
+- [Framer, composants](https://www.framer.com/marketplace/components/) : ce qui revient en 2026, des loupes et des lentilles sur des images (Lens Strip, Scroll Zoom, Inverted Lens Media), du texte qui se courbe sous une bulle (Lumo Bubble Type), des trames et des points (Halftone, Dithering, Dotmark).
+- [Awwwards 2026, la 3D](https://svilenkovic.com/3d/awwwards-2026-3d) : une seule idée forte, racontée au scroll, plutôt qu'un catalogue d'effets.
+Ce qui a été gardé : un seul objet (le point), le noir et blanc des projets, une seule couleur (le Klein, pour les paupières et la lumière du verre), le texte qui reste du texte, et la feuille des projets qui passe ensuite comme avant.
+
 ## Techniques
 
 View Transitions, API Popover et couche supérieure (menu, curseur, voile), `@starting-style`, `text-box`, unités de conteneur, `:has()`, easing `linear()`, police variable, `feDisplacementMap` pour le verre. Chaque effet a un repli : sans JavaScript et en mouvement réduit, la page est complète.

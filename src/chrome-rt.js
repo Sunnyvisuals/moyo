@@ -252,7 +252,7 @@ new MutationObserver(() => {
 if (bar) {
   const root = document.documentElement, land = bar.hasAttribute('data-land'), REST = 2600, sheet = document.getElementById('proj'), over = () => sheet && sheet.open, at = () => over() ? sheet.scrollTop : scrollY;
   let last = at(), upAt = last, q = 0, t = 0;
-  const first = () => land && !over() && scrollY < innerHeight * .85;
+  const hero = document.getElementById('top'), first = () => land && !over() && scrollY < (hero ? hero.offsetHeight - innerHeight * 1.15 : 0) + innerHeight * .85; // the first screen lasts as long as the arrival (hero.js)
   const busy = () => (root.classList.contains('kbd') && bar.contains(document.activeElement)) || menu.matches(':popover-open') || !!bar.querySelector(':hover');
   const hide = () => bar.classList.add('away');
   const rest = () => { clearTimeout(t); if (!reduce) t = setTimeout(() => busy() ? rest() : hide(), REST); };
