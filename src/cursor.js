@@ -115,7 +115,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const [A, D] = asc(best.cs.fontWeight, best.cs.fontFamily); let base = best.r.top + A * best.size, right = best.right;
     const name = el.classList.contains('nm') && el.querySelector('.rl'); // its two copies roll on hover: the line itself does not move
     if (name) { const b = name.getBoundingClientRect(), lh = parseFloat(getComputedStyle(el).lineHeight); base = b.bottom - .2 * best.size - (lh - (A + D) * best.size) / 2 - D * best.size; }
-    else el.querySelectorAll('i,svg').forEach(x => { const r = x.getBoundingClientRect(); if (r.width && r.width < best.size * 2 && Math.abs(r.top + r.height / 2 - best.r.top - best.r.height / 2) < best.size) right = Math.max(right, r.right); }); // after its arrow
+    else el.querySelectorAll('i,svg,sup').forEach(x => { const r = x.getBoundingClientRect(); if (r.width && r.width < best.size * 2 && Math.abs(r.top + r.height / 2 - best.r.top - best.r.height / 2) < best.size) right = Math.max(right, r.right); }); // after its arrow
     const s = clamp(best.size * .155, 7, 26);
     return { x: right + s * .55 + best.size * .05, y: base - s / 2, s };
   }

@@ -118,6 +118,7 @@ function showLogin(mode, note) {
     sent: `<div class="lg-a"><button class="btn" type="button" data-lg="back"><span>Retour</span><i class="ar back" aria-hidden="true"></i></button><button type="button" class="tx" data-lg="forgot">Renvoyer le lien</button></div><p class="lg-n">Rien reçu après quelques minutes ? Regardez dans les indésirables, puis renvoyez le lien.</p>`,
     create: `${user}${pwField('n1', 'Nouveau mot de passe', 'new-password', meter('n1'))}${pwField('n2', 'Encore une fois', 'new-password')}${remember}<div class="lg-a"><button class="btn" type="submit"><span>Enregistrer</span><i class="ar" aria-hidden="true"></i></button></div>`
   }[mode];
+  arrived = false; if (!reduce) [$('#lgP'), ...F.children].forEach((e, i) => rise(e, 150 + i * 130));
   eyes.wake(); $('#lgT .dot b').animate?.([{ scale: 1.9 }, { scale: 1 }], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)' });
   const f = $('input:not(.sr)', F); if (f && matchMedia('(pointer:fine)').matches) f.focus({ preventScroll: true }); else $('#lgT').focus({ preventScroll: true });
 }
@@ -350,12 +351,39 @@ addEventListener('hashchange', () => {
   picked = ''; adding = -1; addingMaq = false; render(); scrollTo(0, 0); const p = route[0] === 'projets' && data.projects.find(x => x.id === route[1]); $(p && blank(p) ? '#view .vt' : '#view h1')?.focus({ preventScroll: true });
 });
 const VIEWS = { projets: () => { const p = route[1] && data.projects.find(x => x.id === route[1]); return p ? projectView(p) : projectsView(); }, methode: methodView, equipe: () => { const m = route[1] && data.team.find(x => x.id === route[1]); return m ? personView(m) : teamView(); }, categories: catsView, mentions: lawView, messages: msgsView, 'mot-de-passe': passView };
+/* ---------- movement, slow: what comes onto the screen rises one after another (further down: when it is reached), pictures are uncovered.
+   The titles stay still: only their point falls. Nothing of this for who asks for less movement ---------- */
+const EASE = 'cubic-bezier(.16,1,.3,1)';
+let watch = null, arrived = false;
+const rise = (e, delay = 0, from = '0 40px') => e.animate([{ opacity: 0, translate: from }, { opacity: 1, translate: '0 0' }], { duration: 1400, delay, easing: EASE, fill: 'backwards' });
+function uncover(e, delay) {
+  e.animate([{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 1600, delay, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'backwards' });
+  $$('img,video', e).forEach(m => m.animate([{ scale: 1.18 }, { scale: 1 }], { duration: 2600, delay, easing: EASE, fill: 'backwards' }));
+}
+function bringIn() {
+  watch?.disconnect(); if (reduce) return;
+  const items = [...$('#view').children].filter(e => !e.matches('.vh')).flatMap(e => e.matches('ul,ol,#lawF,div[data-o]') ? [...e.children] : [e]), waiting = new Map();
+  watch = new IntersectionObserver(seen => seen.filter(x => x.isIntersecting).forEach(({ target }, i) => {
+    const a = waiting.get(target), delay = Math.min(i, 8) * 130; watch.unobserve(target); if (!a) return; a.effect.updateTiming({ delay }); a.play();
+    $$('.rw-o .plate,.mt,.ed-p .plate', target).forEach(p => uncover(p, delay + 150));
+  }));
+  items.forEach(e => { const a = rise(e); a.pause(); waiting.set(e, a); watch.observe(e); });
+}
+/* once, when the admin opens: the bar, then the way, whose line is drawn from the top */
+function arrive() {
+  if (arrived || reduce) return; arrived = true;
+  $$('.ab>*').forEach((e, i) => rise(e, i * 110, '0 -18px'));
+  $$('.aw li,.aw-x>*').forEach((e, i) => rise(e, 200 + i * 100, '-26px 0'));
+  $('.aw-l')?.animate([{ scale: '1 0' }, { scale: '1 1' }], { duration: 1800, delay: 200, easing: EASE, fill: 'backwards' });
+}
+
 function render(keep) {
   route = parse(); const V = $('#view'), y = scrollY;
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
   if (route[0] === 'projets' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.projects, a, b)); if (route[0] === 'equipe' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.team, a, b));
   if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b));
-  grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); { const p = bkProject(); if (p) bkSum(p); } if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+  grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); { const p = bkProject(); if (p) bkSum(p); } if (keep) scrollTo(0, y); else bringIn();
+  arrive();
 }
 const when = t => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(t));
 /* a field as tall as its text, where the browser does not do it by itself */
@@ -680,7 +708,7 @@ function catsView() {
 
 /* ---------- messages ---------- */
 const TYPES = { identite: 'Identité', site: 'Site', donnees: 'Données', motion: 'Motion', audiovisuel: 'Audiovisuel', communication: 'Communication', autre: 'Autre' }, BUDGETS = { lt5: 'Moins de 5 000 €', '5-15': 'De 5 000 à 15 000 €', '15-40': 'De 15 000 à 40 000 €', gt40: 'Plus de 40 000 €', tbd: 'Budget non défini' };
-async function loadMsgs() { try { msgs = (await api('/api/messages')).messages; } catch (_) { msgs = msgs || []; } if (!data) return; way(); if (route[0] === 'messages') render(true); }
+async function loadMsgs() { try { msgs = (await api('/api/messages')).messages; } catch (_) { msgs = msgs || []; } if (!data) return; way(); if (route[0] === 'messages') { render(true); bringIn(); } }
 function msgsView() {
   if (!msgs) return head('Messages') + '<p class="vn">Chargement…</p>';
   return head('Messages') + (msgs.length ? `<ul class="ms">${msgs.map(m => `<li data-id="${esc(m.id)}"${isNew(m) ? ' class="new"' : ''}><h2>${esc(m.name)}</h2><p class="who"><a href="mailto:${esc(m.email)}">${esc(m.email)}</a><span>${esc(when(m.at))}</span>${m.type ? `<span>${esc(m.type.split(',').map(t => TYPES[t] || t).join(', '))}</span>` : ''}${m.budget ? `<span>${esc(BUDGETS[m.budget] || m.budget)}</span>` : ''}${m.lang === 'en' ? '<span>En anglais</span>' : ''}</p><p class="txt">${esc(m.message)}</p><div class="pa" style="margin:0;justify-content:space-between"><a class="tx" href="mailto:${esc(m.email)}?subject=${encodeURIComponent(m.lang === 'en' ? 'moyo, your message' : 'moyo, votre message')}">Répondre ↗</a><button type="button" class="tx red" data-act="rmMsg">Supprimer</button></div></li>`).join('')}</ul>` : '<div class="none"><b></b><p>Aucun message pour l’instant.<br>Ils arrivent ici depuis le formulaire du site.</p></div>');
@@ -693,7 +721,7 @@ document.addEventListener('toggle', e => { const d = e.target; if (d.classList?.
 
 /* ---------- the legal notice: who publishes the site; online once complete (functions/_lib/legal.js) ---------- */
 let law = null;
-async function loadLaw() { try { law = await api('/api/legal'); } catch (x) { return fail(x); } if (route[0] === 'mentions') render(true); }
+async function loadLaw() { try { law = await api('/api/legal'); } catch (x) { return fail(x); } if (route[0] === 'mentions') { render(true); bringIn(); } }
 const LAW = [['nom', 'Prénom et nom', 'name'], ['adresse', 'Adresse (numéro, rue, code postal, ville)', 'street-address'], ['telephone', 'Téléphone', 'tel'], ['siren', 'SIREN (9 chiffres)', 'off'], ['tva', 'N° de TVA (seulement si vous la facturez)', 'off']];
 const lawField = (id, label, value, auto, wide) => `<div class="fld${wide ? ' w2' : ''}"><label class="fl" for="${id}">${label}</label><input id="${id}" type="${auto === 'tel' ? 'tel' : 'text'}" autocomplete="${auto}" value="${esc(value)}"></div>`;
 function lawView() {
@@ -714,7 +742,7 @@ async function saveLaw(F) {
 let safety = null, setup = null, codes = null; // what the server says; the key being put in the application; the recovery codes, shown once
 async function loadSafety() {
   try { const [two, b] = await Promise.all([api('/api/totp'), api('/api/backup')]); safety = { ...two, versions: b.versions }; } catch (x) { return fail(x); }
-  if (route[0] === 'mot-de-passe') render(true);
+  if (route[0] === 'mot-de-passe') { render(true); bringIn(); }
 }
 const submitRow = (label, id, cls = '') => `<div class="w2"><button class="btn${cls}" type="submit" id="${id}"><span>${label}</span><i class="ar" aria-hidden="true"></i></button></div>`;
 const narrow = x => `<div class="w2" style="max-width:34em">${x}</div>`;
@@ -794,14 +822,14 @@ V.addEventListener('submit', e => {
   e.preventDefault(); if (e.target.id === 'passF') return changePass(e.target);
   if (['startF', 'addF', 'onF', 'offF'].includes(e.target.id)) return twoStep(e.target);
   if (e.target.id === 'lawF') return saveLaw(e.target);
-  if (e.target.id === 'catAdd') { const fr = $('#cFr').value.trim(); if (!fr) return $('#cFr').focus(); data.categories.push({ id: freeId(slug(fr) || 'categorie', data.categories), fr, en: $('#cEn').value.trim() || fr }); render(true); $('#cFr').focus(); }
+  if (e.target.id === 'catAdd') { const fr = $('#cFr').value.trim(); if (!fr) return $('#cFr').focus(); data.categories.push({ id: freeId(slug(fr) || 'categorie', data.categories), fr, en: $('#cEn').value.trim() || fr }); render(true); const li = $('#view .ct>li:last-child'); if (li && !reduce) { rise(li); li.animate([{ backgroundColor: 'rgb(0 47 167 / .09)' }, { backgroundColor: 'rgb(0 47 167 / 0)' }], { duration: 3200, easing: 'ease-in' }); } $('#cFr').focus(); }
 });
 V.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act, o = objOf(b);
   if (act === 'copyKey' || act === 'copyCodes') { try { await navigator.clipboard.writeText(act === 'copyKey' ? setup.secret : codes.join('\n')); toast('Copié.'); } catch (_) { toast('Copie impossible : sélectionnez le texte.', true); } }
   else if (act === 'codesDone') { codes = null; render(true); }
   else if (act === 'takeVersion') takeVersion(b);
-  else if (act === 'lang') { lang = b.dataset.l; render(true); $(`[data-act="lang"][data-l="${lang}"]`)?.focus(); }
+  else if (act === 'lang') { lang = b.dataset.l; render(true); if (!reduce) $$('#view .ef,#view .mt-w').forEach(e => rise(e, 0, '0 14px')); $(`[data-act="lang"][data-l="${lang}"]`)?.focus(); }
   else if (act === 'pick') (b.closest('section,[class^="ed-p"]') || V).querySelector('.dz input').click();
   else if (act === 'draftYes') { data = bkAdopt(offered.data); offered = null; data.method ||= JSON.parse(saved).method; render(); toast('Brouillon repris.'); }
   else if (act === 'draftNo') { offered = null; store.set(DRAFT, null); render(true); }
@@ -811,7 +839,7 @@ V.addEventListener('click', async e => {
   else if (act === 'rmMedia') { const was = JSON.stringify(data), x = [o.media, o.poster]; o.media = o.poster = null; changed('Étape sans image.', was, x); }
   else if (act === 'rmProject') { if (await ask(`Supprimer « ${o.fr.title || 'Sans titre'} » ?`, 'Le projet quittera le site à la prochaine publication.', 'Supprimer')) { data.projects.splice(data.projects.indexOf(o), 1); [o.cover, ...(o.images || [])].forEach(drop); location.hash = 'projets'; } }
   else if (act === 'rmPerson') { if (await ask(`Retirer ${o.name || 'ce profil'} de l’équipe ?`, 'Sa page quittera le site à la prochaine publication.', 'Retirer')) { data.team.splice(data.team.indexOf(o), 1); drop(o.photo); location.hash = 'equipe'; } }
-  else if (act === 'rmCat') { data.categories.splice(data.categories.indexOf(o), 1); render(true); }
+  else if (act === 'rmCat') { b.disabled = true; if (!reduce) await b.closest('li').animate([{ opacity: 1, translate: '0 0' }, { opacity: 0, translate: '-60px 0' }], { duration: 800, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' }).finished; const at = data.categories.indexOf(o); if (at < 0) return; data.categories.splice(at, 1); render(true); }
   else if (act === 'rmMsg') { const li = b.closest('li'); if (await ask('Supprimer ce message ?', 'Il ne pourra pas être récupéré.', 'Supprimer')) api('/api/messages/' + encodeURIComponent(li.dataset.id), { method: 'DELETE' }).then(() => { msgs = msgs.filter(m => m.id !== li.dataset.id); render(true); toast('Message supprimé.'); }).catch(fail); }
 });
 

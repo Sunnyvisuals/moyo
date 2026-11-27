@@ -61,14 +61,22 @@ body{min-height:100vh;min-height:100svh}
 .aw .new sup{color:var(--klein);font-weight:700}
 .aw-x{display:grid;justify-items:start;gap:6px;margin-top:clamp(1.5rem,2.6vw,2.75rem);padding-left:28px}
 .aw-x .btn{height:auto;color:var(--ink);font-size:var(--fs-small)}
-.aw-x a.btn:hover{color:var(--klein)} /* in ink, underlined, with their point: they are seen to be pressed */
+.aw-x a.btn:hover{color:var(--klein)}
+@media (hover:hover){#out:hover{--c:var(--red)}}#out:focus-visible{--c:var(--red);color:var(--red)} /* leaving is told in red */ /* in ink, underlined, with their point: they are seen to be pressed */
 
 /* Views */
 .av{grid-column:4/-1;min-width:0;outline:none}
 .vh{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 32px;margin-bottom:clamp(2rem,3.8vw,4.25rem)}
 .vh h1{outline:none;padding-top:.18em}
-.vh .dot b{animation:fall 1.05s linear(0,.0157,.0625,.1406,.25,.3906,.5625,.7656,1 36.4%,.8906 45.5%,.8125 50%,.7656 54.5%,.75 59%,.7656 63.6%,.8125 68.2%,.8906 72.7%,1 77.3%,.9531,.9375 86.4%,.9531,1 95.5%,.9844,1) .15s both}
+.vh .dot b{animation:fall 1.6s linear(0,.0157,.0625,.1406,.25,.3906,.5625,.7656,1 36.4%,.8906 45.5%,.8125 50%,.7656 54.5%,.75 59%,.7656 63.6%,.8125 68.2%,.8906 72.7%,1 77.3%,.9531,.9375 86.4%,.9531,1 95.5%,.9844,1) .15s both}
 @keyframes fall{from{translate:0 -1.35em;opacity:0}12%{opacity:1}}
+@keyframes words{from{opacity:0;padding-top:44px}}
+/* under the mouse, slowly: the picture comes closer, the name moves on */
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .aw a{transition:color .3s,translate .9s var(--ease)}.aw a:hover{translate:7px 0}
+  .rw-o .plate img{transition:scale 1.6s var(--ease)}.rw-o:hover .plate img{scale:1.1}
+  .rw-o .rw-t,.rw-o .rw-s{transition:color .4s,translate .9s var(--ease)}.rw-o:hover :is(.rw-t,.rw-s){translate:10px 0}
+}
 .vn{max-width:54ch;margin:calc(clamp(2rem,3.8vw,4.25rem) * -.45) 0 clamp(2rem,3.8vw,4.25rem);color:var(--mute)}
 .vb{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 32px;margin-bottom:clamp(.75rem,1.6vw,1.75rem)}
 .av .crumbs{margin:0}
@@ -93,6 +101,12 @@ body{min-height:100vh;min-height:100svh}
 .acc-b>.vn{margin:0 0 1.75rem}
 .acc-b>h3.mt-k{margin:clamp(2.25rem,3.4vw,3.25rem) 0 1.25rem}
 .acc-end{margin-top:clamp(1.75rem,2.8vw,2.75rem)}
+@media (prefers-reduced-motion:no-preference){
+  /* a part opens and shuts slowly, where the browser can */
+  .acc{interpolate-size:allow-keywords}
+  .acc::details-content{height:0;opacity:0;overflow:clip;overflow-clip-margin:10px;transition:height 1.1s var(--ease),opacity .9s,content-visibility 1.1s allow-discrete}
+  .acc[open]::details-content{height:auto;opacity:1}
+}
 .key{margin:0 0 6px;font-size:var(--fs-m);font-weight:700;letter-spacing:.04em;user-select:all;overflow-wrap:anywhere}
 .codes{display:grid;grid-template-columns:repeat(2,max-content);gap:8px 44px;margin:0 0 14px;font-size:var(--fs-lead);font-weight:700;user-select:all}
 .sum{margin-left:1em;font-weight:500;color:var(--mute);font-size:var(--fs-small)}
@@ -181,7 +195,7 @@ body{min-height:100vh;min-height:100svh}
 /* a file above the page, or a picture in the hand: what can take it is ringed, what is under it turns blue and says what will happen.
    The edges of a picture of the layout add beside it */
 /* the mouse over a picture: it says that a file can be dropped there (and a click still chooses one) */
-@media (hover:hover){html:not(.files,.carry) :is(.dz:not(.busy):hover,.bk-p:hover)::before{content:"Glisser-déposer.";position:absolute;inset:0;z-index:3;display:grid;place-items:center;text-align:center;text-wrap:balance;padding:10px;background:rgb(18 18 20 / .46);box-shadow:inset 0 0 0 2px var(--klein);color:var(--bg);font-size:clamp(1.0625rem,1.6vw,1.75rem);font-weight:700;letter-spacing:-.034em;line-height:1.08;pointer-events:none}
+@media (hover:hover){html:not(.files,.carry) :is(.dz:not(.busy):hover,.bk-p:hover)::before{content:"Glisser-déposer.";position:absolute;inset:0;z-index:3;display:grid;place-items:center;text-align:center;text-wrap:balance;padding:10px;background:rgb(18 18 20 / .46);box-shadow:inset 0 0 0 2px var(--klein);color:var(--bg);font-size:clamp(1.0625rem,1.6vw,1.75rem);font-weight:700;letter-spacing:-.034em;line-height:1.08;pointer-events:none;animation:words .9s var(--ease) both}
   /* without a picture there is only its point: the words go below it, on no veil */
   html:not(.files,.carry) :is(.dz.plate--none,.mt:not(.has)>.dz):not(.busy):hover::before{place-items:end center;padding-bottom:9%;background:none}
   html:not(.files,.carry) .dz.plate--none:not(.busy):hover::before{color:var(--ink)}}
@@ -382,7 +396,7 @@ html.files .bk1.over.before::before{content:"Avant.";inset:0 72% 0 0}html.files 
 .ask p+p{margin-top:14px;max-width:48ch;color:var(--mute)}
 .ask-a{display:flex;flex-wrap:wrap;align-items:center;gap:14px 32px;margin-top:clamp(1.75rem,3vw,3rem)}
 .ts{position:fixed;left:50%;bottom:max(clamp(16px,2.6vw,36px),env(safe-area-inset-bottom));z-index:90;translate:-50% 0;width:max-content;max-width:calc(100vw - 40px);pointer-events:none}
-.ts p{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 28px;border-radius:27px;background:var(--ink);color:var(--bg);font-size:var(--fs-small);font-weight:600;line-height:1.35;white-space:pre-line;animation:rise .7s var(--ease) both}
+.ts p{display:flex;align-items:center;gap:12px;min-height:54px;padding:12px 28px;border-radius:27px;background:var(--ink);color:var(--bg);font-size:var(--fs-small);font-weight:600;line-height:1.35;white-space:pre-line;animation:rise 1.1s var(--ease) both}
 .ts p::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--bg)}
 .ts .err{background:var(--red)}
 .ts button{margin-left:10px;min-height:44px;font-weight:700;pointer-events:auto;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .72em)/100% 1px no-repeat}
