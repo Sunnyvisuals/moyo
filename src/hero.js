@@ -21,6 +21,7 @@ function fit() {
   const fits = f => { title.style.setProperty('--fit', f.toFixed(2) + 'px'); if (title.offsetHeight > H) return false; const a = title.getBoundingClientRect(), b = rg.getBoundingClientRect(); return b.right <= a.right + 1 && !alone(f); }; // the letters themselves, not what decorates them
   let lo = 24, hi = Math.max(lo, most);
   if (fits(hi)) lo = hi; else for (let i = 0; i < 14 && hi - lo > .5; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; }
+  if (matchMedia('(min-width:821px) and (max-height:1150px)').matches) { lo *= .8; while (lo > 24 && !fits(lo)) lo -= 1; } // on a laptop, a sentence filling the whole screen is too much
   title.style.setProperty('--fit', Math.floor(lo * 4) / 4 + 'px'); title.offsetHeight; title.classList.remove('fitting');}
 window.moyoFit = fit;
 let t = 0; const later = () => { clearTimeout(t); t = setTimeout(fit, 80); };

@@ -18,18 +18,20 @@ const DESIGN_CSS = `
   --m:max(clamp(20px,3.4vw,64px),env(safe-area-inset-left),env(safe-area-inset-right));--max:clamp(1680px,80vw,2400px);
   --edge:max(var(--m),calc((100vw - var(--max)) / 2));--w:calc(100vw - 2 * var(--edge));
   --gut:clamp(16px,calc(var(--w) * .0193),44px);
+  /* type and the space between things follow --t: the width of the page, or less on a laptop (see below) */
+  --t:var(--w);
   /* type */
-  --fs-hero:clamp(2.75rem,calc(var(--w) * .0912),15rem);
-  --fs-xl:clamp(2.5rem,calc(var(--w) * .059),9.5rem);
-  --fs-l:clamp(1.75rem,calc(var(--w) * .0375),6rem);
-  --fs-row:clamp(1.5rem,calc(var(--w) * .0268),4.25rem);
-  --fs-m:clamp(1.3125rem,calc(var(--w) * .0204),3.25rem);
-  --fs-lead:clamp(1.125rem,calc(var(--w) * .0145),2.25rem);
-  --fs-body:clamp(1.0625rem,calc(var(--w) * .0129),1.75rem);
-  --fs-small:clamp(.9375rem,calc(var(--w) * .0109),1.4rem);
+  --fs-hero:clamp(2.75rem,calc(var(--t) * .0912),15rem);
+  --fs-xl:clamp(2.5rem,calc(var(--t) * .059),9.5rem);
+  --fs-l:clamp(1.75rem,calc(var(--t) * .0375),6rem);
+  --fs-row:clamp(1.5rem,calc(var(--t) * .0268),4.25rem);
+  --fs-m:clamp(1.3125rem,calc(var(--t) * .0204),3.25rem);
+  --fs-lead:clamp(1.125rem,calc(var(--t) * .0145),2.25rem);
+  --fs-body:clamp(1.0625rem,calc(var(--t) * .0129),1.75rem);
+  --fs-small:clamp(.9375rem,calc(var(--t) * .0109),1.4rem);
   /* space */
-  --sec:clamp(8rem,calc(var(--w) * .172),26rem);
-  --gap:clamp(3rem,calc(var(--w) * .0687),10rem);
+  --sec:clamp(8rem,calc(var(--t) * .172),26rem);
+  --gap:clamp(3rem,calc(var(--t) * .0687),10rem);
   --hdr:clamp(64px,8vh,84px);
   /* motion */
   --ease:cubic-bezier(.16,1,.3,1);--ease-io:cubic-bezier(.76,0,.24,1);
@@ -37,6 +39,9 @@ const DESIGN_CSS = `
   --chaux:var(--bg);--paper:var(--bg);
   --paper-soft:color-mix(in oklab,var(--bg) 80%,var(--klein));
 }
+/* A laptop is wide but not tall (a MacBook 14" shows 1512 × 860): sizes taken from the width alone are huge there. The height holds them back,
+   by a fifth at most. Taller screens, tablets and phones keep theirs. */
+@media (min-width:821px) and (max-height:1150px){:root{--t:max(calc(var(--w) * .78),min(var(--w),132vh))}}
 *,*::before,*::after{box-sizing:border-box}
 html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-width:none;scroll-padding-top:calc(var(--hdr) + 12px)}
 @media (pointer:fine){html{overscroll-behavior-y:none}}

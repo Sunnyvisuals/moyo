@@ -46,7 +46,7 @@ const CHROME_CSS = `
 .bar>*{pointer-events:auto}
 .bar.away{translate:0 -100%}
 html.kbd .bar:focus-within{translate:0 0}
-.bar-mark,.menu-mark{font-size:clamp(1.5rem,calc(var(--w) * .0204),2.75rem);font-weight:700;letter-spacing:-.052em;line-height:1;margin-left:-.06em}
+.bar-mark,.menu-mark{font-size:clamp(1.5rem,calc(var(--t) * .0204),2.75rem);font-weight:700;letter-spacing:-.052em;line-height:1;margin-left:-.06em}
 .bar-mark{display:inline-flex;align-items:center;min-height:44px;color:inherit}
 .bar-mark::before{content:"moyo"}
 .bar :focus-visible{outline-color:currentColor;outline-offset:4px}
@@ -84,7 +84,7 @@ html.kbd .bar:focus-within{translate:0 0}
   .menu-list.arc a::before{display:none!important}
   .menu-list.arc a::after{content:"↗";position:static;display:inline-block;font-size:.48em;font-weight:500;opacity:var(--arw,0);
     translate:calc((var(--arw,0) - 1) * .12em) calc((1 - var(--arw,0)) * .12em);transition:none}
-  .menu-list.arc .mn{font-size:clamp(2rem,calc(var(--w) * .0343),5.25rem);font-weight:280;line-height:1.08;letter-spacing:-.025em}
+  .menu-list.arc .mn{font-size:clamp(2rem,calc(var(--t) * .0343),5.25rem);font-weight:280;line-height:1.08;letter-spacing:-.025em}
   .menu-list.arc .roll{overflow:visible}
   .menu-list.arc .roll .r2{display:none}
   .menu-list.arc .roll .c{transform:none!important;transition:none}
@@ -93,7 +93,7 @@ html.kbd .bar:focus-within{translate:0 0}
   .menu-pv{flex:none;width:clamp(220px,calc(var(--w) * .2146),520px);will-change:transform}
   .pv-frame{display:block;cursor:pointer;position:relative;aspect-ratio:4/5;transform-origin:50% 50%}
   .pv-l{position:absolute;left:0;right:0;top:-12%;bottom:-12%;background:var(--arc-frame) var(--img,none) 50% var(--py,50%)/cover no-repeat;clip-path:inset(12% 0)}
-  .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:.9em;font-size:clamp(.8125rem,calc(var(--w) * .0098),1.375rem)}
+  .pv-cap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:.9em;font-size:clamp(.8125rem,calc(var(--t) * .0098),1.375rem)}
   .pv-cw{height:5em;overflow:hidden;flex:1;min-width:0}
   .pv-ci{height:5em;overflow:hidden}
   .pv-cs,.pv-ns{display:block;will-change:transform}
