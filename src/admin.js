@@ -715,10 +715,12 @@ const narrow = x => `<div class="w2" style="max-width:34em">${x}</div>`;
 function twoView() {
   if (!safety) return '<p class="vn">Chargement…</p>';
   if (codes) return `<p class="vn">La double vérification est active. Notez ces codes de secours et gardez-les à part : chacun ouvre l’admin une fois si le téléphone manque. Ils ne seront plus montrés.</p><p class="codes">${codes.map(c => `<span>${esc(c)}</span>`).join('')}</p><div class="pa"><button type="button" class="tx" data-act="copyCodes">Copier les codes</button><button type="button" class="tx" data-act="codesDone">C’est noté</button></div>`;
-  if (safety.on) return `<p class="vn">Active : à la connexion, un code de votre application est demandé. Codes de secours restants : ${+safety.left}.</p><form id="offF" class="ef" novalidate>${user}${narrow(pwField('p3', 'Mot de passe', 'current-password'))}${narrow(codeField('c3', 'Code de l’application, ou code de secours'))}${submitRow('Désactiver', 'offB', ' red')}</form>`;
+  const nameField = narrow(`<div class="fld"><label class="fl" for="dn">Nom de l’appareil (par exemple « Téléphone de Zahia »)</label><input id="dn" type="text" maxlength="40" autocomplete="off"></div>`);
+  if (safety.on && !setup) { const list = safety.devices, one = list.length < 2;
+    return `<p class="vn">Active : à la connexion, un code est demandé, de l’un de ces appareils. Codes de secours restants : ${+safety.left}.</p><ul class="rw">${list.map(d => `<li><span class="rw-o"><span><span class="rw-t">${esc(d.name)}</span>${d.at ? `<span class="rw-s">Ajouté le ${esc(when(d.at))}</span>` : ''}</span></span></li>`).join('')}</ul>${list.length < safety.most ? `<h3 class="mt-k">Ajouter un appareil</h3><form id="addF" class="ef" novalidate>${user}${nameField}${narrow(pwField('p4', 'Mot de passe', 'current-password'))}${submitRow('Ajouter', 'addB')}</form>` : ''}<h3 class="mt-k">${one ? 'Désactiver' : 'Retirer un appareil, ou tout désactiver'}</h3><form id="offF" class="ef" novalidate>${user}${one ? '' : `<fieldset class="w2 chips"><legend class="fl">Que retirer ?</legend>${[...list.map(d => [d.id, d.name]), ['', 'Tout désactiver']].map(([v, n], i) => `<label><input type="radio" name="dev" value="${esc(v)}"${i ? '' : ' checked'}><span>${esc(n)}</span></label>`).join('')}</fieldset>`}${narrow(pwField('p3', 'Mot de passe', 'current-password'))}${narrow(codeField('c3', 'Code d’un appareil, ou code de secours'))}${submitRow(one ? 'Désactiver' : 'Retirer', 'offB', ' red')}</form>`; }
   if (!safety.ready) return '<p class="vn">Choisissez d’abord un mot de passe pour l’admin, ci-dessus.</p>';
-  if (setup) return `<p class="vn">Dans votre application d’authentification (Google Authenticator, Microsoft Authenticator, 1Password…), ajoutez un compte avec cette clé, puis entrez le code qu’elle affiche.</p><p class="key">${esc(setup.secret.replace(/(.{4})/g, '$1 ').trim())}</p><div class="pa"><a class="tx" href="${esc(setup.url)}">Ouvrir dans l’application ↗</a><button type="button" class="tx" data-act="copyKey">Copier la clé</button></div><form id="onF" class="ef" novalidate>${narrow(codeField('c1', 'Code à six chiffres'))}${submitRow('Activer', 'onB')}</form>`;
-  return `<p class="vn">En plus du mot de passe, un code donné par une application sur votre téléphone. Même quelqu’un qui connaîtrait le mot de passe ne pourrait pas entrer.</p><form id="startF" class="ef" novalidate>${user}${narrow(pwField('p3', 'Mot de passe actuel', 'current-password'))}${submitRow('Commencer', 'startB')}</form>`;
+  if (setup) return `<p class="vn">${esc(setup.name)} : dans l’application d’authentification de ce téléphone (Google Authenticator, Microsoft Authenticator, 1Password…), ajoutez un compte avec cette clé, puis entrez le code qu’elle affiche.</p><p class="key">${esc(setup.secret.replace(/(.{4})/g, '$1 ').trim())}</p><div class="pa"><a class="tx" href="${esc(setup.url)}">Ouvrir dans l’application ↗</a><button type="button" class="tx" data-act="copyKey">Copier la clé</button></div><form id="onF" class="ef" novalidate>${narrow(codeField('c1', 'Code à six chiffres'))}${submitRow('Activer', 'onB')}</form>`;
+  return `<p class="vn">En plus du mot de passe, un code donné par une application sur votre téléphone. Même quelqu’un qui connaîtrait le mot de passe ne pourrait pas entrer.</p><form id="startF" class="ef" novalidate>${user}${nameField}${narrow(pwField('p3', 'Mot de passe actuel', 'current-password'))}${submitRow('Commencer', 'startB')}</form>`;
 }
 function keptView() {
   const list = safety?.versions || [];
@@ -729,16 +731,17 @@ function passView() {
   if (!safety) loadSafety();
   return head('Sécurité') + part('Mot de passe', `<p class="vn">Le changer déconnecte les autres appareils.</p><form id="passF" class="ef" novalidate>${user}<div class="w2" style="max-width:34em">${pwField('p0', 'Mot de passe actuel', 'current-password')}</div><div class="w2" style="max-width:34em">${pwField('p1', 'Nouveau mot de passe', 'new-password', meter('p1'))}</div><div class="w2" style="max-width:34em">${pwField('p2', 'Encore une fois', 'new-password')}</div><div class="w2"><button class="btn" type="submit"><span>Changer le mot de passe</span><i class="ar" aria-hidden="true"></i></button></div></form>`) + part('Double vérification', twoView()) + part('Sauvegardes', keptView());
 }
+const twoState = async () => ({ ...safety, ...(await api('/api/totp')) });
 async function twoStep(F) {
   const btn = $('.btn', F), pw = $('input[type=password],.pwd input', F), code = $('input[autocomplete=one-time-code]', F);
   if (pw && !pw.value) { err(pw.id, 'Entrez le mot de passe.'); return pw.focus(); }
   if (code && !code.value.trim()) { err(code.id, 'Entrez le code.'); return code.focus(); }
   btn.disabled = true;
-  const body = { ...(pw ? { current: await proofOf(pw.value) } : {}), ...(code ? { code: code.value.trim() } : {}) };
+  const body = { ...(pw ? { current: await proofOf(pw.value) } : {}), ...(code ? { code: code.value.trim() } : {}), ...($('#dn', F) ? { name: $('#dn', F).value } : {}), ...($('[name=dev]:checked', F)?.value ? { device: $('[name=dev]:checked', F).value } : {}) };
   try {
-    if (F.id === 'startF') setup = await post('/api/totp', body);
-    else if (F.id === 'onF') { codes = (await post('/api/totp', body, 'PUT')).codes; setup = null; safety = { ...safety, on: true, left: codes.length }; }
-    else { await post('/api/totp', body, 'DELETE'); safety = { ...safety, on: false, left: 0 }; toast('Double vérification désactivée.'); }
+    if (F.id === 'startF' || F.id === 'addF') setup = await post('/api/totp', body);
+    else if (F.id === 'onF') { const r = await post('/api/totp', body, 'PUT'); codes = r.codes; setup = null; safety = await twoState(); if (!codes) toast('Appareil ajouté.'); }
+    else { const r = await post('/api/totp', body, 'DELETE'); safety = await twoState(); toast(r.on ? 'Appareil retiré.' : 'Double vérification désactivée.'); }
     render(true);
   } catch (x) {
     btn.disabled = false;
@@ -784,7 +787,7 @@ V.addEventListener('change', e => {
 V.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.vt,.mt-w .a')) { e.preventDefault(); e.target.blur(); } });
 V.addEventListener('submit', e => {
   e.preventDefault(); if (e.target.id === 'passF') return changePass(e.target);
-  if (['startF', 'onF', 'offF'].includes(e.target.id)) return twoStep(e.target);
+  if (['startF', 'addF', 'onF', 'offF'].includes(e.target.id)) return twoStep(e.target);
   if (e.target.id === 'lawF') return saveLaw(e.target);
   if (e.target.id === 'catAdd') { const fr = $('#cFr').value.trim(); if (!fr) return $('#cFr').focus(); data.categories.push({ id: freeId(slug(fr) || 'categorie', data.categories), fr, en: $('#cEn').value.trim() || fr }); render(true); $('#cFr').focus(); }
 });

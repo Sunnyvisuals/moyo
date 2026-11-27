@@ -1,5 +1,6 @@
-/* The second step of the sign-in: the six figures of an authenticator application (TOTP, RFC 6238: HMAC-SHA1, a new code every 30 seconds), and eight
-   recovery codes for the day the phone is lost. Each code works once. */
+/* The second step of the sign-in: the six figures of an authenticator application (TOTP, RFC 6238: HMAC-SHA1, a new code every 30 seconds), on up to
+   four devices (each with its own key: the two of the studio, a spare one), and eight recovery codes for the day a phone is lost. Each code works once.
+   In the auth document: totp = { devices: [{ id, name, secret, last, at }], codes }. */
 import { sha, b64url } from './auth.js';
 
 const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567', STEP = 30;
@@ -24,6 +25,9 @@ export function unbase32(text) {
 
 export const newSecret = () => base32(crypto.getRandomValues(new Uint8Array(20)));
 export const otpauth = secret => `otpauth://totp/moyo:admin?secret=${secret}&issuer=moyo&algorithm=SHA1&digits=6&period=${STEP}`;
+export const MOST = 4;
+/* the devices of a second step; the first ones were kept as a single key, without a list */
+export const devicesOf = t => !t ? [] : t.devices || [{ id: 'd1', name: 'Premier appareil', secret: t.secret, last: t.last, at: 0 }];
 
 export async function codeAt(secret, step) {
   const key = await crypto.subtle.importKey('raw', unbase32(secret), { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
@@ -46,16 +50,22 @@ export const hashCode = async c => b64url(await sha('moyo-secours.' + plain(c)))
 export function recoveryCodes(n = 8) {
   return Array.from({ length: n }, () => { const s = base32(crypto.getRandomValues(new Uint8Array(7))).slice(0, 10).toLowerCase(); return s.slice(0, 5) + '-' + s.slice(5); });
 }
-/* A code given at the sign-in, against the second step of the auth document. Right: it is used up (written to KV) and true. */
+/* A code given at the sign-in, against the second step of the auth document: of any device, or a recovery code. Right: it is used up (written to KV)
+   and true. */
 export async function secondStep(env, auth, given) {
-  const t = auth.totp, step = await stepOf(t.secret, given, t.last);
-  if (step !== null) t.last = step;
-  else {
+  const t = auth.totp, devices = devicesOf(t);
+  let found = false;
+  for (const d of devices) {
+    const step = await stepOf(d.secret, given, d.last);
+    if (step !== null) { d.last = step; found = true; break; }
+  }
+  if (!found) {
     if (plain(given).length !== 10) return false;
     const at = t.codes.indexOf(await hashCode(given));
     if (at < 0) return false;
     t.codes.splice(at, 1);
   }
+  auth.totp = { devices, codes: t.codes };
   await env.MOYO.put('auth', JSON.stringify(auth));
   return true;
 }
