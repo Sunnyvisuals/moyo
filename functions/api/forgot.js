@@ -1,4 +1,4 @@
-import { json, random, sha, limit, ipOf } from '../_lib/auth.js';
+import { json, random, sha, limit, ipOf, ours } from '../_lib/auth.js';
 import { mailbox, masked, send } from '../_lib/mail.js';
 
 const hex = u => [...u].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -6,7 +6,7 @@ const MIN = 30;
 
 /* Forgotten password, or never chosen: a one-time link, sent only to the studio's own mailbox (never to an address given here). Valid 30 minutes. */
 export async function onRequestPost({ request, env }) {
-  if (request.headers.get('X-Moyo-Admin') !== '1') return json({ error: 'bad_request' }, 400);
+  if (!ours(request)) return json({ error: 'bad_request' }, 400);
   if (!env.MOYO || !env.RESEND_API_KEY) return json({ error: 'no_mail', message: 'L’envoi d’e-mails n’est pas réglé sur ce site.' }, 503);
   const mine = await limit(env, 'rlf:' + ipOf(request), 3, 3600), all = await limit(env, 'rlf', 6, 3600);
   if (mine.full || all.full) return json({ error: 'too_many', message: 'Trop de demandes. Réessayez dans une heure.' }, 429);

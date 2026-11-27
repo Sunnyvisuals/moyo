@@ -20,7 +20,7 @@ async function api(path, opt = {}) {
   let r; try { r = await fetch(path, { credentials: 'same-origin', ...opt, headers: { ...HEAD, ...(opt.headers || {}) } }); } catch (_) { throw new Error('Le serveur ne répond pas. Vérifiez la connexion.'); }
   let b = null; try { b = await r.json(); } catch (_) {}
   if (r.status === 401 && path !== '/api/login' && data) { showLogin('login', 'La session a expiré. Votre brouillon est gardé.'); throw new Error('401'); }
-  if (!r.ok) throw new Error((b && b.message) || 'Erreur ' + r.status);
+  if (!r.ok) throw Object.assign(new Error((b && b.message) || 'Erreur ' + r.status), { code: b && b.error });
   return b;
 }
 const post = (path, body, method = 'POST') => api(path, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -60,6 +60,7 @@ const strength = p => [p.length >= 5, p.length >= 10, p.length >= 10 && (kinds(p
 const weak = p => p.length < 10 ? 'Dix caractères au minimum.' : COMMON.includes(p.toLowerCase().replace(/\s/g, '')) || /^(.)\1+$/.test(p) ? 'Celui-ci est trop connu.' : '';
 const pwField = (id, label, auto, extra = '') => `<div class="fld"><label class="fl" for="${id}">${label}</label><div class="pwd"><input id="${id}" type="password" autocomplete="${auto}" autocapitalize="off" spellcheck="false" required aria-describedby="${id}E"><button type="button" class="tx" data-eye="${id}" aria-pressed="false">Afficher</button></div>${extra}<small class="f-err" id="${id}E"></small></div>`;
 const meter = id => `<div class="str" data-str="${id}"><span class="f-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Dix caractères au minimum. Une phrase se retient mieux qu’un code.</span></div>`;
+const codeField = (id, label) => `<div class="fld"><label class="fl" for="${id}">${label}</label><input id="${id}" type="text" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" maxlength="14" aria-describedby="${id}E"><small class="f-err" id="${id}E"></small></div>`;
 const user = '<input type="text" name="username" autocomplete="username" value="moyo" class="sr" tabindex="-1" aria-hidden="true">';
 const err = (id, t) => { const e = $('#' + id + 'E'), f = $('#' + id); if (e) e.textContent = t || ''; if (f) t ? f.setAttribute('aria-invalid', 'true') : f.removeAttribute('aria-invalid'); };
 document.addEventListener('click', e => { const b = e.target.closest('[data-eye]'); if (!b) return; const f = $('#' + b.dataset.eye), on = f.type === 'password'; f.type = on ? 'text' : 'password'; b.textContent = on ? 'Masquer' : 'Afficher'; b.setAttribute('aria-pressed', String(on)); f.focus(); });
@@ -133,13 +134,22 @@ $('#lgF').addEventListener('submit', async e => {
   if (mode === 'login') {
     const v = $('#pw').value; if (!v) { err('pw', 'Entrez le mot de passe.'); return $('#pw').focus(); }
     btn.disabled = true;
-    try { await post('/api/login', { ...(await proofOf(v)), remember: stay }); await enter(btn); }
-    catch (x) { btn.disabled = false; err('pw', x.message); eyes.no(); $('#pw').select(); }
+    const code = $('#code');
+    if (code && !code.value.trim()) { btn.disabled = false; err('code', 'Entrez le code.'); return code.focus(); }
+    try { await post('/api/login', { ...(await proofOf(v)), remember: stay, ...(code ? { code: code.value.trim() } : {}) }); await enter(btn); }
+    catch (x) {
+      btn.disabled = false;
+      if (x.code === 'code') { // the second step: its field appears under the password
+        if (!code) { $('#pw').closest('.fld').insertAdjacentHTML('afterend', codeField('code', 'Code de l’application, ou code de secours')); return $('#code').focus(); }
+        err('code', x.message); eyes.no(); return code.select();
+      }
+      err('pw', x.message); eyes.no(); $('#pw').select();
+    }
   } else if (mode === 'create') {
     const a = $('#n1').value, w = weak(a); if (w) { err('n1', w); eyes.no(); return $('#n1').focus(); }
     if (a !== $('#n2').value) { err('n2', 'Les deux ne sont pas identiques.'); eyes.no(); return $('#n2').focus(); }
     btn.disabled = true;
-    try { await post('/api/password', { token, next: await newOne(a), remember: stay }); token = ''; history.replaceState(null, '', location.pathname); me = await api('/api/me'); await enter(btn); toast('Mot de passe enregistré.'); }
+    try { const r = await post('/api/password', { token, next: await newOne(a), remember: stay }); token = ''; history.replaceState(null, '', location.pathname); me = await api('/api/me'); if (r.code) return showLogin('login', 'Mot de passe enregistré. Entrez-le, puis le code de votre application.'); await enter(btn); toast('Mot de passe enregistré.'); }
     catch (x) { btn.disabled = false; toast(x.message, true); if (/expiré/.test(x.message)) { history.replaceState(null, '', location.pathname); showLogin(firstMode()); } }
   }
 });
@@ -284,7 +294,7 @@ const FORMAT = { webp: 'WebP', jpg: 'JPEG', jpeg: 'JPEG', png: 'PNG', avif: 'AVI
 const RATIOS = [[1, 1], [5, 4], [4, 3], [3, 2], [16, 10], [16, 9], [2, 1], [21, 9]];
 const ratio = (w, h) => { const v = Math.max(w, h) / Math.min(w, h), m = RATIOS.find(([a, b]) => Math.abs(v * b / a - 1) < .012); return m ? (w >= h ? m : [m[1], m[0]]).join(':') : w >= h ? v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ':1' : '1:' + v.toLocaleString('fr-FR', { maximumFractionDigits: 2 }); };
 /* where it is shown, how many pixels it takes on the long side (on the width for a full screen), and from what weight it is slow */
-const NEED = { cover: { min: 1200, good: 2000, heavy: .9, in: 'l’image principale' }, gallery: { min: 1200, good: 2000, heavy: .9, in: 'la galerie' }, bk: { min: 1200, good: 2000, heavy: 1.2, in: 'la mise en page' }, photo: { min: 900, good: 1600, heavy: .7, in: 'un portrait' }, media: { min: 1920, good: 2560, heavy: 1.6, in: 'le plein écran' } };
+const NEED = { cover: { min: 1200, good: 2000, heavy: .9, in: 'l’image principale' }, bk: { min: 1200, good: 2000, heavy: 1.2, in: 'la mise en page' }, photo: { min: 900, good: 1600, heavy: .7, in: 'un portrait' }, media: { min: 1920, good: 2560, heavy: 1.6, in: 'le plein écran' } };
 function about(id) {
   let f = facts.get(id); if (!f) facts.set(id, f = {}); if (f.done) return f; if (f.wait) return f.wait;
   return f.wait = (async () => {
@@ -321,7 +331,7 @@ function tell() {
 /* =====================================================================================================
    Places
    ===================================================================================================== */
-const PLACES = [['projets', 'Projets'], ['methode', 'Méthode'], ['equipe', 'Équipe'], ['categories', 'Catégories'], ['messages', 'Messages'], ['mot-de-passe', 'Mot de passe']];
+const PLACES = [['projets', 'Projets'], ['methode', 'Méthode'], ['equipe', 'Équipe'], ['categories', 'Catégories'], ['messages', 'Messages'], ['mot-de-passe', 'Sécurité']];
 const isNew = m => m.id > (store.get(SEEN) || '');
 function way() {
   if (!data) return; const at = Math.max(0, PLACES.findIndex(p => p[0] === route[0])), news = (msgs || []).filter(isNew).length, n = { projets: data.projects.length, equipe: data.team.length, categories: data.categories.length, messages: msgs ? msgs.length : '' };
@@ -335,6 +345,7 @@ addEventListener('hashchange', () => {
   if (/^#creer=/.test(location.hash)) return start(); if (!data) return;
   const was = route; if (was[0] === 'projets' && was[1]) { const p = data.projects.find(x => x.id === was[1]); if (p && blank(p)) { data.projects.splice(data.projects.indexOf(p), 1); } } // left empty: it never existed
   if (was[0] === 'messages' && msgs?.length) store.set(SEEN, msgs[0].id);
+  if (was[0] === 'mot-de-passe') safety = setup = codes = null; // asked again next time
   picked = ''; adding = -1; addingMaq = false; render(); scrollTo(0, 0); const p = route[0] === 'projets' && data.projects.find(x => x.id === route[1]); $(p && blank(p) ? '#view .vt' : '#view h1')?.focus({ preventScroll: true });
 });
 const VIEWS = { projets: () => { const p = route[1] && data.projects.find(x => x.id === route[1]); return p ? projectView(p) : projectsView(); }, methode: methodView, equipe: () => { const m = route[1] && data.team.find(x => x.id === route[1]); return m ? personView(m) : teamView(); }, categories: catsView, messages: msgsView, 'mot-de-passe': passView };
@@ -342,7 +353,7 @@ function render(keep) {
   route = parse(); const V = $('#view'), y = scrollY;
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
   if (route[0] === 'projets' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.projects, a, b)); if (route[0] === 'equipe' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.team, a, b));
-  if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b)); const g = $('.gal', V); if (g) { const p = objOf(g); sortable(g, (a, b) => moved(p.images, a, b), { sel: '.ed-p [data-drop="cover"]', put: i => toCover(p, i) }); }
+  if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b));
   grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); { const p = bkProject(); if (p) bkSum(p); } if (keep) scrollTo(0, y); else if (!reduce) [...V.children].forEach((e, i) => e.animate([{ opacity: 0, translate: '0 22px' }, { opacity: 1, translate: '0 0' }], { duration: 760, delay: i * 70, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
 }
 const when = t => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(t));
@@ -354,7 +365,7 @@ const crumbs = (href, name, here) => `<nav class="crumbs" aria-label="Vous êtes
 const field = (label, k, v, { area, ph, w2, max = 200 } = {}) => `<label class="fld${w2 ? ' w2' : ''}"><span class="fl">${label}</span>${area ? `<textarea data-k="${k}" maxlength="${max}" placeholder="${esc(ph)}">${esc(v)}</textarea>` : `<input type="text" data-k="${k}" value="${esc(v)}" maxlength="${max}" placeholder="${esc(ph)}" autocomplete="off">`}</label>`;
 const thumb = (id, v) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt="" draggable="false">`) : '';
 const ring = '<span class="up"><i></i></span>';
-const zone = (act, id, label, accept = 'image/*', cls = 'plate', has = id) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${has ? 'Remplacer' : 'Ajouter'}" data-to="${act === 'gallery' ? 'Ajouter à la galerie' : has ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}"${act === 'gallery' ? ' multiple' : ''}>${ring}</label>`;
+const zone = (act, id, label, accept = 'image/*', cls = 'plate', has = id) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${has ? 'Remplacer' : 'Ajouter'}" data-to="${has ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}">${ring}</label>`;
 
 /* =====================================================================================================
    Texts with a form: written as they are seen, kept as plain words (shared/rich.js). The browser does the work (execCommand): its shortcuts, its undo,
@@ -417,7 +428,7 @@ function linkRow(ed, a) {
 }
 function linkDo(row, what) {
   const ed = edOf(row), f = $('input', row); let u = f.value.trim();
-  if (what === 'ok') { if (!u) return f.focus(); if (/^[^\s@/]+@[^\s@/]+\.[a-z]{2,}$/i.test(u)) u = 'mailto:' + u; else if (!richURL(u)) u = 'https://' + u.replace(/^\/+/, ''); if (/^https?:/i.test(u) && !URL.canParse?.(u) || /\s/.test(u)) { f.setAttribute('aria-invalid', 'true'); return f.focus(); } }
+  if (what === 'ok') { if (!u) return f.focus(); if (/^[^\s@/]+@[^\s@/]+\.[a-z]{2,}$/i.test(u)) u = 'mailto:' + u; else if (!richURL(u)) u = 'https://' + u.replace(/^\/+/, ''); if (/^https?:/i.test(u) && URL.canParse && !URL.canParse(u) || /\s/.test(u)) { f.setAttribute('aria-invalid', 'true'); return f.focus(); } }
   row.hidden = true; ed.focus(); const s = getSelection(); if (kept) { s.removeAllRanges(); s.addRange(kept); }
   if (what === 'ok') { if (s.isCollapsed) run('insertHTML', `<a href="${esc(u)}">${esc(u.replace(/^(mailto:|https?:\/\/(www\.)?)/, '').replace(/\/$/, ''))}</a>`); else run('createLink', u); s.collapseToEnd(); } else if (what === 'no') run('unlink');
   richShow(ed);
@@ -674,8 +685,52 @@ function msgsView() {
   return head('Messages') + (msgs.length ? `<ul class="ms">${msgs.map(m => `<li data-id="${esc(m.id)}"${isNew(m) ? ' class="new"' : ''}><h2>${esc(m.name)}</h2><p class="who"><a href="mailto:${esc(m.email)}">${esc(m.email)}</a><span>${esc(when(m.at))}</span>${m.type ? `<span>${esc(m.type.split(',').map(t => TYPES[t] || t).join(', '))}</span>` : ''}${m.budget ? `<span>${esc(BUDGETS[m.budget] || m.budget)}</span>` : ''}${m.lang === 'en' ? '<span>En anglais</span>' : ''}</p><p class="txt">${esc(m.message)}</p><div class="pa" style="margin:0;justify-content:space-between"><a class="tx" href="mailto:${esc(m.email)}?subject=${encodeURIComponent(m.lang === 'en' ? 'moyo, your message' : 'moyo, votre message')}">Répondre ↗</a><button type="button" class="tx red" data-act="rmMsg">Supprimer</button></div></li>`).join('')}</ul>` : '<div class="none"><b></b><p>Aucun message pour l’instant.<br>Ils arrivent ici depuis le formulaire du site.</p></div>');
 }
 
-/* ---------- password ---------- */
-function passView() { return head('Mot de passe') + `<p class="vn">Les autres appareils connectés seront déconnectés.</p><form id="passF" class="ef" novalidate>${user}<div class="w2" style="max-width:34em">${pwField('p0', 'Mot de passe actuel', 'current-password')}</div><div class="w2" style="max-width:34em">${pwField('p1', 'Nouveau mot de passe', 'new-password', meter('p1'))}</div><div class="w2" style="max-width:34em">${pwField('p2', 'Encore une fois', 'new-password')}</div><div class="w2"><button class="btn" type="submit"><span>Changer le mot de passe</span><i class="ar" aria-hidden="true"></i></button></div></form>`; }
+/* ---------- security: the password, the second step, the versions kept ---------- */
+let safety = null, setup = null, codes = null; // what the server says; the key being put in the application; the recovery codes, shown once
+async function loadSafety() {
+  try { const [two, b] = await Promise.all([api('/api/totp'), api('/api/backup')]); safety = { ...two, versions: b.versions }; } catch (x) { return fail(x); }
+  if (route[0] === 'mot-de-passe') render(true);
+}
+const submitRow = (label, id, cls = '') => `<div class="w2"><button class="btn${cls}" type="submit" id="${id}"><span>${label}</span><i class="ar" aria-hidden="true"></i></button></div>`;
+const narrow = x => `<div class="w2" style="max-width:34em">${x}</div>`;
+function twoView() {
+  if (!safety) return '<p class="vn">Chargement…</p>';
+  if (codes) return `<p class="vn">La double vérification est active. Notez ces codes de secours et gardez-les à part : chacun ouvre l’admin une fois si le téléphone manque. Ils ne seront plus montrés.</p><p class="codes">${codes.map(c => `<span>${esc(c)}</span>`).join('')}</p><div class="pa"><button type="button" class="tx" data-act="copyCodes">Copier les codes</button><button type="button" class="tx" data-act="codesDone">C’est noté</button></div>`;
+  if (safety.on) return `<p class="vn">Active : à la connexion, un code de votre application est demandé. Codes de secours restants : ${+safety.left}.</p><form id="offF" class="ef" novalidate>${user}${narrow(pwField('p3', 'Mot de passe', 'current-password'))}${narrow(codeField('c3', 'Code de l’application, ou code de secours'))}${submitRow('Désactiver', 'offB', ' red')}</form>`;
+  if (!safety.ready) return '<p class="vn">Choisissez d’abord un mot de passe pour l’admin, ci-dessus.</p>';
+  if (setup) return `<p class="vn">Dans votre application d’authentification (Google Authenticator, Microsoft Authenticator, 1Password…), ajoutez un compte avec cette clé, puis entrez le code qu’elle affiche.</p><p class="key">${esc(setup.secret.replace(/(.{4})/g, '$1 ').trim())}</p><div class="pa"><a class="tx" href="${esc(setup.url)}">Ouvrir dans l’application ↗</a><button type="button" class="tx" data-act="copyKey">Copier la clé</button></div><form id="onF" class="ef" novalidate>${narrow(codeField('c1', 'Code à six chiffres'))}${submitRow('Activer', 'onB')}</form>`;
+  return `<p class="vn">En plus du mot de passe, un code donné par une application sur votre téléphone. Même quelqu’un qui connaîtrait le mot de passe ne pourrait pas entrer.</p><form id="startF" class="ef" novalidate>${user}${narrow(pwField('p3', 'Mot de passe actuel', 'current-password'))}${submitRow('Commencer', 'startB')}</form>`;
+}
+function keptView() {
+  const list = safety?.versions || [];
+  return `<p class="vn">Chaque publication garde la version d’avant, avec ses images : les dix dernières.</p>${list.length ? `<ul class="rw">${list.map(v => `<li><span class="rw-o"><span class="rw-s">Version remplacée le ${esc(when(v.at))}</span></span><button type="button" class="tx" data-act="takeVersion" data-id="${esc(v.id)}" data-at="${esc(v.at)}">Reprendre</button></li>`).join('')}</ul>` : '<p class="vn">Aucune pour l’instant : la première arrivera à la prochaine publication.</p>'}<div class="pa"><a class="tx" href="/api/backup?tout=1" download>Tout télécharger (textes, messages, inscriptions) ↓</a></div>`;
+}
+const part = (title, body) => `<section class="sct"><h2>${title}</h2>${body}</section>`;
+function passView() {
+  if (!safety) loadSafety();
+  return head('Sécurité') + part('Mot de passe', `<p class="vn">Le changer déconnecte les autres appareils.</p><form id="passF" class="ef" novalidate>${user}<div class="w2" style="max-width:34em">${pwField('p0', 'Mot de passe actuel', 'current-password')}</div><div class="w2" style="max-width:34em">${pwField('p1', 'Nouveau mot de passe', 'new-password', meter('p1'))}</div><div class="w2" style="max-width:34em">${pwField('p2', 'Encore une fois', 'new-password')}</div><div class="w2"><button class="btn" type="submit"><span>Changer le mot de passe</span><i class="ar" aria-hidden="true"></i></button></div></form>`) + part('Double vérification', twoView()) + part('Sauvegardes', keptView());
+}
+async function twoStep(F) {
+  const btn = $('.btn', F), pw = $('input[type=password],.pwd input', F), code = $('input[autocomplete=one-time-code]', F);
+  if (pw && !pw.value) { err(pw.id, 'Entrez le mot de passe.'); return pw.focus(); }
+  if (code && !code.value.trim()) { err(code.id, 'Entrez le code.'); return code.focus(); }
+  btn.disabled = true;
+  const body = { ...(pw ? { current: await proofOf(pw.value) } : {}), ...(code ? { code: code.value.trim() } : {}) };
+  try {
+    if (F.id === 'startF') setup = await post('/api/totp', body);
+    else if (F.id === 'onF') { codes = (await post('/api/totp', body, 'PUT')).codes; setup = null; safety = { ...safety, on: true, left: codes.length }; }
+    else { await post('/api/totp', body, 'DELETE'); safety = { ...safety, on: false, left: 0 }; toast('Double vérification désactivée.'); }
+    render(true);
+  } catch (x) {
+    btn.disabled = false;
+    if (x.code === 'expired') { setup = null; render(true); }
+    if (/mot de passe actuel/.test(x.message) && pw) err(pw.id, x.message); else if (x.code === 'wrong' && code) err(code.id, x.message); else fail(x);
+  }
+}
+async function takeVersion(b) {
+  if (!(await ask(`Reprendre la version remplacée le ${when(b.dataset.at)} ?`, 'Elle remplace ce qui est à l’écran. Rien ne change sur le site avant que vous publiiez.', 'Reprendre', 'Annuler', false))) return;
+  try { const d = await api('/api/backup?id=' + b.dataset.id), was = data.method; data = bkAdopt(d); data.method ||= was; location.hash = 'projets'; touched(); toast('Version reprise. Publiez pour la remettre en ligne.'); } catch (x) { fail(x); }
+}
 async function changePass(F) {
   const [a, b, c] = ['p0', 'p1', 'p2'].map(i => $('#' + i).value), w = weak(b), bad = !a ? ['p0', 'Entrez le mot de passe actuel.'] : w ? ['p1', w] : b === a ? ['p1', 'C’est le même que l’actuel.'] : b !== c ? ['p2', 'Les deux ne sont pas identiques.'] : null;
   if (bad) { err(...bad); return $('#' + bad[0]).focus(); }
@@ -710,20 +765,22 @@ V.addEventListener('change', e => {
 V.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.vt,.mt-w .a')) { e.preventDefault(); e.target.blur(); } });
 V.addEventListener('submit', e => {
   e.preventDefault(); if (e.target.id === 'passF') return changePass(e.target);
+  if (['startF', 'onF', 'offF'].includes(e.target.id)) return twoStep(e.target);
   if (e.target.id === 'catAdd') { const fr = $('#cFr').value.trim(); if (!fr) return $('#cFr').focus(); data.categories.push({ id: freeId(slug(fr) || 'categorie', data.categories), fr, en: $('#cEn').value.trim() || fr }); render(true); $('#cFr').focus(); }
 });
 V.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act, o = objOf(b);
-  if (act === 'lang') { lang = b.dataset.l; render(true); $(`[data-act="lang"][data-l="${lang}"]`)?.focus(); }
+  if (act === 'copyKey' || act === 'copyCodes') { try { await navigator.clipboard.writeText(act === 'copyKey' ? setup.secret : codes.join('\n')); toast('Copié.'); } catch (_) { toast('Copie impossible : sélectionnez le texte.', true); } }
+  else if (act === 'codesDone') { codes = null; render(true); }
+  else if (act === 'takeVersion') takeVersion(b);
+  else if (act === 'lang') { lang = b.dataset.l; render(true); $(`[data-act="lang"][data-l="${lang}"]`)?.focus(); }
   else if (act === 'pick') (b.closest('section,[class^="ed-p"]') || V).querySelector('.dz input').click();
   else if (act === 'draftYes') { data = bkAdopt(offered.data); offered = null; data.method ||= JSON.parse(saved).method; render(); toast('Brouillon repris.'); }
   else if (act === 'draftNo') { offered = null; store.set(DRAFT, null); render(true); }
-  else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, tone: 'klein', cover: null, images: [], blocks: [], plate: '', fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
+  else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, cover: null, images: [], blocks: [], fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
   else if (act === 'newPerson') { const id = freeId('profil', data.team); data.team.push({ id, name: '', first: '', last: '', photo: null, fr: { role: '', bio: '', phrase: '' }, en: { role: '', bio: '', phrase: '' }, links: [] }); lang = 'fr'; location.hash = 'equipe/' + id; }
-  else if (act === 'toCover') toCover(o, +b.closest('[data-img]').dataset.img);
   else if (act === 'rmCover' || act === 'rmPhoto') { const was = JSON.stringify(data), k = act === 'rmCover' ? 'cover' : 'photo', x = o[k]; o[k] = null; changed(k === 'cover' ? 'Image principale retirée.' : 'Portrait retiré.', was, [x]); }
   else if (act === 'rmMedia') { const was = JSON.stringify(data), x = [o.media, o.poster]; o.media = o.poster = null; changed('Étape sans image.', was, x); }
-  else if (act === 'rmImg') { const was = JSON.stringify(data), x = o.images.splice(+b.closest('[data-img]').dataset.img, 1); changed('Image retirée de la galerie.', was, x); }
   else if (act === 'rmProject') { if (await ask(`Supprimer « ${o.fr.title || 'Sans titre'} » ?`, 'Le projet quittera le site à la prochaine publication.', 'Supprimer')) { data.projects.splice(data.projects.indexOf(o), 1); [o.cover, ...(o.images || [])].forEach(drop); location.hash = 'projets'; } }
   else if (act === 'rmPerson') { if (await ask(`Retirer ${o.name || 'ce profil'} de l’équipe ?`, 'Sa page quittera le site à la prochaine publication.', 'Retirer')) { data.team.splice(data.team.indexOf(o), 1); drop(o.photo); location.hash = 'equipe'; } }
   else if (act === 'rmCat') { data.categories.splice(data.categories.indexOf(o), 1); render(true); }
@@ -731,31 +788,29 @@ V.addEventListener('click', async e => {
 });
 
 /* ---------- order: with the pointer or the arrows ---------- */
-/* an image of the gallery and the main one change places (or the gallery gives it, when there was none) */
-function toCover(o, i) { const was = JSON.stringify(data), x = o.images[i], y = o.cover; o.cover = x; if (y) o.images[i] = y; else o.images.splice(i, 1); changed(y ? 'Les deux images ont échangé leur place.' : 'C’est l’image principale.', was); }
 const noClick = () => { const f = e => { e.preventDefault(); e.stopPropagation(); }; addEventListener('click', f, true); setTimeout(() => removeEventListener('click', f, true), 60); }; // the end of a move is not a click
 function moved(list, a, b) { list.splice(b, 0, list.splice(a, 1)[0]); render(true); $$('#view [data-s] .grip')[b]?.focus({ preventScroll: true }); }
-function sortable(box, done, onto) {
+function sortable(box, done) {
   if (!box) return; const items = () => [...box.children].filter(c => c.hasAttribute('data-s'));
   box.addEventListener('keydown', e => { const g = e.target.closest('.grip'), d = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key]; if (!g || !d) return; e.preventDefault(); const l = items(), a = l.indexOf(g.closest('[data-s]')), b = clamp(a + d, 0, l.length - 1); if (a !== b) done(a, b); });
   box.addEventListener('pointerdown', e => {
-    const grip = e.target.closest('.grip'), g = grip || (onto && e.pointerType !== 'touch' && !e.target.closest('button') && e.target.closest('[data-img] .dz')); if (!g || e.button) return; if (grip) e.preventDefault(); // by its handle, or directly by the picture
+    const g = e.target.closest('.grip'); if (!g || e.button) return; e.preventDefault(); // by its handle
     const l = items(), from = l.indexOf(g.closest('[data-s]')), me = l[from], S = l.map(i => { const r = i.getBoundingClientRect(); return { x: r.left, y: r.top + scrollY, w: r.width, h: r.height }; }), col = S.every(s => Math.abs(s.x - S[0].x) < 4), gap = col && S[1] ? S[1].y - S[0].y - S[0].h : 0;
-    const sx = e.clientX, sy = e.clientY + scrollY; let to = from, px = e.clientX, py = e.clientY, raf = 0, on = false, main = null; const begin = () => { on = true; me.classList.add('drag'); box.classList.add('sorting'); root.classList.add('carry'); getSelection()?.removeAllRanges(); raf = requestAnimationFrame(edge); }; if (grip) try { g.setPointerCapture(e.pointerId); } catch (_) {}
+    const sx = e.clientX, sy = e.clientY + scrollY; let to = from, px = e.clientX, py = e.clientY, raf = 0, on = false; const begin = () => { on = true; me.classList.add('drag'); box.classList.add('sorting'); root.classList.add('carry'); getSelection()?.removeAllRanges(); raf = requestAnimationFrame(edge); }; try { g.setPointerCapture(e.pointerId); } catch (_) {}
     const place = () => { const o = l.map((_, i) => i).filter(i => i !== from); o.splice(to, 0, from); let y = S[0].y; o.forEach((i, k) => { const ty = col ? y : S[k].y, tx = col ? S[i].x : S[k].x; y += S[i].h + gap; if (i !== from) l[i].style.translate = `${tx - S[i].x}px ${ty - S[i].y}px`; }); };
-    const step = () => { me.style.translate = `${col ? 0 : px - sx}px ${py + scrollY - sy}px`; const cx = S[from].x + S[from].w / 2 + (col ? 0 : px - sx), cy = S[from].y + S[from].h / 2 + py + scrollY - sy; let best = to, d = 1e9; S.forEach((s, k) => { const q = Math.hypot(s.x + s.w / 2 - cx, s.y + s.h / 2 - cy); if (q < d) { d = q; best = k; } }); const c = onto && document.elementFromPoint(px, py)?.closest(onto.sel); if (c !== main) { main?.classList.remove('over', 'in'); main = c || null; main?.classList.add('over', 'in'); me.classList.toggle('onto', !!main); } if (main) best = from; if (best !== to) { to = best; place(); } };
+    const step = () => { me.style.translate = `${col ? 0 : px - sx}px ${py + scrollY - sy}px`; const cx = S[from].x + S[from].w / 2 + (col ? 0 : px - sx), cy = S[from].y + S[from].h / 2 + py + scrollY - sy; let best = to, d = 1e9; S.forEach((s, k) => { const q = Math.hypot(s.x + s.w / 2 - cx, s.y + s.h / 2 - cy); if (q < d) { d = q; best = k; } }); if (best !== to) { to = best; place(); } };
     const edge = () => { const v = py < 120 ? (py - 120) / 7 : py > innerHeight - 90 ? (py - innerHeight + 90) / 7 : 0; if (v) { scrollBy(0, v); step(); } raf = requestAnimationFrame(edge); };
     const mv = q => { px = q.clientX; py = q.clientY; if (!on) { if (Math.hypot(px - sx, py + scrollY - sy) < 7) return; begin(); } step(); };
-    const end = () => { cancelAnimationFrame(raf); removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); if (!on) return; if (!grip) noClick(); root.classList.remove('carry'); main?.classList.remove('over', 'in'); me.classList.remove('onto'); l.forEach(i => { i.style.translate = ''; i.style.transition = 'none'; }); me.classList.remove('drag'); box.classList.remove('sorting'); requestAnimationFrame(() => l.forEach(i => { i.style.transition = ''; })); if (main) onto.put(from); else if (to !== from) done(from, to); };
-    addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end); if (grip) begin();
+    const end = () => { cancelAnimationFrame(raf); removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); if (!on) return; root.classList.remove('carry'); l.forEach(i => { i.style.translate = ''; i.style.transition = 'none'; }); me.classList.remove('drag'); box.classList.remove('sorting'); requestAnimationFrame(() => l.forEach(i => { i.style.transition = ''; })); if (to !== from) done(from, to); };
+    addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end); begin();
   });
 }
 
-/* ---------- a picture is taken directly, and exchanged with the one it is put on: main image and gallery, steps of the method ---------- */
+/* ---------- the picture of a step of the method is taken directly, and exchanged with the one it is put on ---------- */
 V.addEventListener('mousedown', e => { if (!e.button && e.target.closest('.dz')) e.preventDefault(); }); // no text is selected on the way
 V.addEventListener('pointerdown', e => {
-  const z = e.target.closest('.ed-p .dz[data-drop="cover"],.mt .dz[data-drop="media"]'), o = z && objOf(z), what = z?.dataset.drop; if (!z || e.button || e.pointerType === 'touch' || !o[what] || z.classList.contains('busy')) return;
-  const sel = what === 'cover' ? '.gal .dz[data-drop="img"]' : '.mt .dz[data-drop="media"]', x0 = e.clientX, y0 = e.clientY; let g = null, at = null, px = x0, py = y0, raf = 0;
+  const z = e.target.closest('.mt .dz[data-drop="media"]'), o = z && objOf(z); if (!z || e.button || e.pointerType === 'touch' || !o.media || z.classList.contains('busy')) return;
+  const sel = '.mt .dz[data-drop="media"]', x0 = e.clientX, y0 = e.clientY; let g = null, at = null, px = x0, py = y0, raf = 0;
   const look = () => { g.style.translate = `${px}px ${py}px`; const d = document.elementFromPoint(px, py)?.closest(sel), t = d && d !== z ? d : null; if (t !== at) { at?.classList.remove('over', 'in'); at = t; at?.classList.add('over', 'in'); } };
   const edge = () => { const v = py < 110 ? (py - 110) / 7 : py > innerHeight - 90 ? (py - innerHeight + 90) / 7 : 0; if (v) { scrollBy(0, v); look(); } raf = requestAnimationFrame(edge); };
   const mv = q => {
@@ -766,8 +821,7 @@ V.addEventListener('pointerdown', e => {
   const end = q => {
     removeEventListener('pointermove', mv); removeEventListener('pointerup', end); removeEventListener('pointercancel', end); if (!g) return; cancelAnimationFrame(raf); noClick(); g.remove(); z.classList.remove('lift'); root.classList.remove('carry'); $$('.can').forEach(d => { d.classList.remove('can', 'over', 'in'); d.dataset.to = d.dataset.was; });
     if (!at || q.type === 'pointercancel') return;
-    if (what === 'cover') toCover(o, +at.closest('[data-img]').dataset.img);
-    else { const was = JSON.stringify(data), b = objOf(at); ['media', 'poster', 'fit'].forEach(k => { [o[k], b[k]] = [b[k] ?? null, o[k] ?? null]; }); [o, b].forEach(m => { m.fit ||= 'center'; }); changed('Les deux étapes ont échangé leur image.', was); }
+    const was = JSON.stringify(data), b = objOf(at); ['media', 'poster', 'fit'].forEach(k => { [o[k], b[k]] = [b[k] ?? null, o[k] ?? null]; }); [o, b].forEach(m => { m.fit ||= 'center'; }); changed('Les deux étapes ont échangé leur image.', was);
   };
   addEventListener('pointermove', mv); addEventListener('pointerup', end); addEventListener('pointercancel', end);
 });
@@ -778,11 +832,10 @@ const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
 let aim = null; // the picture under the file, and which part of it: the middle replaces, the edges add before or after
 function aimAt(d, e) {
   let side = 'in'; if (d?.dataset.drop === 'bk') { const r = d.getBoundingClientRect(), m = d.querySelector('.bk-p,.bk-0'), k = (e.clientX - r.left) / r.width, empty = d.querySelector('.bk-0'); side = empty ? 'in' : m ? (k < .22 ? 'before' : k > .78 ? 'after' : e.dataTransfer.items?.length > 1 ? (k < .5 ? 'before' : 'after') : 'in') : (e.clientY - r.top) / r.height < .5 ? 'before' : 'after'; }
-  if (d?.dataset.drop === 'img') { const r = d.getBoundingClientRect(), k = (e.clientX - r.left) / r.width, many = e.dataTransfer.items?.length > 1; side = k < (many ? .5 : .26) ? 'before' : k > (many ? .5 : .74) ? 'after' : 'in'; }
   if (aim && (aim.d !== d || aim.side !== side)) aim.d.classList.remove('over', 'before', 'after', 'in');
   aim = d ? { d, side } : null; if (d) d.classList.add('over', side);
 }
-/* beside the pictures, a file still has a place: the main image of the project if it has none, its gallery, the portrait */
+/* beside the pictures, a file still has a place: the main image of the project if it has none, its layout, the portrait */
 const spare = () => $('#view [data-drop]:hover') || (!data || !route[1] ? null : route[0] === 'projets' && $('#bk') ? $(objOf($('#bk')).cover ? '#bk' : '#view [data-drop="cover"]') : route[0] === 'equipe' ? $('#view [data-drop="photo"]') : null);
 let awayT; const away = () => { clearTimeout(awayT); root.classList.remove('files'); aimAt(null); };
 addEventListener('dragover', e => { e.preventDefault(); if (!data || !hasFiles(e)) return; clearTimeout(awayT); root.classList.add('files'); const d = V.contains(e.target) ? e.target.closest('[data-drop]') : null; aimAt(d, e); e.dataTransfer.dropEffect = d || spare() ? 'copy' : 'none'; });
@@ -801,16 +854,8 @@ async function take(what, files, z, o, side = 'in') {
   if (what === 'bk' || what === 'bkend') { const p = bkProject(); return bkTake(list, z, p, what === 'bk' ? { block: o.id, side } : {}).catch(e => { z.classList.remove('busy'); fail(e); }); }
   const say = p => z.style.setProperty('--u', p); z.classList.add('busy'); say(4);
   const here = route.join('/'), was = JSON.stringify(data), end = (text, gone) => { if (route.join('/') === here) changed(text, was, gone); else { touched(); toast(text); } };
-  const many = async l => { const got = []; for (let n = 0; n < l.length; n++) got.push(await picture(l[n], p => say(Math.round((n + p / 100) / l.length * 100)))); return got; };
   try {
-    if (what === 'gallery' || what === 'img') {
-      const l = list.filter(f => f.type.startsWith('image/')); if (!l.length) throw new Error('Choisissez des images.'); o.images ||= [];
-      const i = what === 'img' ? +z.closest('[data-img]').dataset.img : 0, swap = what === 'img' && side === 'in' && l.length === 1;
-      if (!swap && o.images.length + l.length > 40) throw new Error('40 images au plus par projet.');
-      const got = await many(l); const x = swap ? o.images.splice(i, 1, got[0]) : []; if (!swap) o.images.splice(what === 'img' ? i + (side === 'before' ? 0 : 1) : o.images.length, 0, ...got);
-      end(`${swap ? 'Image remplacée' : got.length > 1 ? got.length + ' images ajoutées' : 'Image ajoutée'} : ${gain(got)}.`, x);
-    }
-    else if (what === 'media') { const r = await film(list[0], say), x = [o.media, o.poster]; o.media = r.id; o.poster = r.poster; await about(r.id); end(`${isVideo(r.id) ? 'Vidéo' : isGif(r.id) ? 'GIF' : 'Image'} : ${gain([r.id])}.`, x); }
+    if (what === 'media') { const r = await film(list[0], say), x = [o.media, o.poster]; o.media = r.id; o.poster = r.poster; await about(r.id); end(`${isVideo(r.id) ? 'Vidéo' : isGif(r.id) ? 'GIF' : 'Image'} : ${gain([r.id])}.`, x); }
     else { const id = await picture(list[0], say), x = o[what]; o[what] = id; const more = what === 'cover' ? list.slice(1) : []; if (more.length) setTimeout(() => $('#bk') && bkTake(more, $('#bk'), o, {}).catch(fail), 60); end(`${what === 'photo' ? 'Portrait' : 'Image principale'} : ${gain([id])}.${more.length ? ' Les autres vont dans la mise en page.' : ''}`, [x]); }
   } catch (e) { z.classList.remove('busy'); fail(e); }
 }

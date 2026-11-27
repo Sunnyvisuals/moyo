@@ -20,8 +20,43 @@ export async function hasStored(env) {
   return !!(env.MOYO && (await env.MOYO.get('projects')));
 }
 
-export async function saveData(env, data) {
+/* ---------- publishing, and the versions kept ----------
+   Each publication keeps the one before, under "backup:<time>", the last KEEP of them. A picture is deleted only when neither the site nor a kept
+   version shows it any more. */
+const KEEP = 10;
+export const VERSION_ID = /^\d{15}$/;
+
+/* the ids of the versions kept, newest first */
+export async function versions(env) {
+  const r = await env.MOYO.list({ prefix: 'backup:' });
+  return r.keys.map(k => k.name.slice(7)).filter(i => VERSION_ID.test(i)).sort().reverse();
+}
+const version = (env, id) => env.MOYO.get('backup:' + id, 'json');
+
+/* every picture that the site or a kept version shows */
+export async function heldImages(env) {
+  const s = imagesOf(await getData(env));
+  for (const doc of await Promise.all((await versions(env)).map(i => version(env, i)))) if (doc) imagesOf(doc).forEach(i => s.add(i));
+  return s;
+}
+
+/* saves a new document; returns how many pictures were deleted */
+export async function publish(env, data) {
+  const had = await hasStored(env), before = await getData(env);
+  let list = await versions(env), fresh = null;
+  if (had && JSON.stringify(before) !== JSON.stringify(data)) {
+    fresh = String(Date.now()).padStart(15, '0');
+    await env.MOYO.put('backup:' + fresh, JSON.stringify(before));
+    list = [fresh, ...list.filter(i => i !== fresh)]; // a version just written is not always listed yet
+  }
   await env.MOYO.put('projects', JSON.stringify(data));
+  const kept = list.slice(0, KEEP), old = list.slice(KEEP), read = i => i === fresh ? before : version(env, i);
+  const shown = imagesOf(data), may = new Set();
+  for (const doc of await Promise.all(kept.map(read))) if (doc) imagesOf(doc).forEach(i => shown.add(i));
+  for (const doc of await Promise.all(old.map(read))) if (doc) imagesOf(doc).forEach(i => may.add(i));
+  const gone = [...may].filter(i => !shown.has(i) && IMAGE_ID.test(i));
+  await Promise.all([...gone.map(i => env.MOYO.delete('img:' + i)), ...old.map(i => env.MOYO.delete('backup:' + i))]);
+  return gone.length;
 }
 
 export function imagesOf(data) {
@@ -39,10 +74,8 @@ export function imagesOf(data) {
 /* ---------- Validation: keep only known fields, with limits ---------- */
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const SLUG = /^[a-z0-9][a-z0-9-]{0,59}$/;
-// Plates are hand-made SVG drawings. Only the admin can write them, but refuse anything that could run code anyway.
-const UNSAFE_SVG = /<script|<foreignobject|<iframe|<image|<use|\son[a-z]+\s*=|javascript:|href\s*=|url\s*\(\s*['"]?\s*(?!#)/i;
-
-function text(t = {}) {
+function text(v) {
+  const t = v || {};
   return {
     title: str(t.title, 200),
     type: str(t.type, 120),
@@ -78,20 +111,14 @@ export function validate(input) {
     if (category && !categories.some(c => c.id === category)) { errors.push(`Projet « ${label} » : catégorie inconnue « ${category} ».`); continue; }
     const cover = typeof p.cover === 'string' && PICTURE.test(p.cover) ? p.cover : null;
     const images = (Array.isArray(p.images) ? p.images : []).filter(i => typeof i === 'string' && PICTURE.test(i)).slice(0, 40);
-    let plate = typeof p.plate === 'string' ? p.plate.trim() : '';
-    if (plate && (plate.length > 20000 || !/^<svg[\s>][\s\S]*<\/svg>$/i.test(plate) || UNSAFE_SVG.test(plate))) {
-      errors.push(`Projet « ${label} » : motif SVG refusé.`); plate = '';
-    }
     projects.push({
       id,
       year: str(p.year, 12),
       category,
       featured: !!p.featured,
-      tone: p.tone === 'wash' ? 'wash' : 'klein',
       cover,
       images,
       blocks: bkClean(p.blocks, v => typeof v === 'string' && PICTURE.test(v), v => typeof v === 'string' && /\.(mp4|webm)$/.test(v) && MEDIA.test(v)),
-      plate,
       fr,
       en
     });

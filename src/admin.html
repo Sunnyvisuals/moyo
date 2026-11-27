@@ -77,7 +77,10 @@ body{min-height:100vh;min-height:100svh}
 .seg button:hover{color:var(--klein)}
 .m9{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));column-gap:var(--gut);row-gap:clamp(2rem,4vw,4rem);align-items:start}
 .sct{margin-top:clamp(3.5rem,6vw,6.5rem);border-top:1px solid var(--line);padding-top:clamp(1.25rem,2vw,2rem)}
-.sct>h2,.sh{font-size:inherit;font-weight:600;margin-bottom:clamp(1.25rem,2vw,2rem)}
+.sct>h2{font-size:inherit;font-weight:600;margin-bottom:clamp(1.25rem,2vw,2rem)}
+.sct>.vn{margin:0 0 1.75rem}
+.key{margin:0 0 6px;font-size:var(--fs-m);font-weight:700;letter-spacing:.04em;user-select:all;overflow-wrap:anywhere}
+.codes{display:grid;grid-template-columns:repeat(2,max-content);gap:8px 44px;margin:0 0 14px;font-size:var(--fs-lead);font-weight:700;user-select:all}
 .sum{margin-left:1em;font-weight:500;color:var(--mute);font-size:var(--fs-small)}
 /* what a file is: its state (a dot: good, enough, to change), then the facts */
 .tec{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;margin-top:10px;min-height:1.5em;font-size:var(--fs-small);line-height:1.5;color:var(--mute);font-variant-numeric:tabular-nums}
@@ -162,7 +165,7 @@ body{min-height:100vh;min-height:100svh}
 .dz>input{position:absolute;inset:0;z-index:2;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
 .dz.plate--none:hover::after{scale:1.12}
 /* a file above the page, or a picture in the hand: what can take it is ringed, what is under it turns blue and says what will happen.
-   The edges of a picture of the gallery add beside it */
+   The edges of a picture of the layout add beside it */
 html.files [data-drop]::before,.can::before,.dz.over.in::before{content:"";position:absolute;inset:0;z-index:6;display:grid;place-items:center;text-align:center;text-wrap:balance;padding:10px;box-shadow:inset 0 0 0 2px var(--klein);color:var(--bg);font-size:clamp(1.0625rem,1.6vw,1.75rem);font-weight:700;letter-spacing:-.034em;line-height:1.08;pointer-events:none}
 html.files [data-drop].over::before,.dz.over.in::before{content:attr(data-to) ".";background:var(--klein)}
 html.files .dz.over.before::before{content:"Avant.";inset:0 60% 0 0}
@@ -185,16 +188,6 @@ html.carry,html.carry *{user-select:none;-webkit-user-select:none}
 .rw .up i{width:34px}.rw .up i{mask:radial-gradient(closest-side,#0000 calc(100% - 4px),#000 calc(100% - 3px))}
 .up i{width:72px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--klein) calc(var(--u,0) * 1%),rgb(18 18 20 / .14) 0);mask:radial-gradient(closest-side,#0000 calc(100% - 6px),#000 calc(100% - 5px))}
 .pa{display:flex;flex-wrap:wrap;gap:0 24px;margin-top:8px}
-.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(22px,2.4vw,40px) var(--gut);align-items:start}
-.gi{position:relative}
-.gal .dz{aspect-ratio:4/3;background:var(--tint);overflow:clip}
-.gal img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:scale .6s var(--ease)}
-.gi.drag{z-index:30}.gi.drag .dz{box-shadow:0 24px 60px rgb(18 18 20 / .26)}.gi.drag .tec{opacity:0}.gi.drag.onto{opacity:.6}
-.ga{display:flex;align-items:center;gap:0 18px}
-.ga .grip{margin-left:-14px}.ga .tx{color:var(--mute)}.ga .tx:hover{color:var(--klein)}.ga .tx.red:hover{color:var(--red)}
-.gi.drag .ga{opacity:0}
-.gal .dz::after{width:22%}
-
 /* The layout of a project: the page, its margins, its four axes. --pm: the margin of the page */
 #bk{position:relative}
 .bk-n{margin-bottom:clamp(1.5rem,2.4vw,2.5rem)}
@@ -390,7 +383,6 @@ html.files .bk1.over.before::before{content:"Avant.";inset:0 72% 0 0}html.files 
   .m9{display:block}.ed-p{max-width:340px;margin-bottom:36px}
   .rw>li{flex-wrap:wrap}.rw-o{flex-basis:calc(100% - 60px)}
   .rw .tg{margin:-10px 0 6px 40px}.rw>li>.rw-o:last-child:not(:nth-child(2)){display:none}
-  .gal{grid-template-columns:repeat(2,minmax(0,1fr))}
   .mt{aspect-ratio:4/5}.mt-w textarea{width:100%}
   .ct>li{grid-template-columns:40px minmax(0,1fr) auto;row-gap:10px}.ct>li>:nth-child(3){grid-column:2}.ct .n{grid-column:2;padding:0}.ct>li>:last-child{grid-column:3;grid-row:1}
   .lg-mono{margin-top:24px}

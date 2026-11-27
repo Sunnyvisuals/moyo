@@ -50,7 +50,7 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 La phrase en affiche, à la taille de l'écran, et un seul mouvement : la caméra sort du point final. C'est le langage du passage d'une page à l'autre (le point s'ouvre au clic, l'écran est bleu, il se referme sur le titre suivant), poussé jusqu'au bout : on est dans l'idée, on recule, la phrase apparaît autour d'elle.
 - *Powers of Ten* (Charles et Ray Eames, 1977) : un seul plan continu qui recule.
 - Les ouvertures des keynotes d'Apple : un seul geste, rapide au départ, lent à l'atterrissage, rien d'autre autour.
-Essai abandonné : un œil de verre qui regardait les projets, puis prenait l'écran au scroll (`archive/hero-oeil.js`). Jugé pas assez fort.
+Essai abandonné : un œil de verre qui regardait les projets, puis prenait l'écran au scroll (dans l'historique Git). Jugé pas assez fort.
 
 ## Techniques
 

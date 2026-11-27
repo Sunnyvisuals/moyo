@@ -1,5 +1,5 @@
 /* The static pages (built from the seed) with the projects and the team of the moment: once the admin has saved, the lists are replaced on the fly,
-   so the pages stay complete without JavaScript. page: 'home' or 'all'. */
+   so the pages stay complete without JavaScript. page: 'home', 'all', or 'legal' (only the footer changes there). */
 import { getData, hasStored } from './store.js';
 import seed from '../../data/projects.json';
 import { rowsHTML, featuredOf, stepsHTML, tabsHTML, dataJSON } from '../../shared/render.js';

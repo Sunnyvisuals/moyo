@@ -2,7 +2,7 @@
    a search engine, or a browser without JavaScript. Same template as the sheet and the profiles. French and English are both in the page. */
 import seed from '../../data/projects.json';
 import { getData } from '../_lib/store.js';
-import { escHTML as e, imgURL, catLabel, txt, plateInner } from '../../shared/render.js';
+import { escHTML as e, imgURL, catLabel, txt, plateInner, enBlock } from '../../shared/render.js';
 import { richHTML, richWords, richShort } from '../../shared/rich.js';
 import { bkHTML } from '../../shared/blocks.js';
 import { DESIGN_CSS, headCommon, scripts } from '../../shared/design.js';
@@ -56,7 +56,7 @@ ${chromeHead(1)}
   ${nx ? `<a class="nm-link g next" href="/projets/${e(nx.id)}"><span class="nm" ${two(txt(nx, 'fr').title, txt(nx, 'en').title)}</span><span class="nm-role q4" data-i="nextP">Projet suivant</span></a>` : ''}
 </main></div>
 ${footerHTML(data.team)}
-<script type="application/json" id="en">{"_title":"${e([en.title, en.type].filter(Boolean).join(', '))} · Moyo Studio","skip":"Skip to content","here":"You are here","home":"Home","proj":"Projects","fCat":"Category","fRole":"Role","fPlace":"Place","fYear":"Year","share":"Share","nextP":"Next project"}</script>
+<script type="application/json" id="en">${enBlock({ _title: [en.title, en.type].filter(Boolean).join(', ') + ' · Moyo Studio', skip: 'Skip to content', here: 'You are here', home: 'Home', proj: 'Projects', fCat: 'Category', fRole: 'Role', fPlace: 'Place', fYear: 'Year', share: 'Share', nextP: 'Next project' })}</script>
 ${scripts}
 </body>
 </html>`;

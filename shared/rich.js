@@ -7,7 +7,7 @@
    strips that line to put the file inside the scripts. */
 
 const RICH_ALIGN = { c: 'center', r: 'right', j: 'justify' };
-const richURL = u => /^(https?:\/\/|mailto:|\/(?!\/)|#)/i.test(u);
+const richURL = u => /^(https?:\/\/|mailto:|\/(?![\/\\])|#)/i.test(u); // "/\\" is read as "//" by the browsers: another site
 const richEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* the blocks of a text */
@@ -18,11 +18,14 @@ function richBlocks(s) {
     return /^# /.test(x) ? { kind: 'h', align, lines: [x.slice(2)] } : { kind: 'p', align, lines: [x] };
   });
 }
-/* in French no line starts with : ; ? ! or a closing quote */
+/* in French no line starts with : ; ? ! or a closing quote. The addresses of the links are set aside while the rest is read: "==" or "**" in one of
+   them is part of the address */
 function richInline(s) {
-  return richEsc(String(s).replace(/ ([:;?!»])/g, ' $1').replace(/« /g, '« '))
-    .replace(/\[([^\[\]\n]+)\]\(([^()\s]+)\)/g, (m, t, u) => richURL(u) ? `<a href="${u}"${/^https?:/i.test(u) ? ' target="_blank" rel="noopener"' : ''}>${t}</a>` : t)
-    .replace(/\*\*(?=\S)([^]*?\S)\*\*/g, '<b>$1</b>').replace(/==(?=\S)([^]*?\S)==/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  const to = [];
+  return richEsc(String(s).replace(/\u0000/g, '').replace(/ ([:;?!»])/g, '\u00a0$1').replace(/« /g, '«\u00a0'))
+    .replace(/\[([^\[\]\n]+)\]\(([^()\s]+)\)/g, (m, t, u) => richURL(u) ? `<a href="\u0000${to.push(u) - 1}\u0000"${/^https?:/i.test(u) ? ' target="_blank" rel="noopener"' : ''}>${t}</a>` : t)
+    .replace(/\*\*(?=\S)([^]*?\S)\*\*/g, '<b>$1</b>').replace(/==(?=\S)([^]*?\S)==/g, '<em>$1</em>').replace(/\n/g, '<br>')
+    .replace(/\u0000(\d+)\u0000/g, (m, i) => to[i]);
 }
 const richHTML = (s, h = 'h2') => richBlocks(s).map(b => {
   const a = b.align ? ` style="text-align:${b.align}"` : '', tag = b.kind === 'h' ? h : b.kind, li = b.lines.map(richInline);

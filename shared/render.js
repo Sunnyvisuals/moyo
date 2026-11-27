@@ -60,9 +60,12 @@ function mediaHTML(s) {
 const stepsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<li class="step q${i + 1}"${['center', 'right'].includes(s.align) ? ` data-al="${s.align}"` : ''}>${mediaHTML(s)}<h3 class="t-m" ${bi(s.fr.title, s.en && s.en.title)}</h3><p class="mute" data-ink="step" ${bi(s.fr.text, s.en && s.en.text)}</p></li>`).join('');
 const tabsHTML = steps => (steps || []).slice(0, 4).map((s, i) => `<button type="button" tabindex="-1" class="tab q${i + 1}"><span ${bi(s.fr.title, s.en && s.en.title)}</span></button>`).join('');
 
+/* the English words of a page, in its <script id="en">: JSON, so that a title keeps its &, quotes and backslashes as they are */
+const enBlock = words => JSON.stringify(words).replace(/</g, '\\u003c');
+
 /* JSON that can sit inside <script type="application/json"> without closing it. */
 function dataJSON(data) {
   return JSON.stringify(data, (k, v) => k === 'blocks' ? undefined : v).replace(/</g, '\\u003c');
 }
 
-export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON };
+export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON, enBlock };

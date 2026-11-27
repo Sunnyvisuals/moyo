@@ -3,7 +3,7 @@
    and plays only while its step is on screen. Without JavaScript or with reduced motion: a plain list of four steps, each with its picture. */
 (() => {
 'use strict';
-const sec = document.getElementById('methode'), box = sec && sec.querySelector('.mth-s'), root = document.documentElement;
+const sec = document.getElementById('methode'), box = sec && sec.querySelector('.mth-s');
 if (!box) return;
 const steps = [...sec.querySelectorAll('.step')], films = steps.map(s => s.querySelector('video'));
 if (!steps.length) return;

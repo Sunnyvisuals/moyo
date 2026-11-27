@@ -35,8 +35,7 @@ const DESIGN_CSS = `
   --ease:cubic-bezier(.16,1,.3,1);--ease-io:cubic-bezier(.76,0,.24,1);
   /* names used by the header, the menu and the footer */
   --chaux:var(--bg);--paper:var(--bg);
-  --paper-soft:color-mix(in oklab,var(--bg) 80%,var(--klein));--paper-line:color-mix(in oklab,var(--bg) 34%,var(--klein));
-  --ease-enter:var(--ease);--dur-1:.45s;--dur-3:.9s;--dur-4:1.2s;
+  --paper-soft:color-mix(in oklab,var(--bg) 80%,var(--klein));
 }
 *,*::before,*::after{box-sizing:border-box}
 html{background:var(--bg);-webkit-text-size-adjust:100%;scrollbar-width:none;scroll-padding-top:calc(var(--hdr) + 12px)}

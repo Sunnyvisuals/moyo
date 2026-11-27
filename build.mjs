@@ -1,6 +1,7 @@
 /* Build the static site into dist/ (what Cloudflare Pages serves):
      src/index.src.html   -> dist/index.html        (home)
      src/projets.src.html -> dist/projets.html      (every project, filtered by category)
+     src/confidentialite.src.html -> dist/confidentialite.html  (privacy: what is collected, the rights)
      src/admin.html       -> dist/admin/index.html  (admin, talks to functions/api)
      src/*.js             -> dist/*.js              (behaviour, one file per job)
    Tokens, type, grid and components: shared/design.js. Header, menu and footer: shared/chrome.js.
@@ -18,7 +19,7 @@ const fill = (s, map) => Object.entries(map).reduce((acc, [k, v]) => acc.split(k
 
 const { rowsHTML, featuredOf, stepsHTML, tabsHTML, dataJSON } = await import(pathToFileURL(r('shared/render.js')).href);
 const { DESIGN_CSS, sheetHTML, headCommon, iconLinks, scripts } = await import(pathToFileURL(r('shared/design.js')).href);
-const { SITE, HOME, LIST, LOST, SERVICES, head, ldHome, ldList, sample } = await import(pathToFileURL(r('shared/seo.js')).href);
+const { SITE, HOME, LIST, PRIVACY, LOST, SERVICES, head, ldHome, ldList, sample } = await import(pathToFileURL(r('shared/seo.js')).href);
 const { CHROME, CHROME_ARIA, FOOT_EN } = await import(pathToFileURL(r('shared/i18n.js')).href);
 const { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML, teamRows } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
@@ -57,6 +58,7 @@ const sizes = {
     __ROWS__: rowsHTML(seed.projects, 'fr'),
     __FOOTER__: footerHTML(seed.team)
   })),
+  'confidentialite.html': out('dist/confidentialite.html', fill(read('src/confidentialite.src.html'), { ...common, __META__: head({ path: '/confidentialite', ...PRIVACY.fr }), __CHROME_HEAD__: chromeHead(0), __FOOTER__: footerHTML(seed.team) })),
   '404.html': out('dist/404.html', fill(read('src/404.src.html'), { ...common, __META__: head({ path: '/', ...LOST.fr, robots: 'noindex', alternates: false }), __CHROME_HEAD__: chromeHead(0), __FOOTER__: footerHTML(seed.team) })),
   'admin/index.html': out('dist/admin/index.html', fill(read('src/admin.html'), { __ICONS__: iconLinks, __CSS__: DESIGN_CSS + FOOTER_CSS })),
   'admin/admin.js': out('dist/admin/admin.js', fill(read('src/admin.js'), { __RICH__: richSrc, __BLOCKS__: inlined('shared/blocks.js') })),
@@ -80,7 +82,7 @@ fs.mkdirSync(r('dist/fonts'), { recursive: true });
 fs.copyFileSync(r('fonts/hanken-grotesk-latin-wght-normal.woff2'), r('dist/fonts/hanken-grotesk.woff2'));
 
 for (const [k, v] of Object.entries(sizes)) console.log(`dist/${k}`.padEnd(24), (v / 1024).toFixed(1), 'Ko');
-for (const f of ['index.html', 'projets.html', '404.html', 'site.js']) {
+for (const f of ['index.html', 'projets.html', 'confidentialite.html', '404.html', 'site.js']) {
   const left = fs.readFileSync(r('dist/' + f), 'utf8').match(/__[A-Z_]+__/g);
   if (left) throw new Error(`markers left in ${f}: ${left.join(', ')}`);
 }

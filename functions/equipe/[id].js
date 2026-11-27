@@ -2,7 +2,7 @@
    Same template as a project sheet: name on top, portrait on the first axis, words on the third.
    French and English are both in the page; CSS shows the language of <html lang> (chosen on the site, stored as "hb-lang"). */
 import { getData } from '../_lib/store.js';
-import { escHTML as e, imgURL } from '../../shared/render.js';
+import { escHTML as e, imgURL, enBlock } from '../../shared/render.js';
 import { richHTML } from '../../shared/rich.js';
 import { DESIGN_CSS, headCommon, scripts } from '../../shared/design.js';
 import { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML } from '../../shared/chrome.js';
@@ -52,7 +52,7 @@ ${chromeHead(4)}
   ${next ? `<a class="nm-link g next" href="/equipe/${e(next.id)}"><span class="nm">${e(next.name)}</span><span class="nm-role q4" data-i="nextS">Suivant</span></a>` : ''}
 </main></div>
 ${footerHTML(team)}
-<script type="application/json" id="en">{"_title":"${e([m.name, en.role].filter(Boolean).join(', '))} · Moyo Studio","skip":"Skip to content","here":"You are here","home":"Home","team":"Team","nextS":"Next"}</script>
+<script type="application/json" id="en">${enBlock({ _title: [m.name, en.role].filter(Boolean).join(', ') + ' · Moyo Studio', skip: 'Skip to content', here: 'You are here', home: 'Home', team: 'Team', nextS: 'Next' })}</script>
 ${scripts}
 </body>
 </html>`;

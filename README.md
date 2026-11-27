@@ -53,6 +53,7 @@ Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les 
 ```
 src/index.src.html     page d'accueil (gabarit)
 src/projets.src.html   page « Projets »
+src/confidentialite.src.html  page « Confidentialité » (RGPD), liée en pied de page
 src/admin.html         admin : la page et son style, sur le système de design du site
 src/admin.js           admin : connexion, projets, méthode, équipe, catégories, messages, mot de passe
 src/site.js            langue, scroll, projets, fiche, formulaire (toutes les pages)
@@ -66,7 +67,7 @@ shared/blocks.js       mise en page des projets : blocs, intégrations, rendu
 shared/rich.js         textes mis en forme (biographies, descriptions), partagé par les pages, le serveur et l'admin
 functions/equipe/      page de profil, rendue par le serveur
 functions/projets/     page de projet, rendue par le serveur
-archive/               anciennes versions (accueil v8, phrases manuscrites, effets de titres, l'heure et le soleil)
+archive/proj-675/      les images de départ en petit (700 px), avant agrandissement
 data/projects.json     projets de départ (les 5 exemples)
 functions/             API Cloudflare : /api/projects, /api/login, /api/logout, /api/me, /api/images, /api/preview, /img/<id>
 build.mjs              construit dist/
@@ -153,21 +154,27 @@ npm run build
 
 Le site a besoin des Functions Cloudflare pour l'admin et les données à jour. GitHub Pages ne sert plus que la version statique de départ.
 
-## Tester
+## Sécurité
 
-Les tests utilisent Playwright (Python) et Google Chrome.
+| Protection | Comment |
+| --- | --- |
+| HTTPS | Imposé : toute adresse en `http` est renvoyée en `https`, et le navigateur s'en souvient un an (`functions/_middleware.js`). |
+| Mot de passe | Jamais envoyé ni gardé tel quel : étiré dans le navigateur (PBKDF2-SHA256, 600 000 tours, la recommandation de l'OWASP pour cet algorithme ; bcrypt et Argon2 ne tiennent pas dans le temps de calcul des Functions Cloudflare), puis seule son empreinte est gardée. |
+| Essais | Cinq erreurs par adresse (par réseau en IPv6), puis un quart d'heure d'attente. |
+| Double vérification | Dans l'admin, onglet « Sécurité » : un code à six chiffres d'une application (Google ou Microsoft Authenticator, 1Password…), huit codes de secours à usage unique. Le lien reçu par e-mail change alors le mot de passe sans ouvrir l'admin. Téléphone et codes perdus : supprimer la clé `auth` du stockage KV « MOYO » dans Cloudflare, puis redemander un lien. |
+| Requêtes forgées (CSRF) | Cookie `HttpOnly; Secure; SameSite=Strict`, en-tête propre au site obligatoire, et origine annoncée par le navigateur vérifiée, sur l'admin comme sur les formulaires. |
+| Messages d'erreur | Une seule phrase pour un mauvais mot de passe ; il n'y a pas d'identifiant à deviner. |
+| Envois et textes | Type, contenu réel et poids des fichiers vérifiés ; rien n'est lu comme du HTML dans les textes. |
+| En-têtes | Politique de contenu (rien ne s'exécute depuis ailleurs, l'admin ne s'affiche dans aucune autre page), caméra, micro et position refusés. |
+| Formulaires | Champ piège, cinq messages par heure et par adresse. |
+| Sauvegardes | Chaque publication garde la version d'avant et ses images (les dix dernières), à reprendre dans l'onglet « Sécurité » ; « Tout télécharger » donne les textes, les versions, les messages et les inscriptions (sans les images). |
+| Secrets | Dans les secrets Cloudflare, jamais dans le dépôt. |
 
-```bash
-npm install                  # installe axe-core
-pip install playwright
-python3 tests/qa.py          # axe-core sur 20 états : bureau 1440 px (FR) et mobile 390 px (EN)
-python3 tests/modes.py       # sans JavaScript, animations réduites
-python3 tests/rm2.py         # animations réduites : aucune animation active
-python3 tests/scroll.py      # scroll Lenis, menu, ancres, dialogue
-python3 tests/foot.py 1440 900   # le grand « moyo » est collé au bas de la page
-```
+**RGPD** : la page `/confidentialite` (et `/en/confidentialite`) dit ce qui est recueilli et pourquoi. Les messages et les inscriptions s'effacent seuls au bout de trois ans. Effacez aussi les e-mails reçus et les sauvegardes téléchargées à la même échéance, et mettez la page à jour si un prestataire ou un usage change.
 
-Ces scripts ont été écrits pour l'accueil v8 : leurs sélecteurs sont à adapter à la version actuelle.
+**Ce qui se règle dans Cloudflare, pas dans le code** : la protection anti-DDoS de Cloudflare couvre déjà le site. Un pare-feu applicatif (règles WAF, limitation de débit, Turnstile) demande un nom de domaine à vous, ajouté à Cloudflare. Pensez aussi à activer la double vérification de vos comptes Cloudflare, GitHub et de la boîte mail du studio : ils ouvrent tout le reste.
+
+Dépendances : `npm audit` et `npm outdated` de temps en temps.
 
 ## Estimation Awwwards (auto-évaluation, pas un jury)
 
@@ -190,7 +197,7 @@ Le point faible est le contenu : projets d'exemple, pas de photos ni de cas clie
 
 ## Historique
 
-Le dossier `archive/` garde les versions précédentes, les scripts de modification et les anciens tests. Voir `archive/README.md`.
+Les versions précédentes, les anciens scripts et les anciens tests sont dans l'historique Git : le dossier `archive/` les contenait encore au commit `95da2a0`.
 
 ## Crédits et licences
 
