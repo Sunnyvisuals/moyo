@@ -1,10 +1,7 @@
 {
-  "nom": "",
-  "statut": "Entrepreneur individuel (auto-entrepreneur)",
-  "capital": "",
-  "adresse": "",
-  "telephone": "",
-  "immatriculation": "",
-  "tva": "",
+  "editeurs": [
+    { "nom": "Zahia Bougouffa", "adresse": "", "telephone": "", "siren": "", "tva": "" },
+    { "nom": "Yacine Bouabdallah", "adresse": "", "telephone": "", "siren": "", "tva": "" }
+  ],
   "directeur": ""
 }

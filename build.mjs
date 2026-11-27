@@ -24,15 +24,18 @@ const { MAIL, SITE, HOME, LIST, PRIVACY, LEGAL, LOST, SERVICES, head, ldHome, ld
 const { CHROME, CHROME_ARIA, FOOT_EN } = await import(pathToFileURL(r('shared/i18n.js')).href);
 const { CHROME_CSS, chromeHead, FOOTER_CSS, GLASS_CSS, footerHTML, teamRows } = await import(pathToFileURL(r('shared/chrome.js')).href);
 const seed = JSON.parse(read('data/projects.json'));
-/* the legal notice: what the law asks about whoever publishes the site (data/mentions.json). What is not known yet is said so, and the build warns. */
+/* the legal notice: what the law asks about whoever publishes the site (data/mentions.json): two sole traders who work under one name. What is not
+   known yet is said so, and the build warns. */
 const notice = JSON.parse(read('data/mentions.json'));
 const escLaw = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function legal(lang) {
-  const en = lang === 'en';
-  const rows = [['nom', 'Nom ou raison sociale', 'Name or company name'], ['statut', 'Statut', 'Legal form'], ['capital', 'Capital social', 'Share capital', true], ['adresse', 'Adresse', 'Address'], ['telephone', 'Téléphone', 'Telephone'], ['immatriculation', 'Immatriculation', 'Registration'], ['tva', 'TVA intracommunautaire', 'VAT number', true], ['directeur', 'Direction de la publication', 'Publication director']];
-  return '<ul>' + rows.filter(([k, , , free]) => notice[k] || !free).map(([k, fr, an]) => `<li>${en ? an : fr}${en ? ':' : '\u00a0:'} ${notice[k] ? escLaw(notice[k]) : `<mark>${en ? 'to be completed' : 'à compléter'}</mark>`}</li>`).join('') + `<li>${en ? 'Email:' : 'E-mail\u00a0:'} <a href="mailto:${MAIL}">${MAIL}</a></li></ul>`;
+  const en = lang === 'en', colon = en ? ':' : '\u00a0:', blank = `<mark>${en ? 'to be completed' : 'à compléter'}</mark>`;
+  const line = (label, value) => `<li>${label}${colon} ${value ? escLaw(value) : blank}</li>`;
+  const who = notice.editeurs.map(p => `<h3>${escLaw(p.nom)} EI</h3><ul><li>${en ? 'Status: sole trader (French “auto-entrepreneur” scheme)' : 'Statut\u00a0: entrepreneur individuel (auto-entrepreneur)'}</li>${line(en ? 'Address' : 'Adresse', p.adresse)}${line(en ? 'Telephone' : 'Téléphone', p.telephone)}${line('SIREN', p.siren)}${p.tva ? line(en ? 'VAT number' : 'TVA intracommunautaire', p.tva) : ''}</ul>`).join('');
+  const intro = en ? 'moyo is the name under which two independent sole traders work together. They publish this site jointly.' : 'moyo est le nom sous lequel deux entrepreneurs individuels indépendants travaillent ensemble. Ils publient ce site conjointement.';
+  return `<p>${intro}</p>${who}<h3>${en ? 'For both' : 'Pour les deux'}</h3><ul><li>${en ? 'Email:' : 'E-mail\u00a0:'} <a href="mailto:${MAIL}">${MAIL}</a></li>${line(en ? 'Publication director' : 'Direction de la publication', notice.directeur)}</ul>`;
 }
-const missing = ['nom', 'statut', 'adresse', 'telephone', 'immatriculation', 'directeur'].filter(k => !notice[k]);
+const missing = notice.editeurs.flatMap(p => ['adresse', 'telephone', 'siren'].filter(k => !p[k]).map(k => `${p.nom} : ${k}`)).concat(notice.directeur ? [] : ['directeur']);
 if (missing.length) console.warn('MENTIONS LÉGALES INCOMPLÈTES (data/mentions.json) :', missing.join(', '));
 const inlined = f => { const t = read(f).replace(/^import .*;\s*$/gm, '').replace(/^export \{[^}]*\};?\s*$/m, ''); if (/^\s*(export|import)\b/m.test(t)) throw new Error(f + ': keep `export` on the last line only'); return t; };
 const richSrc = inlined('shared/rich.js'), renderSrc = richSrc + inlined('shared/render.js');
