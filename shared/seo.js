@@ -18,6 +18,10 @@ const PRIVACY = {
   fr: { title: 'Confidentialité et RGPD · Moyo Studio', desc: 'Les données que le site de moyo recueille, pourquoi, combien de temps, et vos droits.' },
   en: { title: 'Privacy and GDPR · Moyo Studio', desc: 'What the moyo website collects, why, for how long, and your rights.' }
 };
+const LEGAL = {
+  fr: { title: 'Mentions légales · Moyo Studio', desc: 'Qui publie le site du studio moyo, qui l’héberge, et à qui appartient ce qu’il montre.' },
+  en: { title: 'Legal notice · Moyo Studio', desc: 'Who publishes the moyo studio website, who hosts it, and who owns what it shows.' }
+};
 const LOST = { fr: { title: 'Rien à voir · Moyo Studio', desc: '' }, en: { title: 'Nothing to see · Moyo Studio', desc: '' } };
 /* the same words as the page (build.mjs checks it) */
 const SERVICES = [
@@ -91,4 +95,4 @@ function head({ path, lang = 'fr', title, desc, og, ogTitle, type = 'website', i
 const sample = (p, seed) => { const s = ((seed && seed.projects) || []).find(x => x.id === p.id); return !!s && s.fr.title === (p.fr && p.fr.title) && s.fr.desc === (p.fr && p.fr.desc); };
 const waiting = m => /lorem ipsum/i.test((m.fr && m.fr.bio) || '') || /lorem ipsum/i.test((m.en && m.en.bio) || '');
 
-export { SITE, MAIL, SHARE, REGION, HOME, LIST, PRIVACY, LOST, SERVICES, ROBOTS, local, full, ldHome, ldList, ldWork, ldPerson, head, sample, waiting };
+export { SITE, MAIL, SHARE, REGION, HOME, LIST, PRIVACY, LEGAL, LOST, SERVICES, ROBOTS, local, full, ldHome, ldList, ldWork, ldPerson, head, sample, waiting };

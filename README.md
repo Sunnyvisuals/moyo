@@ -54,6 +54,7 @@ Les projets et les images sont stockés dans Cloudflare KV (espace `MOYO`). Les 
 src/index.src.html     page d'accueil (gabarit)
 src/projets.src.html   page « Projets »
 src/confidentialite.src.html  page « Confidentialité » (RGPD), liée en pied de page
+src/mentions-legales.src.html page « Mentions légales » ; les informations du studio sont dans data/mentions.json
 src/admin.html         admin : la page et son style, sur le système de design du site
 src/admin.js           admin : connexion, projets, méthode, équipe, catégories, messages, mot de passe
 src/site.js            langue, scroll, projets, fiche, formulaire (toutes les pages)

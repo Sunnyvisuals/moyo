@@ -6,7 +6,7 @@
 import { fresh } from './_lib/fresh.js';
 import { draftOf, preview } from './_lib/preview.js';
 
-const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all', '/confidentialite': 'legal', '/confidentialite.html': 'legal' };
+const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all', '/confidentialite': 'legal', '/confidentialite.html': 'legal', '/mentions-legales': 'legal', '/mentions-legales.html': 'legal' };
 
 /* What a page may load and who may show it. The pages carry their own scripts and styles; nothing runs from elsewhere.
    The site: its own files, and, in a project, the frames of other services once the visitor asks. The admin: shown by no one. */

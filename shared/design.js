@@ -569,4 +569,23 @@ const scripts = `<script src="/lenis.js" defer></script>
 <script src="/leave.js" defer></script>
 <script src="/cursor.js" defer></script>`;
 
-export { DESIGN_CSS, sheetHTML, headCommon, iconLinks, scripts };
+/* the legal pages (privacy, legal notice) */
+const LAW_CSS = `
+/* each part: its name on the first axis, its words on the third */
+.law .intro{max-width:38ch;margin:0 0 var(--gap)}
+.law section{row-gap:18px;padding:clamp(1.75rem,3vw,3.25rem) 0;border-top:1px solid var(--line)}
+.law h2{text-box:normal}
+.law .txt{max-width:62ch;font-size:var(--fs-body);line-height:1.6}
+.law .txt>*+*{margin-top:1em}
+.law h3{font-size:inherit;font-weight:600;margin-top:1.8em}
+.law h3+*{margin-top:.4em}
+.law ul{list-style:disc;padding-left:1.15em}
+.law li+li{margin-top:.45em}
+.law li::marker{color:var(--klein)}
+.law mark{background:none;color:var(--klein);font-weight:600}
+.law .txt a{background:linear-gradient(currentColor,currentColor) 0 100%/100% 1px no-repeat;overflow-wrap:anywhere;transition:color .4s}
+.law .txt a:hover{color:var(--klein)}
+@media (min-width:821px){.law .txt{grid-column:7/-1!important}.law h2{grid-column:1/7!important}}
+`;
+
+export { DESIGN_CSS, LAW_CSS, sheetHTML, headCommon, iconLinks, scripts };
