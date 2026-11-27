@@ -4,7 +4,8 @@
    - html.enter: coming from a link of the site. The screen is blue (the dot opened on the click, see leave.js) and closes on the final point of the title.
    - On the home, "Tout part d’un point." (drop()): the point falls from the sky onto the page, where the final point of the sentence is, or the blue of
      the link closes on it. Where it lands one wave leaves it, and the sentence appears behind the wave, bent as it passes, like a word under water.
-   window.moyoReady resolves when the stage is free (stage.js waits for it), window.moyoDrawn when the title is there. Any key, click or scroll jumps to the end. Nothing with reduced motion. */
+   window.moyoReady resolves when the stage is free (stage.js waits for it), window.moyoDrawn when the title is there. Any key, click or scroll jumps to the end,
+   except on the home, which is seen whole: the page does not scroll until it is over, and only Escape ends it. Nothing with reduced motion. */
 (() => {
 'use strict';
 const root = document.documentElement;
@@ -16,15 +17,20 @@ const io = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, out = 
 let hurry = false, layer = null, title = null, mark = null;
 const tween = (ms, ease, fn) => new Promise(done => { const t0 = performance.now(); const f = t => { const u = hurry ? 1 : Math.min(1, (t - t0) / ms); fn(ease(u)); u < 1 ? requestAnimationFrame(f) : done(); }; requestAnimationFrame(f); });
 function end() {
-  root.classList.remove('load', 'enter');
+  root.classList.remove('load', 'enter'); hold(false);
   if (layer) layer.remove();
   if (title) { title.style.clipPath = ''; title.style.color = ''; }
   if (mark) mark.style.visibility = '';
+  SKIP.forEach(n => removeEventListener(n, skip)); removeEventListener('scroll', away);
   free(); drawn();
 }
-const skip = () => { hurry = true; };
-['wheel', 'touchmove', 'keydown', 'pointerdown'].forEach(n => addEventListener(n, skip, { once: true, passive: true }));
-addEventListener('scroll', function f() { if (scrollY < 24) return; removeEventListener('scroll', f); skip(); }, { passive: true }); // the scroll bar, a script
+/* any key, click or scroll jumps to the end; while the home opens (held), the page does not scroll and only Escape ends it, so that it is seen whole */
+let held = false;
+const skip = e => { if (held && !(e.type === 'keydown' && e.key === 'Escape')) return; hurry = true; }, SKIP = ['wheel', 'touchmove', 'keydown', 'pointerdown'];
+const away = () => { if (scrollY >= 24) skip({ type: 'scroll' }); }; // the scroll bar, a script
+SKIP.forEach(n => addEventListener(n, skip, { passive: true })); addEventListener('scroll', away, { passive: true });
+const block = e => { if (e.type === 'keydown' && !/^( |Spacebar|PageUp|PageDown|Home|End|ArrowUp|ArrowDown)$/.test(e.key)) return; e.preventDefault(); e.stopImmediatePropagation(); };
+function hold(on) { if (held === on) return; held = on; root.classList.toggle('hold', on); for (const n of ['wheel', 'touchmove', 'keydown']) on ? addEventListener(n, block, { capture: true, passive: false }) : removeEventListener(n, block, { capture: true }); }
 
 /* the final point of the title on screen: the one of the h1, or of the section the link leads to */
 const onScreen = r => r.bottom > 0 && r.top < innerHeight;
@@ -91,10 +97,11 @@ async function load() {
 }
 
 /* ---------- the home: tout part d\u2019un point ----------
-   The point falls from the sky (large and soft while it is close, sharp as it lands), or the blue of the link closes on it. Where it lands one ring
-   leaves it and crosses the screen: behind the ring the sentence is there, bent as the ring passes like a word under water, then still. The facts
-   above come once the ring has passed them. WebGL draws the time of the wave, each letter where the page puts it, and the page takes over at the
-   end, exactly in place. Without WebGL the ring simply uncovers the sentence. */
+   The point falls from the top of the screen as a drop, pointed at first and round as it comes down, or the blue of the link closes on it. On the
+   line it flattens and wobbles before it settles as the point, and one ring leaves it and crosses the screen: behind the ring the sentence is there,
+   bent as the ring passes like a word under water, then still. The facts above come once the ring has passed them. The page holds still meanwhile.
+   WebGL draws the time of the wave, each letter where the page puts it, and the page takes over at the end, exactly in place. Without WebGL the
+   ring simply uncovers the sentence. */
 const home = () => !!(title || (title = document.querySelector('h1.t-hero'))) && !!title.closest('#top');
 async function drop(blue) {
   if (window.moyoFit) moyoFit();
@@ -113,25 +120,28 @@ async function drop(blue) {
   let ring = null, box = null;
   if (paint) title.style.color = 'transparent';
   else { box = title.getBoundingClientRect(); title.style.clipPath = 'circle(0px at 0px 0px)'; ring = document.createElement('i'); ring.style.cssText = `position:absolute;left:0;top:0;border:1.5px solid ${KL};border-radius:50%`; layer.appendChild(ring); }
-  mark.style.visibility = 'hidden';
-  const dot = document.createElement('i'); dot.className = 'ld-d'; dot.style.width = dot.style.height = r0 * 2 + 'px'; layer.appendChild(dot);
-  const at = (x, y) => { dot.style.translate = `${(x - r0).toFixed(1)}px ${(y - r0).toFixed(1)}px`; };
-  at(P[0], P[1]);
+  mark.style.visibility = 'hidden'; hold(true); setTimeout(() => hold(false), 10000); // never held for good, whatever happens
+  /* the point is a drop: k points it (1 as it leaves the sky, 0 round), sx and sy stretch it; with k = 0 and sx = sy = 1 it is the point of the page */
+  const NS = 'http://www.w3.org/2000/svg', sv = document.createElementNS(NS, 'svg'), drip = document.createElementNS(NS, 'path');
+  sv.setAttribute('viewBox', `0 0 ${W} ${H}`); sv.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible'; drip.setAttribute('fill', KL); sv.appendChild(drip); layer.appendChild(sv);
+  const shape = (cx, cy, r, k, sx, sy) => { let d = ''; for (let i = 0; i < 96; i++) { const f = i / 48 * Math.PI, w = k * Math.pow(Math.max(0, Math.cos(f)), 5); d += (i ? 'L' : 'M') + (cx + Math.sin(f) * (1 - .35 * w) * r * sx).toFixed(2) + ' ' + (cy - (Math.cos(f) + 1.3 * w) * r * sy).toFixed(2); } drip.setAttribute('d', d + 'Z'); };
+  const step = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  shape(P[0], P[1], r0, 0, 1, 1);
   if (blue) { // coming from a link: the screen is blue, and it closes on the point
     const kl = document.createElement('div'); kl.className = 'kl'; layer.appendChild(kl); root.classList.remove('enter');
     await tween(900, t => 1 - Math.pow(1 - t, 3.2), u => { kl.style.clipPath = `circle(${(r0 + (far + 4 - r0) * (1 - u)).toFixed(1)}px at ${P[0].toFixed(1)}px ${P[1].toFixed(1)}px)`; });
     kl.remove();
-  } else { // it falls from the sky: from above the screen, large and soft while it is close, faster and sharper as it comes down
-    const S0 = 3, y0 = -r0 * S0 * 2.2;
-    dot.style.opacity = '0'; root.classList.remove('load');
-    await tween(1150, t => t, u => { const k = u * u, s = 1 / (1 / S0 + (1 - 1 / S0) * k); at(P[0], y0 + (P[1] - y0) * k); dot.style.scale = s.toFixed(3); dot.style.filter = s > 1.02 ? `blur(${((s - 1) * 5 / s).toFixed(2)}px)` : 'none'; dot.style.opacity = Math.min(1, u / .3).toFixed(3); });
-    dot.style.scale = dot.style.filter = dot.style.opacity = '';
+  } else { // it falls from the sky as a drop: it leaves the top of the screen pointed and drawn out, and rounds up as it comes down
+    const s0 = 1.35, y0 = -r0 * s0 * 1.3;
+    shape(P[0], y0, r0 * s0, 1, .9, 1.25); root.classList.remove('load');
+    await tween(1150, t => t, u => { const k = 1 - step(.45, .96, u), s = 1 + (s0 - 1) * Math.pow(1 - u, 1.5); shape(P[0], y0 + (P[1] - y0) * u * u, r0 * s, k, 1 - .1 * k, 1 + .25 * k); });
   }
-  // it lands: the point gives a little, and the wave leaves it
-  dot.animate([{ scale: 1.3 }, { scale: 1 }], { duration: hurry ? 1 : 900, easing: 'cubic-bezier(.16,1,.3,1)' });
-  let freed = false;
+  // on the line it flattens, wobbles like water and settles round: the point. The wave leaves it at the same moment
+  let freed = false, still = false;
   await tween(2800, t => t, u => {
-    const e = 1 - Math.pow(1 - u, 2.6), R = r0 + (Rmax - r0) * e;
+    const ms = u * 2800, e = 1 - Math.pow(1 - u, 2.6), R = r0 + (Rmax - r0) * e;
+    if (ms < 1400) { const a = .3 * Math.exp(-ms / 170) * Math.cos(2 * Math.PI * ms / 300), sy = 1 - a; shape(P[0], P[1] + r0 * (1 - sy), r0, 0, 1 + a, sy); }
+    else if (!still) { still = true; shape(P[0], P[1], r0, 0, 1, 1); }
     if (paint) paint(R, fs * .08 * Math.pow(1 - u, 1.4) * Math.min(1, u * 30), fs * (.4 + .3 * e), .85 * Math.pow(1 - u, 1.3) * Math.min(1, u * 40)); // a wide, soft lens: never more than 1.7 times larger, never folded
     else { title.style.clipPath = `circle(${R.toFixed(1)}px at ${(P[0] - box.left).toFixed(1)}px ${(P[1] - box.top).toFixed(1)}px)`; ring.style.width = ring.style.height = 2 * R + 'px'; ring.style.translate = `${(P[0] - R).toFixed(1)}px ${(P[1] - R).toFixed(1)}px`; ring.style.opacity = (.85 * Math.pow(1 - u, 1.3)).toFixed(3); }
     if (!freed && R > reach) { freed = true; free(); }

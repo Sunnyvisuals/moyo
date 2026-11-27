@@ -501,7 +501,7 @@ html.is-dialog{overflow:hidden}
 /* ---------- Loading and page change (load.js, leave.js): the dot draws the title, or opens on the click and closes on the next title ---------- */
 html.load::before,html.enter::before{content:"";position:fixed;inset:0;z-index:2147482000;background:var(--bg)}
 html.enter::before{background:var(--klein)}
-html.load,html.enter{overflow:hidden}
+html.load,html.enter,html.hold{overflow:hidden}
 .ld{position:fixed;inset:0;z-index:2147482100;pointer-events:none;overflow:clip}
 .ld-d{position:absolute;left:0;top:0;border-radius:50%;background:var(--klein);will-change:translate}
 .ld-n{position:absolute;overflow:clip;line-height:1;font-size:var(--fs-hero);font-weight:700;letter-spacing:-.05em}
