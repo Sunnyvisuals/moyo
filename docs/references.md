@@ -4,7 +4,7 @@ Ce qui a été lu avant de dessiner, et ce que chaque lecture a donné sur le si
 
 ## L'idée
 
-Une seule idée pour tout le site : **le point Klein**. Il charge la page (il dessine la phrase), termine les titres, devient le curseur, voyage sur le chemin, fait les sept métiers, et finit dans le pied de page : il quitte le chemin, entre dans le dernier o, saute dans le premier. C'était un œil.
+Une seule idée pour tout le site : **le point Klein**. Il ouvre le site (il tombe, et son onde écrit la phrase), charge les autres pages (il dessine leur titre), termine les titres, devient le curseur, voyage sur le chemin, fait les sept métiers, et finit dans le pied de page : il quitte le chemin, entre dans le dernier o, saute dans le premier. C'était un œil.
 
 ## Créativité
 
@@ -45,16 +45,19 @@ Une seule idée pour tout le site : **le point Klein**. Il charge la page (il de
 
 - [Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) : relues une à une. Elles ont donné les pages projet, le bouton « Moins de mouvement », le brouillon gardé, les messages d'erreur qui disent quoi faire, le retour au toucher, les marges des écrans à encoche.
 
-## L'ouverture : sortir du point
+## L'ouverture : tout part d'un point
 
-La phrase en affiche, à la taille de l'écran, et un seul mouvement : la caméra sort du point final. C'est le langage du passage d'une page à l'autre (le point s'ouvre au clic, l'écran est bleu, il se referme sur le titre suivant), poussé jusqu'au bout : on est dans l'idée, on recule, la phrase apparaît autour d'elle.
-- *Powers of Ten* (Charles et Ray Eames, 1977) : un seul plan continu qui recule.
-- Les ouvertures des keynotes d'Apple : un seul geste, rapide au départ, lent à l'atterrissage, rien d'autre autour.
-Essai abandonné : un œil de verre qui regardait les projets, puis prenait l'écran au scroll (dans l'historique Git). Jugé pas assez fort.
+« Tout part d'un point. » Quatre mots, et leur point final est le point Klein : en français, le même mot dit la ponctuation, la forme et le départ. Un seul geste le montre. Le point tombe du ciel sur la page (grand et flou de près, net en arrivant) ; là où il touche, une seule onde part. Derrière elle la phrase est là, courbée au passage comme un mot sous l'eau, puis immobile. Les faits viennent quand l'onde les a dépassés. En venant d'une autre page, l'écran bleu se referme sur le point, et l'onde part de lui.
+- La région : Yves Klein était niçois, et son récit fondateur (en partie légendaire, daté de 1947 ou 1948 selon les sources) le montre sur une plage de Nice, prenant le ciel pour œuvre. D'où la légende sur le quatrième axe : « Ce point est bleu Klein, tombé du ciel de Nice. » [Centre Pompidou, chronologie](https://www.centrepompidou.fr/fileadmin/user_upload/dossierressources-yves_klein-chronologie.pdf)
+- Les sites du jour Awwwards de 2026 : un chargement qui est déjà l'identité, une grille sans tolérance, une phrase seule. [Neutomni](https://www.awwwards.com/sites/neutomni), [unanim.studio](https://www.awwwards.com/sites/unanim-studio-1)
+- Les ondes sur du texte existent en composants ([Ripple Surface](https://www.framer.com/marketplace/components/ripple-surface/), [Liquid Glass Ripple](https://www.framer.com/community/marketplace/components/liquid-glass-ripple/)) : une eau continue, qu'on règle. Ici une seule onde, une seule fois, qui fait apparaître la page au lieu de la troubler.
+- La phrase est peinte une fois sur une texture à la taille de l'écran ; WebGL la courbe le temps de l'onde (la crête est une loupe, jamais repliée), puis la page reprend exactement à la même place. Sans WebGL, l'anneau découvre la phrase.
+
+Ouverture précédente : la caméra sortait du point final (*Powers of Ten*, les keynotes d'Apple). Jugée trop proche d'un dézoom ; elle est dans l'historique Git, comme l'œil de verre essayé avant elle.
 
 ## Techniques
 
-View Transitions, API Popover et couche supérieure (menu, curseur, voile), `@starting-style`, `text-box`, unités de conteneur, `:has()`, easing `linear()`, police variable, `feDisplacementMap` pour le verre. Chaque effet a un repli : sans JavaScript et en mouvement réduit, la page est complète.
+View Transitions, API Popover et couche supérieure (menu, curseur, voile), `@starting-style`, `text-box`, unités de conteneur, `:has()`, easing `linear()`, police variable, `feDisplacementMap` pour le verre, WebGL pour l'onde de l'ouverture. Chaque effet a un repli : sans JavaScript et en mouvement réduit, la page est complète.
 
 ## Grille Awwwards
 
