@@ -89,7 +89,6 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (t.closest('.eye .hit')) return { m: 'say', w: 'hold' };
     if (t.closest('.pv-frame')) return { m: 'say', w: 'go' };
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
-    const sy = t.closest('[data-say]'); if (sy) return { m: 'say', t: sy.dataset.say }; // admin: what a file zone does
     const ch = t.closest('.chips label,.scale label'); if (ch) return { m: 'word', el: ch, at: place(ch) };
     if (t.closest('.path')) return { m: 'none' }; // the dot of the way is enough
     const bt = t.closest('.btn'), sd = t.closest('.send'), pt = bt ? bt.querySelector('i.ar') : sd && sd.querySelector('.f-dots i'); if (bt || sd) return { m: (bt || sd).disabled ? 'free' : 'word', el: bt || sd, at: pt && middle(pt) }; // it joins the final point
@@ -149,11 +148,11 @@ html.has-cur :is(${TEXT}){cursor:text!important}
   function tone() {
     if (!known()) return;
     const t = document.elementFromPoint(x, y), now = pick(t);
-    if (now.m !== mode.m || now.el !== mode.el || now.t !== mode.t || now.w !== mode.w) seen = 0;
+    if (now.m !== mode.m || now.el !== mode.el || now.w !== mode.w) seen = 0;
     mode = now;
     c.classList.toggle('ring', mode.m === 'ring'); c.classList.toggle('say', mode.m === 'say'); c.classList.toggle('on', mode.m !== 'text' && mode.m !== 'none');
     c.classList.toggle('sea', root.classList.contains('mono') || !!(t && t.closest('#menu'))); // on blue, the edge is blue
-    if (mode.m === 'say') { const w = mode.t || word(mode.w); if (say.textContent !== w) say.textContent = w; }
+    if (mode.m === 'say') { const w = word(mode.w); if (say.textContent !== w) say.textContent = w; }
     if (mode.blue || mode.m === 'say' && !(t && t.closest('#menu'))) c.classList.remove('inv');
     else { const l = under(x, y); c.classList.toggle('inv', c.classList.contains('inv') ? l < .58 : l < .46); }
     kick();

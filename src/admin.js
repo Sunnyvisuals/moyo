@@ -108,7 +108,7 @@ const eyes = (() => {
 let token = '';
 function showLogin(mode, note) {
   data = null; $('#app').hidden = true; $('#login').hidden = false; document.title = 'Admin · Moyo Studio';
-  const F = $('#lgF'), T = { login: 'Bonjour', first: 'Bienvenue', sent: 'Regardez vos mails', create: 'Votre mot de passe' }[mode];
+  const F = $('#lgF'), T = { login: 'Bonjour Boss', first: 'Bienvenue', sent: 'Regardez vos mails', create: 'Votre mot de passe' }[mode];
   $('#lgT span').textContent = T; F.dataset.mode = mode;
   $('#lgP').textContent = note || { login: 'L’admin du site. Entrez le mot de passe du studio.', first: 'L’admin n’a pas encore de mot de passe. Choisissez-le : un lien arrive dans la boîte mail du studio.', sent: `Un lien vient de partir vers ${me.to || me.mail}. Il est valable 30 minutes et ne sert qu’une fois.`, create: 'Choisissez celui qui ouvrira l’admin. Il n’est connu que de vous.' }[mode];
   const remember = '<label class="tg"><input type="checkbox" id="stay"><i aria-hidden="true"></i><span>Rester connecté 7 jours sur cet appareil</span></label>';
@@ -366,7 +366,7 @@ const crumbs = (href, name, here) => `<nav class="crumbs" aria-label="Vous êtes
 const field = (label, k, v, { area, ph, w2, max = 200 } = {}) => `<label class="fld${w2 ? ' w2' : ''}"><span class="fl">${label}</span>${area ? `<textarea data-k="${k}" maxlength="${max}" placeholder="${esc(ph)}">${esc(v)}</textarea>` : `<input type="text" data-k="${k}" value="${esc(v)}" maxlength="${max}" placeholder="${esc(ph)}" autocomplete="off">`}</label>`;
 const thumb = (id, v) => id ? (isVideo(id) ? `<video src="${imgURL(id)}"${v ? ` poster="${imgURL(v)}"` : ''} muted loop playsinline autoplay></video>` : `<img src="${imgURL(id)}" alt="" draggable="false">`) : '';
 const ring = '<span class="up"><i></i></span>';
-const zone = (act, id, label, accept = 'image/*', cls = 'plate', has = id) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-say="${has ? 'Remplacer' : 'Ajouter'}" data-to="${has ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}">${ring}</label>`;
+const zone = (act, id, label, accept = 'image/*', cls = 'plate', has = id) => `<label class="dz ${cls}${cls === 'plate' && !id ? ' plate--none' : ''}" data-drop="${act}" data-to="${has ? 'Remplacer' : 'Ajouter'}">${thumb(id)}<input type="file" accept="${accept}" data-file="${act}" aria-label="${esc(label)}">${ring}</label>`;
 
 /* =====================================================================================================
    Texts with a form: written as they are seen, kept as plain words (shared/rich.js). The browser does the work (execCommand): its shortcuts, its undo,
@@ -674,8 +674,8 @@ function personView(m) {
 /* ---------- categories ---------- */
 function catsView() {
   const n = id => data.projects.filter(p => p.category === id).length;
-  return head('Catégories') + `<p class="vn">Elles rangent les projets. Sur le site, une catégorie sans projet est affichée en clair, sans lien.</p><ul class="ct">${data.categories.map(c => `<li data-s data-o="cat:${esc(c.id)}"><button type="button" class="grip" aria-label="Déplacer ${esc(c.fr)}. Flèches haut et bas."></button>${field('Français', 'fr', c.fr, { max: 60 })}${field('English', 'en', c.en, { max: 60, ph: c.fr })}<span class="n">${plural(n(c.id), 'projet')}</span><button type="button" class="tx red" data-act="rmCat"${n(c.id) ? ' disabled title="Retirez d’abord cette catégorie de ses projets"' : ''}>Supprimer</button></li>`).join('')}</ul>
-  <form class="sct" id="catAdd"><h2>Nouvelle catégorie</h2><div class="ef"><label class="fld"><span class="fl">Français</span><input type="text" id="cFr" maxlength="60" required></label><label class="fld"><span class="fl">English</span><input type="text" id="cEn" maxlength="60"></label><div class="w2"><button class="btn" type="submit"><span>Ajouter</span><i class="ar add" aria-hidden="true"></i></button></div></div></form>`;
+  return head('Catégories') + `<p class="vn">Elles rangent les projets. Sur le site, une catégorie sans projet est affichée en clair, sans lien.</p><form class="ct-new" id="catAdd"><h2>Nouvelle catégorie</h2><div class="ef"><label class="fld"><span class="fl">Français</span><input type="text" id="cFr" maxlength="60" required></label><label class="fld"><span class="fl">English</span><input type="text" id="cEn" maxlength="60"></label><div class="w2"><button class="btn" type="submit"><span>Ajouter</span><i class="ar add" aria-hidden="true"></i></button></div></div></form>
+  <ul class="ct">${data.categories.map(c => `<li data-s data-o="cat:${esc(c.id)}"><button type="button" class="grip" aria-label="Déplacer ${esc(c.fr)}. Flèches haut et bas."></button>${field('Français', 'fr', c.fr, { max: 60 })}${field('English', 'en', c.en, { max: 60, ph: c.fr })}<span class="n">${plural(n(c.id), 'projet')}</span><button type="button" class="tx red" data-act="rmCat"${n(c.id) ? ' disabled title="Retirez d’abord cette catégorie de ses projets"' : ''}>Supprimer</button></li>`).join('')}</ul>`;
 }
 
 /* ---------- messages ---------- */
@@ -686,6 +686,11 @@ function msgsView() {
   return head('Messages') + (msgs.length ? `<ul class="ms">${msgs.map(m => `<li data-id="${esc(m.id)}"${isNew(m) ? ' class="new"' : ''}><h2>${esc(m.name)}</h2><p class="who"><a href="mailto:${esc(m.email)}">${esc(m.email)}</a><span>${esc(when(m.at))}</span>${m.type ? `<span>${esc(m.type.split(',').map(t => TYPES[t] || t).join(', '))}</span>` : ''}${m.budget ? `<span>${esc(BUDGETS[m.budget] || m.budget)}</span>` : ''}${m.lang === 'en' ? '<span>En anglais</span>' : ''}</p><p class="txt">${esc(m.message)}</p><div class="pa" style="margin:0;justify-content:space-between"><a class="tx" href="mailto:${esc(m.email)}?subject=${encodeURIComponent(m.lang === 'en' ? 'moyo, your message' : 'moyo, votre message')}">Répondre ↗</a><button type="button" class="tx red" data-act="rmMsg">Supprimer</button></div></li>`).join('')}</ul>` : '<div class="none"><b></b><p>Aucun message pour l’instant.<br>Ils arrivent ici depuis le formulaire du site.</p></div>');
 }
 
+/* ---------- the parts of a view that open and shut (security, legal notice): shut at first, each says where it stands; what is opened stays open ---------- */
+const opened = new Set();
+const part = (id, title, state, body) => `<details class="acc" data-part="${id}"${opened.has(id) ? ' open' : ''}><summary><h2>${title}</h2><span class="acc-s">${esc(state)}</span><span class="btn acc-go" aria-hidden="true"><span class="o">Ouvrir</span><span class="c">Fermer</span><i class="ar"></i></span></summary><div class="acc-b">${body}</div></details>`;
+document.addEventListener('toggle', e => { const d = e.target; if (d.classList?.contains('acc')) d.open ? opened.add(d.dataset.part) : opened.delete(d.dataset.part); }, true);
+
 /* ---------- the legal notice: who publishes the site; online once complete (functions/_lib/legal.js) ---------- */
 let law = null;
 async function loadLaw() { try { law = await api('/api/legal'); } catch (x) { return fail(x); } if (route[0] === 'mentions') render(true); }
@@ -694,10 +699,11 @@ const lawField = (id, label, value, auto, wide) => `<div class="fld${wide ? ' w2
 function lawView() {
   if (!law) { loadLaw(); return head('Mentions légales') + '<p class="vn">Chargement…</p>'; }
   const { info, missing } = law;
-  return head('Mentions légales') + `<p class="vn">La page n’apparaît sur le site que lorsque tout est rempli et la case cochée. Les adresses et les téléphones y seront publics.</p><form id="lawF" novalidate>${info.editeurs.map((p, i) => `<section class="sct"><h2>${esc(p.nom || 'Éditeur ' + (i + 1))}</h2><div class="ef">${LAW.map(([k, label, auto]) => lawField(`law-${i}-${k}`, label, p[k], auto, k === 'adresse')).join('')}</div></section>`).join('')}<section class="sct"><h2>Publication</h2><div class="ef">${lawField('law-dir', 'Responsable de la publication (prénom et nom)', info.directeur, 'off', true)}<div class="w2"><label class="tg"><input type="checkbox" id="law-on"${info.online ? ' checked' : ''}><i aria-hidden="true"></i><span>Mettre la page en ligne</span></label></div><p class="vn w2">${missing.length ? 'Il manque encore ' + esc(missing.join(', ')) + '.' : info.online ? 'La page est en ligne. <a class="tx" href="/mentions-legales" target="_blank" rel="noopener">La voir ↗</a>' : 'Tout est rempli : cochez la case et enregistrez.'}</p><div class="w2"><button class="btn" type="submit"><span>Enregistrer</span><i class="ar" aria-hidden="true"></i></button></div></div></section></form>`;
+  const told = p => ['nom', 'adresse', 'telephone', 'siren'].every(k => p[k]) ? 'Complet' : 'À compléter';
+  return head('Mentions légales') + `<p class="vn">La page n’apparaît sur le site que lorsque tout est rempli et la case cochée. Les adresses et les téléphones y seront publics.</p><form id="lawF" novalidate>${info.editeurs.map((p, i) => part('law' + i, esc(p.nom || 'Éditeur ' + (i + 1)), told(p), `<div class="ef">${LAW.map(([k, label, auto]) => lawField(`law-${i}-${k}`, label, p[k], auto, k === 'adresse')).join('')}</div>`)).join('')}${part('lawP', 'Publication', info.online ? 'La page est en ligne' : missing.length ? 'La page n’est pas en ligne : il manque des informations' : 'Tout est rempli, la page n’est pas encore en ligne', `<div class="ef">${lawField('law-dir', 'Responsable de la publication (prénom et nom)', info.directeur, 'off', true)}<div class="w2"><label class="tg"><input type="checkbox" id="law-on"${info.online ? ' checked' : ''}><i aria-hidden="true"></i><span>Mettre la page en ligne</span></label></div><p class="vn w2">${missing.length ? 'Il manque encore ' + esc(missing.join(', ')) + '.' : info.online ? 'La page est en ligne. <a class="tx" href="/mentions-legales" target="_blank" rel="noopener">La voir ↗</a>' : 'Tout est rempli : cochez la case et enregistrez.'}</p></div>`)}<div class="acc-end"><button class="btn" type="submit"><span>Enregistrer</span><i class="ar" aria-hidden="true"></i></button></div></form>`;
 }
 async function saveLaw(F) {
-  const btn = $('.btn', F), v = id => $('#' + id).value;
+  const btn = $('[type=submit]', F), v = id => $('#' + id).value;
   const body = { editeurs: law.info.editeurs.map((_, i) => Object.fromEntries(LAW.map(([k]) => [k, v(`law-${i}-${k}`)]))), directeur: v('law-dir'), online: $('#law-on').checked };
   btn.disabled = true;
   try { law = await post('/api/legal', body, 'PUT'); render(true); toast(law.info.online ? 'Enregistré. La page est en ligne.' : 'Enregistré. La page n’est pas en ligne.'); }
@@ -726,10 +732,9 @@ function keptView() {
   const list = safety?.versions || [];
   return `<p class="vn">Chaque publication garde la version d’avant, avec ses images : les dix dernières.</p>${list.length ? `<ul class="rw">${list.map(v => `<li><span class="rw-o"><span class="rw-s">Version remplacée le ${esc(when(v.at))}</span></span><button type="button" class="tx" data-act="takeVersion" data-id="${esc(v.id)}" data-at="${esc(v.at)}">Reprendre</button></li>`).join('')}</ul>` : '<p class="vn">Aucune pour l’instant : la première arrivera à la prochaine publication.</p>'}<div class="pa"><a class="tx" href="/api/backup?tout=1" download>Tout télécharger (textes, messages, inscriptions) ↓</a></div>`;
 }
-const part = (title, body) => `<section class="sct"><h2>${title}</h2>${body}</section>`;
 function passView() {
   if (!safety) loadSafety();
-  return head('Sécurité') + part('Mot de passe', `<p class="vn">Le changer déconnecte les autres appareils.</p><form id="passF" class="ef" novalidate>${user}<div class="w2" style="max-width:34em">${pwField('p0', 'Mot de passe actuel', 'current-password')}</div><div class="w2" style="max-width:34em">${pwField('p1', 'Nouveau mot de passe', 'new-password', meter('p1'))}</div><div class="w2" style="max-width:34em">${pwField('p2', 'Encore une fois', 'new-password')}</div><div class="w2"><button class="btn" type="submit"><span>Changer le mot de passe</span><i class="ar" aria-hidden="true"></i></button></div></form>`) + part('Double vérification', twoView()) + part('Sauvegardes', keptView());
+  return head('Sécurité') + part('pass', 'Mot de passe', 'Celui qui ouvre l’admin', `<p class="vn">Le changer déconnecte les autres appareils.</p><form id="passF" class="ef" novalidate>${user}<div class="w2" style="max-width:34em">${pwField('p0', 'Mot de passe actuel', 'current-password')}</div><div class="w2" style="max-width:34em">${pwField('p1', 'Nouveau mot de passe', 'new-password', meter('p1'))}</div><div class="w2" style="max-width:34em">${pwField('p2', 'Encore une fois', 'new-password')}</div><div class="w2"><button class="btn" type="submit"><span>Changer le mot de passe</span><i class="ar" aria-hidden="true"></i></button></div></form>`) + part('two', 'Double vérification', !safety ? 'Chargement…' : safety.on ? `Active, ${plural((safety.devices || []).length, 'appareil')}` : 'Désactivée', twoView()) + part('kept', 'Sauvegardes', !safety ? 'Chargement…' : safety.versions?.length ? plural(safety.versions.length, 'version gardée').replace('version gardées', 'versions gardées') : 'Aucune pour l’instant', keptView());
 }
 const twoState = async () => ({ ...safety, ...(await api('/api/totp')) });
 async function twoStep(F) {

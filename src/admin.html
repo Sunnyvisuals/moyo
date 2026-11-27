@@ -59,8 +59,9 @@ body{min-height:100vh;min-height:100svh}
 .aw a:hover{color:var(--klein)}
 .aw sup{font-size:.7em;font-weight:500;line-height:0;margin-left:.35em;translate:0 -.1em}
 .aw .new sup{color:var(--klein);font-weight:700}
-.aw-x{display:grid;justify-items:start;margin-top:clamp(1rem,2vw,2rem);padding-left:28px}
-.aw-x .tx{color:var(--mute)}.aw-x .tx:hover{color:var(--klein)}
+.aw-x{display:grid;justify-items:start;gap:6px;margin-top:clamp(1.5rem,2.6vw,2.75rem);padding-left:28px}
+.aw-x .btn{height:auto;color:var(--ink);font-size:var(--fs-small)}
+.aw-x a.btn:hover{color:var(--klein)} /* in ink, underlined, with their point: they are seen to be pressed */
 
 /* Views */
 .av{grid-column:4/-1;min-width:0;outline:none}
@@ -78,8 +79,20 @@ body{min-height:100vh;min-height:100svh}
 .m9{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));column-gap:var(--gut);row-gap:clamp(2rem,4vw,4rem);align-items:start}
 .sct{margin-top:clamp(3.5rem,6vw,6.5rem);border-top:1px solid var(--line);padding-top:clamp(1.25rem,2vw,2rem)}
 .sct>h2{font-size:inherit;font-weight:600;margin-bottom:clamp(1.25rem,2vw,2rem)}
-.sct>.vn{margin:0 0 1.75rem}
-.sct>h3.mt-k{margin:clamp(2.25rem,3.4vw,3.25rem) 0 1.25rem}
+/* a part that opens and shuts */
+.acc{border-top:1px solid var(--line)}
+.acc:last-of-type{border-bottom:1px solid var(--line)}
+.acc>summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 24px;padding:clamp(1.25rem,2vw,2rem) 0;list-style:none;cursor:pointer}
+.acc>summary::-webkit-details-marker{display:none}
+.acc h2{font-size:var(--fs-m);font-weight:700;letter-spacing:-.034em;line-height:1.15;transition:color .3s}
+.acc-s{grid-column:1;font-size:var(--fs-small);color:var(--mute)}
+.acc-go{grid-column:2;grid-row:1/span 2;font-size:var(--fs-small)}
+.acc-go .c,.acc[open] .acc-go .o{display:none}.acc[open] .acc-go .c{display:inline}
+@media (hover:hover){.acc>summary:hover h2,.acc>summary:hover .acc-go{color:var(--klein)}}
+.acc-b{padding:.5rem 0 clamp(2.25rem,3.4vw,3.25rem)}
+.acc-b>.vn{margin:0 0 1.75rem}
+.acc-b>h3.mt-k{margin:clamp(2.25rem,3.4vw,3.25rem) 0 1.25rem}
+.acc-end{margin-top:clamp(1.75rem,2.8vw,2.75rem)}
 .key{margin:0 0 6px;font-size:var(--fs-m);font-weight:700;letter-spacing:.04em;user-select:all;overflow-wrap:anywhere}
 .codes{display:grid;grid-template-columns:repeat(2,max-content);gap:8px 44px;margin:0 0 14px;font-size:var(--fs-lead);font-weight:700;user-select:all}
 .sum{margin-left:1em;font-weight:500;color:var(--mute);font-size:var(--fs-small)}
@@ -167,6 +180,11 @@ body{min-height:100vh;min-height:100svh}
 .dz.plate--none:hover::after{scale:1.12}
 /* a file above the page, or a picture in the hand: what can take it is ringed, what is under it turns blue and says what will happen.
    The edges of a picture of the layout add beside it */
+/* the mouse over a picture: it says that a file can be dropped there (and a click still chooses one) */
+@media (hover:hover){html:not(.files,.carry) :is(.dz:not(.busy):hover,.bk-p:hover)::before{content:"Glisser-déposer.";position:absolute;inset:0;z-index:3;display:grid;place-items:center;text-align:center;text-wrap:balance;padding:10px;background:rgb(18 18 20 / .46);box-shadow:inset 0 0 0 2px var(--klein);color:var(--bg);font-size:clamp(1.0625rem,1.6vw,1.75rem);font-weight:700;letter-spacing:-.034em;line-height:1.08;pointer-events:none}
+  /* without a picture there is only its point: the words go below it, on no veil */
+  html:not(.files,.carry) :is(.dz.plate--none,.mt:not(.has)>.dz):not(.busy):hover::before{place-items:end center;padding-bottom:9%;background:none}
+  html:not(.files,.carry) .dz.plate--none:not(.busy):hover::before{color:var(--ink)}}
 html.files [data-drop]::before,.can::before,.dz.over.in::before{content:"";position:absolute;inset:0;z-index:6;display:grid;place-items:center;text-align:center;text-wrap:balance;padding:10px;box-shadow:inset 0 0 0 2px var(--klein);color:var(--bg);font-size:clamp(1.0625rem,1.6vw,1.75rem);font-weight:700;letter-spacing:-.034em;line-height:1.08;pointer-events:none}
 html.files [data-drop].over::before,.dz.over.in::before{content:attr(data-to) ".";background:var(--klein)}
 html.files .dz.over.before::before{content:"Avant.";inset:0 60% 0 0}
@@ -317,6 +335,8 @@ html.files .bk1.over.before::before{content:"Avant.";inset:0 72% 0 0}html.files 
 /* Categories */
 .ct>li{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(0,1fr) 7.5em auto;align-items:end;gap:0 var(--gut);padding:14px 0 18px;border-bottom:1px solid var(--line);background:var(--bg)}
 .ct{border-top:1px solid var(--line)}
+.ct-new{margin-bottom:clamp(2.75rem,4.6vw,5rem)}
+.ct-new>h2{font-size:inherit;font-weight:600;margin-bottom:clamp(1.25rem,2vw,2rem)}
 .ct .grip{margin:0 0 4px -12px}
 .ct .n{font-size:var(--fs-small);color:var(--mute);padding-bottom:16px}
 
@@ -413,7 +433,7 @@ html.files .bk1.over.before::before{content:"Avant.";inset:0 72% 0 0}html.files 
   </header>
   <div class="ad">
     <nav class="aw" aria-label="Sections"><ol id="way"></ol>
-      <div class="aw-x"><a class="tx" href="/" target="_blank" rel="noopener">Voir le site ↗</a><button class="tx" id="out" type="button">Se déconnecter</button></div>
+      <div class="aw-x"><a class="btn" href="/" target="_blank" rel="noopener"><span>Voir le site</span><i class="ar" aria-hidden="true"></i></a><button class="btn" id="out" type="button"><span>Se déconnecter</span><i class="ar" aria-hidden="true"></i></button></div>
     </nav>
     <main class="av" id="view"></main>
   </div>
