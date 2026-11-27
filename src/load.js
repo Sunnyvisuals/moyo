@@ -121,32 +121,73 @@ async function drop(blue) {
   if (paint) title.style.color = 'transparent';
   else { box = title.getBoundingClientRect(); title.style.clipPath = 'circle(0px at 0px 0px)'; ring = document.createElement('i'); ring.style.cssText = `position:absolute;left:0;top:0;border:1.5px solid ${KL};border-radius:50%`; layer.appendChild(ring); }
   mark.style.visibility = 'hidden'; hold(true); setTimeout(() => hold(false), 10000); // never held for good, whatever happens
-  /* the point is a drop: k points it (1 as it leaves the sky, 0 round), sx and sy stretch it; with k = 0 and sx = sy = 1 it is the point of the page */
-  const NS = 'http://www.w3.org/2000/svg', sv = document.createElementNS(NS, 'svg'), drip = document.createElementNS(NS, 'path');
-  sv.setAttribute('viewBox', `0 0 ${W} ${H}`); sv.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible'; drip.setAttribute('fill', KL); sv.appendChild(drip); layer.appendChild(sv);
-  const shape = (cx, cy, r, k, sx, sy) => { let d = ''; for (let i = 0; i < 96; i++) { const f = i / 48 * Math.PI, w = k * Math.pow(Math.max(0, Math.cos(f)), 5); d += (i ? 'L' : 'M') + (cx + Math.sin(f) * (1 - .35 * w) * r * sx).toFixed(2) + ' ' + (cy - (Math.cos(f) + 1.3 * w) * r * sy).toFixed(2); } drip.setAttribute('d', d + 'Z'); };
-  const step = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-  shape(P[0], P[1], r0, 0, 1, 1);
-  if (blue) { // coming from a link: the screen is blue, and it closes on the point
-    const kl = document.createElement('div'); kl.className = 'kl'; layer.appendChild(kl); root.classList.remove('enter');
+  const drip = goutte(layer, P, r0, KL, getComputedStyle(root).getPropertyValue('--bg').trim() || '#FAFAF8');
+  if (blue) { // coming from a link: the screen is blue, and it closes on the point, which then lands
+    drip.still(); const kl = document.createElement('div'); kl.className = 'kl'; layer.appendChild(kl); root.classList.remove('enter');
     await tween(900, t => 1 - Math.pow(1 - t, 3.2), u => { kl.style.clipPath = `circle(${(r0 + (far + 4 - r0) * (1 - u)).toFixed(1)}px at ${P[0].toFixed(1)}px ${P[1].toFixed(1)}px)`; });
     kl.remove();
-  } else { // it falls from the sky as a drop: it leaves the top of the screen pointed and drawn out, and rounds up as it comes down
-    const s0 = 1.35, y0 = -r0 * s0 * 1.3;
-    shape(P[0], y0, r0 * s0, 1, .9, 1.25); root.classList.remove('load');
-    await tween(1150, t => t, u => { const k = 1 - step(.45, .96, u), s = 1 + (s0 - 1) * Math.pow(1 - u, 1.5); shape(P[0], y0 + (P[1] - y0) * u * u, r0 * s, k, 1 - .1 * k, 1 + .25 * k); });
+  } else { // a drop gathers under the top of the screen, lets go and falls
+    drip.fall(0); root.classList.remove('load');
+    await tween(drip.T, t => t, u => drip.fall(u * drip.T));
   }
-  // on the line it flattens, wobbles like water and settles round: the point. The wave leaves it at the same moment
-  let freed = false, still = false;
-  await tween(2800, t => t, u => {
-    const ms = u * 2800, e = 1 - Math.pow(1 - u, 2.6), R = r0 + (Rmax - r0) * e;
-    if (ms < 1400) { const a = .3 * Math.exp(-ms / 170) * Math.cos(2 * Math.PI * ms / 300), sy = 1 - a; shape(P[0], P[1] + r0 * (1 - sy), r0, 0, 1 + a, sy); }
-    else if (!still) { still = true; shape(P[0], P[1], r0, 0, 1, 1); }
+  // on the line it flattens, holds, jumps back and settles round: the point. The wave leaves it at the same moment
+  let freed = false;
+  await tween(2600, t => t, u => {
+    const ms = u * 2600, e = 1 - Math.pow(1 - u, 2.6), R = r0 + (Rmax - r0) * e;
+    if (blue) drip.land(ms, .4, 0, 0); else drip.land(ms, .85, 85, 1);
     if (paint) paint(R, fs * .08 * Math.pow(1 - u, 1.4) * Math.min(1, u * 30), fs * (.4 + .3 * e), .85 * Math.pow(1 - u, 1.3) * Math.min(1, u * 40)); // a wide, soft lens: never more than 1.7 times larger, never folded
     else { title.style.clipPath = `circle(${R.toFixed(1)}px at ${(P[0] - box.left).toFixed(1)}px ${(P[1] - box.top).toFixed(1)}px)`; ring.style.width = ring.style.height = 2 * R + 'px'; ring.style.translate = `${(P[0] - R).toFixed(1)}px ${(P[1] - R).toFixed(1)}px`; ring.style.opacity = (.85 * Math.pow(1 - u, 1.3)).toFixed(3); }
     if (!freed && R > reach) { freed = true; free(); }
   });
   end();
+}
+
+/* The drop, drawn the way animators draw one. It gathers under the top of the screen and swells, slowly; its neck thins and snaps (fast, as water
+   does), the rest springs back up and the tail goes into the drop, which wobbles once free, rounds up, then is drawn out by its speed; one smear just
+   before the line. On the line it flattens hard and holds (on twos, like a drawing), jumps back up drawn out the other way, and settles round, losing
+   its shine: it is the point. Shapes in a "goo" filter (blur, then a hard edge on the alpha) merge like water when they touch and part with a neck. */
+function goutte(layer, P, r0, KL, BG) {
+  const NS = 'http://www.w3.org/2000/svg', rb = r0 * 1.12, gy = P[1] + r0, x0 = P[0], X = x0 - rb * 7, Wc = rb * 14, Hc = gy + rb * 7;
+  const sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', `${X.toFixed(2)} 0 ${Wc.toFixed(2)} ${Hc.toFixed(2)}`); layer.appendChild(sv); // a column around the drop, on its own layer: the wave under it is not painted again
+  sv.style.cssText = `position:absolute;left:${X.toFixed(2)}px;top:0;width:${Wc.toFixed(2)}px;height:${Hc.toFixed(2)}px;overflow:visible;will-change:transform`;
+  const mk = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (p || sv).appendChild(e); return e; };
+  const id = 'goo' + Math.random().toString(36).slice(2, 8), f = mk('filter', { id, filterUnits: 'userSpaceOnUse', x: X, y: -rb * 3, width: Wc, height: Hc + rb * 3, 'color-interpolation-filters': 'sRGB' }, mk('defs', {}));
+  mk('feGaussianBlur', { stdDeviation: (rb * .3).toFixed(2) }, f); mk('feColorMatrix', { type: 'matrix', values: '1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -9' }, f);
+  const g = mk('g', { filter: `url(#${id})`, fill: KL }), M = mk('ellipse', { cx: x0 }, g), N = mk('ellipse', { cx: x0 }, g), B = mk('ellipse', { cx: x0 }, g);
+  const S = mk('ellipse', { fill: BG, opacity: 0 }), O = mk('circle', { cx: x0, cy: P[1], r: r0, fill: KL, visibility: 'hidden' });
+  const el = (e, cy, rx, ry) => { e.setAttribute('cy', cy.toFixed(2)); e.setAttribute('rx', Math.max(0, rx).toFixed(2)); e.setAttribute('ry', Math.max(0, ry).toFixed(2)); };
+  const shine = (cy, r, sx, sy, a) => { S.setAttribute('opacity', Math.max(0, a).toFixed(3)); S.setAttribute('rx', (r * .25 * Math.min(sx, 1.3)).toFixed(2)); S.setAttribute('ry', (r * .14 * Math.min(sy, 1.3)).toFixed(2)); S.setAttribute('transform', `translate(${(x0 - r * .36 * sx).toFixed(2)} ${(cy - r * .38 * sy).toFixed(2)}) rotate(-38)`); };
+  const cl = x => Math.min(1, Math.max(0, x)), io = x => .5 - .5 * Math.cos(Math.PI * cl(x)), out = x => 1 - Math.pow(1 - cl(x), 3);
+  const T1 = 850, T2 = 1130, T = 1830; // gathered, let go, on the line
+  let yR = 0, done = false;
+  const gloss = (sy, a) => a * cl((sy - .62) / .2) * cl((1.6 - sy) / .25); // no shine when it is flat or a streak
+  const zone = (y0, y1) => { f.setAttribute('y', y0.toFixed(1)); f.setAttribute('height', Math.max(1, y1 - y0).toFixed(1)); }; // the filter only works where the drop is
+  return {
+    T,
+    still() { el(M, 0, 0, 0); el(N, 0, 0, 0); el(B, P[1], r0, r0); zone(gy - rb * 6, gy + rb * 3); },
+    fall(t) {
+      if (t < T2) { // hanging: a thin film spreads under the top, the drop swells under it, swaying a little; then it sinks, its neck draws out and thins, (t - tc)^2/3, and snaps
+        const p = cl(t / T1), q = cl((t - T1) / (T2 - T1)), r = rb * (.3 + .7 * io(p)), y = rb * (.45 + .95 * Math.pow(p, 1.4)) + rb * Math.pow(q, 1.6);
+        const w = 1 + .05 * Math.sin(p * 13.8) * p, sy = (1 + .16 * q) / w, sx = 1 / sy, top = rb * .2, bot = y - r * sy * .3;
+        el(M, 0, rb * (.3 + 1 * out(p / .5)), rb * (.15 + .32 * out(p / .5) + .1 * q)); el(N, (top + bot) / 2, rb * (.42 - .08 * p) * Math.pow(1 - q, .67), (bot - top) / 2); el(B, y, r * sx, r * sy);
+        shine(y, r, sx, sy, gloss(sy, .85 * io((p - .35) / .4))); zone(-rb * 3, y + rb * 4); yR = y; return;
+      }
+      // free: the rest springs back into the top, the tail goes into the drop, it wobbles and rounds up, then its speed draws it out
+      const ms = t - T2, s = cl(ms / (T - T2)), yI = gy - rb, back = cl(1 - ms / 240), tail = 1 - out(ms / 200);
+      const osc = .13 * Math.exp(-ms / 200) * Math.cos(2 * Math.PI * ms / 190), k = .4 * s * s * s, smear = s > .955;
+      let sy = smear ? 2.1 : (1 + k) / (1 + osc), sx = 1 / sy, y = yR + (yI - yR) * (.18 * s + .82 * s * s);
+      if (smear) y -= rb * (sy - 1) * .55; // the one drawing where it is a streak
+      el(M, 0, rb * 1.3 * back, rb * .57 * back * back); el(N, y - rb * sy * .85 - rb * .45 * tail, rb * .26 * tail, rb * (.45 * tail + .1) * (tail > 0)); el(B, y, rb * sx, rb * sy);
+      shine(y, rb, sx, sy, gloss(sy, .85)); zone(back > 0 ? -rb * 3 : y - rb * (sy + 3), y + rb * 4);
+    },
+    land(tp, A, hold, sh) { // tp: since it touched the line
+      if (tp >= 900) { if (!done) { done = true; g.setAttribute('visibility', 'hidden'); S.setAttribute('visibility', 'hidden'); O.setAttribute('visibility', 'visible'); } return; }
+      const tau = Math.max(0, tp - hold), q = tau < 332 ? Math.floor(tau / 83) * 83 : tau; // the first drawings on twos
+      const k = A * Math.exp(-q / 150) * Math.cos(2 * Math.PI * q / 330), sx = 1 + k, sy = 1 / sx, r = rb + (r0 - rb) * out(tau / 400);
+      const lift = q < 300 ? rb * .75 * (A / .85) * Math.sin(Math.PI * q / 300) * Math.exp(-q / 220) : 0, cy = gy - r * sy - lift;
+      el(M, 0, 0, 0); el(N, 0, 0, 0); el(B, cy, r * sx, r * sy); shine(cy, r, sx, sy, gloss(sy, sh * .85 * (1 - io((tp - 250) / 400)))); zone(gy - rb * 6, gy + rb * 3);
+    }
+  };
 }
 
 /* the sentence under water: painted once at the size of the screen, then bent by the wave on the graphics card. The crest of the ring is a lens:
