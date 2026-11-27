@@ -223,6 +223,17 @@ html[lang=fr] [data-l=fr]:is(span,div,small),html[lang=en] [data-l=en]:is(span,d
 .scale label:not(.tbd):has(~ label:not(.tbd) :checked) span::after{border-color:var(--klein)}
 .scale:has([value="tbd"]:checked) .scale-d{left:calc((100% + var(--gut)) / 2);top:calc(var(--h1) / 2);--dd:calc(var(--r) * 1.312)}
 @supports not selector(:has(a)){.scale :checked+span::after{background:var(--klein)!important;-webkit-mask:none!important;mask:none!important}}
+/* on a line, each amount stands in the middle under its ring (--c: the width of a quarter) */
+@media (min-width:621px){
+  .scale label:not(.tbd){text-align:center}
+  .scale label:not(.tbd) b{max-width:none;text-align:center}
+  .scale label:not(.tbd) span::after{left:calc(50% - var(--o) / 2)}
+  .scale{--c:calc((100% - 3 * var(--gut)) / 4)}
+  .scale::after{width:0}
+  .scale:has(label:not(.tbd) :checked)::after{width:calc((100% - 3 * var(--gut)) / 4 * (var(--at) + .5) + var(--gut) * var(--at))}
+  .scale-d{left:calc(var(--c) * (var(--at) + .5) + var(--gut) * var(--at));translate:-50% -50%}
+  .scale:has([value="tbd"]:checked) .scale-d{left:calc((100% + var(--gut)) / 2 + var(--dd) / 2)}
+}
 @media (max-width:1359px){.chips{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){
   .chips{column-gap:20px}
