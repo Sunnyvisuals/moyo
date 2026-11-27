@@ -70,7 +70,7 @@ const sizes = {
   'site.js': out('dist/site.js', fill(read('src/site.js'), { __RENDER__: renderSrc }))
 };
 /* behaviour: one file per job */
-const RUNTIME = { chrome: 'chrome-rt', hero: 'hero', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink', trades: 'trades', blocks: 'blocks-rt', play: 'play', divide: 'divide' };
+const RUNTIME = { chrome: 'chrome-rt', hero: 'hero', 'hero-enter': 'hero-enter', footer: 'footer-rt', glass: 'glass-rt', stage: 'stage', reveal: 'reveal', roll: 'roll', leave: 'leave', cursor: 'cursor', load: 'load', path: 'path', eyes: 'eyes', method: 'method', weight: 'weight', stack: 'stack', ink: 'ink', trades: 'trades', blocks: 'blocks-rt', play: 'play', divide: 'divide' };
 const words = { __CHROME__: JSON.stringify(CHROME), __CHROME_ARIA__: JSON.stringify(CHROME_ARIA), __FOOT_EN__: JSON.stringify(FOOT_EN) };
 for (const [to, from] of Object.entries(RUNTIME)) out(`dist/${to}.js`, fill(read(`src/${from}.js`), words));
 out('dist/lenis.js', lenis);
