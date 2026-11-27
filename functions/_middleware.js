@@ -5,8 +5,9 @@
    - Adds a few security headers everywhere, and keeps /admin out of search engines. */
 import { fresh } from './_lib/fresh.js';
 import { draftOf, preview } from './_lib/preview.js';
+import { legalOf } from './_lib/legal.js';
 
-const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all', '/confidentialite': 'legal', '/confidentialite.html': 'legal', '/mentions-legales': 'legal', '/mentions-legales.html': 'legal' };
+const PAGES = { '/': 'home', '/index.html': 'home', '/projets': 'all', '/projets/': 'all', '/projets.html': 'all', '/confidentialite': 'legal', '/confidentialite.html': 'legal' };
 
 /* What a page may load and who may show it. The pages carry their own scripts and styles; nothing runs from elsewhere.
    The site: its own files, and, in a project, the frames of other services once the visitor asks. The admin: shown by no one. */
@@ -37,6 +38,9 @@ export async function onRequest(ctx) {
       .on('#ctStatus', { element: el => { el.setInnerContent(ok ? 'Message envoyé. Merci !' : 'Le message n’a pas pu partir. Vérifiez les champs et réessayez.'); if (!ok) el.setAttribute('class', 'f-status err'); } })
       .transform(res);
   }
+
+  // no link to the legal notice while it is not online (functions/_lib/legal.js)
+  if (isHTML && !url.pathname.startsWith('/admin') && !(await legalOf(env)).online) res = new HTMLRewriter().on('a[data-i="fLegal"]', { element: el => { el.remove(); } }).transform(res);
 
   res = new Response(res.body, res);
   const h = res.headers;

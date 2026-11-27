@@ -2,6 +2,7 @@
    until they are replaced (shared/seo.js). */
 import seed from '../data/projects.json';
 import { getData } from './_lib/store.js';
+import { legalOf } from './_lib/legal.js';
 import { SITE, full, sample, waiting } from '../shared/seo.js';
 import { imgURL } from '../shared/render.js';
 
@@ -9,7 +10,7 @@ const x = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', 
 
 export async function onRequestGet({ env }) {
   const d = await getData(env), real = (d.projects || []).filter(p => !sample(p, seed));
-  const pages = [['/'], ['/projets'], ['/confidentialite'], ['/mentions-legales'], ...real.map(p => ['/projets/' + encodeURIComponent(p.id), p]), ...(d.team || []).filter(m => !waiting(m)).map(m => ['/equipe/' + encodeURIComponent(m.id)])];
+  const pages = [['/'], ['/projets'], ['/confidentialite'], ...((await legalOf(env)).online ? [['/mentions-legales']] : []), ...real.map(p => ['/projets/' + encodeURIComponent(p.id), p]), ...(d.team || []).filter(m => !waiting(m)).map(m => ['/equipe/' + encodeURIComponent(m.id)])];
   const alt = path => ['fr', 'en'].map(l => `<xhtml:link rel="alternate" hreflang="${l}" href="${x(full(path, l))}"/>`).join('') + `<xhtml:link rel="alternate" hreflang="x-default" href="${x(full(path, 'fr'))}"/>`;
   const pics = p => !p ? '' : [p.cover, ...(p.images || [])].filter(Boolean).slice(0, 20).map(i => `<image:image><image:loc>${x(new URL(imgURL(i), SITE).href)}</image:loc></image:image>`).join('');
   const urls = pages.flatMap(([path, p]) => ['fr', 'en'].map(l => `<url><loc>${x(full(path, l))}</loc>${alt(path)}${pics(p)}</url>`));

@@ -29,6 +29,6 @@ export async function onRequestGet({ request, env }) {
   return json({
     at: new Date().toISOString(), site: await getData(env),
     versions: await Promise.all(list.map(async i => ({ at: new Date(+i).toISOString(), site: await env.MOYO.get('backup:' + i, 'json') }))),
-    messages: await all(env, 'msg:'), subscribers: await all(env, 'sub:')
+    legal: await env.MOYO.get('legal', 'json'), messages: await all(env, 'msg:'), subscribers: await all(env, 'sub:')
   }, 200, { 'Content-Disposition': `attachment; filename="moyo-sauvegarde-${day}.json"` });
 }

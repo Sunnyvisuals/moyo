@@ -582,7 +582,6 @@ const LAW_CSS = `
 .law ul{list-style:disc;padding-left:1.15em}
 .law li+li{margin-top:.45em}
 .law li::marker{color:var(--klein)}
-.law mark{background:none;color:var(--klein);font-weight:600}
 .law .txt a{background:linear-gradient(currentColor,currentColor) 0 100%/100% 1px no-repeat;overflow-wrap:anywhere;transition:color .4s}
 .law .txt a:hover{color:var(--klein)}
 @media (min-width:821px){.law .txt{grid-column:7/-1!important}.law h2{grid-column:1/7!important}}

@@ -331,7 +331,7 @@ function tell() {
 /* =====================================================================================================
    Places
    ===================================================================================================== */
-const PLACES = [['projets', 'Projets'], ['methode', 'Méthode'], ['equipe', 'Équipe'], ['categories', 'Catégories'], ['messages', 'Messages'], ['mot-de-passe', 'Sécurité']];
+const PLACES = [['projets', 'Projets'], ['methode', 'Méthode'], ['equipe', 'Équipe'], ['categories', 'Catégories'], ['messages', 'Messages'], ['mentions', 'Mentions légales'], ['mot-de-passe', 'Sécurité']];
 const isNew = m => m.id > (store.get(SEEN) || '');
 function way() {
   if (!data) return; const at = Math.max(0, PLACES.findIndex(p => p[0] === route[0])), news = (msgs || []).filter(isNew).length, n = { projets: data.projects.length, equipe: data.team.length, categories: data.categories.length, messages: msgs ? msgs.length : '' };
@@ -346,9 +346,10 @@ addEventListener('hashchange', () => {
   const was = route; if (was[0] === 'projets' && was[1]) { const p = data.projects.find(x => x.id === was[1]); if (p && blank(p)) { data.projects.splice(data.projects.indexOf(p), 1); } } // left empty: it never existed
   if (was[0] === 'messages' && msgs?.length) store.set(SEEN, msgs[0].id);
   if (was[0] === 'mot-de-passe') safety = setup = codes = null; // asked again next time
+  if (was[0] === 'mentions') law = null;
   picked = ''; adding = -1; addingMaq = false; render(); scrollTo(0, 0); const p = route[0] === 'projets' && data.projects.find(x => x.id === route[1]); $(p && blank(p) ? '#view .vt' : '#view h1')?.focus({ preventScroll: true });
 });
-const VIEWS = { projets: () => { const p = route[1] && data.projects.find(x => x.id === route[1]); return p ? projectView(p) : projectsView(); }, methode: methodView, equipe: () => { const m = route[1] && data.team.find(x => x.id === route[1]); return m ? personView(m) : teamView(); }, categories: catsView, messages: msgsView, 'mot-de-passe': passView };
+const VIEWS = { projets: () => { const p = route[1] && data.projects.find(x => x.id === route[1]); return p ? projectView(p) : projectsView(); }, methode: methodView, equipe: () => { const m = route[1] && data.team.find(x => x.id === route[1]); return m ? personView(m) : teamView(); }, categories: catsView, mentions: lawView, messages: msgsView, 'mot-de-passe': passView };
 function render(keep) {
   route = parse(); const V = $('#view'), y = scrollY;
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
@@ -685,6 +686,24 @@ function msgsView() {
   return head('Messages') + (msgs.length ? `<ul class="ms">${msgs.map(m => `<li data-id="${esc(m.id)}"${isNew(m) ? ' class="new"' : ''}><h2>${esc(m.name)}</h2><p class="who"><a href="mailto:${esc(m.email)}">${esc(m.email)}</a><span>${esc(when(m.at))}</span>${m.type ? `<span>${esc(m.type.split(',').map(t => TYPES[t] || t).join(', '))}</span>` : ''}${m.budget ? `<span>${esc(BUDGETS[m.budget] || m.budget)}</span>` : ''}${m.lang === 'en' ? '<span>En anglais</span>' : ''}</p><p class="txt">${esc(m.message)}</p><div class="pa" style="margin:0;justify-content:space-between"><a class="tx" href="mailto:${esc(m.email)}?subject=${encodeURIComponent(m.lang === 'en' ? 'moyo, your message' : 'moyo, votre message')}">Répondre ↗</a><button type="button" class="tx red" data-act="rmMsg">Supprimer</button></div></li>`).join('')}</ul>` : '<div class="none"><b></b><p>Aucun message pour l’instant.<br>Ils arrivent ici depuis le formulaire du site.</p></div>');
 }
 
+/* ---------- the legal notice: who publishes the site; online once complete (functions/_lib/legal.js) ---------- */
+let law = null;
+async function loadLaw() { try { law = await api('/api/legal'); } catch (x) { return fail(x); } if (route[0] === 'mentions') render(true); }
+const LAW = [['nom', 'Prénom et nom', 'name'], ['adresse', 'Adresse (numéro, rue, code postal, ville)', 'street-address'], ['telephone', 'Téléphone', 'tel'], ['siren', 'SIREN (9 chiffres)', 'off'], ['tva', 'N° de TVA (seulement si vous la facturez)', 'off']];
+const lawField = (id, label, value, auto, wide) => `<div class="fld${wide ? ' w2' : ''}"><label class="fl" for="${id}">${label}</label><input id="${id}" type="${auto === 'tel' ? 'tel' : 'text'}" autocomplete="${auto}" value="${esc(value)}"></div>`;
+function lawView() {
+  if (!law) { loadLaw(); return head('Mentions légales') + '<p class="vn">Chargement…</p>'; }
+  const { info, missing } = law;
+  return head('Mentions légales') + `<p class="vn">La page n’apparaît sur le site que lorsque tout est rempli et la case cochée. Les adresses et les téléphones y seront publics.</p><form id="lawF" novalidate>${info.editeurs.map((p, i) => `<section class="sct"><h2>${esc(p.nom || 'Éditeur ' + (i + 1))}</h2><div class="ef">${LAW.map(([k, label, auto]) => lawField(`law-${i}-${k}`, label, p[k], auto, k === 'adresse')).join('')}</div></section>`).join('')}<section class="sct"><h2>Publication</h2><div class="ef">${lawField('law-dir', 'Responsable de la publication (prénom et nom)', info.directeur, 'off', true)}<div class="w2"><label class="tg"><input type="checkbox" id="law-on"${info.online ? ' checked' : ''}><i aria-hidden="true"></i><span>Mettre la page en ligne</span></label></div><p class="vn w2">${missing.length ? 'Il manque encore ' + esc(missing.join(', ')) + '.' : info.online ? 'La page est en ligne. <a class="tx" href="/mentions-legales" target="_blank" rel="noopener">La voir ↗</a>' : 'Tout est rempli : cochez la case et enregistrez.'}</p><div class="w2"><button class="btn" type="submit"><span>Enregistrer</span><i class="ar" aria-hidden="true"></i></button></div></div></section></form>`;
+}
+async function saveLaw(F) {
+  const btn = $('.btn', F), v = id => $('#' + id).value;
+  const body = { editeurs: law.info.editeurs.map((_, i) => Object.fromEntries(LAW.map(([k]) => [k, v(`law-${i}-${k}`)]))), directeur: v('law-dir'), online: $('#law-on').checked };
+  btn.disabled = true;
+  try { law = await post('/api/legal', body, 'PUT'); render(true); toast(law.info.online ? 'Enregistré. La page est en ligne.' : 'Enregistré. La page n’est pas en ligne.'); }
+  catch (x) { btn.disabled = false; fail(x); }
+}
+
 /* ---------- security: the password, the second step, the versions kept ---------- */
 let safety = null, setup = null, codes = null; // what the server says; the key being put in the application; the recovery codes, shown once
 async function loadSafety() {
@@ -766,6 +785,7 @@ V.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('
 V.addEventListener('submit', e => {
   e.preventDefault(); if (e.target.id === 'passF') return changePass(e.target);
   if (['startF', 'onF', 'offF'].includes(e.target.id)) return twoStep(e.target);
+  if (e.target.id === 'lawF') return saveLaw(e.target);
   if (e.target.id === 'catAdd') { const fr = $('#cFr').value.trim(); if (!fr) return $('#cFr').focus(); data.categories.push({ id: freeId(slug(fr) || 'categorie', data.categories), fr, en: $('#cEn').value.trim() || fr }); render(true); $('#cFr').focus(); }
 });
 V.addEventListener('click', async e => {
