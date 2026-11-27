@@ -104,6 +104,10 @@ const eyes = (() => {
   return { wake() { fit(); document.fonts?.ready.then(fit); if (!reduce && !raf) { last = 0; raf = requestAnimationFrame(frame); } }, no() { no = performance.now(); } };
 })();
 
+/* in the way, the one point goes to the name under the mouse (or the keyboard), and comes back to where we are */
+const peek = e => { const W = $('#way'), li = e && e.target.closest?.('li'); li ? W.style.setProperty('--peek', $$('li', W).indexOf(li)) : W.style.removeProperty('--peek'); };
+['pointerover', 'focusin'].forEach(n => $('#way').addEventListener(n, peek)); ['pointerleave', 'focusout', 'click'].forEach(n => $('#way').addEventListener(n, () => peek()));
+
 /* the four states of the login page */
 let token = '';
 function showLogin(mode, note) {

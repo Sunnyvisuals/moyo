@@ -53,7 +53,7 @@ body{min-height:100vh;min-height:100svh}
 .aw{--row:clamp(42px,calc(var(--w) * .029),56px);grid-column:1/4;position:sticky;top:calc(var(--hdr) + clamp(1rem,2.4vw,2.75rem))}
 .aw ol{position:relative;padding-left:28px}
 .aw-l{position:absolute;left:5px;top:calc(var(--row) / 2);bottom:calc(var(--row) / 2);width:1px;background:rgb(18 18 20 / .2)}
-.aw-d{position:absolute;left:0;top:calc(var(--row) / 2 - 5.5px);width:11px;height:11px;border-radius:50%;background:var(--klein);translate:0 calc(var(--at,0) * var(--row));transition:translate .8s var(--ease)}
+.aw-d{position:absolute;left:0;top:calc(var(--row) / 2 - 5.5px);width:11px;height:11px;border-radius:50%;background:var(--klein);translate:0 calc(var(--peek,var(--at,0)) * var(--row));transition:translate .8s var(--ease)}
 .aw a{display:inline-flex;align-items:center;height:var(--row);font-weight:600;color:var(--mute);transition:color .3s}
 .aw a[aria-current]{color:var(--ink)}
 .aw a:hover{color:var(--klein)}

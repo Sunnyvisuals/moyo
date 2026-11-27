@@ -90,7 +90,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     if (t.closest('.pv-frame')) return { m: 'say', w: 'go' };
     if (t.closest('.row .plate')) return { m: 'say', w: 'see' };
     const ch = t.closest('.chips label,.scale label'); if (ch) return { m: 'word', el: ch, at: place(ch) };
-    if (t.closest('.path')) return { m: 'none' }; // the dot of the way is enough
+    if (t.closest('.path') || innerWidth > 820 && t.closest('.aw ol a')) return { m: 'none' }; // the dot of the way is enough (on the site, and in the admin)
     const bt = t.closest('.btn'), sd = t.closest('.send'), pt = bt ? bt.querySelector('i.ar') : sd && sd.querySelector('.f-dots i'); if (bt || sd) return { m: (bt || sd).disabled ? 'free' : 'word', el: bt || sd, at: pt && middle(pt) }; // it joins the final point
     if (t.closest('.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx,.rt-b button')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     const cta = t.closest('.foot-cta'); if (cta) { const q = cta.querySelector('.qd'); return { m: 'word', el: cta, at: q ? middle(q) : null }; }
@@ -115,7 +115,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const [A, D] = asc(best.cs.fontWeight, best.cs.fontFamily); let base = best.r.top + A * best.size, right = best.right;
     const name = el.classList.contains('nm') && el.querySelector('.rl'); // its two copies roll on hover: the line itself does not move
     if (name) { const b = name.getBoundingClientRect(), lh = parseFloat(getComputedStyle(el).lineHeight); base = b.bottom - .2 * best.size - (lh - (A + D) * best.size) / 2 - D * best.size; }
-    else el.querySelectorAll('i,svg,sup').forEach(x => { const r = x.getBoundingClientRect(); if (r.width && r.width < best.size * 2 && Math.abs(r.top + r.height / 2 - best.r.top - best.r.height / 2) < best.size) right = Math.max(right, r.right); }); // after its arrow
+    else el.querySelectorAll('i,svg').forEach(x => { const r = x.getBoundingClientRect(); if (r.width && r.width < best.size * 2 && Math.abs(r.top + r.height / 2 - best.r.top - best.r.height / 2) < best.size) right = Math.max(right, r.right); }); // after its arrow
     const s = clamp(best.size * .155, 7, 26);
     return { x: right + s * .55 + best.size * .05, y: base - s / 2, s };
   }
