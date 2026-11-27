@@ -6,7 +6,7 @@
 const hero = document.getElementById('top'), title = hero && hero.querySelector('h1'), top = hero && hero.querySelector('.hero-top');
 if (!title || !top) return;
 const probe = document.createElement('i'); probe.setAttribute('aria-hidden', 'true'); probe.style.cssText = 'position:absolute;left:0;top:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';
-hero.style.position = 'relative'; hero.appendChild(probe);
+hero.appendChild(probe); // only its height is read: the first screen keeps its own position, sticky under the projects (stack.js)
 const st = document.createElement('style'); st.textContent = '.hero h1.fitting,.hero h1.fitting *{transition:none!important}'; document.head.appendChild(st); // a transition would give the old size back while measuring (with reduced motion they are all very short, not absent)
 let last = '';
 function fit() {
