@@ -95,16 +95,16 @@ function arcCard(dt){
   const W = pvFrame.clientWidth, H = pvFrame.clientHeight, off = H * .12, N = 18;
   const sy = (q, x) => (((q - .5) * st + .5 + v * .042 * Math.sin(x * Math.PI)) * H + off);
   const sn = Math.sin(fr * Math.PI), t = performance.now() / 1e3;
-  const yb = x => 1 - fr - sn * (.09 * Math.sin(x * Math.PI) + .035 * Math.sin(x * 7 + fr * 9 + t * 1.9)) * (.35 + amt) * -A.sdir;
+  const yb = x => fr + sn * (.09 * Math.sin(x * Math.PI) + .035 * Math.sin(x * 7 + fr * 9 + t * 1.9)) * (.35 + amt) * -A.sdir; // the next picture comes from the top: the line goes the way one scrolls
   const top = [], mid = [], bot = [];
   for (let j = 0; j <= N; j++) { const x = j / N, px = (x * W).toFixed(1);
     top.push(px + 'px ' + sy(0, x).toFixed(1) + 'px'); bot.push(px + 'px ' + sy(1, x).toFixed(1) + 'px');
     mid.push(px + 'px ' + sy(clamp(yb(x), 0, 1), x).toFixed(1) + 'px'); }
   const rev = a => a.slice().reverse();
-  pvA.style.clipPath = 'polygon(' + top.concat(rev(mid)).join(',') + ')';
-  pvB.style.clipPath = fr > 0 ? 'polygon(' + mid.concat(rev(bot)).join(',') + ')' : 'inset(100% 0 0 0)';
+  pvA.style.clipPath = 'polygon(' + mid.concat(rev(bot)).join(',') + ')';
+  pvB.style.clipPath = fr > 0 ? 'polygon(' + top.concat(rev(mid)).join(',') + ')' : 'inset(100% 0 0 0)';
   pvA.style.filter = fr > 0 ? 'brightness(' + (1 - .42 * fr).toFixed(3) + ')' : '';
-  pvA.style.setProperty('--py', (50 - fr * 22).toFixed(1) + '%'); pvB.style.setProperty('--py', (50 + (1 - fr) * 22).toFixed(1) + '%');
+  pvA.style.setProperty('--py', (50 + fr * 22).toFixed(1) + '%'); pvB.style.setProperty('--py', (50 - (1 - fr) * 22).toFixed(1) + '%');
   const img = i => ARC_IMG[i] ? 'url("' + ARC_IMG[i] + '")' : 'radial-gradient(circle,#002FA7 0 13%,#FAFAF8 13.3%)';
   if (pvA.dataset.i !== String(ia)) { pvA.dataset.i = ia; pvA.style.setProperty('--img', img(ia)); }
   if (pvB.dataset.i !== String(ib)) { pvB.dataset.i = ib; pvB.style.setProperty('--img', img(ib)); }
