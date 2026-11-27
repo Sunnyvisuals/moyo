@@ -88,6 +88,8 @@ __CSS__
 
 /* Studio: the statement is inked as it is read (ink.js) */
 .say{max-width:24em;text-wrap:pretty}
+@media (min-width:821px){#studio .say{max-width:27em;font-size:min(var(--fs-l),calc(var(--w) * .0365))}}
+@media (max-width:820px){#studio .say{font-size:min(var(--fs-l),calc(var(--w) * .081))}}
 .defs{margin-top:var(--gap);row-gap:40px;align-items:start}
 .defs h3{font-size:inherit;font-weight:600;margin-bottom:14px}
 .defs dl{display:grid;grid-template-columns:auto 1fr;gap:4px 16px}
@@ -170,7 +172,7 @@ __CHROME_HEAD__
 <!-- Studio -->
 <section class="sec over" id="studio" aria-labelledby="stuT">
   <h2 class="t-xl" id="stuT"><span data-i="stuT">Studio</span><i class="dot">&#8288;<b></b></i></h2>
-  <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est un studio créatif basé en Provence-Alpes-Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
+  <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est un studio créatif basé en Provence-&#8288;Alpes-&#8288;Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
   <div class="g defs">
     <div class="q3">
       <h3 data-i="enT">Moyo, nom. Du japonais moyō.</h3>
