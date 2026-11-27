@@ -99,9 +99,19 @@ __CSS__
 /* Contact */
 .contact{padding-bottom:var(--sec)}
 .ct-g{row-gap:72px;align-items:start}
-.ct-mail{display:inline-flex;align-items:center;min-height:44px;margin-top:clamp(2.25rem,3.6vw,3.75rem);font-size:var(--fs-lead);font-weight:600;overflow-wrap:anywhere;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .78em)/100% 1px no-repeat;transition:color .4s,background-size .7s var(--ease)}
-.ct-mail:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .78em)}
-.ct-l .lnk{font-size:var(--fs-small)}
+.ct-row{position:relative;display:flex;align-items:center;gap:6px;margin-top:clamp(2.25rem,3.6vw,3.75rem);font-size:var(--fs-lead)}
+.ct-mail{display:inline-flex;align-items:center;min-width:0;min-height:44px;font-weight:600;overflow-wrap:anywhere;background:linear-gradient(currentColor,currentColor) 0 calc(50% + .7em)/100% 1px no-repeat;transition:color .4s,background-size .7s var(--ease)}
+.ct-mail:hover{color:var(--klein);background-size:0 1px;background-position:100% calc(50% + .7em)}
+/* beside the address, to take a copy of it: two sheets; once taken, a tick and a word */
+.ct-copy{flex:none;display:grid;place-items:center;width:44px;height:44px;color:var(--ink);transition:color .4s}
+html:not(.js) .ct-copy{display:none}
+.ct-copy svg{width:1.2em;height:1.2em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ct-copy svg>*{transform-origin:12px 12px;transition:opacity .4s,scale .6s var(--ease)}
+.ct-copy svg>path,.ct-copy.done svg>g{opacity:0;scale:.5}.ct-copy.done svg>path{opacity:1;scale:1}
+.ct-copy:hover,.ct-copy.done{color:var(--klein)}
+.ct-copy:active svg{scale:.88}
+.ct-said{position:absolute;left:0;top:calc(100% + 4px);font-size:var(--fs-small);font-weight:600;color:var(--klein)}
+@media (max-width:420px){.ct-row{font-size:min(var(--fs-lead),4.5vw)}}
 .ct-form{display:grid;gap:clamp(2.25rem,3.4vw,3.5rem)}
 .f-done{padding-top:8px;outline:none}
 .f-done p{margin-top:clamp(26px,2.6vw,60px);max-width:30em;color:var(--mute);text-wrap:balance}
@@ -117,7 +127,7 @@ __CHROME_HEAD__
 <!-- First screen -->
 <section class="hero" id="top">
   <div class="g hero-top">
-    <p class="h1"><span data-i="heroWhat">Studio créatif indépendant</span><small data-i="heroWhere">Provence-Alpes-Côte d’Azur</small></p>
+    <p class="h1"><span data-i="heroWhat">Studio créatif indépendant</span><small data-i="heroWhere">Provence-Alpes-Côte d’Azur</small></p>
     <p class="q3"><a class="btn" href="#projets"><span data-i="heroCta">Voir les projets</span><i class="ar" aria-hidden="true"></i></a></p>
   </div>
   <h1 class="t-hero"><span data-i="h1a">Moyo dessine des images, des sites et des films à&nbsp;partir </span><span class="k" data-i="h1b">d’une seule&nbsp;idée</span><i class="dot">&#8288;<b></b></i></h1>
@@ -160,7 +170,7 @@ __CHROME_HEAD__
 <!-- Studio -->
 <section class="sec over" id="studio" aria-labelledby="stuT">
   <h2 class="t-xl" id="stuT"><span data-i="stuT">Studio</span><i class="dot">&#8288;<b></b></i></h2>
-  <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est un studio créatif basé en Provence-Alpes-Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
+  <p class="t-l say" data-ink="scroll" data-i="stuP">Moyo est un studio créatif basé en Provence-Alpes-Côte d’Azur. Nous imaginons des images, des sites, des films et des campagnes pour des lieux, des événements et des marques qui ont quelque chose de précis à montrer.</p>
   <div class="g defs">
     <div class="q3">
       <h3 data-i="enT">Moyo, nom. Du japonais moyō.</h3>
@@ -188,9 +198,7 @@ __CHROME_HEAD__
   <div class="g ct-g">
     <div class="ct-l c5">
       <p class="t-m" data-ink="scroll"><span data-i="ctQ">Un lieu, un événement, une marque&nbsp;?</span> <span class="mute" data-i="ctLead">Racontez-nous le projet. Nous répondons sous 48&nbsp;heures.</span></p>
-      <p><a class="ct-mail" id="mail" href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a></p>
-      <button class="lnk" id="copy" type="button" data-i="copy">Copier l’adresse</button>
-      <span class="sr" id="copyMsg" role="status"></span>
+      <p class="ct-row"><a class="ct-mail" id="mail" href="mailto:contact.moyostudio@gmail.com">contact.moyostudio@gmail.com</a><button class="ct-copy" id="copy" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><g><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V7A2.5 2.5 0 0 0 13 4.5H7A2.5 2.5 0 0 0 4.5 7v6A2.5 2.5 0 0 0 7 15.5h1.5"/></g><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="sr" data-i="copy">Copier l’adresse</span></button><span class="ct-said" id="copyMsg" role="status"></span></p>
     </div>
     <form class="ct-form h2" id="ctForm" action="/api/contact" method="post" novalidate>
       <div class="f-two">

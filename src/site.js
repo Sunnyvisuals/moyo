@@ -290,12 +290,16 @@ document.addEventListener('click', async e => {
 
 /* ---------- Contact ---------- */
 const copy = $('#copy');
-if (copy) copy.addEventListener('click', async () => {
-  const en = lang === 'en', label = copy.textContent;
-  const say2 = t => { copy.textContent = t; $('#copyMsg').textContent = t; setTimeout(() => { copy.textContent = lang === 'en' ? EN.copy : store.get(copy) || label; }, 2200); };
-  try { await navigator.clipboard.writeText('contact.moyostudio@gmail.com'); say2(en ? 'Address copied' : 'Adresse copiée'); }
-  catch (_) { say2(en ? 'Copy failed, select the address' : 'Copie impossible, sélectionnez l’adresse'); }
-});
+if (copy) {
+  let back = 0;
+  const said = (t, done) => { $('#copyMsg').textContent = t; copy.classList.toggle('done', done); clearTimeout(back); back = setTimeout(() => { $('#copyMsg').textContent = ''; copy.classList.remove('done'); }, 2600); };
+  copy.addEventListener('pointerenter', () => { copy.title = copy.textContent.trim(); }); // the name of the picture, in the language shown
+  copy.addEventListener('click', async () => {
+    const en = lang === 'en';
+    try { await navigator.clipboard.writeText('contact.moyostudio@gmail.com'); said(en ? 'Address copied' : 'Adresse copiée', true); }
+    catch (_) { said(en ? 'Copy failed, select the address' : 'Copie impossible, sélectionnez l’adresse', false); }
+  });
+}
 /* sent with fetch; without JavaScript the form posts normally and comes back with ?envoye=1 */
 const form = $('#ctForm');
 if (form) {

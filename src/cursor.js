@@ -92,7 +92,7 @@ html.has-cur :is(${TEXT}){cursor:text!important}
     const ch = t.closest('.chips label,.scale label'); if (ch) return { m: 'word', el: ch, at: place(ch) };
     if (t.closest('.path') || innerWidth > 820 && t.closest('.aw ol a')) return { m: 'none' }; // the dot of the way is enough (on the site, and in the admin)
     const bt = t.closest('.btn'), sd = t.closest('.send'), pt = bt ? bt.querySelector('i.ar') : sd && sd.querySelector('.f-dots i'); if (bt || sd) return { m: (bt || sd).disabled ? 'free' : 'word', el: bt || sd, at: pt && middle(pt) }; // it joins the final point
-    if (t.closest('.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx,.rt-b button')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
+    if (t.closest('.sub-btn,#menuBtn,.menu-close,.grip,.tg,.gal .x,.pwd .tx,.rt-b button,.ct-copy')) return { m: t.closest('a,button,label') ? 'ring' : 'free' };
     const cta = t.closest('.foot-cta'); if (cta) { const q = cta.querySelector('.qd'); return { m: 'word', el: cta, at: q ? middle(q) : null }; }
     const row = t.closest('.row'), nm = t.closest('.nm-link'), a = t.closest('a,button,[role=button]');
     const el = row ? row.querySelector('.r-title') : nm ? nm.querySelector('.nm') : a && !a.disabled && (a.tagName !== 'A' || a.hasAttribute('href')) && !a.closest('.menu-list.arc') ? a : null;
