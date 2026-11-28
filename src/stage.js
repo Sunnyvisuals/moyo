@@ -20,7 +20,7 @@
   document.head.appendChild(st);
 
   /* the final point of each section title falls when the title is there */
-  const dots = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('in', e.isIntersecting)), { rootMargin: '-4% 0px -16% 0px' });
+  const dots = new IntersectionObserver(es => es.forEach(e => { if (!e.target.hasAttribute('data-trip')) e.target.classList.toggle('in', e.isIntersecting); }), { rootMargin: '-4% 0px -16% 0px' }); // a point that travels (trip.js) is left alone
   (window.moyoReady || Promise.resolve()).then(() => document.querySelectorAll('.sec .dot').forEach(d => dots.observe(d)));
 
   const els = [...document.querySelectorAll(TARGETS)].filter(e => !e.closest('dialog,#menu,.bar,[hidden]') && !(e.parentElement && e.parentElement.closest('.stg')) && !e.matches('script,.sr,.hp') && !(innerWidth > 820 && e.matches('.cases .cap>*'))); // the accordion shows its own captions
