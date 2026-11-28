@@ -66,6 +66,7 @@ html.kbd .bar:focus-within{translate:0 0}
 .menu-foot a,.menu-foot button{display:inline-flex;align-items:center;min-height:44px}
 .menu-foot .flang button{color:var(--paper-soft);background:none}
 .menu-foot .flang button[aria-pressed="true"]{color:var(--bg);text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.menu-foot .flang button:hover{color:var(--bg)}
 .menu-list a{position:relative;display:block;padding:10px 0;color:var(--bg)}
 .menu-list .mn{font-size:clamp(2.25rem,11vw,4.5rem);font-weight:700;letter-spacing:-.045em;line-height:1.08}
 .menu-list .roll{position:relative;display:inline-block;overflow:hidden;vertical-align:top;padding:0 .06em .2em 0;margin-bottom:-.2em}
