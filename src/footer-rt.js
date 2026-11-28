@@ -32,6 +32,9 @@ addEventListener('resize',()=>{ if(!footRaf) footRaf=requestAnimationFrame(footF
 footFrame();
 /* newsletter sign-up */
 const subForm=$('#subForm');
+if(subForm){ const q=new URLSearchParams(location.search), m=$('#subMsg'), en=document.documentElement.lang==='en'; // came back from the form posted without JavaScript
+  if(q.has('inscrit')) m.textContent=en?'Thank you, see you soon.':'Merci, à très vite.';
+  else if(q.get('inscription')==='erreur'){ m.textContent=en?'Sign-up failed. Check the address and try again.':'L’inscription a échoué. Vérifiez l’adresse et réessayez.'; m.classList.add('err'); } }
 if(subForm) subForm.addEventListener('submit',async e=>{
   e.preventDefault();
   const en=lang==='en', mail=$('#subMail'), btn=subForm.querySelector('.sub-btn'), msg=$('#subMsg');

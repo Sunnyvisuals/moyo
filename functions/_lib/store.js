@@ -74,6 +74,7 @@ export function imagesOf(data) {
 /* ---------- Validation: keep only known fields, with limits ---------- */
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const SLUG = /^[a-z0-9][a-z0-9-]{0,59}$/;
+const FRAMES = ['top', 'bottom', 'left', 'right']; // framing of a cover or a portrait (shared/render.js POS); the centre is the default
 function text(v) {
   const t = v || {};
   return {
@@ -117,6 +118,7 @@ export function validate(input) {
       category,
       featured: !!p.featured,
       cover,
+      ...(FRAMES.includes(p.pos) ? { pos: p.pos } : {}),
       images,
       blocks: bkClean(p.blocks, v => typeof v === 'string' && PICTURE.test(v), v => typeof v === 'string' && /\.(mp4|webm)$/.test(v) && MEDIA.test(v)),
       fr,
@@ -133,10 +135,11 @@ export function validate(input) {
     if (team.some(x => x.id === id)) { errors.push(`Équipe : identifiant en double ${id}.`); continue; }
     const links = (Array.isArray(m.links) ? m.links : []).slice(0, 6)
       .map(l => ({ label: str(l?.label, 40), url: str(l?.url, 300) }))
-      .filter(l => l.label && /^(https?:\/\/|mailto:)/i.test(l.url));
+      .filter(l => l.label && /^(https?:\/\/[^\s"'<>]+|mailto:[^\s"'<>]+)$/i.test(l.url));
     team.push({
       id, name, first, last,
       photo: typeof m.photo === 'string' && PICTURE.test(m.photo) ? m.photo : null,
+      ...(FRAMES.includes(m.pos) ? { pos: m.pos } : {}),
       fr: { role: str(m.fr?.role, 120), bio: str(m.fr?.bio, 4000), phrase: str(m.fr?.phrase, 80) },
       en: { role: str(m.en?.role, 120), bio: str(m.en?.bio, 4000), phrase: str(m.en?.phrase, 80) },
       links

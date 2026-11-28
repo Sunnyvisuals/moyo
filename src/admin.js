@@ -217,7 +217,7 @@ addEventListener('scroll', () => $('#ab').classList.toggle('on', scrollY > 8), {
    Preview: the real site, with what is not published yet (functions/_lib/preview.js), and what changes
    ===================================================================================================== */
 const copy = x => JSON.parse(JSON.stringify(x)), eq = (x, y) => JSON.stringify(x ?? null) === JSON.stringify(y ?? null);
-const FIELD = { title: 'titre', desc: 'description', type: 'type de projet', role: 'rôle', place: 'lieu', text: 'texte', bio: 'biographie' };
+const FIELD = { title: 'titre', desc: 'description', type: 'type de projet', role: 'rôle', place: 'lieu', text: 'texte', bio: 'biographie', phrase: 'sous-titre' };
 /* what differs from the published version, in words, and how to put it back */
 function changes() {
   const a = JSON.parse(saved), out = [], T = (x, l, k) => (x[l] || {})[k] || '';
@@ -229,9 +229,9 @@ function changes() {
     const oa = was.filter(x => B.has(x.id)).map(x => x.id), ob = now.filter(x => A.has(x.id)).map(x => x.id); if (!eq(oa, ob)) out.push({ t: order, d: 'ordre', href: at, back: () => { const n = new Map(was.map((x, k) => [x.id, k])); L().sort((x, y) => (n.get(x.id) ?? 1e9) - (n.get(y.id) ?? 1e9)); } });
   };
   list('projects', a.projects, data.projects.filter(p => !blank(p) || T(p, 'fr', 'title').trim()), { name: p => T(p, 'fr', 'title') || 'Projet sans titre', add: 'nouveau projet', del: 'retiré du site', order: 'Projets', at: '/projets', href: p => T(p, 'fr', 'title').trim() ? '/projets/' + p.id : '/projets',
-    diff: (x, y) => [...words(x, y, 'rôle du studio'), x.category !== y.category && 'catégorie', (x.year || '') !== (y.year || '') && 'année', x.cover !== y.cover && 'image principale', !eq(x.images || [], y.images || []) && 'galerie', !eq(x.blocks || [], y.blocks || []) && 'mise en page', !!x.featured !== !!y.featured && (y.featured ? 'mis sur l’accueil' : 'retiré de l’accueil')].filter(Boolean) });
+    diff: (x, y) => [...words(x, y, 'rôle du studio'), x.category !== y.category && 'catégorie', (x.year || '') !== (y.year || '') && 'année', x.cover !== y.cover && 'image principale', (x.pos || '') !== (y.pos || '') && 'cadrage', !eq(x.images || [], y.images || []) && 'galerie', !eq(x.blocks || [], y.blocks || []) && 'mise en page', !!x.featured !== !!y.featured && (y.featured ? 'mis sur l’accueil' : 'retiré de l’accueil')].filter(Boolean) });
   (data.method || []).forEach((y, k) => { const x = (a.method || [])[k]; if (!x) return; const d = [...words(x, y), x.media !== y.media && (isVideo(y.media) ? 'vidéo' : 'image'), (x.fit || 'center') !== (y.fit || 'center') && 'cadrage', (x.align || 'left') !== (y.align || 'left') && 'alignement'].filter(Boolean); if (d.length) out.push({ t: `Méthode, étape ${k + 1}`, d: d.join(', '), href: '/#methode', step: k, back: () => { data.method[k] = copy(x); } }); });
-  list('team', a.team || [], data.team || [], { name: m => m.name || 'Profil sans nom', add: 'nouveau profil', del: 'retiré de l’équipe', order: 'Équipe', at: '/#equipe', href: m => '/equipe/' + m.id, diff: (x, y) => [...words(x, y, 'titre'), (x.name || '') !== (y.name || '') && 'nom', x.photo !== y.photo && 'portrait'].filter(Boolean) });
+  list('team', a.team || [], data.team || [], { name: m => m.name || 'Profil sans nom', add: 'nouveau profil', del: 'retiré de l’équipe', order: 'Équipe', at: '/#equipe', href: m => '/equipe/' + m.id, diff: (x, y) => [...words(x, y, 'titre'), (x.name || '') !== (y.name || '') && 'nom', x.photo !== y.photo && 'portrait', (x.pos || '') !== (y.pos || '') && 'cadrage', !eq(x.links || [], y.links || []) && 'liens'].filter(Boolean) });
   list('categories', a.categories, data.categories, { name: c => c.fr || 'Catégorie sans nom', add: 'nouvelle catégorie', del: 'catégorie supprimée', order: 'Catégories', at: '/projets', href: () => '/projets', diff: (x, y) => [x.fr !== y.fr && 'nom', x.en !== y.en && 'anglais'].filter(Boolean) });
   return out;
 }
@@ -386,6 +386,7 @@ function render(keep) {
   V.innerHTML = (offered ? `<div class="df"><p>Un brouillon du ${esc(when(offered.at))} n’a pas été publié.</p><button type="button" class="tx" data-act="draftYes">Le reprendre</button><button type="button" class="tx red" data-act="draftNo">L’oublier</button></div>` : '') + VIEWS[route[0]]();
   if (route[0] === 'projets' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.projects, a, b)); if (route[0] === 'equipe' && !route[1]) sortable($('.rw', V), (a, b) => moved(data.team, a, b));
   if (route[0] === 'categories') sortable($('.ct', V), (a, b) => moved(data.categories, a, b));
+  { const o = route[1] && (route[0] === 'projets' ? data.projects : route[0] === 'equipe' ? data.team : []).find(x => x.id === route[1]); if (o?.pos) framed(V, o.pos); }
   grow(V); $$('.rt[contenteditable]', V).forEach(richShow); touched(); tell(); { const p = bkProject(); if (p) bkSum(p); } if (keep) scrollTo(0, y); else bringIn();
   arrive();
 }
@@ -669,7 +670,7 @@ function projectView(p) {
   const live = JSON.parse(saved).projects.some(x => x.id === p.id);
   return `<div class="vb">${crumbs('projets', 'Projets', f.title || 'Nouveau projet')}${langs()}</div><div data-o="project:${esc(p.id)}"><h1 class="sr" tabindex="-1">${esc(f.title || 'Nouveau projet')}</h1>
   <textarea class="vt" rows="1" data-k="${L}.title" maxlength="200" aria-label="Titre du projet" placeholder="${esc(L === 'en' ? f.title || 'Title' : 'Titre du projet')}">${esc(t.title)}</textarea>
-  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${tec(p.cover, 'cover', 'full')}<p class="hint">${p.cover ? 'Déposez un fichier dessus pour la remplacer.' : 'Choisie, déposée ou collée. Sans image, le point est affiché.'}</p></div>
+  <div class="m9"><div class="ed-p">${zone('cover', p.cover, 'Image principale')}<div class="pa">${p.cover ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmCover">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter une image</button>'}</div>${frameChips(p, p.cover)}${tec(p.cover, 'cover', 'full')}<p class="hint">${p.cover ? 'Déposez un fichier dessus pour la remplacer.' : 'Choisie, déposée ou collée. Sans image, le point est affiché.'}</p></div>
   <div class="ed-f ef">
     ${richField('Description' + en, L + '.desc', t.desc, { ph: richWords(ph('desc')), max: 6000 })}
     <fieldset class="chips w2"><legend class="fl">Catégorie</legend>${data.categories.map(c => `<label><input type="radio" name="cat" data-k="category" value="${esc(c.id)}"${c.id === p.category ? ' checked' : ''}><span><b>${esc(c.fr)}</b></span></label>`).join('')}</fieldset>
@@ -682,6 +683,10 @@ function projectView(p) {
 }
 
 /* ---------- method ---------- */
+/* framing of a cover or a portrait: which part stays when the site cuts the picture (shared/render.js POS) */
+const FRAMES = [['', 'Centre'], ['top', 'Haut'], ['bottom', 'Bas'], ['left', 'Gauche'], ['right', 'Droite']], FRAME_POS = { top: '50% 12%', bottom: '50% 88%', left: '15% 50%', right: '85% 50%' };
+const frameChips = (o, pic) => pic ? `<fieldset class="chips frame"><legend class="fl">Cadrage <span class="opt">(la partie gardée quand l’image est recadrée)</span></legend>${FRAMES.map(([v, n]) => `<label><input type="radio" name="pos" data-k="pos" value="${v}"${(o.pos || '') === v ? ' checked' : ''}><span><b>${n}</b></span></label>`).join('')}</fieldset>` : '';
+const framed = (root, pos) => root?.querySelectorAll('.ed-p .dz img').forEach(i => { i.style.objectPosition = FRAME_POS[pos] || ''; });
 const FITS = [['center', 'Au centre'], ['top', 'En haut'], ['bottom', 'En bas'], ['contain', 'En entier']], SIDES = [['left', 'À gauche'], ['center', 'Au centre'], ['right', 'À droite']];
 function methodView() {
   const L = lang;
@@ -698,8 +703,9 @@ function teamView() {
 function personView(m) {
   const L = lang, t = m[L] || (m[L] = {}), f = m.fr || (m.fr = {}), ph = k => L === 'en' ? f[k] || '' : '', live = JSON.parse(saved).team?.some(x => x.id === m.id);
   return `<div class="vb">${crumbs('equipe', 'Équipe', m.name || 'Nouveau profil')}${langs()}</div><div data-o="team:${esc(m.id)}"><div class="vh"><h1 class="t-xl" tabindex="-1"><span id="who">${esc(m.name || 'Nouveau profil')}</span>${dot}</h1></div>
-  <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait')}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div>${tec(m.photo, 'photo', 'full')}</div>
-  <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${richField('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { ph: richWords(ph('bio')), max: 4000 })}</div></div>
+  <div class="m9"><div class="ed-p">${zone('photo', m.photo, 'Portrait')}<div class="pa">${m.photo ? '<button type="button" class="tx" data-act="pick">Remplacer</button><button type="button" class="tx red" data-act="rmPhoto">Retirer</button>' : '<button type="button" class="tx" data-act="pick">Ajouter un portrait</button>'}</div>${frameChips(m, m.photo)}${tec(m.photo, 'photo', 'full')}<p class="hint">Un portrait vertical (3:4 ou 4:5) convient le mieux.</p></div>
+  <div class="ed-f ef">${field('Prénom', 'first', m.first ?? (m.name || '').split(' ')[0], { max: 60 })}${field('Nom', 'last', m.last ?? (m.name || '').split(' ').slice(1).join(' '), { max: 60 })}${field('Titre', L + '.role', t.role, { ph: ph('role') || 'Cofondatrice', w2: 1, max: 120 })}${field('Sous-titre <span class="opt">(une phrase courte sous le titre, facultatif)</span>', L + '.phrase', t.phrase, { ph: ph('phrase') || 'imaginer ensemble', w2: 1, max: 80 })}${richField('Biographie' + (L === 'en' ? ' <span class="opt">(vide : le français est repris)</span>' : ''), L + '.bio', t.bio, { ph: richWords(ph('bio')), max: 4000 })}</div></div>
+  <section class="sct"><h2>Liens</h2><p class="vn">Portfolio, LinkedIn, Instagram… affichés sous la biographie (six au plus). L’adresse commence par https:// ou mailto:.</p><div class="lk">${(m.links ||= []).map((l, i) => `<div class="ef lk-r">${field('Nom du lien', `links.${i}.label`, l.label, { ph: 'LinkedIn', max: 40 })}${field('Adresse', `links.${i}.url`, l.url, { ph: 'https://', max: 300 })}<button type="button" class="tx red" data-act="rmLink" data-i="${i}" aria-label="Retirer le lien ${esc(l.label || i + 1)}">Retirer</button></div>`).join('')}</div>${m.links.length < 6 ? '<div class="pa"><button type="button" class="tx" data-act="addLink">Ajouter un lien</button></div>' : ''}</section>
   <section class="sct"><h2>Adresse</h2><div class="ef">${field('moyo-d0n.pages.dev/equipe/', 'id', m.id, { max: 60 })}</div><div class="pa" style="margin-top:22px;justify-content:space-between">${live ? `<a class="tx" href="/equipe/${esc(m.id)}" target="_blank" rel="noopener">Voir la page en ligne ↗</a>` : '<span></span>'}<button type="button" class="tx red" data-act="rmPerson">Retirer de l’équipe</button></div></section></div>`;
 }
 
@@ -812,6 +818,8 @@ V.addEventListener('input', e => {
   if (k === 'first' || k === 'last') { o.first ??= ''; o.last ??= ''; o.name = `${o.first} ${o.last}`.trim(); $('#who').textContent = o.name || 'Nouveau profil'; $('.crumbs [aria-current] span').textContent = o.name || 'Nouveau profil'; }
   if (k === 'fr.title' && e.target.matches('.vt')) $('.crumbs [aria-current] span').textContent = v || 'Nouveau projet';
   if (k === 'fit' || k === 'align') e.target.closest('section').querySelector('.mt').dataset[k === 'fit' ? 'fit' : 'al'] = v;
+  if (k === 'pos') { if (!v) Reflect.deleteProperty(o, 'pos'); framed(V, v); }
+  if (/^links\.\d+\.url$/.test(k)) { const ok = !v.trim() || /^(https?:\/\/\S+|mailto:\S+)$/i.test(v.trim()); ok ? e.target.removeAttribute('aria-invalid') : e.target.setAttribute('aria-invalid', 'true'); e.target.title = ok ? '' : 'L’adresse doit commencer par https:// ou mailto:'; }
   touched();
 });
 V.addEventListener('change', e => {
@@ -840,6 +848,8 @@ V.addEventListener('click', async e => {
   else if (act === 'newProject') { const id = freeId('nouveau-projet', data.projects); data.projects.unshift({ id, year: String(new Date().getFullYear()), category: data.categories[0]?.id || '', featured: false, cover: null, images: [], blocks: [], fr: { title: '', type: '', role: '', place: '', desc: '' }, en: { title: '', type: '', role: '', place: '', desc: '' } }); lang = 'fr'; location.hash = 'projets/' + id; }
   else if (act === 'newPerson') { const id = freeId('profil', data.team); data.team.push({ id, name: '', first: '', last: '', photo: null, fr: { role: '', bio: '', phrase: '' }, en: { role: '', bio: '', phrase: '' }, links: [] }); lang = 'fr'; location.hash = 'equipe/' + id; }
   else if (act === 'rmCover' || act === 'rmPhoto') { const was = JSON.stringify(data), k = act === 'rmCover' ? 'cover' : 'photo', x = o[k]; o[k] = null; changed(k === 'cover' ? 'Image principale retirée.' : 'Portrait retiré.', was, [x]); }
+  else if (act === 'addLink') { (o.links ||= []).push({ label: '', url: '' }); render(true); touched(); $$('.lk-r input').at(-2)?.focus(); }
+  else if (act === 'rmLink') { o.links.splice(+b.dataset.i, 1); render(true); touched(); }
   else if (act === 'rmMedia') { const was = JSON.stringify(data), x = [o.media, o.poster]; o.media = o.poster = null; changed('Étape sans image.', was, x); }
   else if (act === 'rmProject') { if (await ask(`Supprimer « ${o.fr.title || 'Sans titre'} » ?`, 'Le projet quittera le site à la prochaine publication.', 'Supprimer')) { data.projects.splice(data.projects.indexOf(o), 1); [o.cover, ...(o.images || [])].forEach(drop); location.hash = 'projets'; } }
   else if (act === 'rmPerson') { if (await ask(`Retirer ${o.name || 'ce profil'} de l’équipe ?`, 'Sa page quittera le site à la prochaine publication.', 'Retirer')) { data.team.splice(data.team.indexOf(o), 1); drop(o.photo); location.hash = 'equipe'; } }

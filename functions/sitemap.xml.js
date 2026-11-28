@@ -10,9 +10,9 @@ const x = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', 
 
 export async function onRequestGet({ env }) {
   const d = await getData(env), real = (d.projects || []).filter(p => !sample(p, seed));
-  const pages = [['/'], ['/projets'], ['/confidentialite'], ...((await legalOf(env)).online ? [['/mentions-legales']] : []), ...real.map(p => ['/projets/' + encodeURIComponent(p.id), p]), ...(d.team || []).filter(m => !waiting(m)).map(m => ['/equipe/' + encodeURIComponent(m.id)])];
+  const pages = [['/'], ['/projets'], ['/confidentialite'], ...((await legalOf(env)).online ? [['/mentions-legales']] : []), ...real.map(p => ['/projets/' + encodeURIComponent(p.id), p]), ...(d.team || []).filter(m => !waiting(m)).map(m => ['/equipe/' + encodeURIComponent(m.id), { cover: m.photo }])];
   const alt = path => ['fr', 'en'].map(l => `<xhtml:link rel="alternate" hreflang="${l}" href="${x(full(path, l))}"/>`).join('') + `<xhtml:link rel="alternate" hreflang="x-default" href="${x(full(path, 'fr'))}"/>`;
-  const pics = p => !p ? '' : [p.cover, ...(p.images || [])].filter(Boolean).slice(0, 20).map(i => `<image:image><image:loc>${x(new URL(imgURL(i), SITE).href)}</image:loc></image:image>`).join('');
+  const pics = p => !p ? '' : [...new Set([p.cover, ...(p.images || []), ...(p.blocks || []).flatMap(b => [b.src, b.poster])])].filter(i => i && !/\.(mp4|webm)$/i.test(i)).slice(0, 20).map(i => `<image:image><image:loc>${x(new URL(imgURL(i), SITE).href)}</image:loc></image:image>`).join('');
   const urls = pages.flatMap(([path, p]) => ['fr', 'en'].map(l => `<url><loc>${x(full(path, l))}</loc>${alt(path)}${pics(p)}</url>`));
   return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${urls.join('\n')}\n</urlset>\n`, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
 }

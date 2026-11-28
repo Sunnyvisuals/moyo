@@ -40,7 +40,9 @@ const full = (path, lang) => SITE + local(path, lang);
 
 /* ---------- structured data: one graph, the same identifiers on every page ---------- */
 const ORG = SITE + '/#studio', WEB = SITE + '/#site';
-const person = (m, lang) => ({ '@type': 'Person', '@id': `${SITE}/equipe/${m.id}#personne`, name: m.name, jobTitle: (m[lang] && m[lang].role) || (m.fr && m.fr.role) || undefined, url: full('/equipe/' + m.id, lang), worksFor: { '@id': ORG } });
+const person = (m, lang) => { const same = (m.links || []).map(l => l && l.url).filter(u => /^https?:\/\//i.test(u || ''));
+  return { '@type': 'Person', '@id': `${SITE}/equipe/${m.id}#personne`, name: m.name, givenName: m.first || undefined, familyName: m.last || undefined, jobTitle: (m[lang] && m[lang].role) || (m.fr && m.fr.role) || undefined,
+    description: (m[lang] && m[lang].phrase) || (m.fr && m.fr.phrase) || undefined, url: full('/equipe/' + m.id, lang), ...(same.length ? { sameAs: same } : {}), worksFor: { '@id': ORG } }; };
 const studio = (team, lang) => ({
   '@type': ['Organization', 'ProfessionalService'], '@id': ORG, name: 'Moyo Studio', alternateName: ['moyo', 'Moyo'], url: SITE + '/', email: MAIL,
   description: HOME[lang].desc, slogan: lang === 'en' ? 'Images, websites and films from a single idea' : 'Des images, des sites et des films à partir d’une seule idée',

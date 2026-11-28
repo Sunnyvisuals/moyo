@@ -41,7 +41,7 @@ Site : https://moyo-d0n.pages.dev
 | `/` | La page d'accueil. La section Projets montre les projets marqués « accueil » (★) |
 | `/projets` | Tous les projets, filtrés par catégorie (`/projets?cat=identite`) |
 | `/projets/<id>` | Un projet. Depuis l'accueil ou la liste, il s'ouvre en fiche par-dessus la page ; partagé, rechargé ou ouvert dans un onglet, c'est cette page |
-| `/equipe/<id>` | Un profil |
+| `/equipe/<id>` | Un profil : portrait, titre, sous-titre, biographie et liens (portfolio, LinkedIn…), tous modifiables dans l’admin, onglet « Équipe » |
 | `/en`, `/en/projets`… | Les mêmes pages en anglais, rendues par le serveur (`functions/en`) |
 | `/sitemap.xml`, `/llms.txt`, `/robots.txt` | Pour les moteurs de recherche et les moteurs de réponse (IA) |
 | `/admin` | Mode admin, protégé par mot de passe : ajouter, modifier, ordonner, supprimer des projets, gérer les catégories, envoyer la photo de couverture et la galerie ; la méthode (image, vidéo ou GIF, titre et texte de chaque étape) ; l'équipe ; les messages |
@@ -102,6 +102,7 @@ Tout est dans `shared/seo.js`, en deux langues ; `build.mjs` vérifie que les se
 - **Déposer** : un fichier se dépose directement sur une image (elle est remplacée), sur les bords d’une image de la galerie (il s’ajoute avant ou après), sur une ligne de la liste des projets ou de l’équipe, sur une étape de la méthode. À côté des images, il va dans la galerie. Coller (Ctrl V) vise l’image sous la souris.
 - **Déplacer** : une image de la galerie se prend directement ; posée sur l’image principale, elle l’échange. Deux étapes de la méthode s’échangent de la même façon. Au clavier et au doigt : la poignée à six points, « Principale », « Retirer ».
 - **Annuler** : pendant huit secondes, dans le message du bas, ou Ctrl Z.
+- **Cadrage** : sous l’image principale d’un projet et sous un portrait, cinq choix (centre, haut, bas, gauche, droite) disent quelle partie reste visible quand le site recadre l’image (cartes, fiche, profil). Gardé en `pos`, appliqué par `posAttr` (`shared/render.js`).
 - **Fiche technique** : dimensions, proportions, poids, format, durée d’une vidéo, temps de chargement en 4G, poids du fichier d’origine, et un avis (point plein : bon ; anneau : suffisant ou lourd ; rouge : à changer). Les seuils sont dans `NEED` (`src/admin.js`).
 - **Envoi** : les images sont réduites dans le navigateur (2800 px, 3840 px pour la méthode), en WebP, sans les données de l’appareil photo (lieu, date).
 

@@ -296,7 +296,7 @@ const footerInner = ({ home = false, team } = {}) => {
       <h2 class="fh" data-i="fBy">Réalisé par</h2>
       <ul class="fnames fby">${creditLinks(team)}</ul>
     </div>
-    <form class="fcol q4 foot-sub" id="subForm" novalidate>
+    <form class="fcol q4 foot-sub" id="subForm" action="/api/subscribe" method="post" novalidate>
       <h2 class="fh" data-i="subH">Inscrivez-vous pour un peu de joie.</h2>
       <div class="sub-row"><label class="sr" for="subMail" data-i="subH">Inscrivez-vous pour un peu de joie.</label><input id="subMail" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="send" required placeholder="vous@exemple.com" data-ph="subPh"><input type="text" name="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" class="sub-btn" aria-label="S’inscrire" data-ia="subBtn"><i aria-hidden="true"></i></button></div>
       <p class="sub-msg" id="subMsg" role="status" aria-live="polite"></p>

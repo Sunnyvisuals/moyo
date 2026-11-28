@@ -20,8 +20,12 @@ function txt(p, lang) {
   return lang === 'fr' ? Object.fromEntries(Object.entries(t).map(([k, v]) => [k, typeof v === 'string' ? v.replace(/ ([:;?!])/g, '\u00a0$1') : v])) : t;
 }
 
+/* framing of a picture, chosen in the admin: which part stays when the plate cuts it */
+const POS = { top: '50% 12%', bottom: '50% 88%', left: '15% 50%', right: '85% 50%' };
+const posAttr = pos => POS[pos] ? ` style="object-position:${POS[pos]}"` : '';
+
 function plateInner(p, alt) {
-  return p.cover ? `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}" loading="lazy" decoding="async">` : ''; // no cover: the plate draws the dot
+  return p.cover ? `<img src="${imgURL(p.cover)}" alt="${escHTML(alt || '')}" loading="lazy" decoding="async"${posAttr(p.pos)}>` : ''; // no cover: the plate draws the dot
 }
 
 const metaText = (p, t) => [t.place, p.year].filter(Boolean).join(', ');
@@ -68,4 +72,4 @@ function dataJSON(data) {
   return JSON.stringify(data, (k, v) => k === 'blocks' ? undefined : v).replace(/</g, '\\u003c');
 }
 
-export { escHTML, imgURL, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON, enBlock };
+export { escHTML, imgURL, POS, posAttr, catLabel, txt, plateInner, metaText, rowHTML, featuredOf, rowsHTML, stepsHTML, tabsHTML, isVideo, dataJSON, enBlock };
