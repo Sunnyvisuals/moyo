@@ -143,9 +143,9 @@ async function drop(blue) {
 }
 
 /* The drop, drawn the way animators draw one. It gathers under the top of the screen and swells, slowly; its neck thins and snaps (fast, as water
-   does), the rest springs back up and the tail goes into the drop, which wobbles once free: all of it on twos, each drawing held for two frames of
-   film. Then it rounds up and is drawn out by its speed; one smear just before the line. On the line it flattens hard and holds, on twos again,
-   jumps back up drawn out the other way, and settles round, losing its shine: it is the point. Shapes in a "goo" filter (blur, then a hard edge on the alpha) merge like water when they touch and part with a neck. */
+   does), the rest springs back up and the tail goes into the drop, which wobbles once free, rounds up and is drawn out by its speed; its last
+   drawing before the line is a smear, a streak from where it was. On the line it flattens hard and holds, jumps back up drawn out the other way, and
+   settles round, losing its shine: it is the point. From the first drawing to the last, each is held for two frames of film, like an anime. Shapes in a "goo" filter (blur, then a hard edge on the alpha) merge like water when they touch and part with a neck. */
 function goutte(layer, P, r0, KL, BG) {
   const NS = 'http://www.w3.org/2000/svg', rb = r0 * 1.12, gy = P[1] + r0, x0 = P[0], X = x0 - rb * 7, Wc = rb * 14, Hc = gy + rb * 7;
   const sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', `${X.toFixed(2)} 0 ${Wc.toFixed(2)} ${Hc.toFixed(2)}`); layer.appendChild(sv); // a column around the drop, on its own layer: the wave under it is not painted again
@@ -158,7 +158,7 @@ function goutte(layer, P, r0, KL, BG) {
   const el = (e, cy, rx, ry) => { e.setAttribute('cy', cy.toFixed(2)); e.setAttribute('rx', Math.max(0, rx).toFixed(2)); e.setAttribute('ry', Math.max(0, ry).toFixed(2)); };
   const shine = (cy, r, sx, sy, a) => { S.setAttribute('opacity', Math.max(0, a).toFixed(3)); S.setAttribute('rx', (r * .25 * Math.min(sx, 1.3)).toFixed(2)); S.setAttribute('ry', (r * .14 * Math.min(sy, 1.3)).toFixed(2)); S.setAttribute('transform', `translate(${(x0 - r * .36 * sx).toFixed(2)} ${(cy - r * .38 * sy).toFixed(2)}) rotate(-38)`); };
   const cl = x => Math.min(1, Math.max(0, x)), io = x => .5 - .5 * Math.cos(Math.PI * cl(x)), out = x => 1 - Math.pow(1 - cl(x), 3);
-  const T1 = 850, T2 = 1130, T = 1830; // gathered, let go, on the line
+  const D2 = 83, T1 = 850, T2 = 1130, T = 22 * D2; // a drawing held for two frames of film; gathered, let go, on the line (after a whole number of drawings)
   let yR = 0, done = false;
   const gloss = (sy, a) => a * cl((sy - .62) / .2) * cl((1.6 - sy) / .25); // no shine when it is flat or a streak
   const zone = (y0, y1) => { f.setAttribute('y', y0.toFixed(1)); f.setAttribute('height', Math.max(1, y1 - y0).toFixed(1)); }; // the filter only works where the drop is
@@ -166,7 +166,7 @@ function goutte(layer, P, r0, KL, BG) {
     T,
     still() { el(M, 0, 0, 0); el(N, 0, 0, 0); el(B, P[1], r0, r0); zone(gy - rb * 6, gy + rb * 3); },
     fall(t) {
-      if (t < T2 + 240) t = Math.floor(t / 83) * 83; // on twos, like the landing, until it is free of the top
+      t = Math.min(T - D2, Math.floor(t / D2) * D2); // on twos from start to end, like an anime; the last drawing holds until the line
       if (t < T2) { // hanging: a thin film spreads under the top, the drop swells under it, swaying a little; then it sinks, its neck draws out and thins, (t - tc)^2/3, and snaps
         const p = cl(t / T1), q = cl((t - T1) / (T2 - T1)), r = rb * (.3 + .7 * io(p)), y = rb * (.45 + .95 * Math.pow(p, 1.4)) + rb * Math.pow(q, 1.6);
         const w = 1 + .05 * Math.sin(p * 13.8) * p, sy = (1 + .16 * q) / w, sx = 1 / sy, top = rb * .2, bot = y - r * sy * .3;
@@ -174,19 +174,23 @@ function goutte(layer, P, r0, KL, BG) {
         shine(y, r, sx, sy, gloss(sy, .85 * io((p - .35) / .4))); zone(-rb * 3, y + rb * 4); yR = y; return;
       }
       // free: the rest springs back into the top, the tail goes into the drop, it wobbles and rounds up, then its speed draws it out
-      const ms = t - T2, s = cl(ms / (T - T2)), yI = gy - rb, back = cl(1 - ms / 240), tail = 1 - out(ms / 200);
-      const osc = .13 * Math.exp(-ms / 200) * Math.cos(2 * Math.PI * ms / 190), k = .4 * s * s * s, smear = s > .955;
-      let sy = smear ? 2.1 : (1 + k) / (1 + osc), sx = 1 / sy, y = yR + (yI - yR) * (.18 * s + .82 * s * s);
-      if (smear) y -= rb * (sy - 1) * .55; // the one drawing where it is a streak
+      const at = tt => { const s = cl((tt - T2) / (T - T2)); return yR + (gy - rb - yR) * (.18 * s + .82 * s * s); };
+      const ms = t - T2, s = cl(ms / (T - T2)), back = cl(1 - ms / 240), tail = 1 - out(ms / 200);
+      const osc = .13 * Math.exp(-ms / 200) * Math.cos(2 * Math.PI * ms / 190), k = .4 * s * s * s;
+      let sy = (1 + k) / (1 + osc), sx = 1 / sy, y = at(t);
+      if (t >= T - D2) { // the last drawing is a smear: a comet, its head just above the line, its tail up to where the drop was
+        const top = y - rb, head = gy - rb * 1.25; el(M, 0, 0, 0); el(N, (top + head) / 2, rb * .38, (head - top) / 2); el(B, head, rb * .8, rb * 1.25);
+        shine(head, rb, .8, 1.25, 0); zone(top - rb * 3, gy + rb * 3); return;
+      }
       el(M, 0, rb * 1.3 * back, rb * .57 * back * back); el(N, y - rb * sy * .85 - rb * .45 * tail, rb * .26 * tail, rb * (.45 * tail + .1) * (tail > 0)); el(B, y, rb * sx, rb * sy);
       shine(y, rb, sx, sy, gloss(sy, .85)); zone(back > 0 ? -rb * 3 : y - rb * (sy + 3), y + rb * 4);
     },
     land(tp, A, hold, sh) { // tp: since it touched the line
       if (tp >= 900) { if (!done) { done = true; g.setAttribute('visibility', 'hidden'); S.setAttribute('visibility', 'hidden'); O.setAttribute('visibility', 'visible'); } return; }
-      const tau = Math.max(0, tp - hold), q = tau < 332 ? Math.floor(tau / 83) * 83 : tau; // the first drawings on twos
-      const k = A * Math.exp(-q / 150) * Math.cos(2 * Math.PI * q / 330), sx = 1 + k, sy = 1 / sx, r = rb + (r0 - rb) * out(tau / 400);
+      const tau = Math.max(0, tp - hold), q = Math.floor(tau / D2) * D2; // on twos to the end
+      const k = A * Math.exp(-q / 150) * Math.cos(2 * Math.PI * q / 330), sx = 1 + k, sy = 1 / sx, r = rb + (r0 - rb) * out(q / 400);
       const lift = q < 300 ? rb * .75 * (A / .85) * Math.sin(Math.PI * q / 300) * Math.exp(-q / 220) : 0, cy = gy - r * sy - lift;
-      el(M, 0, 0, 0); el(N, 0, 0, 0); el(B, cy, r * sx, r * sy); shine(cy, r, sx, sy, gloss(sy, sh * .85 * (1 - io((tp - 250) / 400)))); zone(gy - rb * 6, gy + rb * 3);
+      el(M, 0, 0, 0); el(N, 0, 0, 0); el(B, cy, r * sx, r * sy); shine(cy, r, sx, sy, gloss(sy, sh * .85 * (1 - io((q + hold - 250) / 400)))); zone(gy - rb * 6, gy + rb * 3);
     }
   };
 }
