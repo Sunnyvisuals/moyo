@@ -143,9 +143,9 @@ async function drop(blue) {
 }
 
 /* The drop, drawn the way animators draw one. It gathers under the top of the screen and swells, slowly; its neck thins and snaps (fast, as water
-   does), the rest springs back up and the tail goes into the drop, which wobbles once free, rounds up, then is drawn out by its speed; one smear just
-   before the line. On the line it flattens hard and holds (on twos, like a drawing), jumps back up drawn out the other way, and settles round, losing
-   its shine: it is the point. Shapes in a "goo" filter (blur, then a hard edge on the alpha) merge like water when they touch and part with a neck. */
+   does), the rest springs back up and the tail goes into the drop, which wobbles once free: all of it on twos, each drawing held for two frames of
+   film. Then it rounds up and is drawn out by its speed; one smear just before the line. On the line it flattens hard and holds, on twos again,
+   jumps back up drawn out the other way, and settles round, losing its shine: it is the point. Shapes in a "goo" filter (blur, then a hard edge on the alpha) merge like water when they touch and part with a neck. */
 function goutte(layer, P, r0, KL, BG) {
   const NS = 'http://www.w3.org/2000/svg', rb = r0 * 1.12, gy = P[1] + r0, x0 = P[0], X = x0 - rb * 7, Wc = rb * 14, Hc = gy + rb * 7;
   const sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', `${X.toFixed(2)} 0 ${Wc.toFixed(2)} ${Hc.toFixed(2)}`); layer.appendChild(sv); // a column around the drop, on its own layer: the wave under it is not painted again
@@ -166,6 +166,7 @@ function goutte(layer, P, r0, KL, BG) {
     T,
     still() { el(M, 0, 0, 0); el(N, 0, 0, 0); el(B, P[1], r0, r0); zone(gy - rb * 6, gy + rb * 3); },
     fall(t) {
+      if (t < T2 + 240) t = Math.floor(t / 83) * 83; // on twos, like the landing, until it is free of the top
       if (t < T2) { // hanging: a thin film spreads under the top, the drop swells under it, swaying a little; then it sinks, its neck draws out and thins, (t - tc)^2/3, and snaps
         const p = cl(t / T1), q = cl((t - T1) / (T2 - T1)), r = rb * (.3 + .7 * io(p)), y = rb * (.45 + .95 * Math.pow(p, 1.4)) + rb * Math.pow(q, 1.6);
         const w = 1 + .05 * Math.sin(p * 13.8) * p, sy = (1 + .16 * q) / w, sx = 1 / sy, top = rb * .2, bot = y - r * sy * .3;
