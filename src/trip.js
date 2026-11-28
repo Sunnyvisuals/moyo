@@ -1,26 +1,24 @@
-/* From "Studio." to "Équipe.": as the page goes down, the point of the studio lets go, falls on the sentence under it and bumps on its letters
-   (each letter is an obstacle as tall as it is drawn: capitals, d, l, t and accents stand out, a, e, o are low, g, p, y go under the line),
-   rolls to the space between two words and goes through, line after line, then falls to its place after "Équipe" and lands there, on twos,
-   like the drop of the first screen. The fall is worked out once for the layout (gravity, bounces, a drift toward the nearest space), then the
-   scroll plays it, both ways. One point at a time: the one in flight, or a title's. Nothing with reduced motion. */
+/* From "Studio." to "Équipe.": once, when "Équipe" comes on screen, the point of the studio lets go, falls on the sentence under it and bumps on
+   its letters (each letter is an obstacle as tall as it is drawn: capitals, d, l, t and accents stand out, a, e, o are low, g, p, y go under the
+   line), rolls to the space between two words and goes through, line after line, then falls to its place after "Équipe" and lands. Drawn on
+   twos, like the drop of the first screen: each drawing held for two frames of film. The fall is worked out for the layout of the moment
+   (gravity, bounces, a drift toward the nearest space) and lives in the page: the scroll does not drive it. One point at a time; the studio gets
+   its point back the next time its title comes. Nothing with reduced motion. */
 (() => {
 'use strict';
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 const studio = document.getElementById('studio'), team = document.getElementById('equipe');
-const a = studio && studio.querySelector('h2 .dot b'), z = team && team.querySelector('h2 .dot b');
-if (!a || !z) return;
-const LEAVE = .38, LAND = .58; // where the point is on screen as it lets go, and as it lands (share of the height)
+const a = studio && studio.querySelector('h2 .dot b'), z = team && team.querySelector('h2 .dot b'), head = team && team.querySelector('h2');
+if (!a || !z || !head) return;
+const D2 = 83, PACE = 1.35, DT = 2.5; // a drawing held for two frames of film; the fall a little faster than life; ms of fall per step of plan()
 const clamp = (v, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
 const st = document.createElement('style');
-st.textContent = '.trip{position:fixed;left:0;top:0;z-index:80;border-radius:50%;background:var(--klein);pointer-events:none;visibility:hidden;transform-origin:50% 50%;will-change:transform}';
+st.textContent = '.trip{position:absolute;left:0;top:0;z-index:80;border-radius:50%;background:var(--klein);pointer-events:none;visibility:hidden;transform-origin:50% 50%;will-change:transform}';
 document.head.appendChild(st);
 const ball = document.createElement('i'); ball.className = 'trip'; ball.setAttribute('aria-hidden', 'true'); document.body.appendChild(ball);
 
-/* the point of "Équipe" does not fall by itself any more: it is the one of the studio that comes. The one of "Studio" falls in once, as the
-   other titles' do, then stays (stage.js leaves the points marked data-trip alone). */
+// the point of "Équipe" does not fall in by itself: it is the one of the studio that comes (stage.js leaves the points marked data-trip alone)
 z.parentElement.setAttribute('data-trip', ''); z.style.transition = 'none'; z.parentElement.classList.add('in'); z.style.visibility = 'hidden';
-new MutationObserver((m, o) => { if (!a.parentElement.classList.contains('in')) return; o.disconnect(); setTimeout(() => { a.parentElement.setAttribute('data-trip', ''); a.parentElement.classList.add('in'); }, 1400); })
-  .observe(a.parentElement, { attributes: true, attributeFilter: ['class'] });
 
 /* where each letter is drawn, in the page: from the top of its ink to the bottom (in em, from the baseline) */
 const ink = ch => {
@@ -58,7 +56,7 @@ const centre = b => { const r = b.getBoundingClientRect(), t = getComputedStyle(
    top of a letter a push toward the nearest space of its line wide enough to let it through */
 function plan() {
   const S = centre(a), E = centre(z), r = S[2], obs = letters(); if (!obs.length || E[1] <= S[1]) return null;
-  const fs = parseFloat(getComputedStyle(studio.querySelector('.say') || studio).fontSize), g = 46 * fs, top = 14 * fs, rc = r * .85, dt = 1 / 400, e = .36; // scaled on the sentence it falls through
+  const fs = parseFloat(getComputedStyle(studio.querySelector('.say') || studio).fontSize), g = 46 * fs, top = 14 * fs, rc = r * .85, dt = DT / 1000, e = .36; // scaled on the sentence it falls through
   const sc = getComputedStyle(studio), sr = studio.getBoundingClientRect(), L = sr.left + parseFloat(sc.paddingLeft) - r, R = sr.right - parseFloat(sc.paddingRight) + r; // it may go into the margins, not out of the page
   const rows = []; for (const o of obs) { let w = rows.find(q => Math.abs(q.base - o.base) < o.fs * .3); if (!w) rows.push(w = { base: o.base, list: [], t: o.t, b: o.b }); w.list.push(o); w.t = Math.min(w.t, o.t); w.b = Math.max(w.b, o.b); o.row = w; }
   for (const w of rows) { // the openings of a line: the spaces wide enough, and its two ends where there is room beside it
@@ -94,7 +92,7 @@ function plan() {
     keep();
   }
   // under the last line: it falls to the place of the point of "Équipe", drifting to it, and arrives there exactly
-  const x0 = x, v0 = vx, y0 = y; let n = 0; const ys = [], vys = [];
+  const x0 = x, v0 = vx; let n = 0; const ys = [], vys = [];
   while (y < E[1] && n < 8000) { vy = Math.min(top, Math.max(vy, 0) + g * dt); y = Math.min(E[1], y + vy * dt); ys.push(y); vys.push(vy); n++; }
   const T = n * dt || dt;
   for (let i = 0; i < n; i++) {
@@ -102,44 +100,37 @@ function plan() {
     imp *= Math.exp(-dt / .045); X.push(x); Y.push(ys[i]); VX.push(((6 * s2 - 6 * s) * x0 + (3 * s2 - 4 * s + 1) * v0 * T + (6 * s - 6 * s2) * E[0]) / T); VY.push(vys[i]); HIT.push(imp);
   }
   X.push(E[0]); Y.push(E[1]); VX.push(0); VY.push(top); HIT.push(0);
-  /* how much scroll each step takes: what it goes down, and a little for the time it spends bouncing, so that a bounce is seen without the point
-     leaving the screen */
-  const C = new Float64Array(Y.length); for (let i = 1; i < Y.length; i++) C[i] = C[i - 1] + Math.max(0, Y[i] - Y[i - 1]) + top * .35 * dt;
-  const H = innerHeight, from = S[1] - LEAVE * H, to = Math.max(from + 1, E[1] - LAND * H), N = Y.length - 1, SC = new Float64Array(Y.length);
-  // the scroll at which each step is shown, kept so that the point stays between a fifth and the bottom of the screen, always forward
-  for (let i = 0; i <= N; i++) { const s = from + (to - from) * C[i] / C[N]; SC[i] = Math.max(i ? SC[i - 1] : from, Y[i] - .85 * H, Math.min(s, Y[i] - .18 * H)); }
-  SC[0] = from; SC[N] = Math.max(SC[N - 1], to);
-  return { X, Y, VX, VY, HIT, SC, r, top };
+  return { X, Y, VX, VY, HIT, r, top };
 }
 
-let path = null, raf = 0, landed = false;
-const show = (b, on) => { const v = on ? '' : 'hidden'; if (b.style.visibility !== v) b.style.visibility = v; };
-function draw() {
-  raf = 0; if (!path) return;
-  const P = path, N = P.SC.length - 1, s = scrollY, p = s <= P.SC[0] ? 0 : s >= P.SC[N] ? 1 : .5;
-  if (p <= 0 || p >= 1) {
-    ball.style.visibility = 'hidden'; show(a, p <= 0); show(z, p >= 1);
-    if (p >= 1 && !landed) { landed = true; z.animate([{ scale: '1.55 .5', translate: '0 .045em' }, { scale: '.78 1.3', translate: '0 -.14em' }, { scale: '1.1 .92', translate: '0 0' }, { scale: '1 1', translate: '0 0' }], { duration: 580, easing: 'steps(7, end)' }); }
-    if (p <= 0) landed = false;
-    return;
-  }
-  if (landed) { landed = false; z.getAnimations().forEach(x => x.cancel()); }
-  show(a, false); show(z, false);
-  let lo = 0, hi = N; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (P.SC[m] < s) lo = m; else hi = m; }
-  const f = P.SC[hi] > P.SC[lo] ? (s - P.SC[lo]) / (P.SC[hi] - P.SC[lo]) : 0, at = k => k[lo] + (k[hi] - k[lo]) * f;
-  const x = at(P.X), y = at(P.Y), vx = at(P.VX), vy = at(P.VY), hit = Math.max(P.HIT[lo], P.HIT[hi]), r = P.r;
-  let sx = 1, sy = 1, an = 0;
-  if (hit > .04) { sx = 1 + .38 * hit; sy = 1 - .32 * hit; } // it hits a letter: flattened for a moment
-  else { const s = 1 + Math.min(.4, Math.hypot(vx, vy) / (P.top * 2.4)); sy = s; sx = 1 / s; an = Math.atan2(vy, vx) - Math.PI / 2; } // drawn out by its speed
-  ball.style.width = ball.style.height = r * 2 + 'px';
-  ball.style.transform = `translate3d(${(x - r).toFixed(2)}px,${(y - scrollY - r).toFixed(2)}px,0) rotate(${an.toFixed(3)}rad) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
-  ball.style.visibility = 'visible';
+/* one drawing: drawn out by its speed, or flattened when it has just hit a letter (a hit between two drawings is still seen) */
+function pose(P, i, j) {
+  let hit = 0; for (let k = i + 1; k <= j; k++) hit = Math.max(hit, P.HIT[k]);
+  const r = P.r, s = 1 + Math.min(.4, Math.hypot(P.VX[j], P.VY[j]) / (P.top * 2.4)); let sx = 1 / s, sy = s, an = Math.atan2(P.VY[j], P.VX[j]) - Math.PI / 2;
+  if (hit > .04) { sx = 1 + .38 * hit; sy = 1 - .32 * hit; an = 0; }
+  ball.style.transform = `translate3d(${(P.X[j] - r).toFixed(2)}px,${(P.Y[j] - r).toFixed(2)}px,0) rotate(${an.toFixed(3)}rad) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
 }
-const kick = () => { if (!raf) raf = requestAnimationFrame(draw); };
-let tm = 0; const later = () => { clearTimeout(tm); tm = setTimeout(() => { path = plan(); kick(); }, 150); };
-addEventListener('scroll', kick, { passive: true }); addEventListener('resize', later);
-new ResizeObserver(later).observe(document.body); // anything that moves above moves both points
-new MutationObserver(later).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
-const say = studio.querySelector('.say'); if (say) new MutationObserver(later).observe(say, { childList: true });
-document.fonts.ready.then(later); later();
+let busy = false, done = false;
+function land() {
+  busy = false; done = true; ball.style.visibility = 'hidden'; z.style.visibility = '';
+  z.animate([{ scale: '1.55 .5', translate: '0 .045em' }, { scale: '.78 1.3', translate: '0 -.14em' }, { scale: '1.1 .92', translate: '0 0' }, { scale: '1 1', translate: '0 0' }], { duration: 580, easing: 'steps(7, end)' });
+  a.style.visibility = ''; a.parentElement.classList.remove('in'); // the studio gets a point again the next time its title comes (stage.js lets it fall in)
+}
+function play() {
+  if (busy || done) return;
+  const P = plan(); if (!P) { done = true; z.style.visibility = ''; return; }
+  const N = P.X.length - 1, pace = Math.max(PACE, N * DT / 4200); busy = true; // a long way (a phone, many lines) goes faster: never much more than four seconds
+  ball.style.width = ball.style.height = P.r * 2 + 'px'; pose(P, 0, 0); a.style.visibility = 'hidden'; ball.style.visibility = 'visible';
+  const t0 = performance.now(); let last = 0;
+  const frame = now => {
+    if (!busy) return;
+    const j = Math.min(N, Math.floor(Math.floor((now - t0) / D2) * D2 * pace / DT)); // on twos
+    if (j !== last) { pose(P, last, j); last = j; }
+    if (j >= N) land(); else requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+// once, when "Équipe" comes on screen; a change of size while it falls ends it in place
+new IntersectionObserver((es, o) => { if (es.some(x => x.isIntersecting)) { o.disconnect(); document.fonts.ready.then(play); } }, { rootMargin: '0px 0px -12% 0px' }).observe(head);
+addEventListener('resize', () => { if (busy) land(); });
 })();
